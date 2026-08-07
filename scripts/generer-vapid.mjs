@@ -8,6 +8,12 @@
  *  — la clé PUBLIQUE, à mettre dans la variable de build VITE_CLE_VAPID ;
  *  — la clé PRIVÉE au format JWK, à mettre dans le secret Cloudflare VAPID_JWK.
  *
+ * Avec --json, sort une seule ligne { "publique": "…", "jwk": {…} } et rien
+ * d'autre. C'est ce que consomme installer.sh : extraire les clés en découpant
+ * l'affichage décoré ci-dessous s'était révélé fragile — un séparateur avait été
+ * pris pour la clé publique, et la variable GitHub s'en était retrouvée remplie
+ * de tirets sans que rien ne le signale.
+ *
  * La clé privée ne doit jamais être commitée ni quitter le Worker.
  */
 import { webcrypto } from 'node:crypto'
@@ -35,6 +41,11 @@ const jwkComplet = {
   x: publiqueJwk.x,
   y: publiqueJwk.y,
   key_ops: ['sign'],
+}
+
+if (process.argv.includes('--json')) {
+  console.log(JSON.stringify({ publique: clePublique, jwk: jwkComplet }))
+  process.exit(0)
 }
 
 console.log('\n──────────────────────────────────────────────────────────────')

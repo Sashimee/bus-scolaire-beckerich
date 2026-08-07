@@ -9,7 +9,7 @@ compatibility_flags = ["nodejs_compat"]
 # puis reporter l'identifiant renvoyé ci-dessous.
 [[kv_namespaces]]
 binding = "ABONNEMENTS"
-id = "à-remplacer-après-création"
+id = "d53d925456534d2491d7632af5ca0c55"
 
 [vars]
 # Seules ces origines peuvent recevoir un jeton OAuth en retour.

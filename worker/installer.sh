@@ -22,8 +22,16 @@ if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
   read -rp "Account ID : " CLOUDFLARE_ACCOUNT_ID
   export CLOUDFLARE_ACCOUNT_ID
 fi
-read -rp "Sous-domaine workers.dev [alex-baskewitsch] : " SOUS_DOMAINE
-SOUS_DOMAINE="${SOUS_DOMAINE:-alex-baskewitsch}"
+echo "Le sous-domaine seul, sans « .workers.dev » — par exemple « bus-beckerich »."
+read -rp "Sous-domaine workers.dev : " SOUS_DOMAINE
+# Coller l'adresse complète est le réflexe naturel : on retire le suffixe et un
+# éventuel https:// plutôt que de fabriquer un « …workers.dev.workers.dev ».
+SOUS_DOMAINE="${SOUS_DOMAINE#https://}"
+SOUS_DOMAINE="${SOUS_DOMAINE%/}"
+SOUS_DOMAINE="${SOUS_DOMAINE%.workers.dev}"
+if [ -z "$SOUS_DOMAINE" ]; then
+  alerte "Sous-domaine vide."; exit 1
+fi
 URL_WORKER="https://bus-beckerich.${SOUS_DOMAINE}.workers.dev"
 vert "Le Worker sera joignable sur : $URL_WORKER"
 
@@ -93,10 +101,12 @@ echo
 gras "── 4. Clés VAPID ───────────────────────────────────────────────────"
 # Les clés ne transitent pas par l'affichage : la privée part directement dans le
 # secret Cloudflare, la publique dans une variable de dépôt GitHub.
-VAPID="$(node ../scripts/generer-vapid.mjs)"
-CLE_PUBLIQUE="$(printf '%s' "$VAPID" | grep -A1 'VITE_CLE_VAPID' | tail -1 | tr -d ' ')"
-JWK_PRIVE="$(printf '%s' "$VAPID" | grep '^{' | head -1)"
-if [ -z "$CLE_PUBLIQUE" ] || [ -z "$JWK_PRIVE" ]; then
+VAPID="$(node ../scripts/generer-vapid.mjs --json)"
+CLE_PUBLIQUE="$(printf '%s' "$VAPID" | node -e 'let e="";process.stdin.on("data",c=>e+=c).on("end",()=>process.stdout.write(JSON.parse(e).publique))')"
+JWK_PRIVE="$(printf '%s' "$VAPID" | node -e 'let e="";process.stdin.on("data",c=>e+=c).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(e).jwk)))')"
+# La clé publique est un base64url de 87 caractères. Le vérifier ici plutôt que
+# de découvrir six mois plus tard qu'aucune notification n'arrive.
+if ! printf '%s' "$CLE_PUBLIQUE" | grep -qE '^[A-Za-z0-9_-]{80,90}$' || [ -z "$JWK_PRIVE" ]; then
   alerte "Génération des clés incomplète. Lance « node ../scripts/generer-vapid.mjs » à la main."
   exit 1
 fi

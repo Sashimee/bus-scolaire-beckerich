@@ -168,6 +168,12 @@ export CLOUDFLARE_API_TOKEN='le-jeton'
 Le jeton reste dans ton terminal : il n'est ni affiché, ni écrit dans le dépôt.
 Ferme la session ou fais `unset CLOUDFLARE_API_TOKEN` quand tu as fini.
 
+**Si les notifications ne partent pas**, la cause la plus probable est une paire de
+clés VAPID désaccordée — la clé publique du site ne correspondant plus à la clé privée
+du Worker. `./reparer-vapid.sh` régénère la paire et la redépose des deux côtés, puis
+relance le déploiement. Les appareils déjà abonnés doivent alors réactiver les
+notifications.
+
 Il enchaîne tout — dépendances, connexion Cloudflare, création de l'espace de
 stockage, génération des clés, dépôt des quatre secrets, déploiement, déclaration des
 variables côté GitHub, puis vérification — en s'arrêtant aux deux seuls moments qui
@@ -206,7 +212,7 @@ Sur [github.com/settings/developers](https://github.com/settings/developers) →
 *New OAuth App* :
 
 - **Homepage URL** : `https://sashimee.github.io/bus-scolaire-beckerich/`
-- **Authorization callback URL** : `https://bus-beckerich.<ton-sous-domaine>.workers.dev/auth/callback`
+- **Authorization callback URL** : `https://bus-beckerich.abadev.workers.dev/auth/callback`
 
 Noter le *Client ID* et générer un *Client secret*.
 
@@ -227,7 +233,7 @@ npx wrangler deploy
 Vérifier ensuite :
 
 ```bash
-curl https://bus-beckerich.<ton-sous-domaine>.workers.dev/sante
+curl https://bus-beckerich.abadev.workers.dev/sante
 # {"ok":true,"oauth":true,"push":true,"origines":"https://sashimee.github.io,..."}
 ```
 
@@ -239,7 +245,7 @@ Dans `Settings → Secrets and variables → Actions` :
 
 | Type | Nom | Valeur |
 | --- | --- | --- |
-| Variable | `URL_WORKER` | `https://bus-beckerich.<ton-sous-domaine>.workers.dev` |
+| Variable | `URL_WORKER` | `https://bus-beckerich.abadev.workers.dev` |
 | Variable | `CLE_VAPID` | la clé publique de l'étape a |
 | Secret | `SECRET_NOTIFICATION` | la même chaîne aléatoire qu'en c |
 
