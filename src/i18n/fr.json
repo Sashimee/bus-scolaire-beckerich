@@ -276,7 +276,7 @@
     "incertitudesTitre": "Certaines règles du plan restent ambiguës",
     "incertitudesCorps": "Là où le document officiel ne tranche pas, le site affiche son hypothèse et le signale, plutôt que de présenter une réponse comme certaine.",
     "donneesTitre": "Vos données restent chez vous",
-    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Seule exception : si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez."
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Les analytics Goat Counter sont activés via le script installé. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez."
   },
   "independance": {
     "titre": "Site indépendant",

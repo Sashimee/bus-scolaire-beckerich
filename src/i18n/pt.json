@@ -276,7 +276,7 @@
     "incertitudesTitre": "Algumas regras do plano permanecem ambíguas",
     "incertitudesCorps": "Onde o documento oficial não decide, o site mostra a sua hipótese e assinala-a, em vez de apresentar uma resposta como certa.",
     "donneesTitre": "Os seus dados ficam consigo",
-    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. Uma ligação de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Única exceção: se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar."
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. As análises Goat Counter são ativadas via o script instalado. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar."
   },
   "independance": {
     "titre": "Site independente",

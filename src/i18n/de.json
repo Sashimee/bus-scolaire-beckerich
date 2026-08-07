@@ -276,7 +276,7 @@
     "incertitudesTitre": "Manche Regeln des Plans bleiben mehrdeutig",
     "incertitudesCorps": "Wo das offizielle Dokument keine Klarheit schafft, zeigt die Website ihre Annahme und weist darauf hin, statt eine Antwort als sicher darzustellen.",
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
-    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Einzige Ausnahme: Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht."
+    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Goat Counter Analysen werden über das installierte Skript aktiviert. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht."
   },
   "independance": {
     "titre": "Unabhängige Website",

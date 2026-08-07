@@ -276,7 +276,7 @@
     "incertitudesTitre": "Some rules in the plan remain ambiguous",
     "incertitudesCorps": "Where the official document does not decide, the site shows its assumption and says so, rather than presenting an answer as certain.",
     "donneesTitre": "Your data stays with you",
-    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. A share link carries the data in its fragment, which the server never receives. One exception: if you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off."
+    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. Goat Counter analytics are enabled via the installed script. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off."
   },
   "independance": {
     "titre": "Independent site",
