@@ -1,0 +1,31 @@
+{
+  "$commentaire": "Vacances scolaires et jours fériés luxembourgeois. Les dates sont INCLUSIVES aux deux bornes. Si la date consultée sort des années listées, l'application ne prétend PAS savoir s'il y a école : elle le dit explicitement plutôt que d'induire un parent en erreur. À compléter chaque année, voir DONNEES.md.",
+
+  "source": {
+    "url": "https://men.public.lu/fr/vacances-scolaires.html",
+    "intitule": "Ministère de l'Éducation nationale, de l'Enfance et de la Jeunesse",
+    "dateReleve": "2026-08-07"
+  },
+
+  "annees": [
+    {
+      "anneeScolaire": "2026/2027",
+      "debut": "2026-09-15",
+      "fin": "2027-07-15",
+      "vacances": [
+        { "id": "toussaint", "du": "2026-10-31", "au": "2026-11-08" },
+        { "id": "noel", "du": "2026-12-19", "au": "2027-01-03" },
+        { "id": "carnaval", "du": "2027-02-06", "au": "2027-02-14" },
+        { "id": "paques", "du": "2027-03-27", "au": "2027-04-11" },
+        { "id": "pentecote", "du": "2027-05-29", "au": "2027-06-06" },
+        { "id": "ete", "du": "2027-07-16", "au": "2027-09-14" }
+      ],
+      "feries": [
+        { "id": "ascension", "date": "2027-05-06" },
+        { "id": "lundi-pentecote", "date": "2027-05-17" },
+        { "id": "fete-nationale", "date": "2027-06-23" }
+      ],
+      "$noteFeries": "Seuls les jours fériés qui tombent un jour de classe hors vacances sont listés : le 1er mai et le 9 mai 2027 tombent un week-end, la Toussaint, Noël, le Nouvel An, le lundi de Pâques et l'Assomption tombent pendant des vacances."
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "$commentaire": "Arrêts du bus scolaire. Coordonnées WGS84 [latitude, longitude]. Le champ `precision` est affiché dans l'application : « verifiee » = arrêt de bus nommé dans OpenStreetMap ou adresse exacte ; « approximative » = centre de rue ou de village, à affiner. Voir DONNEES.md pour corriger une coordonnée.",
+
+  "arrets": [
+    {
+      "id": "huttange",
+      "village": "Huttange",
+      "lieuCle": "village",
+      "coord": [49.735459, 5.897991],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Huttange, Hitten »"
+    },
+    {
+      "id": "noerdange-gare",
+      "village": "Noerdange",
+      "lieuCle": "gare",
+      "coord": [49.742042, 5.922381],
+      "precision": "verifiee",
+      "source": "OSM · « Ancienne Gare de Noerdange », 1 Op der Gare"
+    },
+    {
+      "id": "noerdange-ecole",
+      "village": "Noerdange",
+      "lieuCle": "ecole",
+      "coord": [49.74094, 5.924744],
+      "precision": "verifiee",
+      "source": "OSM · « Schoul Näerden », 13 Schweecherdaulerstrooss"
+    },
+    {
+      "id": "schweich-peiffer",
+      "village": "Schweich",
+      "lieuNom": "Peiffer",
+      "coord": [49.720887, 5.921397],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Schweich, Peiffer »"
+    },
+    {
+      "id": "schweich-hoh",
+      "village": "Schweich",
+      "lieuNom": "Hoh",
+      "coord": [49.723733, 5.929076],
+      "precision": "approximative",
+      "source": "OSM · rue « An der Hoh » (centre de rue) ; position cohérente avec le marqueur 6 des cartes du plan"
+    },
+    {
+      "id": "elvange-ecole",
+      "village": "Elvange",
+      "lieuCle": "ecole",
+      "coord": [49.724458, 5.917374],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Elvange/Beckerich, Schoul »"
+    },
+    {
+      "id": "hovelange-bitzesch",
+      "village": "Hovelange",
+      "lieuNom": "Bitzesch",
+      "coord": [49.722723, 5.910744],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Hovelange, Bei Bitzesch »"
+    },
+    {
+      "id": "hovelange-kneppchen",
+      "village": "Hovelange",
+      "lieuNom": "Kneppchen",
+      "coord": [49.722833, 5.904877],
+      "precision": "approximative",
+      "source": "OSM · voie « Kneppchen » (centre de rue)"
+    },
+    {
+      "id": "hovelange-op-der-halte",
+      "village": "Hovelange",
+      "lieuNom": "Op der Halte",
+      "aliases": ["Sportshal/Op der Halte", "Op der Halte/Sportshal"],
+      "coord": [49.725, 5.900091],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Hovelange, Halt »"
+    },
+    {
+      "id": "beckerich-fraiheetsbam",
+      "village": "Beckerich",
+      "lieuNom": "Fräiheetsbam",
+      "coord": [49.727974, 5.891021],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Beckerich, Fräiheetsbam »"
+    },
+    {
+      "id": "beckerich-ecole",
+      "village": "Beckerich",
+      "lieuCle": "ecole",
+      "aliases": ["École/Dillendapp"],
+      "coord": [49.731065, 5.882671],
+      "precision": "approximative",
+      "source": "Nominatim · Dikrecherstrooss (centre de rue) ; l'école est au n° 8"
+    },
+    {
+      "id": "beckerich-dillendapp",
+      "village": "Beckerich",
+      "lieuNom": "Dillendapp",
+      "coord": [49.731842, 5.882778],
+      "precision": "verifiee",
+      "source": "OSM · maison relais « Dillendapp », 3A Dikrecherstrooss"
+    },
+    {
+      "id": "beckerich-leewelerwee",
+      "village": "Beckerich",
+      "lieuNom": "Leewelerwee",
+      "aliases": ["Liewelerwee"],
+      "coord": [49.732556, 5.869434],
+      "precision": "approximative",
+      "source": "Nominatim · voie « Leewelerwee » (centre de rue)"
+    },
+    {
+      "id": "beckerich-village",
+      "village": "Beckerich",
+      "lieuCle": "village",
+      "coord": [49.729275, 5.885215],
+      "precision": "approximative",
+      "source": "Centre du village ; le plan officiel ne précise pas l'arrêt de ce départ de 13:25"
+    },
+    {
+      "id": "levelange",
+      "village": "Levelange",
+      "lieuCle": "village",
+      "coord": [49.738889, 5.855657],
+      "precision": "approximative",
+      "source": "Nominatim · centre du village ; deux arrêts OSM existent à Levelange (Ellerstroos, Kalek), le plan ne nomme pas celui utilisé"
+    },
+    {
+      "id": "oberpallen-ecole",
+      "village": "Oberpallen",
+      "lieuCle": "ecole",
+      "coord": [49.730741, 5.840259],
+      "precision": "verifiee",
+      "source": "Nominatim · 28 Kierchewee (adresse exacte de l'école préscolaire)"
+    },
+    {
+      "id": "oberpallen-pont",
+      "village": "Oberpallen",
+      "lieuCle": "pont",
+      "coord": [49.729895, 5.842476],
+      "precision": "verifiee",
+      "source": "OSM · arrêt « Oberpallen, Bréck » (Bréck = pont)"
+    }
+  ]
+}

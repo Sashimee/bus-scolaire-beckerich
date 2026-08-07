@@ -1,0 +1,243 @@
+/**
+ * Calendrier scolaire et export vers les agendas.
+ *
+ * Deux responsabilités : savoir s'il y a école un jour donné, et produire un fichier
+ * `.ics` fidèle — c'est-à-dire qui n'annonce pas un bus pendant les vacances.
+ */
+import { plan, vacances, type AnneeVacances } from './donnees'
+import { semaineEnfant, type ContexteEnfant } from './plan'
+import type { Jour, Trajet } from './types'
+import { JOURS } from './types'
+
+/** Date locale au format AAAA-MM-JJ, sans décalage de fuseau. */
+export function isoDate(d: Date): string {
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const jj = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mm}-${jj}`
+}
+
+/**
+ * Lit une date « AAAA-MM-JJ » comme une date LOCALE.
+ *
+ * `new Date('2026-09-15')` serait interprété en UTC : à l'ouest de Greenwich, la
+ * rentrée tomberait la veille et tout le calendrier serait décalé d'un jour.
+ */
+export function depuisIso(iso: string): Date {
+  const [a, m, j] = iso.split('-').map(Number)
+  return new Date(a, m - 1, j)
+}
+
+/** Le jour de classe correspondant à une date, ou `null` le week-end. */
+export function jourDeSemaine(d: Date): Jour | null {
+  const i = d.getDay()
+  return i >= 1 && i <= 5 ? JOURS[i - 1] : null
+}
+
+/** L'année scolaire couvrant cette date, si elle est connue. */
+export function anneePour(d: Date): AnneeVacances | null {
+  const iso = isoDate(d)
+  return vacances.annees.find((a) => iso >= a.debut && iso <= a.fin) ?? null
+}
+
+export type RaisonSansEcole = 'weekend' | 'vacances' | 'ferie' | 'annee-inconnue'
+
+export interface EtatJour {
+  ecole: boolean
+  raison?: RaisonSansEcole
+  /** Identifiant de la période de vacances ou du jour férié, pour l'affichage. */
+  id?: string
+}
+
+/**
+ * Y a-t-il école ce jour-là ?
+ *
+ * Si la date sort des années scolaires connues, l'application le dit franchement
+ * (`annee-inconnue`) plutôt que d'affirmer une réponse qu'elle n'a pas.
+ */
+export function etatDuJour(d: Date): EtatJour {
+  if (!jourDeSemaine(d)) return { ecole: false, raison: 'weekend' }
+
+  const annee = anneePour(d)
+  if (!annee) return { ecole: false, raison: 'annee-inconnue' }
+
+  const iso = isoDate(d)
+  const conge = annee.vacances.find((v) => iso >= v.du && iso <= v.au)
+  if (conge) return { ecole: false, raison: 'vacances', id: conge.id }
+
+  const ferie = annee.feries.find((f) => f.date === iso)
+  if (ferie) return { ecole: false, raison: 'ferie', id: ferie.id }
+
+  return { ecole: true }
+}
+
+/** Toutes les dates sans école d'une année scolaire, jour de semaine uniquement. */
+function datesSansEcole(annee: AnneeVacances): Date[] {
+  const out: Date[] = []
+  const fin = depuisIso(annee.fin)
+  for (const d = depuisIso(annee.debut); d <= fin; d.setDate(d.getDate() + 1)) {
+    if (!jourDeSemaine(d)) continue
+    const iso = isoDate(d)
+    const enConge = annee.vacances.some((v) => iso >= v.du && iso <= v.au)
+    const ferie = annee.feries.some((f) => f.date === iso)
+    if (enConge || ferie) out.push(new Date(d))
+  }
+  return out
+}
+
+const JOUR_ICS: Record<Jour, string> = {
+  lundi: 'MO',
+  mardi: 'TU',
+  mercredi: 'WE',
+  jeudi: 'TH',
+  vendredi: 'FR',
+}
+
+function horodatage(d: Date, heure: string): string {
+  const [h, m] = heure.split(':')
+  return `${isoDate(d).replace(/-/g, '')}T${h}${m}00`
+}
+
+/** Première date à partir de `depuis` tombant l'un des jours demandés. */
+function premiereOccurrence(depuis: string, jours: Jour[]): Date {
+  const d = depuisIso(depuis)
+  for (let i = 0; i < 14; i++) {
+    const j = jourDeSemaine(d)
+    if (j && jours.includes(j)) return d
+    d.setDate(d.getDate() + 1)
+  }
+  return d
+}
+
+/** Échappe les caractères réservés du format iCalendar. */
+function echapper(texte: string): string {
+  return texte.replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n')
+}
+
+/** Replie les lignes à 75 octets, comme l'exige la RFC 5545. */
+function plier(ligne: string): string {
+  if (ligne.length <= 75) return ligne
+  const morceaux: string[] = [ligne.slice(0, 75)]
+  for (let i = 75; i < ligne.length; i += 74) morceaux.push(' ' + ligne.slice(i, i + 74))
+  return morceaux.join('\r\n')
+}
+
+export interface OptionsIcs {
+  /** Libellé de chaque type de trajet, fourni par la couche i18n. */
+  libelleTrajet: (t: Trajet) => string
+  /** Nom de l'arrêt, fourni par la couche i18n. */
+  nomArret: (idArret: string) => string
+  /** Minutes de marche jusqu'à l'arrêt, pour placer un rappel utile. */
+  minutesMarche: number
+}
+
+/**
+ * Génère un `.ics` pour un enfant.
+ *
+ * Les trajets varient d'un jour à l'autre : on n'émet donc pas un événement
+ * hebdomadaire unique, mais un événement par trajet distinct, avec un `RRULE ... BYDAY`
+ * limité aux jours concernés. Chaque série est bornée à l'année scolaire et exclut,
+ * via `EXDATE`, chaque jour de vacances et chaque férié — sans quoi l'agenda
+ * annoncerait un bus en plein mois de février.
+ */
+export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
+  const annee = vacances.annees[0]
+  const semaine = semaineEnfant(ctx)
+
+  // Regroupe les trajets identiques (même ligne, même heure, mêmes arrêts) et note
+  // les jours où ils ont lieu.
+  const groupes = new Map<string, { trajet: Trajet; jours: Jour[] }>()
+  for (const journee of semaine) {
+    for (const t of journee.trajets) {
+      if (!t.concerneParent || !t.depart.heure) continue
+      const cle = [t.type, t.ligne.id, t.depart.heure, t.depart.arret.id, t.arrivee.arret.id].join('|')
+      const g = groupes.get(cle)
+      if (g) g.jours.push(journee.jour)
+      else groupes.set(cle, { trajet: t, jours: [journee.jour] })
+    }
+  }
+
+  const lignes: string[] = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//bus-scolaire-beckerich//FR',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    `X-WR-CALNAME:${echapper(`Bus scolaire — ${ctx.enfant.prenom}`)}`,
+  ]
+
+  const exclusions = datesSansEcole(annee)
+  const finIso = annee.fin.replace(/-/g, '') + 'T235959'
+
+  let n = 0
+  for (const { trajet, jours } of groupes.values()) {
+    const heure = trajet.depart.heure!
+    const debut = premiereOccurrence(annee.debut, jours)
+    const uid = `${ctx.enfant.id}-${trajet.type}-${n++}@bus-scolaire-beckerich`
+
+    // Les exclusions ne portent que sur les jours réellement concernés par la série.
+    const exdates = exclusions
+      .filter((d) => {
+        const j = jourDeSemaine(d)
+        return j !== null && jours.includes(j)
+      })
+      .map((d) => horodatage(d, heure))
+
+    lignes.push(
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${horodatage(new Date(), '00:00')}Z`,
+      `DTSTART:${horodatage(debut, heure)}`,
+      `DURATION:PT${Math.max(5, o.minutesMarche)}M`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${jours.map((j) => JOUR_ICS[j]).join(',')};UNTIL=${finIso}`,
+      ...(exdates.length ? [plier(`EXDATE:${exdates.join(',')}`)] : []),
+      plier(`SUMMARY:${echapper(`${ctx.enfant.prenom} — ${o.libelleTrajet(trajet)}`)}`),
+      plier(`LOCATION:${echapper(o.nomArret(trajet.depart.arret.id))}`),
+      plier(
+        `DESCRIPTION:${echapper(
+          `${trajet.ligne.nom}\n${o.nomArret(trajet.depart.arret.id)} ${heure} → ` +
+            `${o.nomArret(trajet.arrivee.arret.id)} ${trajet.arrivee.heure ?? ''}\n` +
+            `Environ ${o.minutesMarche} min de marche jusqu'à l'arrêt (estimation).\n` +
+            `Horaires non officiels — source : ${plan.source.url}`,
+        )}`,
+      ),
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      `TRIGGER:-PT${Math.max(5, o.minutesMarche + 5)}M`,
+      plier(`DESCRIPTION:${echapper(`${ctx.enfant.prenom} — départ pour l'arrêt`)}`),
+      'END:VALARM',
+      'END:VEVENT',
+    )
+  }
+
+  lignes.push('END:VCALENDAR')
+  return lignes.join('\r\n') + '\r\n'
+}
+
+/**
+ * Lien « Ajouter à Google Agenda » pour un trajet.
+ *
+ * Google gère mal les exclusions de vacances dans une URL de modèle : le `.ics`
+ * reste le format recommandé, ce lien n'est qu'un raccourci.
+ */
+export function lienGoogleAgenda(
+  ctx: ContexteEnfant,
+  trajet: Trajet,
+  jours: Jour[],
+  titre: string,
+  lieu: string,
+): string {
+  const annee = vacances.annees[0]
+  const heure = trajet.depart.heure ?? '08:00'
+  const debut = premiereOccurrence(annee.debut, jours)
+  const fin = new Date(debut)
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `${ctx.enfant.prenom} — ${titre}`,
+    dates: `${horodatage(debut, heure)}/${horodatage(fin, trajet.arrivee.heure ?? heure)}`,
+    location: lieu,
+    recur: `RRULE:FREQ=WEEKLY;BYDAY=${jours.map((j) => JOUR_ICS[j]).join(',')};UNTIL=${annee.fin.replace(/-/g, '')}`,
+    details: `${trajet.ligne.nom} — horaires non officiels, source : ${plan.source.url}`,
+  })
+  return `https://calendar.google.com/calendar/render?${params}`
+}

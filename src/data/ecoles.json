@@ -1,0 +1,84 @@
+{
+  "$commentaire": "Répartition des cycles entre les sites scolaires de la commune de Beckerich. C'est cette table qui permet à l'application de recalculer tout le plan d'un enfant quand on change son cycle. À revérifier à chaque rentrée : la commune peut redistribuer les cycles entre les bâtiments.",
+
+  "sourceRepartition": {
+    "urls": [
+      "https://www.beckerich.lu/fr/enseignement-sea-dillendapp/infrastructures-scolaires",
+      "https://kanner.beckerich.lu/"
+    ],
+    "dateReleve": "2026-08-07",
+    "anneeScolaire": "2025/2026"
+  },
+
+  "cycles": [
+    {
+      "id": "precoce",
+      "ordre": 0,
+      "site": "beckerich-precoce",
+      "arretEcole": "beckerich-ecole"
+    },
+    { "id": "c1", "ordre": 1, "site": "oberpallen", "arretEcole": "oberpallen-ecole" },
+    { "id": "c2", "ordre": 2, "site": "noerdange", "arretEcole": "noerdange-ecole" },
+    { "id": "c3", "ordre": 3, "site": "elvange", "arretEcole": "elvange-ecole" },
+    { "id": "c4", "ordre": 4, "site": "beckerich", "arretEcole": "beckerich-ecole" }
+  ],
+
+  "sites": [
+    {
+      "id": "beckerich-precoce",
+      "nom": "École précoce de Beckerich",
+      "adresse": "3, Dikrecherstrooss",
+      "codePostal": "L-8523",
+      "localite": "Beckerich",
+      "coord": [49.731842, 5.882778],
+      "precision": "approximative"
+    },
+    {
+      "id": "oberpallen",
+      "nom": "École préscolaire d'Oberpallen",
+      "adresse": "28, Kierchewee",
+      "codePostal": "L-8552",
+      "localite": "Oberpallen",
+      "coord": [49.730741, 5.840259],
+      "precision": "verifiee"
+    },
+    {
+      "id": "noerdange",
+      "nom": "École primaire de Noerdange",
+      "adresse": "13, Schweecherdaulerstrooss",
+      "codePostal": "L-8551",
+      "localite": "Noerdange",
+      "coord": [49.74094, 5.924744],
+      "precision": "verifiee"
+    },
+    {
+      "id": "elvange",
+      "nom": "École primaire d'Elvange",
+      "adresse": "76, Haaptstrooss",
+      "codePostal": "L-8533",
+      "localite": "Elvange",
+      "coord": [49.72434, 5.917371],
+      "precision": "verifiee"
+    },
+    {
+      "id": "beckerich",
+      "nom": "École primaire de Beckerich",
+      "adresse": "8, Dikrecherstrooss",
+      "codePostal": "L-8523",
+      "localite": "Beckerich",
+      "coord": [49.731065, 5.882671],
+      "precision": "approximative"
+    }
+  ],
+
+  "maisonRelais": {
+    "id": "dillendapp",
+    "nom": "Maison relais Dillendapp",
+    "adresse": "3A, Dikrecherstrooss",
+    "codePostal": "L-8523",
+    "localite": "Beckerich",
+    "coord": [49.731842, 5.882778],
+    "precision": "verifiee",
+    "arret": "beckerich-dillendapp"
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "$commentaire": "Horaires du bus scolaire de la commune de Beckerich. Ce fichier est la SEULE source des horaires : pour une nouvelle année scolaire, il suffit de le remplacer. Voir DONNEES.md.",
+
+  "anneeScolaire": "2025/2026",
+  "anneesCouvertes": ["2025/2026", "2026/2027"],
+  "valideDu": "2025-09-15",
+  "valideAu": "2027-07-15",
+
+  "source": {
+    "document": "SUEBELMOUK SPEZIAL — Rentrée scolaire 2025 | 2026, pages 12 à 16",
+    "url": "https://kanner.beckerich.lu/infos/horaires-de-bus",
+    "pdf": "plan-bus-2025-2026.pdf",
+    "dateReleve": "2026-08-07",
+    "confirmePar": "la commune de Beckerich",
+    "confirmeLe": "2026-08",
+    "confirmationOrale": true,
+    "noteConfirmation": "Confirmé par téléphone : le plan est inchangé pour l'année scolaire 2026/2027. Cette confirmation étant orale, la validité affichée reste à vérifier à chaque rentrée."
+  },
+
+  "horairesEcole": {
+    "$commentaire": "Rythme de l'école fondamentale de Beckerich. C'est lui qui détermine combien de trajets un enfant fait chaque jour.",
+    "matin": {
+      "debut": "07:55",
+      "fin": "11:45",
+      "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"]
+    },
+    "apresMidi": {
+      "debut": "14:00",
+      "fin": "15:45",
+      "jours": ["lundi", "mercredi", "vendredi"]
+    }
+  },
+
+  "incertitudes": [
+    {
+      "id": "retours-apres-midi-mardi-jeudi",
+      "portee": "retour-1.apres-midi, retour-2.apres-midi",
+      "question": "Les retours de fin d'après-midi (15:45–16:37) circulent-ils le mardi et le jeudi, jours sans cours l'après-midi, pour les enfants restés à la maison relais ? Le plan officiel ne le précise pas.",
+      "hypothese": "Circulation les seuls lundi, mercredi et vendredi, par cohérence avec la fin des cours à 15:45.",
+      "aVerifierAupres": "Commune de Beckerich / Maison relais Dillendapp"
+    }
+  ],
+
+  "notes": {
+    "$commentaire": "Textes traduits dans src/i18n/<langue>.json sous la clé notes.<id>. Ici, seuls les identifiants comptent.",
+    "huttange-c3-uniquement": {},
+    "voir-aller-3": {},
+    "huttange-retour-dillendapp-1345": {},
+    "depart-non-precise": {},
+    "vendredi-hall-sportif": {},
+    "horaire-intermediaire-non-publie": {}
+  },
+
+  "lignes": [
+    {
+      "id": "aller-1",
+      "nom": "Aller — Bus 1",
+      "direction": "vers-ecole",
+      "dessert": ["noerdange-ecole", "elvange-ecole", "beckerich-ecole", "oberpallen-ecole"],
+      "services": [
+        {
+          "id": "aller-1-matin",
+          "periode": "matin",
+          "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+          "arrets": [
+            {
+              "arret": "huttange",
+              "heure": "07:25",
+              "notes": ["huttange-c3-uniquement"],
+              "reserve": { "cycles": ["c3"] }
+            },
+            { "arret": "noerdange-gare", "heure": "07:28" },
+            { "arret": "noerdange-ecole", "heure": "07:30" },
+            { "arret": "schweich-peiffer", "heure": "07:35" },
+            { "arret": "schweich-hoh", "heure": "07:37" },
+            { "arret": "elvange-ecole", "heure": "07:40" },
+            { "arret": "hovelange-bitzesch", "heure": "07:42" },
+            { "arret": "hovelange-kneppchen", "heure": "07:44" },
+            { "arret": "hovelange-op-der-halte", "heure": "07:46" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "07:48" },
+            { "arret": "beckerich-ecole", "heure": "07:50" },
+            { "arret": "beckerich-leewelerwee", "heure": "07:52" },
+            { "arret": "levelange", "heure": "07:54" },
+            { "arret": "oberpallen-ecole", "heure": "07:58" }
+          ]
+        },
+        {
+          "id": "aller-1-apres-midi",
+          "periode": "apres-midi",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "arrets": [
+            { "arret": "beckerich-village", "heure": "13:25", "notes": ["depart-non-precise"] },
+            { "arret": "huttange", "heure": "13:27" },
+            { "arret": "noerdange-gare", "heure": "13:28" },
+            { "arret": "noerdange-ecole", "heure": "13:30" },
+            { "arret": "schweich-peiffer", "heure": "13:35" },
+            { "arret": "schweich-hoh", "heure": "13:37" },
+            { "arret": "elvange-ecole", "heure": "13:40" },
+            { "arret": "hovelange-bitzesch", "heure": "13:42" },
+            { "arret": "hovelange-kneppchen", "heure": "13:44" },
+            { "arret": "hovelange-op-der-halte", "heure": "13:46" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "13:48" },
+            { "arret": "beckerich-ecole", "heure": "13:50" },
+            { "arret": "beckerich-leewelerwee", "heure": "13:52" },
+            { "arret": "levelange", "heure": "13:54" },
+            { "arret": "oberpallen-ecole", "heure": "13:58" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "aller-2",
+      "nom": "Aller — Bus 2",
+      "direction": "vers-ecole",
+      "dessert": ["beckerich-ecole", "elvange-ecole", "noerdange-ecole"],
+      "services": [
+        {
+          "id": "aller-2-matin",
+          "periode": "matin",
+          "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+          "arrets": [
+            {
+              "arret": "huttange",
+              "heure": null,
+              "notes": ["voir-aller-3"],
+              "desservi": false
+            },
+            { "arret": "oberpallen-pont", "heure": "07:27" },
+            { "arret": "levelange", "heure": "07:31" },
+            { "arret": "beckerich-leewelerwee", "heure": "07:32" },
+            { "arret": "beckerich-ecole", "heure": "07:34" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "07:38" },
+            { "arret": "hovelange-op-der-halte", "heure": "07:41" },
+            { "arret": "hovelange-kneppchen", "heure": "07:45" },
+            { "arret": "hovelange-bitzesch", "heure": "07:48" },
+            { "arret": "elvange-ecole", "heure": "07:50" },
+            { "arret": "schweich-peiffer", "heure": "07:52" },
+            { "arret": "schweich-hoh", "heure": "07:54" },
+            { "arret": "noerdange-ecole", "heure": "08:00" }
+          ]
+        },
+        {
+          "id": "aller-2-apres-midi",
+          "periode": "apres-midi",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "arrets": [
+            {
+              "arret": "huttange",
+              "heure": null,
+              "notes": ["huttange-retour-dillendapp-1345"],
+              "desservi": false
+            },
+            { "arret": "oberpallen-pont", "heure": "13:27" },
+            { "arret": "levelange", "heure": "13:31" },
+            { "arret": "beckerich-leewelerwee", "heure": "13:32" },
+            { "arret": "beckerich-ecole", "heure": "13:34" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "13:38" },
+            { "arret": "hovelange-op-der-halte", "heure": "13:41" },
+            { "arret": "hovelange-kneppchen", "heure": "13:45" },
+            { "arret": "hovelange-bitzesch", "heure": "13:48" },
+            { "arret": "elvange-ecole", "heure": "13:50" },
+            { "arret": "schweich-peiffer", "heure": "13:52" },
+            { "arret": "schweich-hoh", "heure": "13:54" },
+            { "arret": "noerdange-ecole", "heure": "14:00" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "aller-3",
+      "nom": "Aller — Bus 3",
+      "direction": "vers-ecole",
+      "dessert": ["beckerich-ecole", "oberpallen-ecole", "noerdange-ecole"],
+      "services": [
+        {
+          "id": "aller-3-matin",
+          "periode": "matin",
+          "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+          "arrets": [
+            { "arret": "noerdange-ecole", "heure": "07:30" },
+            { "arret": "noerdange-gare", "heure": "07:32" },
+            { "arret": "huttange", "heure": "07:34" },
+            { "arret": "beckerich-dillendapp", "heure": "07:38" },
+            { "arret": "oberpallen-ecole", "heure": "07:45" },
+            { "arret": "beckerich-dillendapp", "heure": "07:52" },
+            { "arret": "huttange", "heure": "07:55" },
+            { "arret": "noerdange-ecole", "heure": "07:58" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "aller-dillendapp",
+      "nom": "Aller — Bus Dillendapp",
+      "direction": "vers-dillendapp",
+      "reserve": {
+        "cycles": ["c2"],
+        "conditionDillendapp": true,
+        "villagesAussiAdmis": ["huttange"]
+      },
+      "dessert": ["beckerich-dillendapp"],
+      "services": [
+        {
+          "id": "aller-dillendapp-midi",
+          "periode": "midi",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "horaireComplet": false,
+          "arrets": [
+            {
+              "arret": "noerdange-ecole",
+              "heure": "12:10",
+              "notes": ["vendredi-hall-sportif"]
+            },
+            {
+              "arret": "huttange",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            },
+            {
+              "arret": "beckerich-dillendapp",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "retour-1",
+      "nom": "Retour — Bus 1",
+      "direction": "vers-domicile",
+      "services": [
+        {
+          "id": "retour-1-midi",
+          "periode": "midi",
+          "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+          "arrets": [
+            { "arret": "oberpallen-ecole", "heure": "11:50" },
+            { "arret": "beckerich-ecole", "heure": "12:00" },
+            { "arret": "huttange", "heure": "12:03" },
+            { "arret": "noerdange-gare", "heure": "12:07" },
+            { "arret": "noerdange-ecole", "heure": "12:10" },
+            { "arret": "schweich-peiffer", "heure": "12:15" },
+            { "arret": "schweich-hoh", "heure": "12:18" },
+            { "arret": "elvange-ecole", "heure": "12:22" },
+            { "arret": "hovelange-bitzesch", "heure": "12:24" },
+            { "arret": "hovelange-kneppchen", "heure": "12:25" },
+            { "arret": "hovelange-op-der-halte", "heure": "12:27" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "12:28" },
+            { "arret": "beckerich-ecole", "heure": "12:31" },
+            { "arret": "beckerich-leewelerwee", "heure": "12:34" },
+            { "arret": "levelange", "heure": "12:35" },
+            { "arret": "oberpallen-pont", "heure": "12:37" }
+          ]
+        },
+        {
+          "id": "retour-1-soir",
+          "periode": "soir",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "incertitude": "retours-apres-midi-mardi-jeudi",
+          "arrets": [
+            { "arret": "oberpallen-ecole", "heure": "15:45" },
+            { "arret": "beckerich-ecole", "heure": "15:55" },
+            { "arret": "huttange", "heure": "16:00" },
+            { "arret": "noerdange-gare", "heure": "16:05" },
+            { "arret": "noerdange-ecole", "heure": "16:10" },
+            { "arret": "schweich-peiffer", "heure": "16:15" },
+            { "arret": "schweich-hoh", "heure": "16:18" },
+            { "arret": "elvange-ecole", "heure": "16:22" },
+            { "arret": "hovelange-bitzesch", "heure": "16:24" },
+            { "arret": "hovelange-kneppchen", "heure": "16:25" },
+            { "arret": "hovelange-op-der-halte", "heure": "16:27" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "16:28" },
+            { "arret": "beckerich-ecole", "heure": "16:31" },
+            { "arret": "beckerich-leewelerwee", "heure": "16:34" },
+            { "arret": "levelange", "heure": "16:35" },
+            { "arret": "oberpallen-pont", "heure": "16:37" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "retour-2",
+      "nom": "Retour — Bus 2",
+      "direction": "vers-domicile",
+      "services": [
+        {
+          "id": "retour-2-midi",
+          "periode": "midi",
+          "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+          "arrets": [
+            { "arret": "oberpallen-ecole", "heure": "11:50" },
+            { "arret": "levelange", "heure": "11:55" },
+            { "arret": "beckerich-leewelerwee", "heure": "11:58" },
+            { "arret": "beckerich-ecole", "heure": "12:00" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "12:05" },
+            { "arret": "hovelange-op-der-halte", "heure": "12:08" },
+            { "arret": "hovelange-kneppchen", "heure": "12:10" },
+            { "arret": "hovelange-bitzesch", "heure": "12:12" },
+            { "arret": "elvange-ecole", "heure": "12:14" },
+            { "arret": "schweich-peiffer", "heure": "12:16" },
+            { "arret": "schweich-hoh", "heure": "12:20" },
+            { "arret": "noerdange-ecole", "heure": "12:25" },
+            { "arret": "noerdange-gare", "heure": "12:27" },
+            { "arret": "huttange", "heure": "12:29" },
+            { "arret": "beckerich-dillendapp", "heure": "12:33" }
+          ]
+        },
+        {
+          "id": "retour-2-soir",
+          "periode": "soir",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "incertitude": "retours-apres-midi-mardi-jeudi",
+          "arrets": [
+            { "arret": "oberpallen-ecole", "heure": "15:45" },
+            { "arret": "levelange", "heure": "15:49" },
+            { "arret": "beckerich-leewelerwee", "heure": "15:52" },
+            { "arret": "beckerich-ecole", "heure": "15:55" },
+            { "arret": "beckerich-fraiheetsbam", "heure": "16:00" },
+            { "arret": "hovelange-op-der-halte", "heure": "16:03" },
+            { "arret": "hovelange-kneppchen", "heure": "16:06" },
+            { "arret": "hovelange-bitzesch", "heure": "16:08" },
+            { "arret": "elvange-ecole", "heure": "16:10" },
+            { "arret": "schweich-peiffer", "heure": "16:12" },
+            { "arret": "schweich-hoh", "heure": "16:14" },
+            { "arret": "noerdange-ecole", "heure": "16:18" },
+            { "arret": "noerdange-gare", "heure": "16:20" },
+            { "arret": "huttange", "heure": "16:21" },
+            { "arret": "beckerich-dillendapp", "heure": "16:23" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "retour-dillendapp",
+      "nom": "Retour — Bus Dillendapp",
+      "$commentaire": "Malgré son nom officiel, ce bus ramène les enfants VERS les écoles après le déjeuner à la maison relais. La direction ci-dessous décrit sa fonction réelle.",
+      "direction": "vers-ecole",
+      "reserve": {
+        "cycles": ["c3"],
+        "conditionDillendapp": true,
+        "villagesAussiAdmis": ["huttange"]
+      },
+      "dessert": ["elvange-ecole", "noerdange-ecole"],
+      "services": [
+        {
+          "id": "retour-dillendapp-apres-midi",
+          "periode": "apres-midi",
+          "jours": ["lundi", "mercredi", "vendredi"],
+          "horaireComplet": false,
+          "arrets": [
+            { "arret": "huttange", "heure": "13:45" },
+            {
+              "arret": "beckerich-dillendapp",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            },
+            {
+              "arret": "beckerich-ecole",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            },
+            {
+              "arret": "elvange-ecole",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            },
+            {
+              "arret": "noerdange-ecole",
+              "heure": null,
+              "notes": ["horaire-intermediaire-non-publie"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
