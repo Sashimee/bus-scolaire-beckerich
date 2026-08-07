@@ -1,12 +1,10 @@
 {
   "langue": "English",
-
   "app": {
     "titre": "Beckerich school bus",
     "court": "School bus",
     "baseline": "Your children's bus times, without thinking about it"
   },
-
   "nav": {
     "accueil": "Today",
     "semaine": "The week",
@@ -18,7 +16,6 @@
     "menu": "Menu",
     "retour": "Back"
   },
-
   "avertissement": {
     "titre": "Before you start",
     "independance": "This site has no connection with the municipality of Beckerich or with the school. It was made by a parent, privately.",
@@ -28,7 +25,6 @@
     "accepter": "Understood",
     "detail": "Read all the limits"
   },
-
   "onboarding": {
     "bienvenue": "Welcome",
     "intro": "Enter your address and your children. The app works out, for each of them, the nearest stop and the times. Everything stays on your device.",
@@ -39,7 +35,6 @@
     "suivant": "Continue",
     "precedent": "Back"
   },
-
   "adresse": {
     "label": "Home address",
     "aide": "Type the start of your street, then the number. For example \"haapt 76\".",
@@ -50,7 +45,6 @@
     "modifier": "Change address",
     "confidentialite": "Your address is searched on your device. It is never sent anywhere."
   },
-
   "enfant": {
     "prenom": "First name",
     "prenomPlaceholder": "Child's first name",
@@ -68,7 +62,6 @@
     "voirSemaine": "View the week",
     "aucunArret": "From your address, no stop serves this child's school. Please check the official plan."
   },
-
   "repas": {
     "titre": "Lunch",
     "aide": "Set day by day: a child can eat at the Dillendapp on Monday and come home on Tuesday.",
@@ -76,10 +69,24 @@
     "maisonCourt": "Home",
     "dillendapp": "Eats at the Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Apply to the whole week",
+    "touteLaSemaine": "Lunch, whole week:",
     "sansCoursApresMidi": "No afternoon classes"
   },
-
+  "bus": {
+    "titre": "Bus",
+    "aide": "If you drop off or pick up your child yourself on some days, say so here: the app will then only show the journeys they actually take.",
+    "pourJour": "Bus use on {jour}",
+    "touteLaSemaine": "Bus, whole week:",
+    "aller-retour": "There and back",
+    "aller": "Outward only",
+    "retour": "Return only",
+    "aucun": "No bus",
+    "aller-retourCourt": "Both ways",
+    "allerCourt": "Outward",
+    "retourCourt": "Return",
+    "aucunCourt": "No bus",
+    "sansBus": "No bus that day"
+  },
   "cycles": {
     "precoce": "Early years",
     "c1": "Cycle 1",
@@ -87,7 +94,6 @@
     "c3": "Cycle 3",
     "c4": "Cycle 4"
   },
-
   "jours": {
     "lundi": "Monday",
     "mardi": "Tuesday",
@@ -100,7 +106,6 @@
     "jeudiCourt": "Thu",
     "vendrediCourt": "Fri"
   },
-
   "trajets": {
     "aller-matin": "Departure for school",
     "retour-midi": "Home again, midday",
@@ -118,13 +123,11 @@
     "concerneParent": "Your journeys",
     "aucun": "No journey that day."
   },
-
   "manquants": {
     "titre": "Not covered by the plan",
     "retour-soir": "The official plan provides no return bus that day for a child who stayed at the Dillendapp. Please ask the maison relais.",
     "generique": "The official plan provides no bus for this journey."
   },
-
   "aujourdhui": {
     "titre": "Today",
     "prochainTrajet": "Next journey",
@@ -138,7 +141,6 @@
     "raisonFerie": "Public holiday: {jour}.",
     "raisonInconnue": "This year's school calendar is not yet recorded in the app. Please check the official calendar."
   },
-
   "vacances": {
     "toussaint": "All Saints' break",
     "noel": "Christmas holidays",
@@ -147,13 +149,11 @@
     "pentecote": "Whitsun break",
     "ete": "summer holidays"
   },
-
   "feries": {
     "ascension": "Ascension Day",
     "lundi-pentecote": "Whit Monday",
     "fete-nationale": "National Day"
   },
-
   "arrets": {
     "ecole": "School",
     "gare": "Station",
@@ -163,7 +163,6 @@
     "precisionApproximativeAide": "The exact location of this stop could not be verified. The walking time is therefore even more indicative than usual.",
     "signaler": "Report an error"
   },
-
   "notes": {
     "huttange-c3-uniquement": "This departure is reserved for children from Huttange attending the school in Elvange (cycle 3). Children from Huttange attending Noerdange (cycle 2) take the Aller 3.",
     "voir-aller-3": "Huttange is not served by this line: see the \"Aller Bus 3\" timetable.",
@@ -172,12 +171,10 @@
     "vendredi-hall-sportif": "On Fridays, departure is from the sports hall rather than the school.",
     "horaire-intermediaire-non-publie": "The official plan does not publish a time for this stop."
   },
-
   "incertitudes": {
     "titre": "Not settled by the official plan",
     "retours-apres-midi-mardi-jeudi": "The plan does not say whether the late-afternoon return buses run on Tuesdays and Thursdays, days without afternoon classes. The app assumes they do not. To be confirmed with the municipality."
   },
-
   "calendrier": {
     "titre": "Add to a calendar",
     "ics": "Download for my calendar (.ics)",
@@ -186,7 +183,6 @@
     "googleAide": "Quick to add, but Google handles holiday exclusions poorly: the .ics file is more accurate.",
     "tousLesEnfants": "All children"
   },
-
   "partage": {
     "titre": "Share this setup",
     "aide": "Send this link to the other parent, the grandparents or the childminder: they will see exactly the same screen.",
@@ -199,20 +195,17 @@
     "accepter": "Use this setup",
     "refuser": "Keep mine"
   },
-
   "impression": {
     "titre": "Printable sheet",
     "bouton": "Print the week",
     "aide": "One A4 page per child, for the fridge door."
   },
-
   "carte": {
     "titre": "Walking route",
     "domicile": "Home",
     "horsLigne": "The map needs a connection. The rest of the app works offline.",
     "ouvrirItineraire": "Open the route"
   },
-
   "reglages": {
     "titre": "Settings",
     "langue": "Language",
@@ -225,7 +218,6 @@
     "effacerConfirmation": "Erase the address, children and preferences saved on this device?",
     "efface": "Data erased."
   },
-
   "plan": {
     "titre": "Official plan",
     "intro": "The times below are a transcription of the municipality's official plan. In case of any discrepancy, the original document prevails.",
@@ -241,7 +233,6 @@
     "horairesEcole": "School hours",
     "horairesEcoleDetail": "Classes from {matinDebut} to {matinFin} Monday to Friday, and from {apresMidiDebut} to {apresMidiFin} on Mondays, Wednesdays and Fridays."
   },
-
   "validite": {
     "couverte": "Plan valid for {annees}",
     "confirme": "Confirmed by {personne} in {date}.",
@@ -249,7 +240,6 @@
     "perime": "Warning: this plan has passed its stated validity period ({fin}). Check the official plan before relying on it.",
     "releve": "Recorded on {date}"
   },
-
   "limites": {
     "titre": "What this site can do, and what it cannot",
     "intro": "This site is a convenience. It does not replace the official plan and guarantees nothing. Here are its limits, precisely.",
@@ -266,7 +256,6 @@
     "donneesTitre": "Your data stays with you",
     "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. A share link carries the data in its fragment, which the server never receives."
   },
-
   "independance": {
     "titre": "Independent site",
     "corps1": "This site has no connection with the municipality of Beckerich, with the fundamental school or with the Dillendapp maison relais. It was neither commissioned, approved nor reviewed by them.",
@@ -278,7 +267,6 @@
     "lienPdf": "Download the official plan",
     "contact": "Report an error"
   },
-
   "installer": {
     "titre": "Install the app",
     "intro": "Installed on your home screen, the app opens full screen, starts instantly and works without a connection.",
@@ -310,14 +298,12 @@
     "boutonInstaller": "Install now",
     "dejaInstallee": "The app is already installed on this device."
   },
-
   "maj": {
     "disponible": "A new version is available.",
     "recharger": "Reload",
     "version": "Version {version}",
     "horsLigne": "Offline — the timetables remain available."
   },
-
   "commun": {
     "fermer": "Close",
     "modifier": "Change",

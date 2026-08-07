@@ -262,6 +262,14 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const repas = enfant.repas[jour]
   const apresMidi = coursApresMidi(jour)
 
+  // Une famille peut n'utiliser le bus qu'à moitié : déposer l'enfant en voiture le
+  // matin et le laisser rentrer en bus, ou l'inverse. On ne propose alors que les
+  // trajets réellement empruntés — et on ne signale surtout pas comme « non couvert »
+  // un retour que le parent assure lui-même.
+  const usage = enfant.bus?.[jour] ?? 'aller-retour'
+  const prendAller = usage === 'aller-retour' || usage === 'aller'
+  const prendRetour = usage === 'aller-retour' || usage === 'retour'
+
   const domicile = [arretDomicile.id]
   const ecole = arretsEquivalents(arretEcole.id)
   const dillendapp = arretsEquivalents(maisonRelais.arret)
@@ -305,23 +313,27 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   }
 
   // 1. Le matin, tout le monde va à l'école.
-  ajouter('aller-matin', {
-    depuis: domicile,
-    vers: ecole,
-    periodes: ['matin'],
-    directions: ['vers-ecole'],
-  })
+  if (prendAller) {
+    ajouter('aller-matin', {
+      depuis: domicile,
+      vers: ecole,
+      periodes: ['matin'],
+      directions: ['vers-ecole'],
+    })
+  }
 
   if (repas === 'maison') {
     // 2. Retour à la maison pour déjeuner.
-    ajouter('retour-midi', {
-      depuis: ecole,
-      vers: domicile,
-      periodes: ['midi'],
-      directions: ['vers-domicile'],
-    })
+    if (prendRetour) {
+      ajouter('retour-midi', {
+        depuis: ecole,
+        vers: domicile,
+        periodes: ['midi'],
+        directions: ['vers-domicile'],
+      })
+    }
     // 3. Retour en classe, uniquement les jours où il y a cours l'après-midi.
-    if (apresMidi) {
+    if (apresMidi && prendAller) {
       ajouter('aller-apres-midi', {
         depuis: domicile,
         vers: ecole,
@@ -352,13 +364,15 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   //    Les autres jours, un enfant resté au Dillendapp n'a pas de bus : le plan
   //    officiel ne le prévoit pas, et l'application doit le dire plutôt que l'inventer.
   if (apresMidi) {
-    ajouter('retour-soir', {
-      depuis: ecole,
-      vers: domicile,
-      periodes: ['soir'],
-      directions: ['vers-domicile'],
-    })
-  } else if (repas === 'dillendapp') {
+    if (prendRetour) {
+      ajouter('retour-soir', {
+        depuis: ecole,
+        vers: domicile,
+        periodes: ['soir'],
+        directions: ['vers-domicile'],
+      })
+    }
+  } else if (repas === 'dillendapp' && prendRetour) {
     // Pas de cours l'après-midi, mais l'enfant est resté à la maison relais : le plan
     // ne prévoit rien pour son retour. C'est ici, et ici seulement, que l'ambiguïté
     // du plan a une conséquence pour le parent.

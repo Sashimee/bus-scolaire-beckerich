@@ -6,12 +6,26 @@
  * prénoms des enfants ne quittent pas les appareils, même en passant par GitHub Pages.
  * Une chaîne de requête (`?c=...`) figurerait, elle, dans les journaux du serveur.
  */
-import type { Cycle, Enfant, Foyer, Jour, RepasMidi } from './types'
+import type { Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
 
-const VERSION = 1
+/** 1 : sans l'usage du bus. 2 : avec. Les liens de version 1 restent lisibles. */
+const VERSION = 2
 
 const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
+
+const LETTRE_BUS: Record<UsageBus, string> = {
+  'aller-retour': 'b',
+  aller: 'a',
+  retour: 'r',
+  aucun: 'n',
+}
+const BUS_PAR_LETTRE: Record<string, UsageBus> = {
+  b: 'aller-retour',
+  a: 'aller',
+  r: 'retour',
+  n: 'aucun',
+}
 
 /** Forme compacte : on encode des index et des lettres, pas des mots. */
 type FoyerCompact = [
@@ -20,7 +34,7 @@ type FoyerCompact = [
   localite: string,
   lat: number,
   lon: number,
-  enfants: [prenom: string, cycle: number, repas: string][],
+  enfants: [prenom: string, cycle: number, repas: string, bus?: string][],
 ]
 
 function versBase64Url(texte: string): string {
@@ -50,6 +64,7 @@ export function encoderFoyer(foyer: Foyer): string {
       e.prenom,
       CYCLES.indexOf(e.cycle),
       JOURS.map((j) => (e.repas[j] === 'dillendapp' ? 'd' : 'm')).join(''),
+      JOURS.map((j) => LETTRE_BUS[e.bus?.[j] ?? 'aller-retour']).join(''),
     ]),
   ]
   return versBase64Url(JSON.stringify(compact))
@@ -59,20 +74,25 @@ export function encoderFoyer(foyer: Foyer): string {
 export function decoderFoyer(code: string): Foyer | null {
   try {
     const brut = JSON.parse(depuisBase64Url(code)) as FoyerCompact
-    if (!Array.isArray(brut) || brut[0] !== VERSION) return null
+    if (!Array.isArray(brut) || brut[0] > VERSION || brut[0] < 1) return null
 
     const [, libelle, localite, lat, lon, enfantsBruts] = brut
     if (typeof lat !== 'number' || typeof lon !== 'number') return null
 
-    const enfants: Enfant[] = enfantsBruts.map(([prenom, iCycle, repasBrut], i) => {
+    const enfants: Enfant[] = enfantsBruts.map(([prenom, iCycle, repasBrut, busBrut], i) => {
       const repas = Object.fromEntries(
         JOURS.map((j, k) => [j, (repasBrut[k] === 'd' ? 'dillendapp' : 'maison') as RepasMidi]),
       ) as Record<Jour, RepasMidi>
+      // Un lien de version 1 ne porte pas l'usage du bus : on suppose aller-retour.
+      const bus = Object.fromEntries(
+        JOURS.map((j, k) => [j, BUS_PAR_LETTRE[busBrut?.[k] ?? 'b'] ?? 'aller-retour']),
+      ) as Record<Jour, UsageBus>
       return {
         id: `partage-${i}`,
         prenom: String(prenom),
         cycle: CYCLES[iCycle] ?? 'c1',
         repas,
+        bus,
       }
     })
 

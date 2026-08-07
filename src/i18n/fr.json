@@ -1,12 +1,10 @@
 {
   "langue": "Français",
-
   "app": {
     "titre": "Bus scolaire Beckerich",
     "court": "Bus scolaire",
     "baseline": "Les horaires du bus de vos enfants, sans y réfléchir"
   },
-
   "nav": {
     "accueil": "Aujourd'hui",
     "semaine": "La semaine",
@@ -18,7 +16,6 @@
     "menu": "Menu",
     "retour": "Retour"
   },
-
   "avertissement": {
     "titre": "Avant de commencer",
     "independance": "Ce site n'a aucun lien avec la commune de Beckerich ni avec l'école. Il est réalisé par un parent, à titre privé.",
@@ -28,7 +25,6 @@
     "accepter": "J'ai compris",
     "detail": "Lire toutes les limites"
   },
-
   "onboarding": {
     "bienvenue": "Bienvenue",
     "intro": "Indiquez votre adresse et vos enfants. L'application en déduit, pour chacun, l'arrêt le plus proche et ses horaires. Tout reste sur votre appareil.",
@@ -39,7 +35,6 @@
     "suivant": "Continuer",
     "precedent": "Retour"
   },
-
   "adresse": {
     "label": "Adresse du domicile",
     "aide": "Tapez le début de votre rue, puis le numéro. Par exemple « haapt 76 ».",
@@ -50,7 +45,6 @@
     "modifier": "Modifier l'adresse",
     "confidentialite": "Votre adresse est recherchée sur votre appareil. Elle n'est envoyée nulle part."
   },
-
   "enfant": {
     "prenom": "Prénom",
     "prenomPlaceholder": "Prénom de l'enfant",
@@ -68,7 +62,6 @@
     "voirSemaine": "Voir la semaine",
     "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel."
   },
-
   "repas": {
     "titre": "Repas de midi",
     "aide": "Réglable jour par jour : un enfant peut manger au Dillendapp le lundi et rentrer le mardi.",
@@ -76,10 +69,24 @@
     "maisonCourt": "Maison",
     "dillendapp": "Mange au Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Appliquer à toute la semaine",
+    "touteLaSemaine": "Repas, toute la semaine :",
     "sansCoursApresMidi": "Pas de cours l'après-midi"
   },
-
+  "bus": {
+    "titre": "Bus",
+    "aide": "Si vous déposez ou récupérez votre enfant vous-même certains jours, indiquez-le : l'application n'affichera que les trajets qu'il emprunte réellement.",
+    "pourJour": "Usage du bus le {jour}",
+    "touteLaSemaine": "Bus, toute la semaine :",
+    "aller-retour": "Aller et retour",
+    "aller": "Aller seulement",
+    "retour": "Retour seulement",
+    "aucun": "Pas de bus",
+    "aller-retourCourt": "Aller-retour",
+    "allerCourt": "Aller",
+    "retourCourt": "Retour",
+    "aucunCourt": "Sans bus",
+    "sansBus": "Sans bus ce jour-là"
+  },
   "cycles": {
     "precoce": "Précoce",
     "c1": "Cycle 1",
@@ -87,7 +94,6 @@
     "c3": "Cycle 3",
     "c4": "Cycle 4"
   },
-
   "jours": {
     "lundi": "Lundi",
     "mardi": "Mardi",
@@ -100,7 +106,6 @@
     "jeudiCourt": "Jeu",
     "vendrediCourt": "Ven"
   },
-
   "trajets": {
     "aller-matin": "Départ pour l'école",
     "retour-midi": "Retour à la maison, midi",
@@ -118,13 +123,11 @@
     "concerneParent": "Vos trajets",
     "aucun": "Aucun trajet ce jour-là."
   },
-
   "manquants": {
     "titre": "Non couvert par le plan",
     "retour-soir": "Le plan officiel ne prévoit pas de bus de retour ce jour-là pour un enfant resté au Dillendapp. Renseignez-vous auprès de la maison relais.",
     "generique": "Le plan officiel ne prévoit pas de bus pour ce déplacement."
   },
-
   "aujourdhui": {
     "titre": "Aujourd'hui",
     "prochainTrajet": "Prochain trajet",
@@ -138,7 +141,6 @@
     "raisonFerie": "Jour férié : {jour}.",
     "raisonInconnue": "Le calendrier scolaire de cette année n'est pas encore renseigné dans l'application. Vérifiez le calendrier officiel."
   },
-
   "vacances": {
     "toussaint": "congé de la Toussaint",
     "noel": "vacances de Noël",
@@ -147,13 +149,11 @@
     "pentecote": "congé de la Pentecôte",
     "ete": "vacances d'été"
   },
-
   "feries": {
     "ascension": "Ascension",
     "lundi-pentecote": "lundi de Pentecôte",
     "fete-nationale": "fête nationale"
   },
-
   "arrets": {
     "ecole": "École",
     "gare": "Gare",
@@ -163,7 +163,6 @@
     "precisionApproximativeAide": "L'emplacement exact de cet arrêt n'a pas pu être vérifié. Le temps de marche est donc encore plus indicatif que d'ordinaire.",
     "signaler": "Signaler une erreur"
   },
-
   "notes": {
     "huttange-c3-uniquement": "Ce départ est réservé aux enfants de Huttange scolarisés à Elvange (cycle 3). Les enfants de Huttange scolarisés à Noerdange (cycle 2) prennent l'Aller 3.",
     "voir-aller-3": "Huttange n'est pas desservi par cette ligne : voir l'horaire « Aller Bus 3 ».",
@@ -172,12 +171,10 @@
     "vendredi-hall-sportif": "Le vendredi, le départ se fait depuis le hall sportif et non depuis l'école.",
     "horaire-intermediaire-non-publie": "Le plan officiel ne publie pas l'heure de passage à cet arrêt."
   },
-
   "incertitudes": {
     "titre": "Point non tranché par le plan officiel",
     "retours-apres-midi-mardi-jeudi": "Le plan ne dit pas si les retours de fin d'après-midi circulent le mardi et le jeudi, jours sans cours l'après-midi. L'application suppose qu'ils ne circulent pas. À vérifier auprès de la commune."
   },
-
   "calendrier": {
     "titre": "Ajouter à un agenda",
     "ics": "Télécharger pour mon agenda (.ics)",
@@ -186,7 +183,6 @@
     "googleAide": "Ajout rapide, mais Google gère mal les exclusions de vacances : le fichier .ics est plus fidèle.",
     "tousLesEnfants": "Tous les enfants"
   },
-
   "partage": {
     "titre": "Partager cette configuration",
     "aide": "Envoyez ce lien à l'autre parent, aux grands-parents ou à la nounou : ils verront exactement le même écran.",
@@ -199,20 +195,17 @@
     "accepter": "Utiliser cette configuration",
     "refuser": "Garder la mienne"
   },
-
   "impression": {
     "titre": "Fiche à imprimer",
     "bouton": "Imprimer la semaine",
     "aide": "Une page A4 par enfant, à coller sur le frigo."
   },
-
   "carte": {
     "titre": "Trajet à pied",
     "domicile": "Domicile",
     "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne.",
     "ouvrirItineraire": "Ouvrir l'itinéraire"
   },
-
   "reglages": {
     "titre": "Réglages",
     "langue": "Langue",
@@ -225,7 +218,6 @@
     "effacerConfirmation": "Effacer l'adresse, les enfants et les préférences enregistrés sur cet appareil ?",
     "efface": "Données effacées."
   },
-
   "plan": {
     "titre": "Plan officiel",
     "intro": "Les horaires ci-dessous sont la transcription du plan officiel de la commune. En cas d'écart, c'est le document original qui fait foi.",
@@ -241,7 +233,6 @@
     "horairesEcole": "Horaires de l'école",
     "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi."
   },
-
   "validite": {
     "couverte": "Plan valable pour {annees}",
     "confirme": "Confirmé par {personne} en {date}.",
@@ -249,7 +240,6 @@
     "perime": "Attention : ce plan a dépassé sa période de validité déclarée ({fin}). Vérifiez le plan officiel avant de vous y fier.",
     "releve": "Relevé le {date}"
   },
-
   "limites": {
     "titre": "Ce que ce site sait faire, et ce qu'il ne sait pas faire",
     "intro": "Ce site est un outil de confort. Il ne remplace pas le plan officiel et ne garantit rien. Voici précisément ses limites.",
@@ -266,7 +256,6 @@
     "donneesTitre": "Vos données restent chez vous",
     "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais."
   },
-
   "independance": {
     "titre": "Site indépendant",
     "corps1": "Ce site n'a aucun lien avec la commune de Beckerich, avec l'école fondamentale ni avec la maison relais Dillendapp. Il n'est ni commandé, ni validé, ni relu par elles.",
@@ -278,7 +267,6 @@
     "lienPdf": "Télécharger le plan officiel",
     "contact": "Signaler une erreur"
   },
-
   "installer": {
     "titre": "Installer l'application",
     "intro": "Installée sur l'écran d'accueil, l'application s'ouvre en plein écran, se lance instantanément et fonctionne sans réseau.",
@@ -310,14 +298,12 @@
     "boutonInstaller": "Installer maintenant",
     "dejaInstallee": "L'application est déjà installée sur cet appareil."
   },
-
   "maj": {
     "disponible": "Une nouvelle version est disponible.",
     "recharger": "Recharger",
     "version": "Version {version}",
     "horsLigne": "Hors ligne — les horaires restent consultables."
   },
-
   "commun": {
     "fermer": "Fermer",
     "modifier": "Modifier",

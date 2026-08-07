@@ -19,6 +19,18 @@ export const JOURS: readonly Jour[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'v
  */
 export type RepasMidi = 'maison' | 'dillendapp'
 
+/**
+ * Dans quelle mesure l'enfant utilise le bus un jour donné.
+ *
+ * Beaucoup de familles ne prennent le bus qu'à moitié : déposé en voiture le matin
+ * et repris par le bus, ou l'inverse, ou pas du tout certains jours. Sans ce réglage,
+ * l'application afficherait des trajets qui n'ont pas lieu et, pire, signalerait
+ * comme « non couvert » un retour que le parent assure lui-même.
+ */
+export type UsageBus = 'aller-retour' | 'aller' | 'retour' | 'aucun'
+
+export const USAGES_BUS: readonly UsageBus[] = ['aller-retour', 'aller', 'retour', 'aucun']
+
 /** Moment de la journée auquel un service circule. */
 export type Periode = 'matin' | 'midi' | 'apres-midi' | 'soir'
 
@@ -147,6 +159,9 @@ export interface Enfant {
   cycle: Cycle
   /** Le repas de midi, jour par jour. */
   repas: Record<Jour, RepasMidi>
+  /** L'usage du bus, jour par jour. Absent sur les données enregistrées avant
+   *  l'introduction du réglage : traiter alors comme « aller-retour ». */
+  bus?: Record<Jour, UsageBus>
 }
 
 export interface Adresse {

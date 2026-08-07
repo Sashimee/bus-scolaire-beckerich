@@ -4,7 +4,7 @@
  * Rien ne quitte l'appareil : pas de compte, pas de serveur, pas de cookie de suivi.
  * `localStorage` suffit et reste lisible par le parent depuis son navigateur.
  */
-import type { Foyer, Jour, RepasMidi } from './types'
+import type { Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
 
 const CLE_FOYER = 'bus-beckerich.foyer'
@@ -16,6 +16,11 @@ export const foyerVide: Foyer = { adresse: null, enfants: [] }
 /** Grille de repas par défaut : l'enfant rentre manger tous les jours. */
 export function repasParDefaut(): Record<Jour, RepasMidi> {
   return Object.fromEntries(JOURS.map((j) => [j, 'maison'])) as Record<Jour, RepasMidi>
+}
+
+/** Usage du bus par défaut : aller et retour tous les jours. */
+export function busParDefaut(): Record<Jour, UsageBus> {
+  return Object.fromEntries(JOURS.map((j) => [j, 'aller-retour'])) as Record<Jour, UsageBus>
 }
 
 function lire<T>(cle: string, defaut: T): T {
@@ -37,7 +42,22 @@ function ecrire(cle: string, valeur: unknown): void {
   }
 }
 
-export const chargerFoyer = (): Foyer => lire(CLE_FOYER, foyerVide)
+/**
+ * Relit le foyer enregistré en complétant les réglages introduits après coup.
+ * Une configuration écrite avant l'ajout du réglage « usage du bus » reste valable :
+ * on lui applique la valeur par défaut plutôt que de la rejeter.
+ */
+export const chargerFoyer = (): Foyer => {
+  const f = lire(CLE_FOYER, foyerVide)
+  return {
+    ...f,
+    enfants: (f.enfants ?? []).map((e) => ({
+      ...e,
+      repas: { ...repasParDefaut(), ...e.repas },
+      bus: { ...busParDefaut(), ...e.bus },
+    })),
+  }
+}
 export const enregistrerFoyer = (f: Foyer): void => ecrire(CLE_FOYER, f)
 
 export const chargerLangue = (): string | null => lire<string | null>(CLE_LANGUE, null)

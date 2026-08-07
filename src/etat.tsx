@@ -8,9 +8,10 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { chargerFoyer, enregistrerFoyer, repasParDefaut } from './lib/stockage'
+import { busParDefaut, chargerFoyer, enregistrerFoyer, repasParDefaut } from './lib/stockage'
 import { contexteEnfant, type ContexteEnfant } from './lib/plan'
-import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi } from './lib/types'
+import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './lib/types'
+import { JOURS } from './lib/types'
 
 export type Theme = 'auto' | 'clair' | 'sombre'
 
@@ -24,6 +25,8 @@ interface EtatFoyer {
   modifierEnfant: (id: string, champs: Partial<Omit<Enfant, 'id'>>) => void
   definirRepas: (id: string, jour: Jour, repas: RepasMidi) => void
   definirRepasSemaine: (id: string, repas: RepasMidi) => void
+  definirBus: (id: string, jour: Jour, usage: UsageBus) => void
+  definirBusSemaine: (id: string, usage: UsageBus) => void
   supprimerEnfant: (id: string) => void
   remplacerFoyer: (f: Foyer) => void
   theme: Theme
@@ -94,6 +97,7 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
               prenom: prenom.trim(),
               cycle,
               repas: repasParDefaut(),
+              bus: busParDefaut(),
             },
           ],
         })),
@@ -109,6 +113,18 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
           repas: Object.fromEntries(
             Object.keys(e.repas).map((j) => [j, repas]),
           ) as Record<Jour, RepasMidi>,
+        })),
+
+      definirBus: (id, jour, usage) =>
+        majEnfant(id, (e) => ({
+          ...e,
+          bus: { ...busParDefaut(), ...e.bus, [jour]: usage },
+        })),
+
+      definirBusSemaine: (id, usage) =>
+        majEnfant(id, (e) => ({
+          ...e,
+          bus: Object.fromEntries(JOURS.map((j) => [j, usage])) as Record<Jour, UsageBus>,
         })),
 
       supprimerEnfant: (id) =>

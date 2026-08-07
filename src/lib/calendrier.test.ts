@@ -152,6 +152,49 @@ describe('partage par lien', () => {
     expect(decoderFoyer(encoderFoyer(f))!.enfants[0].prenom).toBe('Zoé-Ännchen')
   })
 
+  it("conserve l'usage du bus jour par jour", () => {
+    const f: Foyer = {
+      adresse: { libelle: '3, Kneppchen', localite: 'Hovelange', coord: [49.7228, 5.9049] },
+      enfants: [
+        {
+          ...enfantTest(),
+          bus: {
+            lundi: 'aller',
+            mardi: 'aller-retour',
+            mercredi: 'aucun',
+            jeudi: 'retour',
+            vendredi: 'aller-retour',
+          },
+        },
+      ],
+    }
+    const relu = decoderFoyer(encoderFoyer(f))!
+    expect(relu.enfants[0].bus).toEqual(f.enfants[0].bus)
+  })
+
+  it("relit un lien d'ancienne version en supposant l'aller-retour", () => {
+    // Un lien partagé avant l'ajout du réglage doit rester utilisable, plutôt que
+    // d'être rejeté ou d'ouvrir une configuration vide.
+    // Encodé comme le faisait la version 1 : UTF-8 puis base64url. Passer par `btoa`
+    // sur la chaîne brute abîmerait les accents — ce serait la fixture qui aurait
+    // tort, pas le décodeur.
+    const json = JSON.stringify([
+      1,
+      '3, Kneppchen',
+      'Hovelange',
+      49.7228,
+      5.9049,
+      [['Léa', 2, 'mmmmm']],
+    ])
+    let binaire = ''
+    for (const o of new TextEncoder().encode(json)) binaire += String.fromCharCode(o)
+    const v1 = btoa(binaire).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    const relu = decoderFoyer(v1)
+    expect(relu).not.toBeNull()
+    expect(relu!.enfants[0].prenom).toBe('Léa')
+    expect(relu!.enfants[0].bus?.lundi).toBe('aller-retour')
+  })
+
   it('renvoie null sur un lien corrompu au lieu de planter', () => {
     expect(decoderFoyer('pas-du-tout-du-base64-valide!!')).toBeNull()
     expect(decoderFoyer('')).toBeNull()

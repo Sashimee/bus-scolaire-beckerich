@@ -1,12 +1,10 @@
 {
   "langue": "Deutsch",
-
   "app": {
     "titre": "Schulbus Beckerich",
     "court": "Schulbus",
     "baseline": "Die Buszeiten Ihrer Kinder, ohne nachzudenken"
   },
-
   "nav": {
     "accueil": "Heute",
     "semaine": "Die Woche",
@@ -18,7 +16,6 @@
     "menu": "Menü",
     "retour": "Zurück"
   },
-
   "avertissement": {
     "titre": "Bevor Sie beginnen",
     "independance": "Diese Website steht in keiner Verbindung zur Gemeinde Beckerich oder zur Schule. Sie wurde von einem Elternteil privat erstellt.",
@@ -28,7 +25,6 @@
     "accepter": "Verstanden",
     "detail": "Alle Grenzen lesen"
   },
-
   "onboarding": {
     "bienvenue": "Willkommen",
     "intro": "Geben Sie Ihre Adresse und Ihre Kinder an. Die App ermittelt daraus für jedes Kind die nächste Haltestelle und die Fahrzeiten. Alles bleibt auf Ihrem Gerät.",
@@ -39,7 +35,6 @@
     "suivant": "Weiter",
     "precedent": "Zurück"
   },
-
   "adresse": {
     "label": "Wohnadresse",
     "aide": "Tippen Sie den Anfang Ihrer Straße, dann die Hausnummer. Zum Beispiel „haapt 76“.",
@@ -50,7 +45,6 @@
     "modifier": "Adresse ändern",
     "confidentialite": "Ihre Adresse wird auf Ihrem Gerät gesucht. Sie wird nirgendwohin gesendet."
   },
-
   "enfant": {
     "prenom": "Vorname",
     "prenomPlaceholder": "Vorname des Kindes",
@@ -68,7 +62,6 @@
     "voirSemaine": "Woche ansehen",
     "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan."
   },
-
   "repas": {
     "titre": "Mittagessen",
     "aide": "Tageweise einstellbar: ein Kind kann montags im Dillendapp essen und dienstags nach Hause fahren.",
@@ -76,10 +69,24 @@
     "maisonCourt": "Zuhause",
     "dillendapp": "Isst im Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Auf die ganze Woche anwenden",
+    "touteLaSemaine": "Mittagessen, ganze Woche:",
     "sansCoursApresMidi": "Kein Nachmittagsunterricht"
   },
-
+  "bus": {
+    "titre": "Bus",
+    "aide": "Wenn Sie Ihr Kind an manchen Tagen selbst bringen oder abholen, geben Sie es hier an: die App zeigt dann nur die Fahrten, die es wirklich nimmt.",
+    "pourJour": "Busnutzung am {jour}",
+    "touteLaSemaine": "Bus, ganze Woche:",
+    "aller-retour": "Hin und zurück",
+    "aller": "Nur Hinfahrt",
+    "retour": "Nur Rückfahrt",
+    "aucun": "Kein Bus",
+    "aller-retourCourt": "Hin/zurück",
+    "allerCourt": "Hin",
+    "retourCourt": "Zurück",
+    "aucunCourt": "Ohne Bus",
+    "sansBus": "An diesem Tag ohne Bus"
+  },
   "cycles": {
     "precoce": "Früherziehung",
     "c1": "Zyklus 1",
@@ -87,7 +94,6 @@
     "c3": "Zyklus 3",
     "c4": "Zyklus 4"
   },
-
   "jours": {
     "lundi": "Montag",
     "mardi": "Dienstag",
@@ -100,7 +106,6 @@
     "jeudiCourt": "Do",
     "vendrediCourt": "Fr"
   },
-
   "trajets": {
     "aller-matin": "Abfahrt zur Schule",
     "retour-midi": "Heimfahrt, mittags",
@@ -118,13 +123,11 @@
     "concerneParent": "Ihre Fahrten",
     "aucun": "An diesem Tag keine Fahrt."
   },
-
   "manquants": {
     "titre": "Vom Plan nicht abgedeckt",
     "retour-soir": "Der offizielle Plan sieht an diesem Tag keinen Rückbus für ein Kind vor, das im Dillendapp geblieben ist. Bitte erkundigen Sie sich bei der Maison Relais.",
     "generique": "Der offizielle Plan sieht für diese Fahrt keinen Bus vor."
   },
-
   "aujourdhui": {
     "titre": "Heute",
     "prochainTrajet": "Nächste Fahrt",
@@ -138,7 +141,6 @@
     "raisonFerie": "Feiertag: {jour}.",
     "raisonInconnue": "Der Schulkalender dieses Jahres ist in der App noch nicht hinterlegt. Bitte prüfen Sie den offiziellen Kalender."
   },
-
   "vacances": {
     "toussaint": "Allerheiligenferien",
     "noel": "Weihnachtsferien",
@@ -147,13 +149,11 @@
     "pentecote": "Pfingstferien",
     "ete": "Sommerferien"
   },
-
   "feries": {
     "ascension": "Christi Himmelfahrt",
     "lundi-pentecote": "Pfingstmontag",
     "fete-nationale": "Nationalfeiertag"
   },
-
   "arrets": {
     "ecole": "Schule",
     "gare": "Bahnhof",
@@ -163,7 +163,6 @@
     "precisionApproximativeAide": "Der genaue Standort dieser Haltestelle konnte nicht überprüft werden. Die Gehzeit ist daher noch ungenauer als sonst.",
     "signaler": "Fehler melden"
   },
-
   "notes": {
     "huttange-c3-uniquement": "Diese Abfahrt ist Kindern aus Huttange vorbehalten, die die Schule in Elvange besuchen (Zyklus 3). Kinder aus Huttange, die in Noerdange zur Schule gehen (Zyklus 2), nehmen den Aller 3.",
     "voir-aller-3": "Huttange wird von dieser Linie nicht bedient: siehe Fahrplan „Aller Bus 3“.",
@@ -172,12 +171,10 @@
     "vendredi-hall-sportif": "Freitags erfolgt die Abfahrt an der Sporthalle statt an der Schule.",
     "horaire-intermediaire-non-publie": "Der offizielle Plan veröffentlicht für diese Haltestelle keine Uhrzeit."
   },
-
   "incertitudes": {
     "titre": "Vom offiziellen Plan nicht geklärt",
     "retours-apres-midi-mardi-jeudi": "Der Plan sagt nicht, ob die späten Nachmittagsfahrten dienstags und donnerstags verkehren, also an Tagen ohne Nachmittagsunterricht. Die App geht davon aus, dass sie nicht fahren. Bitte bei der Gemeinde nachfragen."
   },
-
   "calendrier": {
     "titre": "Zum Kalender hinzufügen",
     "ics": "Für meinen Kalender herunterladen (.ics)",
@@ -186,7 +183,6 @@
     "googleAide": "Schnell hinzugefügt, aber Google berücksichtigt Ferienausnahmen schlecht: die .ics-Datei ist genauer.",
     "tousLesEnfants": "Alle Kinder"
   },
-
   "partage": {
     "titre": "Diese Konfiguration teilen",
     "aide": "Senden Sie diesen Link an den anderen Elternteil, die Großeltern oder die Tagesmutter: sie sehen genau dieselbe Ansicht.",
@@ -199,20 +195,17 @@
     "accepter": "Diese Konfiguration übernehmen",
     "refuser": "Meine behalten"
   },
-
   "impression": {
     "titre": "Blatt zum Ausdrucken",
     "bouton": "Woche drucken",
     "aide": "Eine A4-Seite pro Kind, für den Kühlschrank."
   },
-
   "carte": {
     "titre": "Fußweg",
     "domicile": "Zuhause",
     "horsLigne": "Die Karte benötigt eine Verbindung. Der Rest der App funktioniert offline.",
     "ouvrirItineraire": "Route öffnen"
   },
-
   "reglages": {
     "titre": "Einstellungen",
     "langue": "Sprache",
@@ -225,7 +218,6 @@
     "effacerConfirmation": "Adresse, Kinder und Einstellungen auf diesem Gerät löschen?",
     "efface": "Daten gelöscht."
   },
-
   "plan": {
     "titre": "Offizieller Plan",
     "intro": "Die folgenden Zeiten sind die Übertragung des offiziellen Gemeindeplans. Bei Abweichungen gilt das Originaldokument.",
@@ -241,7 +233,6 @@
     "horairesEcole": "Schulzeiten",
     "horairesEcoleDetail": "Unterricht von {matinDebut} bis {matinFin} von Montag bis Freitag, sowie von {apresMidiDebut} bis {apresMidiFin} montags, mittwochs und freitags."
   },
-
   "validite": {
     "couverte": "Plan gültig für {annees}",
     "confirme": "Bestätigt durch {personne} im {date}.",
@@ -249,7 +240,6 @@
     "perime": "Achtung: dieser Plan hat seinen angegebenen Gültigkeitszeitraum überschritten ({fin}). Bitte prüfen Sie den offiziellen Plan, bevor Sie sich darauf verlassen.",
     "releve": "Erfasst am {date}"
   },
-
   "limites": {
     "titre": "Was diese Website kann — und was nicht",
     "intro": "Diese Website ist eine Erleichterung. Sie ersetzt den offiziellen Plan nicht und garantiert nichts. Hier sind ihre Grenzen im Einzelnen.",
@@ -266,7 +256,6 @@
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
     "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält."
   },
-
   "independance": {
     "titre": "Unabhängige Website",
     "corps1": "Diese Website steht in keiner Verbindung zur Gemeinde Beckerich, zur Grundschule oder zur Maison Relais Dillendapp. Sie wurde von diesen weder beauftragt noch genehmigt noch geprüft.",
@@ -278,7 +267,6 @@
     "lienPdf": "Offiziellen Plan herunterladen",
     "contact": "Fehler melden"
   },
-
   "installer": {
     "titre": "App installieren",
     "intro": "Auf dem Startbildschirm installiert, öffnet sich die App im Vollbild, startet sofort und funktioniert ohne Netz.",
@@ -310,14 +298,12 @@
     "boutonInstaller": "Jetzt installieren",
     "dejaInstallee": "Die App ist auf diesem Gerät bereits installiert."
   },
-
   "maj": {
     "disponible": "Eine neue Version ist verfügbar.",
     "recharger": "Neu laden",
     "version": "Version {version}",
     "horsLigne": "Offline — die Fahrzeiten bleiben abrufbar."
   },
-
   "commun": {
     "fermer": "Schließen",
     "modifier": "Ändern",

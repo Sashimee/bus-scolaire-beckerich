@@ -79,9 +79,20 @@ export function Semaine() {
           <section className="carte pile pile--serre" key={jour}>
             <div className="rangee" style={{ justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '1rem' }}>{t(`jours.${jour}`)}</h3>
-              <span className="etiquette">{t(`repas.${enfant.repas[jour]}Court`)}</span>
+              <span className="rangee">
+                <span className="etiquette">{t(`repas.${enfant.repas[jour]}Court`)}</span>
+                {(enfant.bus?.[jour] ?? 'aller-retour') !== 'aller-retour' && (
+                  <span className="etiquette">
+                    {t(`bus.${enfant.bus?.[jour] ?? 'aller-retour'}Court`)}
+                  </span>
+                )}
+              </span>
             </div>
-            <JourneeTrajets journee={journee} />
+            {(enfant.bus?.[jour] ?? 'aller-retour') === 'aucun' ? (
+              <p className="champ__aide">{t('bus.sansBus')}</p>
+            ) : (
+              <JourneeTrajets journee={journee} />
+            )}
           </section>
         )
       })}

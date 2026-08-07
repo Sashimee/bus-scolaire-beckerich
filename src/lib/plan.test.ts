@@ -181,6 +181,63 @@ describe('cas particulier de Huttange', () => {
   })
 })
 
+describe("usage partiel du bus", () => {
+  const avecBus = (c: Cycle, repas: RepasMidi, usages: Partial<Record<Jour, 'aller-retour' | 'aller' | 'retour' | 'aucun'>>) => {
+    const e = enfant(c, repas)
+    e.bus = Object.fromEntries(
+      JOURS.map((j) => [j, usages[j] ?? 'aller-retour']),
+    ) as Enfant['bus']
+    return e
+  }
+
+  it("n'affiche que l'aller quand le parent récupère l'enfant en voiture", () => {
+    const ctx = contexteEnfant(avecBus('c2', 'maison', { lundi: 'aller' }), HOVELANGE)
+    expect(types(ctx, 'lundi')).toEqual(['aller-matin', 'aller-apres-midi'])
+  })
+
+  it("n'affiche que les retours quand le parent dépose l'enfant le matin", () => {
+    const ctx = contexteEnfant(avecBus('c2', 'maison', { lundi: 'retour' }), HOVELANGE)
+    expect(types(ctx, 'lundi')).toEqual(['retour-midi', 'retour-soir'])
+  })
+
+  it('n’affiche aucun trajet un jour sans bus', () => {
+    const ctx = contexteEnfant(avecBus('c2', 'maison', { jeudi: 'aucun' }), HOVELANGE)
+    const journee = trajetsDuJour(ctx!, 'jeudi')
+    expect(journee.trajets.filter((t) => t.concerneParent)).toHaveLength(0)
+    expect(journee.manquants).toHaveLength(0)
+  })
+
+  it("ne signale pas de retour manquant si le parent assure lui-même le retour", () => {
+    // Sans ce filtre, l'application avertirait d'un trou que le parent a déjà comblé.
+    const ctx = contexteEnfant(avecBus('c2', 'dillendapp', { mardi: 'aller' }), HOVELANGE)
+    const mardi = trajetsDuJour(ctx!, 'mardi')
+    expect(mardi.manquants).toHaveLength(0)
+    expect(mardi.incertitudes).toHaveLength(0)
+  })
+
+  it('reste indépendant du réglage des autres jours', () => {
+    const ctx = contexteEnfant(
+      avecBus('c2', 'maison', { lundi: 'aucun', mardi: 'retour' }),
+      HOVELANGE,
+    )
+    expect(types(ctx, 'lundi')).toEqual([])
+    expect(types(ctx, 'mardi')).toEqual(['retour-midi'])
+    expect(types(ctx, 'mercredi')).toEqual([
+      'aller-matin',
+      'retour-midi',
+      'aller-apres-midi',
+      'retour-soir',
+    ])
+  })
+
+  it('traite une configuration ancienne sans réglage de bus comme un aller-retour', () => {
+    const e = enfant('c2', 'maison')
+    delete e.bus
+    const ctx = contexteEnfant(e, HOVELANGE)
+    expect(types(ctx, 'lundi')).toHaveLength(4)
+  })
+})
+
 describe('incertitudes assumées', () => {
   it("signale l'ambiguïté le mardi, là où elle a une conséquence", () => {
     const ctx = contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)

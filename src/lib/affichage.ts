@@ -6,7 +6,41 @@
  */
 import type { Traduction } from '../i18n'
 import { arret as trouverArret, plan } from './donnees'
-import type { Arret } from './types'
+import type { Arret, ArretDesservi, Ligne, Service } from './types'
+
+/**
+ * Aligne les services d'une ligne sur une même colonne d'arrêts, pour l'affichage
+ * en tableau.
+ *
+ * On ne peut pas se contenter de l'index : sur l'Aller 1, la course de l'après-midi
+ * part de Beckerich alors que celle du matin commence à Huttange. Aligner par
+ * position décalerait toute la colonne du matin d'un cran. On parcourt donc les deux
+ * séquences en parallèle, en avançant dans le service quand l'arrêt correspond.
+ */
+export function alignerServices(ligne: Ligne): {
+  reference: ArretDesservi[]
+  colonnes: { service: Service; cases: (ArretDesservi | null)[] }[]
+} {
+  const reference = ligne.services.reduce((a, b) =>
+    b.arrets.length > a.arrets.length ? b : a,
+  ).arrets
+
+  const colonnes = ligne.services.map((service) => {
+    let curseur = 0
+    const cases = reference.map((ref) => {
+      for (let k = curseur; k < service.arrets.length; k++) {
+        if (service.arrets[k].arret === ref.arret) {
+          curseur = k + 1
+          return service.arrets[k]
+        }
+      }
+      return null
+    })
+    return { service, cases }
+  })
+
+  return { reference, colonnes }
+}
 
 /**
  * Nom affiché d'un arrêt : « Noerdange · École », « Hovelange · Kneppchen ».

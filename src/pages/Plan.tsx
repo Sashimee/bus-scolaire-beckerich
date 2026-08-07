@@ -1,14 +1,12 @@
 import { useT } from '../i18n'
 import { plan } from '../lib/donnees'
-import { nomArretParId } from '../lib/affichage'
+import { alignerServices, nomArretParId } from '../lib/affichage'
 import type { Ligne } from '../lib/types'
 
 function TableauLigne({ ligne }: { ligne: Ligne }) {
   const { t } = useT()
 
-  // Les services d'une même ligne partagent leur séquence d'arrêts ; on prend la plus
-  // longue comme colonne de référence et on aligne les horaires dessus.
-  const reference = ligne.services.reduce((a, b) => (b.arrets.length > a.arrets.length ? b : a))
+  const { reference, colonnes } = alignerServices(ligne)
 
   return (
     <section className="pile pile--serre">
@@ -41,17 +39,16 @@ function TableauLigne({ ligne }: { ligne: Ligne }) {
             </tr>
           </thead>
           <tbody>
-            {reference.arrets.map((a, i) => (
+            {reference.map((a, i) => (
               <tr key={`${a.arret}-${i}`}>
                 <th scope="row" style={{ fontWeight: 500 }}>
                   {nomArretParId(a.arret, t)}
                 </th>
-                {ligne.services.map((s) => {
-                  const correspondant = s.arrets[i]
-                  const meme = correspondant?.arret === a.arret
+                {colonnes.map(({ service, cases }) => {
+                  const c = cases[i]
                   return (
-                    <td className="heure" key={s.id}>
-                      {meme ? (correspondant.heure ?? '—') : '—'}
+                    <td className="heure" key={service.id}>
+                      {c ? (c.heure ?? (c.desservi === false ? '—' : '·')) : '—'}
                     </td>
                   )
                 })}
@@ -61,7 +58,7 @@ function TableauLigne({ ligne }: { ligne: Ligne }) {
         </table>
       </div>
 
-      {[...new Set(reference.arrets.flatMap((a) => a.notes ?? []))].map((note) => (
+      {[...new Set(colonnes.flatMap((c) => c.cases.flatMap((x) => x?.notes ?? [])))].map((note) => (
         <p className="champ__aide" key={note}>
           * {t(`notes.${note}`)}
         </p>

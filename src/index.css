@@ -342,25 +342,58 @@
     font-size: 0.85rem;
   }
 
-  /* Grille du repas de midi */
-  .grille-repas {
-    display: grid;
-    gap: 0.4rem;
+  /* Grille hebdomadaire : repas de midi et usage du bus, jour par jour */
+  .fieldset-nu {
+    border: 0;
+    padding: 0;
+    margin: 0;
   }
 
-  .grille-repas__jour {
+  .legende {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0;
+  }
+
+  .grille-semaine {
     display: grid;
-    grid-template-columns: 5.5rem 1fr;
+    gap: 0.45rem;
+  }
+
+  .grille-semaine__entete,
+  .grille-semaine__jour {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(9rem, 1fr) minmax(9rem, 1.2fr);
     align-items: center;
     gap: 0.5rem;
   }
 
-  .grille-repas__nom {
+  .grille-semaine__entete {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* Sur petit écran, les deux réglages passent l'un sous l'autre sous le nom du jour. */
+  @media (max-width: 34rem) {
+    .grille-semaine__entete {
+      display: none;
+    }
+    .grille-semaine__jour {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+      padding-block-end: 0.6rem;
+      border-block-end: 1px solid var(--line);
+    }
+  }
+
+  .grille-semaine__nom {
     font-size: 0.9rem;
     font-weight: 600;
   }
 
-  .grille-repas__nom small {
+  .grille-semaine__nom small {
     display: block;
     color: var(--muted);
     font-weight: 400;

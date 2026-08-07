@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from '../composants/ChampAdresse'
-import { GrilleRepas } from '../composants/GrilleRepas'
+import { GrilleSemaine } from '../composants/GrilleSemaine'
 import { siteDuCycle } from '../lib/donnees'
 import type { Cycle } from '../lib/types'
 
@@ -19,6 +19,8 @@ export function Configurer() {
     modifierEnfant,
     definirRepas,
     definirRepasSemaine,
+    definirBus,
+    definirBusSemaine,
     supprimerEnfant,
     configure,
   } = useFoyer()
@@ -81,10 +83,12 @@ export function Configurer() {
               {t('enfant.cycleAide')}
             </p>
 
-            <GrilleRepas
+            <GrilleSemaine
               enfant={enfant}
-              onChanger={(jour, repas) => definirRepas(enfant.id, jour, repas)}
-              onToutChanger={(repas) => definirRepasSemaine(enfant.id, repas)}
+              onRepas={(jour, repas) => definirRepas(enfant.id, jour, repas)}
+              onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
+              onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
+              onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
             />
 
             <div className="rangee">
