@@ -1,8 +1,23 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-07T22:02:39.746Z",
-  "perturbations": [],
+  "misAJour": "2026-08-07T22:04:16.044Z",
+  "perturbations": [
+    {
+      "id": "2026-08-08-glhhi",
+      "du": "2026-08-07",
+      "au": "2026-08-07",
+      "type": "retard",
+      "arret": "beckerich-dillendapp",
+      "minutes": 10,
+      "message": {
+        "fr": "Hallo welter"
+      },
+      "publieLe": "2026-08-07T22:04:16.044Z",
+      "publiePar": "Alex",
+      "gravite": "alerte"
+    }
+  ],
   "correctionsArrets": [
     {
       "arret": "levelange",
