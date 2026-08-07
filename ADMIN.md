@@ -143,6 +143,29 @@ vérification par an, en même temps que la mise à jour du plan de bus.
 > Prévois de vérifier `/sante` puis un envoi réel avant d'annoncer la fonctionnalité
 > aux parents.
 
+### Le chemin court : le script guidé
+
+```bash
+cd worker
+./installer.sh
+```
+
+Il enchaîne tout — dépendances, connexion Cloudflare, création de l'espace de
+stockage, génération des clés, dépôt des quatre secrets, déploiement, déclaration des
+variables côté GitHub, puis vérification — en s'arrêtant aux deux seuls moments qui
+demandent une décision : l'identifiant de compte Cloudflare et la création de
+l'application OAuth GitHub.
+
+Deux précautions y sont prises :
+
+- **la clé privée VAPID n'est jamais affichée** : elle passe directement du générateur
+  au secret Cloudflare ;
+- **l'identifiant de compte n'est pas écrit dans le dépôt** : il est lu depuis
+  `CLOUDFLARE_ACCOUNT_ID` ou demandé à l'exécution.
+
+Les étapes ci-dessous décrivent la même chose à la main, si tu préfères contrôler
+chaque commande ou si le script échoue quelque part.
+
 ### a. Générer les clés VAPID
 
 ```bash

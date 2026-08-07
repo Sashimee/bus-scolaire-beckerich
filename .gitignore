@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
+
+# Identifiant de compte et secrets ne sont jamais commités.
+worker/.dev.vars
+.env
+.env.local
