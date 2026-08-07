@@ -17,6 +17,11 @@ id = "à-remplacer-après-création"
 ORIGINES_AUTORISEES = "https://sashimee.github.io,http://localhost:5173"
 # Contact exigé par la spécification VAPID, transmis aux services de push.
 CONTACT_VAPID = "mailto:contact@example.org"
+# Nombre d'abonnés traités par invocation. Le plan gratuit n'accorde que 10 ms de
+# processeur, et chaque push coûte un chiffrement plus une signature. 10 est une
+# estimation prudente, NON MESURÉE : à ajuster après un premier envoi réel en
+# regardant `npx wrangler tail`. Voir ADMIN.md.
+TAILLE_LOT = "10"
 
 # Secrets à définir séparément, jamais dans ce fichier :
 #   npx wrangler secret put GITHUB_CLIENT_ID

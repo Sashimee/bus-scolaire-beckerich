@@ -94,10 +94,49 @@ sans l'étape 3, c'est uniquement la notification qui sonne toute seule.
 
 **Pourquoi une brique en plus.** Le Web Push exige techniquement un serveur qui émet
 la notification et un endroit où conserver les abonnements. Aucune page statique ne
-peut le faire seule. Le Worker Cloudflare ci-dessous est ce minimum : il tient dans
-l'offre gratuite, ne demande aucune maintenance, et ne stocke **aucune donnée
-personnelle** — ni adresse, ni prénom, ni cycle, seulement des identifiants d'appareil
-opaques, supprimés dès le désabonnement.
+peut le faire seule. Le Worker Cloudflare ci-dessous est ce minimum. Il ne stocke
+**aucune donnée personnelle** — ni adresse, ni prénom, ni cycle, seulement des
+identifiants d'appareil opaques, supprimés dès le désabonnement.
+
+### Ce que ça coûte réellement
+
+Chiffres relevés sur la [documentation Cloudflare](https://developers.cloudflare.com/workers/platform/limits/)
+en août 2026, à revérifier : les grilles tarifaires changent.
+
+| | Plan gratuit | Plan payant |
+| --- | --- | --- |
+| Requêtes | 100 000 / jour | illimité — **5 $/mois** |
+| **Processeur par invocation** | **10 ms** | jusqu'à 5 minutes |
+| Lectures KV | 100 000 / jour | — |
+| Écritures KV | 1 000 / jour | — |
+| Stockage KV | 1 Go | — |
+
+Pour cette commune, les volumes ne posent aucun problème : 300 familles abonnées et
+trois alertes par jour représentent environ 900 lectures KV, très loin des 100 000.
+
+**La contrainte réelle est ailleurs : les 10 ms de processeur par invocation.** Le Web
+Push impose un chiffrement et une signature *par destinataire*. Une boucle sur tous les
+abonnés dépasserait ce budget dès quelques dizaines d'inscrits, et Cloudflare
+interromprait l'envoi en silence — une partie des parents ne recevrait rien sans que
+personne s'en aperçoive.
+
+Le Worker contourne cela en découpant l'envoi en lots, chaque lot repartant avec son
+propre budget. Avec les réglages par défaut (`TAILLE_LOT = 10`, 45 lots), il couvre
+**environ 450 abonnés par envoi**. Au-delà, il répond explicitement `507 trop-abonnes`
+plutôt que de servir une partie des familles seulement.
+
+> **Le coût par push n'a pas été mesuré.** `TAILLE_LOT = 10` est une estimation
+> prudente, pas une valeur validée. Après le premier envoi réel, regarde
+> `npx wrangler tail` : si aucune invocation n'est interrompue, tu peux monter la
+> valeur ; si certaines le sont, descends-la. Passer au plan payant à 5 $/mois lève
+> entièrement la question.
+
+### « Sans maintenance » serait exagéré
+
+Ce n'est pas un service qu'on installe et qu'on oublie : la dépendance
+`webpush-webcrypto` et `wrangler` se mettent à jour, l'application OAuth GitHub et les
+clés VAPID peuvent devoir être renouvelées, et l'API de Cloudflare évolue. Compte une
+vérification par an, en même temps que la mise à jour du plan de bus.
 
 > Ces étapes demandent tes identifiants Cloudflare et GitHub : à toi de les faire.
 > Le code est écrit, mais **il n'a pas pu être testé de bout en bout** faute de compte.

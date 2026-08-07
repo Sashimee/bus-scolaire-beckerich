@@ -119,8 +119,16 @@ async function empreinte(texte) {
 }
 
 /**
- * Envoie une notification à tous les abonnés.
- * Appelé par GitHub Actions après la publication d'une urgence, jamais par le navigateur.
+ * Répartit l'envoi entre plusieurs invocations.
+ *
+ * Le plan gratuit n'accorde que 10 ms de processeur par invocation, et le Web Push
+ * impose un chiffrement AES-GCM plus une signature ECDSA PAR destinataire. Une boucle
+ * sur tous les abonnés dépasserait ce budget dès quelques dizaines d'inscrits, et
+ * Cloudflare interromprait l'invocation en silence : une partie des parents ne
+ * recevrait rien, sans que personne s'en aperçoive.
+ *
+ * On découpe donc en lots, chaque lot étant une sous-requête vers `/notifier-lot`,
+ * qui repart avec son propre budget. Le plan gratuit autorise 50 sous-requêtes.
  */
 async function notifier(requete, env) {
   if (requete.headers.get('Authorization') !== `Bearer ${env.SECRET_NOTIFICATION}`) {
@@ -130,14 +138,73 @@ async function notifier(requete, env) {
   const charge = await requete.json()
   if (!charge?.corps) return json({ erreur: 'corps-manquant' }, 400)
 
-  const cles = await ApplicationServerKeys.fromJSON(JSON.parse(env.VAPID_JWK))
+  const tailleLot = Number(env.TAILLE_LOT ?? 10)
+  const maxSousRequetes = 45 // marge sous la limite de 50 du plan gratuit
+
   const liste = await env.ABONNEMENTS.list({ prefix: PREFIXE_ABONNEMENT })
+  const noms = liste.keys.map((k) => k.name)
+
+  const lots = []
+  for (let i = 0; i < noms.length; i += tailleLot) lots.push(noms.slice(i, i + tailleLot))
+
+  // Au-delà de la capacité d'un seul passage, on le dit franchement plutôt que
+  // d'envoyer à une partie seulement des parents.
+  if (lots.length > maxSousRequetes) {
+    return json(
+      {
+        erreur: 'trop-abonnes',
+        total: noms.length,
+        capacite: tailleLot * maxSousRequetes,
+        conseil:
+          "Augmenter TAILLE_LOT si le processeur le permet, ou passer au plan Workers payant (5 $/mois) qui lève la limite de 10 ms.",
+      },
+      507,
+    )
+  }
+
+  const origine = new URL(requete.url).origin
+  const resultats = await Promise.all(
+    lots.map((lot) =>
+      fetch(`${origine}/notifier-lot`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.SECRET_NOTIFICATION}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ charge, noms: lot }),
+      })
+        .then((r) => r.json())
+        .catch(() => ({ envoyees: 0, purgees: 0, echecs: lot.length })),
+    ),
+  )
+
+  const cumul = resultats.reduce(
+    (a, r) => ({
+      envoyees: a.envoyees + (r.envoyees ?? 0),
+      purgees: a.purgees + (r.purgees ?? 0),
+      echecs: a.echecs + (r.echecs ?? 0),
+    }),
+    { envoyees: 0, purgees: 0, echecs: 0 },
+  )
+
+  return json({ ...cumul, total: noms.length, lots: lots.length })
+}
+
+/** Envoie un lot d'abonnements. Une invocation, donc un budget processeur propre. */
+async function notifierLot(requete, env) {
+  if (requete.headers.get('Authorization') !== `Bearer ${env.SECRET_NOTIFICATION}`) {
+    return json({ erreur: 'non-autorise' }, 401)
+  }
+
+  const { charge, noms } = await requete.json()
+  const cles = await ApplicationServerKeys.fromJSON(JSON.parse(env.VAPID_JWK))
 
   let envoyees = 0
   let purgees = 0
+  let echecs = 0
 
-  for (const { name } of liste.keys) {
-    const brut = await env.ABONNEMENTS.get(name)
+  for (const nom of noms ?? []) {
+    const brut = await env.ABONNEMENTS.get(nom)
     if (!brut) continue
 
     try {
@@ -154,19 +221,21 @@ async function notifier(requete, env) {
       // 404 et 410 signifient que l'abonnement n'existe plus côté navigateur :
       // on le supprime plutôt que de le réessayer indéfiniment.
       if (reponse.status === 404 || reponse.status === 410) {
-        await env.ABONNEMENTS.delete(name)
+        await env.ABONNEMENTS.delete(nom)
         purgees++
       } else if (reponse.ok) {
         envoyees++
+      } else {
+        echecs++
       }
     } catch {
       // Un abonnement illisible ne doit pas empêcher les autres d'être servis.
-      await env.ABONNEMENTS.delete(name)
+      await env.ABONNEMENTS.delete(nom)
       purgees++
     }
   }
 
-  return json({ envoyees, purgees, total: liste.keys.length })
+  return json({ envoyees, purgees, echecs })
 }
 
 export default {
@@ -197,6 +266,8 @@ export default {
           return desabonner(requete, env, origine)
         case 'POST /notifier':
           return notifier(requete, env)
+        case 'POST /notifier-lot':
+          return notifierLot(requete, env)
         default:
           return json({ erreur: 'route-inconnue' }, 404)
       }
