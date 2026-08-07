@@ -72,6 +72,14 @@
     "touteLaSemaine": "Mittagessen, ganze Woche:",
     "sansCoursApresMidi": "Kein Nachmittagsunterricht"
   },
+  "dillendapp": {
+    "titre": "Anwesenheit im Dillendapp",
+    "jusqua": "Bleibt bis",
+    "repartEnBus": "Fährt mit dem Bus",
+    "aRecuperer": "Im Dillendapp abzuholen",
+    "recuperation": "Um {heure} im Dillendapp abzuholen.",
+    "aide": "Wenn Sie eine Uhrzeit angeben, bleibt das Kind nach dem Unterricht in der Maison Relais: der Abendbus setzt es dort ab, statt es nach Hause zu bringen."
+  },
   "bus": {
     "titre": "Bus",
     "aide": "Wenn Sie Ihr Kind an manchen Tagen selbst bringen oder abholen, geben Sie es hier an: die App zeigt dann nur die Fahrten, die es wirklich nimmt.",
@@ -121,7 +129,8 @@
     "alternative": "Ebenfalls möglich: {ligne} um {heure}",
     "interne": "Während des Schultags",
     "concerneParent": "Ihre Fahrten",
-    "aucun": "An diesem Tag keine Fahrt."
+    "aucun": "An diesem Tag keine Fahrt.",
+    "retour-soir-dillendapp": "Rückfahrt zum Dillendapp, abends"
   },
   "manquants": {
     "titre": "Vom Plan nicht abgedeckt",

@@ -72,6 +72,14 @@
     "touteLaSemaine": "Mëttegiessen, ganz Woch:",
     "sansCoursApresMidi": "Kee Cours nomëttes"
   },
+  "dillendapp": {
+    "titre": "Präsenz am Dillendapp",
+    "jusqua": "Bleift bis",
+    "repartEnBus": "Fiert mam Bus",
+    "aRecuperer": "Am Dillendapp ofzehuelen",
+    "recuperation": "Um {heure} am Dillendapp ofzehuelen.",
+    "aide": "Wann Dir eng Auerzäit uginn, bleift d'Kand nom Cours an der Maison Relais: den Owesbus setzt et do of, amplaz et heem ze bréngen."
+  },
   "bus": {
     "titre": "Bus",
     "aide": "Wann Dir Äert Kand un e puer Deeg selwer bréngt oder ofhëlt, gitt et hei un: d'App weist dann nëmmen d'Fahrten, déi et wierklech hëlt.",
@@ -121,7 +129,8 @@
     "alternative": "Och méiglech: {ligne} um {heure}",
     "interne": "Wärend dem Schouldag",
     "concerneParent": "Är Fahrten",
-    "aucun": "Keng Fahrt un dësem Dag."
+    "aucun": "Keng Fahrt un dësem Dag.",
+    "retour-soir-dillendapp": "Zréck an den Dillendapp, owes"
   },
   "manquants": {
     "titre": "Net vum Plang ofgedeckt",

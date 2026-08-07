@@ -21,6 +21,7 @@ export function Configurer() {
     definirRepasSemaine,
     definirBus,
     definirBusSemaine,
+    definirDillendappJusqua,
     supprimerEnfant,
     configure,
   } = useFoyer()
@@ -89,6 +90,7 @@ export function Configurer() {
               onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
               onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
               onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
+              onDillendapp={(jour, heure) => definirDillendappJusqua(enfant.id, jour, heure)}
             />
 
             <div className="rangee">

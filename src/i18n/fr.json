@@ -72,6 +72,14 @@
     "touteLaSemaine": "Repas, toute la semaine :",
     "sansCoursApresMidi": "Pas de cours l'après-midi"
   },
+  "dillendapp": {
+    "titre": "Présence au Dillendapp",
+    "jusqua": "Reste jusqu'à",
+    "repartEnBus": "Repart en bus",
+    "aRecuperer": "À récupérer au Dillendapp",
+    "recuperation": "À récupérer au Dillendapp à {heure}.",
+    "aide": "Si vous indiquez une heure, l'enfant reste à la maison relais après la classe : le bus du soir l'y dépose au lieu de le ramener chez vous."
+  },
   "bus": {
     "titre": "Bus",
     "aide": "Si vous déposez ou récupérez votre enfant vous-même certains jours, indiquez-le : l'application n'affichera que les trajets qu'il emprunte réellement.",
@@ -121,7 +129,8 @@
     "alternative": "Aussi possible : {ligne} à {heure}",
     "interne": "Pendant la journée d'école",
     "concerneParent": "Vos trajets",
-    "aucun": "Aucun trajet ce jour-là."
+    "aucun": "Aucun trajet ce jour-là.",
+    "retour-soir-dillendapp": "Retour au Dillendapp, soir"
   },
   "manquants": {
     "titre": "Non couvert par le plan",

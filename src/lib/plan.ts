@@ -270,6 +270,11 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const prendAller = usage === 'aller-retour' || usage === 'aller'
   const prendRetour = usage === 'aller-retour' || usage === 'retour'
 
+  // Heure de fin de présence à la maison relais. Elle change la destination du soir :
+  // l'enfant retourne bien en classe l'après-midi — l'école est obligatoire — mais le
+  // bus du soir le dépose au Dillendapp au lieu de le ramener chez lui.
+  const finDillendapp = repas === 'dillendapp' ? (enfant.dillendappJusqua?.[jour] ?? null) : null
+
   const domicile = [arretDomicile.id]
   const ecole = arretsEquivalents(arretEcole.id)
   const dillendapp = arretsEquivalents(maisonRelais.arret)
@@ -289,7 +294,10 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
 
   const ajouter = (
     type: TypeTrajet,
-    o: Omit<RechercheOptions, 'jour' | 'enfant' | 'villageDomicile' | 'repas'>,
+    o: Omit<RechercheOptions, 'jour' | 'enfant' | 'villageDomicile' | 'repas'> & {
+      /** Force la visibilité côté parent quand le trajet ne touche pas son arrêt. */
+      concerneParent?: boolean
+    },
   ) => {
     const trouvees = liaisons({ ...base, ...o })
     if (!trouvees.length) {
@@ -306,8 +314,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       notes: principal.notes,
       incertitude: principal.service.incertitude,
       concerneParent:
-        principal.depart.arret.id === arretDomicile.id ||
-        principal.arrivee.arret.id === arretDomicile.id,
+        o.concerneParent ??
+        (principal.depart.arret.id === arretDomicile.id ||
+          principal.arrivee.arret.id === arretDomicile.id),
       alternatives: reste.map((l) => ({ ligne: l.ligne, heureDepart: l.depart.heure })),
     })
   }
@@ -360,19 +369,30 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     }
   }
 
-  // 4. Le retour du soir n'existe que les jours où il y a cours l'après-midi.
-  //    Les autres jours, un enfant resté au Dillendapp n'a pas de bus : le plan
-  //    officiel ne le prévoit pas, et l'application doit le dire plutôt que l'inventer.
+  // 4. Le soir. Trois cas, selon que l'enfant rentre, reste à la maison relais, ou
+  //    n'a tout simplement pas de bus ce jour-là.
   if (apresMidi) {
     if (prendRetour) {
-      ajouter('retour-soir', {
-        depuis: ecole,
-        vers: domicile,
-        periodes: ['soir'],
-        directions: ['vers-domicile'],
-      })
+      if (finDillendapp) {
+        // L'enfant reste au Dillendapp après la classe : le bus du soir l'y dépose.
+        // Le parent ne l'attend donc pas à son arrêt, il vient le chercher sur place.
+        ajouter('retour-soir-dillendapp', {
+          depuis: ecole,
+          vers: dillendapp,
+          periodes: ['soir'],
+          directions: ['vers-domicile'],
+          concerneParent: true,
+        })
+      } else {
+        ajouter('retour-soir', {
+          depuis: ecole,
+          vers: domicile,
+          periodes: ['soir'],
+          directions: ['vers-domicile'],
+        })
+      }
     }
-  } else if (repas === 'dillendapp' && prendRetour) {
+  } else if (repas === 'dillendapp' && prendRetour && !finDillendapp) {
     // Pas de cours l'après-midi, et les retours de fin de journée ne circulent pas ces
     // jours-là — confirmé auprès de la commune. Un enfant resté à la maison relais
     // doit donc être récupéré sur place : ce n'est pas une incertitude du plan, c'est
@@ -388,7 +408,16 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     return ha - hb
   })
 
-  return { jour, trajets, manquants, incertitudes }
+  return {
+    jour,
+    trajets,
+    manquants,
+    incertitudes,
+    // Dès que le parent a indiqué une heure de fin de présence, l'absence de bus
+    // n'est plus un manque : c'est lui qui vient chercher l'enfant, et l'application
+    // le rappelle au lieu de l'alerter.
+    ...(finDillendapp ? { recuperation: { lieu: 'dillendapp' as const, heure: finDillendapp } } : {}),
+  }
 }
 
 /** La semaine complète d'un enfant. */

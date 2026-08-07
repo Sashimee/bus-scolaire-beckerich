@@ -8,7 +8,13 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { busParDefaut, chargerFoyer, enregistrerFoyer, repasParDefaut } from './lib/stockage'
+import {
+  busParDefaut,
+  chargerFoyer,
+  dillendappParDefaut,
+  enregistrerFoyer,
+  repasParDefaut,
+} from './lib/stockage'
 import { contexteEnfant, type ContexteEnfant } from './lib/plan'
 import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './lib/types'
 import { JOURS } from './lib/types'
@@ -27,6 +33,7 @@ interface EtatFoyer {
   definirRepasSemaine: (id: string, repas: RepasMidi) => void
   definirBus: (id: string, jour: Jour, usage: UsageBus) => void
   definirBusSemaine: (id: string, usage: UsageBus) => void
+  definirDillendappJusqua: (id: string, jour: Jour, heure: string | null) => void
   supprimerEnfant: (id: string) => void
   remplacerFoyer: (f: Foyer) => void
   theme: Theme
@@ -98,6 +105,7 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
               cycle,
               repas: repasParDefaut(),
               bus: busParDefaut(),
+              dillendappJusqua: dillendappParDefaut(),
             },
           ],
         })),
@@ -119,6 +127,12 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
         majEnfant(id, (e) => ({
           ...e,
           bus: { ...busParDefaut(), ...e.bus, [jour]: usage },
+        })),
+
+      definirDillendappJusqua: (id, jour, heure) =>
+        majEnfant(id, (e) => ({
+          ...e,
+          dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua, [jour]: heure },
         })),
 
       definirBusSemaine: (id, usage) =>

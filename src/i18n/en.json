@@ -72,6 +72,14 @@
     "touteLaSemaine": "Lunch, whole week:",
     "sansCoursApresMidi": "No afternoon classes"
   },
+  "dillendapp": {
+    "titre": "Time at the Dillendapp",
+    "jusqua": "Stays until",
+    "repartEnBus": "Takes the bus home",
+    "aRecuperer": "To collect from the Dillendapp",
+    "recuperation": "To collect from the Dillendapp at {heure}.",
+    "aide": "If you give a time, the child stays at the maison relais after class: the evening bus drops them there instead of taking them home."
+  },
   "bus": {
     "titre": "Bus",
     "aide": "If you drop off or pick up your child yourself on some days, say so here: the app will then only show the journeys they actually take.",
@@ -121,7 +129,8 @@
     "alternative": "Also possible: {ligne} at {heure}",
     "interne": "During the school day",
     "concerneParent": "Your journeys",
-    "aucun": "No journey that day."
+    "aucun": "No journey that day.",
+    "retour-soir-dillendapp": "Back to the Dillendapp, evening"
   },
   "manquants": {
     "titre": "Not covered by the plan",

@@ -162,6 +162,15 @@ export interface Enfant {
   /** L'usage du bus, jour par jour. Absent sur les données enregistrées avant
    *  l'introduction du réglage : traiter alors comme « aller-retour ». */
   bus?: Record<Jour, UsageBus>
+  /**
+   * Heure à laquelle le parent vient chercher l'enfant au Dillendapp, par jour.
+   *
+   * `null` signifie que l'enfant repart avec le bus comme les autres. Une heure
+   * signifie qu'il RESTE à la maison relais au-delà de la classe : le bus du soir ne
+   * le ramène alors pas chez lui, il le dépose au Dillendapp où le parent le récupère.
+   * Ne vaut que les jours où le repas de midi est pris au Dillendapp.
+   */
+  dillendappJusqua?: Record<Jour, string | null>
 }
 
 export interface Adresse {
@@ -182,6 +191,8 @@ export type TypeTrajet =
   | 'retour-midi'
   | 'aller-apres-midi'
   | 'retour-soir'
+  /** Le bus du soir dépose l'enfant au Dillendapp au lieu de le ramener chez lui. */
+  | 'retour-soir-dillendapp'
   | 'navette-dillendapp-midi'
   | 'navette-dillendapp-retour'
 
@@ -224,4 +235,9 @@ export interface JourneeEnfant {
    * lundi d'une ambiguïté qui ne concerne que le mardi ne fait qu'inquiéter à tort.
    */
   incertitudes: string[]
+  /**
+   * L'enfant est à récupérer par ses parents, et non ramené par un bus.
+   * Renseigné dès que le parent a indiqué une heure de fin de présence au Dillendapp.
+   */
+  recuperation?: { lieu: 'dillendapp'; heure: string }
 }

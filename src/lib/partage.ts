@@ -9,8 +9,9 @@
 import type { Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
 
-/** 1 : sans l'usage du bus. 2 : avec. Les liens de version 1 restent lisibles. */
-const VERSION = 2
+/** 1 : sans l'usage du bus. 2 : avec. 3 : avec la présence au Dillendapp.
+ *  Les liens plus anciens restent lisibles. */
+const VERSION = 3
 
 const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 
@@ -34,7 +35,7 @@ type FoyerCompact = [
   localite: string,
   lat: number,
   lon: number,
-  enfants: [prenom: string, cycle: number, repas: string, bus?: string][],
+  enfants: [prenom: string, cycle: number, repas: string, bus?: string, dillendapp?: (string | null)[]][],
 ]
 
 function versBase64Url(texte: string): string {
@@ -65,6 +66,7 @@ export function encoderFoyer(foyer: Foyer): string {
       CYCLES.indexOf(e.cycle),
       JOURS.map((j) => (e.repas[j] === 'dillendapp' ? 'd' : 'm')).join(''),
       JOURS.map((j) => LETTRE_BUS[e.bus?.[j] ?? 'aller-retour']).join(''),
+      JOURS.map((j) => e.dillendappJusqua?.[j] ?? null),
     ]),
   ]
   return versBase64Url(JSON.stringify(compact))
@@ -79,7 +81,7 @@ export function decoderFoyer(code: string): Foyer | null {
     const [, libelle, localite, lat, lon, enfantsBruts] = brut
     if (typeof lat !== 'number' || typeof lon !== 'number') return null
 
-    const enfants: Enfant[] = enfantsBruts.map(([prenom, iCycle, repasBrut, busBrut], i) => {
+    const enfants: Enfant[] = enfantsBruts.map(([prenom, iCycle, repasBrut, busBrut, dillendappBrut], i) => {
       const repas = Object.fromEntries(
         JOURS.map((j, k) => [j, (repasBrut[k] === 'd' ? 'dillendapp' : 'maison') as RepasMidi]),
       ) as Record<Jour, RepasMidi>
@@ -87,12 +89,18 @@ export function decoderFoyer(code: string): Foyer | null {
       const bus = Object.fromEntries(
         JOURS.map((j, k) => [j, BUS_PAR_LETTRE[busBrut?.[k] ?? 'b'] ?? 'aller-retour']),
       ) as Record<Jour, UsageBus>
+      // Les liens antérieurs à la version 3 ne portent pas la présence au Dillendapp.
+      const dillendappJusqua = Object.fromEntries(
+        JOURS.map((j, k) => [j, dillendappBrut?.[k] ?? null]),
+      ) as Record<Jour, string | null>
+
       return {
         id: `partage-${i}`,
         prenom: String(prenom),
         cycle: CYCLES[iCycle] ?? 'c1',
         repas,
         bus,
+        dillendappJusqua,
       }
     })
 

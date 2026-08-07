@@ -9,6 +9,7 @@ interface Props {
   onRepasSemaine: (repas: RepasMidi) => void
   onBus: (jour: Jour, usage: UsageBus) => void
   onBusSemaine: (usage: UsageBus) => void
+  onDillendapp: (jour: Jour, heure: string | null) => void
 }
 
 /**
@@ -20,7 +21,14 @@ interface Props {
  * dépose en voiture le matin — d'où une grille et non deux cases à cocher. Les
  * raccourcis « toute la semaine » couvrent le cas simple sans imposer dix réglages.
  */
-export function GrilleSemaine({ enfant, onRepas, onRepasSemaine, onBus, onBusSemaine }: Props) {
+export function GrilleSemaine({
+  enfant,
+  onRepas,
+  onRepasSemaine,
+  onBus,
+  onBusSemaine,
+  onDillendapp,
+}: Props) {
   const { t } = useT()
   const bus = (jour: Jour): UsageBus => enfant.bus?.[jour] ?? 'aller-retour'
 
@@ -78,6 +86,30 @@ export function GrilleSemaine({ enfant, onRepas, onRepasSemaine, onBus, onBusSem
                 ))}
               </select>
             </div>
+
+            {/* La présence prolongée ne se pose que les jours de Dillendapp : on
+                n'affiche le champ que là, pour ne pas alourdir la grille. */}
+            {enfant.repas[jour] === 'dillendapp' && (
+              <div className="grille-semaine__dillendapp">
+                <label htmlFor={`${enfant.id}-fin-${jour}`}>{t('dillendapp.jusqua')}</label>
+                <input
+                  id={`${enfant.id}-fin-${jour}`}
+                  type="time"
+                  step={300}
+                  value={enfant.dillendappJusqua?.[jour] ?? ''}
+                  onChange={(e) => onDillendapp(jour, e.target.value || null)}
+                />
+                {enfant.dillendappJusqua?.[jour] && (
+                  <button
+                    type="button"
+                    className="bouton bouton--discret"
+                    onClick={() => onDillendapp(jour, null)}
+                  >
+                    {t('dillendapp.repartEnBus')}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

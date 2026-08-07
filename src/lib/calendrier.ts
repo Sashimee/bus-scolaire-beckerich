@@ -4,7 +4,7 @@
  * Deux responsabilités : savoir s'il y a école un jour donné, et produire un fichier
  * `.ics` fidèle — c'est-à-dire qui n'annonce pas un bus pendant les vacances.
  */
-import { plan, vacances, type AnneeVacances } from './donnees'
+import { maisonRelais, plan, vacances, type AnneeVacances } from './donnees'
 import { semaineEnfant, type ContexteEnfant } from './plan'
 import type { Jour, Trajet } from './types'
 import { JOURS } from './types'
@@ -176,6 +176,8 @@ export interface OptionsIcs {
   nomArret: (idArret: string) => string
   /** Minutes de marche jusqu'à l'arrêt, pour placer un rappel utile. */
   minutesMarche: number
+  /** Libellé de la récupération à la maison relais, fourni par la couche i18n. */
+  libelleRecuperation: string
 }
 
 /**
@@ -195,9 +197,21 @@ export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
   // Regroupe les trajets identiques (même ligne, même heure, mêmes arrêts) et note
   // les jours où ils ont lieu.
   const groupes = new Map<string, { trajet: Trajet; jours: Jour[] }>()
+  // Récupérations à la maison relais, regroupées par heure.
+  const recuperations = new Map<string, Jour[]>()
+
   for (const journee of semaine) {
+    if (journee.recuperation) {
+      const h = journee.recuperation.heure
+      recuperations.set(h, [...(recuperations.get(h) ?? []), journee.jour])
+    }
+
     for (const t of journee.trajets) {
       if (!t.concerneParent || !t.depart.heure) continue
+      // Le bus qui dépose l'enfant au Dillendapp ne demande rien au parent à un
+      // arrêt : ce qui compte pour lui, c'est l'heure de récupération, ajoutée
+      // séparément ci-dessous.
+      if (t.type === 'retour-soir-dillendapp') continue
       const cle = [t.type, t.ligne.id, t.depart.heure, t.depart.arret.id, t.arrivee.arret.id].join('|')
       const g = groupes.get(cle)
       if (g) g.jours.push(journee.jour)
@@ -253,6 +267,36 @@ export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
       'ACTION:DISPLAY',
       `TRIGGER:-PT${Math.max(5, o.minutesMarche + 5)}M`,
       plier(`DESCRIPTION:${echapper(`${ctx.enfant.prenom} — départ pour l'arrêt`)}`),
+      'END:VALARM',
+      'END:VEVENT',
+    )
+  }
+
+  // Les récupérations au Dillendapp : c'est l'engagement le plus concret du parent,
+  // et le seul que rien d'autre ne lui rappellera.
+  for (const [heure, jours] of recuperations) {
+    const debut = premiereOccurrence(annee.debut, jours)
+    const exdates = exclusions
+      .filter((d) => {
+        const j = jourDeSemaine(d)
+        return j !== null && jours.includes(j)
+      })
+      .map((d) => horodatage(d, heure))
+
+    lignes.push(
+      'BEGIN:VEVENT',
+      `UID:${ctx.enfant.id}-recuperation-${heure.replace(':', '')}@bus-scolaire-beckerich`,
+      `DTSTAMP:${horodatage(new Date(), '00:00')}Z`,
+      `DTSTART:${horodatage(debut, heure)}`,
+      'DURATION:PT15M',
+      `RRULE:FREQ=WEEKLY;BYDAY=${jours.map((j) => JOUR_ICS[j]).join(',')};UNTIL=${finIso}`,
+      ...(exdates.length ? [plier(`EXDATE:${exdates.join(',')}`)] : []),
+      plier(`SUMMARY:${echapper(`${ctx.enfant.prenom} — ${o.libelleRecuperation}`)}`),
+      plier(`LOCATION:${echapper(o.nomArret(maisonRelais.arret))}`),
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      'TRIGGER:-PT20M',
+      plier(`DESCRIPTION:${echapper(`${ctx.enfant.prenom} — ${o.libelleRecuperation}`)}`),
       'END:VALARM',
       'END:VEVENT',
     )

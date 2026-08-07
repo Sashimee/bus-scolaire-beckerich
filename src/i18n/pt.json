@@ -72,6 +72,14 @@
     "touteLaSemaine": "Almoço, toda a semana:",
     "sansCoursApresMidi": "Sem aulas à tarde"
   },
+  "dillendapp": {
+    "titre": "Presença no Dillendapp",
+    "jusqua": "Fica até",
+    "repartEnBus": "Regressa de autocarro",
+    "aRecuperer": "A ir buscar ao Dillendapp",
+    "recuperation": "A ir buscar ao Dillendapp às {heure}.",
+    "aide": "Se indicar uma hora, a criança fica na maison relais depois das aulas: o autocarro do fim do dia deixa-a lá em vez de a levar a casa."
+  },
   "bus": {
     "titre": "Autocarro",
     "aide": "Se em alguns dias leva ou vai buscar o seu filho, indique-o: a aplicação mostrará apenas as deslocações que ele faz realmente.",
@@ -121,7 +129,8 @@
     "alternative": "Também possível: {ligne} às {heure}",
     "interne": "Durante o dia de escola",
     "concerneParent": "As suas deslocações",
-    "aucun": "Nenhuma deslocação nesse dia."
+    "aucun": "Nenhuma deslocação nesse dia.",
+    "retour-soir-dillendapp": "Regresso ao Dillendapp, ao fim do dia"
   },
   "manquants": {
     "titre": "Não coberto pelo plano",

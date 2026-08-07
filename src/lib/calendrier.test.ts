@@ -90,6 +90,7 @@ describe('export iCalendar', () => {
     libelleTrajet: (t) => t.type,
     nomArret: (id) => id,
     minutesMarche: 7,
+    libelleRecuperation: 'À récupérer au Dillendapp',
   })
 
   it('produit un calendrier valide', () => {
@@ -122,6 +123,30 @@ describe('export iCalendar', () => {
   it("n'exporte que les trajets qui concernent le parent", () => {
     // Les navettes internes école ↔ Dillendapp n'ont pas à encombrer l'agenda.
     expect(ics).not.toContain('navette-dillendapp')
+  })
+
+  it("inscrit la récupération au Dillendapp, et pas le bus qui l'y dépose", () => {
+    // Ce qui engage le parent, c'est de venir chercher l'enfant à 18:00 — pas
+    // l'heure à laquelle le bus quitte l'école.
+    const e = enfantTest()
+    e.repas = { ...e.repas, lundi: 'dillendapp' }
+    e.dillendappJusqua = {
+      lundi: '18:00',
+      mardi: null,
+      mercredi: null,
+      jeudi: null,
+      vendredi: null,
+    }
+    const avecRecuperation = genererIcs(contexteEnfant(e, HOVELANGE)!, {
+      libelleTrajet: (t) => t.type,
+      nomArret: (id) => id,
+      minutesMarche: 7,
+      libelleRecuperation: 'À récupérer au Dillendapp',
+    })
+
+    expect(avecRecuperation).toContain('À récupérer au Dillendapp')
+    expect(avecRecuperation).toContain('T180000')
+    expect(avecRecuperation).not.toContain('retour-soir-dillendapp')
   })
 })
 

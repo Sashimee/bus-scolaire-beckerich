@@ -238,6 +238,59 @@ describe("usage partiel du bus", () => {
   })
 })
 
+describe('présence prolongée au Dillendapp', () => {
+  const avecFin = (jour: Jour, heure: string | null, repas: RepasMidi = 'dillendapp') => {
+    const e = enfant('c2', repas)
+    e.dillendappJusqua = Object.fromEntries(
+      JOURS.map((j) => [j, j === jour ? heure : null]),
+    ) as Record<Jour, string | null>
+    return contexteEnfant(e, HOVELANGE)
+  }
+
+  it("fait déposer l'enfant au Dillendapp par le bus du soir, pas à la maison", () => {
+    // Le lundi il y a cours l'après-midi : l'enfant retourne bien en classe, mais
+    // comme il reste ensuite à la maison relais, le bus du soir l'y ramène.
+    const journee = trajetsDuJour(avecFin('lundi', '18:00')!, 'lundi')
+    const soir = journee.trajets.find((t) => t.type === 'retour-soir-dillendapp')
+    expect(soir).toBeDefined()
+    expect(journee.trajets.some((t) => t.type === 'retour-soir')).toBe(false)
+    expect(soir?.arrivee.arret.village).toBe('Beckerich')
+  })
+
+  it("annonce l'heure de récupération", () => {
+    const journee = trajetsDuJour(avecFin('lundi', '18:00')!, 'lundi')
+    expect(journee.recuperation).toEqual({ lieu: 'dillendapp', heure: '18:00' })
+  })
+
+  it('ramène l’enfant à la maison quand aucune heure n’est indiquée', () => {
+    const journee = trajetsDuJour(avecFin('lundi', null)!, 'lundi')
+    expect(journee.trajets.some((t) => t.type === 'retour-soir')).toBe(true)
+    expect(journee.recuperation).toBeUndefined()
+  })
+
+  it("comble le trou du mardi : ce n'est plus un manque si le parent vient", () => {
+    // Sans heure, l'app signalait « pas de bus de retour ». Dès que le parent dit
+    // qu'il vient chercher l'enfant, l'avertissement n'a plus lieu d'être.
+    const journee = trajetsDuJour(avecFin('mardi', '16:00')!, 'mardi')
+    expect(journee.manquants).toHaveLength(0)
+    expect(journee.recuperation?.heure).toBe('16:00')
+  })
+
+  it('signale toujours le trou du mardi quand aucune heure n’est donnée', () => {
+    const journee = trajetsDuJour(avecFin('mardi', null)!, 'mardi')
+    expect(journee.manquants).toContain('retour-soir')
+    expect(journee.recuperation).toBeUndefined()
+  })
+
+  it("ignore l'heure si l'enfant rentre manger à la maison ce jour-là", () => {
+    // Une heure résiduelle d'un réglage précédent ne doit pas transformer un enfant
+    // qui déjeune chez lui en pensionnaire de la maison relais.
+    const journee = trajetsDuJour(avecFin('lundi', '18:00', 'maison')!, 'lundi')
+    expect(journee.recuperation).toBeUndefined()
+    expect(journee.trajets.some((t) => t.type === 'retour-soir')).toBe(true)
+  })
+})
+
 describe('absence de retour les mardi et jeudi', () => {
   it("annonce l'absence de bus comme un fait, sans incertitude", () => {
     // Règle confirmée auprès de la commune : les retours de fin de journée ne

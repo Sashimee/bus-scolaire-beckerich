@@ -731,3 +731,22 @@
     }
   }
 }
+
+@layer composants {
+  /* Champ de fin de présence au Dillendapp, sous la ligne du jour concerné. */
+  .grille-semaine__dillendapp {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline-start: 0.5rem;
+    border-inline-start: 2px solid color-mix(in oklab, var(--accent) 50%, transparent);
+    font-size: 0.85rem;
+  }
+
+  .grille-semaine__dillendapp input[type='time'] {
+    inline-size: auto;
+    min-inline-size: 7rem;
+  }
+}

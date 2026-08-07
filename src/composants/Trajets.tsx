@@ -121,6 +121,13 @@ export function JourneeTrajets({
         </details>
       )}
 
+      {journee.recuperation && (
+        <div className="encart encart--info">
+          <div className="encart__titre">{t('dillendapp.aRecuperer')}</div>
+          {t('dillendapp.recuperation', { heure: journee.recuperation.heure })}
+        </div>
+      )}
+
       {journee.manquants.map((type) => (
         <div className="encart encart--attention" key={type}>
           <div className="encart__titre">{t('manquants.titre')}</div>

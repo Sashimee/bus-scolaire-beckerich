@@ -16,6 +16,7 @@ function sens(trajet: Trajet, t: ReturnType<typeof useT>['t']): string {
     case 'retour-soir':
       return t('impression.versMaison')
     case 'navette-dillendapp-midi':
+    case 'retour-soir-dillendapp':
       return t('impression.versDillendapp')
   }
 }
@@ -80,6 +81,11 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
                     </ul>
                   ) : (
                     <span className="fiche__vide">—</span>
+                  )}
+                  {journee.recuperation && (
+                    <div className="fiche__note">
+                      <b>{t('dillendapp.recuperation', { heure: journee.recuperation.heure })}</b>
+                    </div>
                   )}
                   {journee.manquants.includes('retour-soir') && (
                     <div className="fiche__note">{t('manquants.retour-soir')}</div>

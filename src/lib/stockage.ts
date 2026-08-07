@@ -23,6 +23,11 @@ export function busParDefaut(): Record<Jour, UsageBus> {
   return Object.fromEntries(JOURS.map((j) => [j, 'aller-retour'])) as Record<Jour, UsageBus>
 }
 
+/** Par défaut, aucune présence prolongée au Dillendapp : l'enfant repart en bus. */
+export function dillendappParDefaut(): Record<Jour, string | null> {
+  return Object.fromEntries(JOURS.map((j) => [j, null])) as Record<Jour, string | null>
+}
+
 function lire<T>(cle: string, defaut: T): T {
   try {
     const brut = localStorage.getItem(cle)
@@ -55,6 +60,7 @@ export const chargerFoyer = (): Foyer => {
       ...e,
       repas: { ...repasParDefaut(), ...e.repas },
       bus: { ...busParDefaut(), ...e.bus },
+      dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua },
     })),
   }
 }
