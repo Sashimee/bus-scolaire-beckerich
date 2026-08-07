@@ -125,7 +125,7 @@
   },
   "manquants": {
     "titre": "Vom Plan nicht abgedeckt",
-    "retour-soir": "Der offizielle Plan sieht an diesem Tag keinen Rückbus für ein Kind vor, das im Dillendapp geblieben ist. Bitte erkundigen Sie sich bei der Maison Relais.",
+    "retour-soir": "An diesem Tag gibt es keinen Rückbus: nachmittags ist kein Unterricht und die Spätfahrten verkehren nicht. Planen Sie ein, Ihr Kind im Dillendapp abzuholen.",
     "generique": "Der offizielle Plan sieht für diese Fahrt keinen Bus vor."
   },
   "aujourdhui": {
@@ -172,8 +172,7 @@
     "horaire-intermediaire-non-publie": "Der offizielle Plan veröffentlicht für diese Haltestelle keine Uhrzeit."
   },
   "incertitudes": {
-    "titre": "Vom offiziellen Plan nicht geklärt",
-    "retours-apres-midi-mardi-jeudi": "Der Plan sagt nicht, ob die späten Nachmittagsfahrten dienstags und donnerstags verkehren, also an Tagen ohne Nachmittagsunterricht. Die App geht davon aus, dass sie nicht fahren. Bitte bei der Gemeinde nachfragen."
+    "titre": "Vom offiziellen Plan nicht geklärt"
   },
   "calendrier": {
     "titre": "Zum Kalender hinzufügen",
@@ -198,7 +197,14 @@
   "impression": {
     "titre": "Blatt zum Ausdrucken",
     "bouton": "Woche drucken",
-    "aide": "Eine A4-Seite pro Kind, für den Kühlschrank."
+    "aide": "Eine A4-Seite pro Kind, für den Kühlschrank.",
+    "jour": "Tag",
+    "midi": "Mittag",
+    "trajets": "Fahrten",
+    "versEcole": "→ Schule",
+    "versMaison": "→ nach Hause",
+    "versDillendapp": "→ Dillendapp",
+    "genereLe": "Blatt erstellt am {date}"
   },
   "carte": {
     "titre": "Fußweg",

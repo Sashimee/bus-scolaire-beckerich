@@ -31,13 +31,16 @@
     }
   },
 
-  "incertitudes": [
+  "incertitudes": [],
+
+  "reglesConfirmees": [
     {
       "id": "retours-apres-midi-mardi-jeudi",
-      "portee": "retour-1.apres-midi, retour-2.apres-midi",
-      "question": "Les retours de fin d'après-midi (15:45–16:37) circulent-ils le mardi et le jeudi, jours sans cours l'après-midi, pour les enfants restés à la maison relais ? Le plan officiel ne le précise pas.",
-      "hypothese": "Circulation les seuls lundi, mercredi et vendredi, par cohérence avec la fin des cours à 15:45.",
-      "aVerifierAupres": "Commune de Beckerich / Maison relais Dillendapp"
+      "portee": "retour-1.soir, retour-2.soir",
+      "regle": "Les retours de fin d'après-midi (15:45–16:37) ne circulent PAS le mardi ni le jeudi : il n'y a pas cours l'après-midi ces jours-là. Un enfant resté au Dillendapp doit être récupéré sur place.",
+      "confirmePar": "la commune de Beckerich",
+      "confirmeLe": "2026-08-07",
+      "$note": "Cette règle était initialement listée comme incertaine, l'application affichait une hypothèse. Elle est désormais présentée comme un fait."
     }
   ],
 

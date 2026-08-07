@@ -3,6 +3,7 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
+import { FicheImprimable } from '../composants/FicheImprimable'
 import { datesDeLaSemaine, genererIcs } from '../lib/calendrier'
 import { semaineEnfant } from '../lib/plan'
 import { distanceLisible, nomArret, nomArretParId } from '../lib/affichage'
@@ -50,7 +51,11 @@ export function Semaine() {
   }
 
   return (
-    <div className="pile pile--large enfant-imprimable">
+    <>
+      {/* Mise en page distincte, visible uniquement à l'impression. */}
+      <FicheImprimable ctx={ctx} />
+
+      <div className="pile pile--large ecran-seulement">
       <header className="pile pile--serre">
         <div className="rangee" style={{ justifyContent: 'space-between' }}>
           <h2>{enfant.prenom}</h2>
@@ -121,5 +126,6 @@ export function Semaine() {
         </Link>
       </section>
     </div>
+    </>
   )
 }

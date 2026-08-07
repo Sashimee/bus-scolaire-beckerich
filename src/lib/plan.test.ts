@@ -238,20 +238,20 @@ describe("usage partiel du bus", () => {
   })
 })
 
-describe('incertitudes assumées', () => {
-  it("signale l'ambiguïté le mardi, là où elle a une conséquence", () => {
+describe('absence de retour les mardi et jeudi', () => {
+  it("annonce l'absence de bus comme un fait, sans incertitude", () => {
+    // Règle confirmée auprès de la commune : les retours de fin de journée ne
+    // circulent pas les jours sans cours l'après-midi.
     const ctx = contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)
     const mardi = trajetsDuJour(ctx!, 'mardi')
-    expect(mardi.incertitudes).toContain('retours-apres-midi-mardi-jeudi')
-    expect(plan.incertitudes.some((i) => i.id === mardi.incertitudes[0])).toBe(true)
+    expect(mardi.manquants).toContain('retour-soir')
+    expect(mardi.incertitudes).toHaveLength(0)
   })
 
-  it("ne l'affiche pas le lundi, où le retour du soir est certain", () => {
-    // Avertir un parent le lundi d'une ambiguïté qui ne concerne que le mardi ne
-    // ferait que l'inquiéter à tort.
+  it('laisse le lundi intact, où le retour du soir existe bien', () => {
     const ctx = contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)
     const lundi = trajetsDuJour(ctx!, 'lundi')
-    expect(lundi.incertitudes).toHaveLength(0)
+    expect(lundi.manquants).toHaveLength(0)
     expect(lundi.trajets.some((t) => t.type === 'retour-soir')).toBe(true)
   })
 
@@ -260,6 +260,10 @@ describe('incertitudes assumées', () => {
     const mardi = trajetsDuJour(ctx!, 'mardi')
     expect(mardi.incertitudes).toHaveLength(0)
     expect(mardi.manquants).toHaveLength(0)
+  })
+
+  it("ne déclare plus aucune incertitude dans le plan", () => {
+    expect(plan.incertitudes).toHaveLength(0)
   })
 })
 

@@ -125,7 +125,7 @@
   },
   "manquants": {
     "titre": "Net vum Plang ofgedeckt",
-    "retour-soir": "Den offizielle Plang gesäit un dësem Dag kee Retourbus fir e Kand vir, dat am Dillendapp bliwwen ass. Frot w.e.g. bei der Maison Relais no.",
+    "retour-soir": "Un dësem Dag gëtt et kee Retourbus: nomëttes ass kee Cours an déi spéit Fahrte fueren net. Plangt an, Äert Kand am Dillendapp ofzehuelen.",
     "generique": "Den offizielle Plang gesäit fir dës Fahrt kee Bus vir."
   },
   "aujourdhui": {
@@ -172,8 +172,7 @@
     "horaire-intermediaire-non-publie": "Den offizielle Plang publizéiert fir dës Statioun keng Auerzäit."
   },
   "incertitudes": {
-    "titre": "Vum offizielle Plang net gekläert",
-    "retours-apres-midi-mardi-jeudi": "De Plang seet net, ob déi spéit Nomëttesfahrten dënschdes an donneschdes fueren, also un Deeg ouni Cours nomëttes. D'App geet dovun aus, datt se net fueren. Frot w.e.g. bei der Gemeng no."
+    "titre": "Vum offizielle Plang net gekläert"
   },
   "calendrier": {
     "titre": "An e Kalenner derbäisetzen",
@@ -198,7 +197,14 @@
   "impression": {
     "titre": "Blat fir auszedrécken",
     "bouton": "D'Woch drécken",
-    "aide": "Eng A4-Säit pro Kand, fir op de Frigo."
+    "aide": "Eng A4-Säit pro Kand, fir op de Frigo.",
+    "jour": "Dag",
+    "midi": "Mëtteg",
+    "trajets": "Fahrten",
+    "versEcole": "→ Schoul",
+    "versMaison": "→ heem",
+    "versDillendapp": "→ Dillendapp",
+    "genereLe": "Blat erstallt den {date}"
   },
   "carte": {
     "titre": "Wee zu Fouss",

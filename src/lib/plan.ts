@@ -373,11 +373,11 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       })
     }
   } else if (repas === 'dillendapp' && prendRetour) {
-    // Pas de cours l'après-midi, mais l'enfant est resté à la maison relais : le plan
-    // ne prévoit rien pour son retour. C'est ici, et ici seulement, que l'ambiguïté
-    // du plan a une conséquence pour le parent.
+    // Pas de cours l'après-midi, et les retours de fin de journée ne circulent pas ces
+    // jours-là — confirmé auprès de la commune. Un enfant resté à la maison relais
+    // doit donc être récupéré sur place : ce n'est pas une incertitude du plan, c'est
+    // une absence de desserte, et le parent doit le savoir clairement.
     manquants.push('retour-soir')
-    incertitudes.push('retours-apres-midi-mardi-jeudi')
   }
 
   trajets.sort((a, b) => {

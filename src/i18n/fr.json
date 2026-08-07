@@ -125,7 +125,7 @@
   },
   "manquants": {
     "titre": "Non couvert par le plan",
-    "retour-soir": "Le plan officiel ne prévoit pas de bus de retour ce jour-là pour un enfant resté au Dillendapp. Renseignez-vous auprès de la maison relais.",
+    "retour-soir": "Pas de bus de retour ce jour-là : il n'y a pas cours l'après-midi et les retours de fin de journée ne circulent pas. Prévoyez de venir chercher votre enfant au Dillendapp.",
     "generique": "Le plan officiel ne prévoit pas de bus pour ce déplacement."
   },
   "aujourdhui": {
@@ -172,8 +172,7 @@
     "horaire-intermediaire-non-publie": "Le plan officiel ne publie pas l'heure de passage à cet arrêt."
   },
   "incertitudes": {
-    "titre": "Point non tranché par le plan officiel",
-    "retours-apres-midi-mardi-jeudi": "Le plan ne dit pas si les retours de fin d'après-midi circulent le mardi et le jeudi, jours sans cours l'après-midi. L'application suppose qu'ils ne circulent pas. À vérifier auprès de la commune."
+    "titre": "Point non tranché par le plan officiel"
   },
   "calendrier": {
     "titre": "Ajouter à un agenda",
@@ -198,7 +197,14 @@
   "impression": {
     "titre": "Fiche à imprimer",
     "bouton": "Imprimer la semaine",
-    "aide": "Une page A4 par enfant, à coller sur le frigo."
+    "aide": "Une page A4 par enfant, à coller sur le frigo.",
+    "jour": "Jour",
+    "midi": "Midi",
+    "trajets": "Trajets",
+    "versEcole": "→ école",
+    "versMaison": "→ maison",
+    "versDillendapp": "→ Dillendapp",
+    "genereLe": "Fiche générée le {date}"
   },
   "carte": {
     "titre": "Trajet à pied",

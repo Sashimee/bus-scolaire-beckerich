@@ -579,25 +579,46 @@
 }
 
 @layer impression {
-  /* Feuille à coller sur le frigo : un bloc par enfant, lisible sans couleur. */
+  /*
+   * La fiche papier n'est pas la page écran compressée : c'est une mise en page
+   * distincte. Reprendre l'affichage confortable d'un téléphone occupait trois pages
+   * A4 pour un seul enfant, ce qui ne tient pas sur une porte de frigo.
+   */
+  .fiche {
+    display: none;
+  }
+
   @media print {
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
     :root {
       --bg: #fff;
       --bg-2: #fff;
       --panel: #fff;
       --panel-2: #fff;
-      --line: #999;
+      --line: #767676;
       --text: #000;
-      --muted: #444;
+      --muted: #333;
       --accent: #000;
-      --cyan: #000;
-      --violet: #000;
     }
 
+    /* On masque toute l'interface : seule la fiche est imprimée. */
     .entete,
-    .pied nav,
-    .sans-impression {
+    .pied,
+    .bandeau,
+    .sans-impression,
+    .ecran-seulement {
       display: none !important;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+      font-size: 10pt;
+      line-height: 1.35;
     }
 
     .page {
@@ -605,23 +626,108 @@
       padding: 0;
     }
 
-    .carte {
-      border: 1px solid #999;
+    .fiche {
+      display: block;
+    }
+
+    .fiche__entete {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      border-block-end: 2px solid #000;
+      padding-block-end: 2mm;
+    }
+
+    .fiche__nom {
+      font-size: 20pt;
+      margin: 0;
+    }
+
+    .fiche__site {
+      font-size: 10pt;
+      margin: 0;
+    }
+
+    .fiche__arret {
+      margin-block: 3mm;
+      font-size: 10pt;
+    }
+
+    .fiche__tableau {
+      inline-size: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+
+    .fiche__tableau th,
+    .fiche__tableau td {
+      border: 1px solid #767676;
+      padding: 1.6mm 2mm;
+      text-align: start;
+      vertical-align: top;
+      white-space: normal;
+    }
+
+    .fiche__tableau thead th {
+      background: #eee;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .fiche__tableau tbody th {
+      inline-size: 26mm;
+      font-weight: 700;
+    }
+
+    .fiche__tableau tbody td:first-of-type {
+      inline-size: 26mm;
+    }
+
+    /* Une journée ne doit jamais être coupée entre deux pages. */
+    .fiche__tableau tr {
       break-inside: avoid;
     }
 
-    .enfant-imprimable {
-      break-after: page;
+    .fiche__trajets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 5mm;
     }
 
-    .enfant-imprimable:last-child {
-      break-after: auto;
+    .fiche__trajets b {
+      font-variant-numeric: tabular-nums;
     }
 
-    a[href^='http']::after {
-      content: ' (' attr(href) ')';
-      font-size: 0.7em;
-      color: #444;
+    .fiche__ligne {
+      color: #333;
+      font-size: 8.5pt;
+    }
+
+    .fiche__vide {
+      color: #333;
+    }
+
+    .fiche__note {
+      font-size: 8.5pt;
+      color: #333;
+      margin-block-start: 1mm;
+    }
+
+    .fiche__pied {
+      margin-block-start: 4mm;
+      padding-block-start: 2mm;
+      border-block-start: 1px solid #767676;
+      font-size: 8pt;
+      color: #333;
+    }
+
+    .fiche__pied p {
+      margin: 0 0 1mm;
     }
   }
 }

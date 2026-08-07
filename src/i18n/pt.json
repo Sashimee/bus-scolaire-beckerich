@@ -125,7 +125,7 @@
   },
   "manquants": {
     "titre": "Não coberto pelo plano",
-    "retour-soir": "O plano oficial não prevê autocarro de regresso nesse dia para uma criança que ficou no Dillendapp. Informe-se junto da maison relais.",
+    "retour-soir": "Nesse dia não há autocarro de regresso: não há aulas à tarde e as circulações de fim de dia não funcionam. Conte ir buscar o seu filho ao Dillendapp.",
     "generique": "O plano oficial não prevê autocarro para esta deslocação."
   },
   "aujourdhui": {
@@ -172,8 +172,7 @@
     "horaire-intermediaire-non-publie": "O plano oficial não publica a hora de passagem nesta paragem."
   },
   "incertitudes": {
-    "titre": "Ponto não esclarecido pelo plano oficial",
-    "retours-apres-midi-mardi-jeudi": "O plano não indica se os regressos do fim da tarde circulam à terça e à quinta-feira, dias sem aulas à tarde. A aplicação parte do princípio de que não circulam. A confirmar junto do município."
+    "titre": "Ponto não esclarecido pelo plano oficial"
   },
   "calendrier": {
     "titre": "Adicionar a um calendário",
@@ -198,7 +197,14 @@
   "impression": {
     "titre": "Folha para imprimir",
     "bouton": "Imprimir a semana",
-    "aide": "Uma página A4 por criança, para colar no frigorífico."
+    "aide": "Uma página A4 por criança, para colar no frigorífico.",
+    "jour": "Dia",
+    "midi": "Almoço",
+    "trajets": "Deslocações",
+    "versEcole": "→ escola",
+    "versMaison": "→ casa",
+    "versDillendapp": "→ Dillendapp",
+    "genereLe": "Folha gerada em {date}"
   },
   "carte": {
     "titre": "Percurso a pé",

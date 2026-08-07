@@ -125,7 +125,7 @@
   },
   "manquants": {
     "titre": "Not covered by the plan",
-    "retour-soir": "The official plan provides no return bus that day for a child who stayed at the Dillendapp. Please ask the maison relais.",
+    "retour-soir": "There is no return bus that day: there are no afternoon classes and the late-day runs do not operate. Plan to collect your child from the Dillendapp.",
     "generique": "The official plan provides no bus for this journey."
   },
   "aujourdhui": {
@@ -172,8 +172,7 @@
     "horaire-intermediaire-non-publie": "The official plan does not publish a time for this stop."
   },
   "incertitudes": {
-    "titre": "Not settled by the official plan",
-    "retours-apres-midi-mardi-jeudi": "The plan does not say whether the late-afternoon return buses run on Tuesdays and Thursdays, days without afternoon classes. The app assumes they do not. To be confirmed with the municipality."
+    "titre": "Not settled by the official plan"
   },
   "calendrier": {
     "titre": "Add to a calendar",
@@ -198,7 +197,14 @@
   "impression": {
     "titre": "Printable sheet",
     "bouton": "Print the week",
-    "aide": "One A4 page per child, for the fridge door."
+    "aide": "One A4 page per child, for the fridge door.",
+    "jour": "Day",
+    "midi": "Lunch",
+    "trajets": "Journeys",
+    "versEcole": "→ school",
+    "versMaison": "→ home",
+    "versDillendapp": "→ Dillendapp",
+    "genereLe": "Sheet generated on {date}"
   },
   "carte": {
     "titre": "Walking route",

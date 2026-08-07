@@ -166,14 +166,18 @@ l'après-midi, repas au Dillendapp, cas particuliers de Huttange.
 
 ---
 
-## Questions encore en suspens auprès de la commune
+## Règles confirmées auprès de la commune
 
-À poser lors du prochain contact, et à répercuter dans `incertitudes` de
-`plan-*.json` une fois la réponse obtenue :
+Consignées dans `reglesConfirmees` de `plan-*.json`, avec leur date, pour qu'on sache
+plus tard sur quoi elles reposent :
 
-- **Les retours de fin d'après-midi (15:45–16:37) circulent-ils le mardi et le jeudi ?**
-  Ces jours-là il n'y a pas cours l'après-midi, mais un enfant inscrit au Dillendapp y
-  reste. Le plan officiel ne dit pas comment il rentre. L'application suppose
-  aujourd'hui qu'aucun bus ne circule et le signale au parent.
+- **Les retours de fin d'après-midi (15:45–16:37) ne circulent pas le mardi ni le
+  jeudi**, puisqu'il n'y a pas cours l'après-midi ces jours-là. Un enfant resté au
+  Dillendapp doit être récupéré sur place. *(Confirmé le 7 août 2026.)*
+
+## Questions encore en suspens
+
+À poser lors du prochain contact avec la commune :
+
 - **L'arrêt du départ de 13:25 à Beckerich (Aller 1)** n'est pas nommé dans le plan :
   s'agit-il de l'école, du Dillendapp ou d'un autre point ?

@@ -15,7 +15,9 @@ id = "à-remplacer-après-création"
 # Seules ces origines peuvent recevoir un jeton OAuth en retour.
 # Sans cette liste, le Worker serait une redirection ouverte.
 ORIGINES_AUTORISEES = "https://sashimee.github.io,http://localhost:5173"
-# Contact exigé par la spécification VAPID, transmis aux services de push.
+# Contact exigé par la spécification VAPID, transmis aux services de push en cas de
+# problème. À renseigner avant le déploiement — de préférence une adresse dédiée
+# plutôt qu'une adresse personnelle, ce fichier étant dans un dépôt public.
 CONTACT_VAPID = "mailto:contact@example.org"
 # Nombre d'abonnés traités par invocation. Le plan gratuit n'accorde que 10 ms de
 # processeur, et chaque push coûte un chiffrement plus une signature. 10 est une
