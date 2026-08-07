@@ -60,7 +60,9 @@
     "tempsMarcheEstimation": "about {minutes} min walk (estimate)",
     "distance": "{metres} m",
     "voirSemaine": "View the week",
-    "aucunArret": "From your address, no stop serves this child's school. Please check the official plan."
+    "aucunArret": "From your address, no stop serves this child's school. Please check the official plan.",
+    "aPied": "No bus: the school is right next door",
+    "aPiedDetail": "Your address is about {minutes} min on foot from {site}. No bus journey is planned for {prenom}: the nearest stop is the school’s own."
   },
   "repas": {
     "titre": "Lunch",
@@ -217,7 +219,8 @@
     "versEcole": "→ school",
     "versMaison": "→ home",
     "versDillendapp": "→ Dillendapp",
-    "genereLe": "Sheet generated on {date}"
+    "genereLe": "Sheet generated on {date}",
+    "aPied": "On foot"
   },
   "carte": {
     "titre": "Walking route",

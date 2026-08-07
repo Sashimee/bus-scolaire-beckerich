@@ -60,7 +60,9 @@
     "tempsMarcheEstimation": "cerca de {minutes} min a pé (estimativa)",
     "distance": "{metres} m",
     "voirSemaine": "Ver a semana",
-    "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial."
+    "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial.",
+    "aPied": "Sem autocarro: a escola fica mesmo ao lado",
+    "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola."
   },
   "repas": {
     "titre": "Almoço",
@@ -217,7 +219,8 @@
     "versEcole": "→ escola",
     "versMaison": "→ casa",
     "versDillendapp": "→ Dillendapp",
-    "genereLe": "Folha gerada em {date}"
+    "genereLe": "Folha gerada em {date}",
+    "aPied": "A pé"
   },
   "carte": {
     "titre": "Percurso a pé",

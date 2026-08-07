@@ -60,7 +60,9 @@
     "tempsMarcheEstimation": "environ {minutes} min à pied (estimation)",
     "distance": "{metres} m",
     "voirSemaine": "Voir la semaine",
-    "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel."
+    "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel.",
+    "aPied": "Pas de bus : l’école est juste à côté",
+    "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même."
   },
   "repas": {
     "titre": "Repas de midi",
@@ -217,7 +219,8 @@
     "versEcole": "→ école",
     "versMaison": "→ maison",
     "versDillendapp": "→ Dillendapp",
-    "genereLe": "Fiche générée le {date}"
+    "genereLe": "Fiche générée le {date}",
+    "aPied": "À pied"
   },
   "carte": {
     "titre": "Trajet à pied",

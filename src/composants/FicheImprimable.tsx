@@ -42,13 +42,25 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
         </p>
       </header>
 
-      <p className="fiche__arret">
-        <strong>{t('enfant.arretLePlusProche')} :</strong> {nomArret(ctx.arretDomicile, t)} —{' '}
-        {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
-        {ctx.arretDomicile.precision === 'approximative' &&
-          ` (${t('arrets.precisionApproximative').toLowerCase()})`}
-      </p>
+      {ctx.marcheDirecte ? (
+        <p className="fiche__arret">
+          <strong>{t('impression.aPied')} :</strong>{' '}
+          {t('enfant.aPiedDetail', {
+            minutes: ctx.temps,
+            site: siteDuCycle(enfant.cycle).nom,
+            prenom: enfant.prenom,
+          })}
+        </p>
+      ) : (
+        <p className="fiche__arret">
+          <strong>{t('enfant.arretLePlusProche')} :</strong> {nomArret(ctx.arretDomicile, t)} —{' '}
+          {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
+          {ctx.arretDomicile.precision === 'approximative' &&
+            ` (${t('arrets.precisionApproximative').toLowerCase()})`}
+        </p>
+      )}
 
+      {!ctx.marcheDirecte && (
       <table className="fiche__tableau">
         <thead>
           <tr>
@@ -96,6 +108,7 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
           })}
         </tbody>
       </table>
+      )}
 
       <footer className="fiche__pied">
         <p>

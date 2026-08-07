@@ -360,3 +360,25 @@ describe('cohérence des données', () => {
     }
   })
 })
+
+describe('domicile mitoyen de l’école', () => {
+  // 1, Kächereck se trouve à moins de 100 m de l'école de Beckerich. Un C4 qui y habite
+  // n'a donc aucun bus — ce qui est juste, mais l'interface l'annonçait comme cinq
+  // journées sans trajet, indiscernable d'une panne du calcul. Le drapeau doit remonter.
+  const KACHERECK = adresse('1, Kächereck', 49.73135, 5.88187)
+
+  it('signale la marche directe pour un C4 voisin de son école', () => {
+    const ctx = contexteEnfant(enfant('c4', 'maison'), KACHERECK)
+    expect(ctx).not.toBeNull()
+    expect(ctx!.marcheDirecte).toBe(true)
+    expect(ctx!.arretEcole.id).toBe(arretEcoleDuCycle('c4').id)
+    for (const jour of JOURS) expect(trajetsDuJour(ctx!, jour).trajets).toHaveLength(0)
+  })
+
+  it('donne malgré tout un bus à un C2 de la même adresse, scolarisé ailleurs', () => {
+    const ctx = contexteEnfant(enfant('c2', 'maison'), KACHERECK)
+    expect(ctx).not.toBeNull()
+    expect(ctx!.marcheDirecte).toBe(false)
+    expect(types(ctx, 'lundi')).toContain('aller-matin')
+  })
+})

@@ -46,8 +46,10 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
 
       {ctx.marcheDirecte ? (
         <p>
-          {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })} —{' '}
-          {nomArret(ctx.arretEcole, t)}
+          <strong>{t('enfant.aPied')}</strong>{' '}
+          <span className="champ__aide">
+            · {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
+          </span>
         </p>
       ) : (
         <>

@@ -60,7 +60,9 @@
     "tempsMarcheEstimation": "ongeféier {minutes} Min. zu Fouss (Schätzung)",
     "distance": "{metres} m",
     "voirSemaine": "D'Woch kucken",
-    "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no."
+    "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no.",
+    "aPied": "Kee Bus: d’Schoul ass direkt niewendrun",
+    "aPiedDetail": "Är Adress ass ongeféier {minutes} Min. zu Fouss vu(n) {site} ewech. Fir {prenom} ass keng Busfaart virgesinn: déi nooste Statioun ass déi vun der Schoul selwer."
   },
   "repas": {
     "titre": "Mëttegiessen",
@@ -217,7 +219,8 @@
     "versEcole": "→ Schoul",
     "versMaison": "→ heem",
     "versDillendapp": "→ Dillendapp",
-    "genereLe": "Blat erstallt den {date}"
+    "genereLe": "Blat erstallt den {date}",
+    "aPied": "Zu Fouss"
   },
   "carte": {
     "titre": "Wee zu Fouss",

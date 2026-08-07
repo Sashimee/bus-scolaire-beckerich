@@ -60,7 +60,9 @@
     "tempsMarcheEstimation": "etwa {minutes} Min. zu Fuß (Schätzung)",
     "distance": "{metres} m",
     "voirSemaine": "Woche ansehen",
-    "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan."
+    "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan.",
+    "aPied": "Kein Bus: die Schule liegt gleich nebenan",
+    "aPiedDetail": "Ihre Adresse liegt etwa {minutes} Min. zu Fuß von {site} entfernt. Für {prenom} ist keine Busfahrt vorgesehen: die nächste Haltestelle ist die der Schule selbst."
   },
   "repas": {
     "titre": "Mittagessen",
@@ -217,7 +219,8 @@
     "versEcole": "→ Schule",
     "versMaison": "→ nach Hause",
     "versDillendapp": "→ Dillendapp",
-    "genereLe": "Blatt erstellt am {date}"
+    "genereLe": "Blatt erstellt am {date}",
+    "aPied": "Zu Fuß"
   },
   "carte": {
     "titre": "Fußweg",

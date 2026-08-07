@@ -36,6 +36,11 @@ export function Semaine() {
 
   const semaine = semaineEnfant(ctx)
 
+  // Un enfant dont l'école est déjà l'arrêt le plus proche ne prend aucun bus. Sans ce
+  // cas explicite, la fiche affichait cinq journées vides — « aucun trajet ce jour-là »,
+  // répété cinq fois, ce qui se lit comme une panne plutôt que comme une bonne nouvelle.
+  const aPied = ctx.marcheDirecte
+
   const telechargerIcs = () => {
     const ics = genererIcs(ctx, {
       libelleTrajet: (trajet) => t(`trajets.${trajet.type}`),
@@ -67,25 +72,39 @@ export function Semaine() {
         </p>
       </header>
 
-      <section className="carte pile pile--serre">
-        <div className="etiquette">{t('enfant.arretLePlusProche')}</div>
-        <strong style={{ fontSize: '1.05rem' }}>{nomArret(ctx.arretDomicile, t)}</strong>
-        <p className="champ__aide">
-          {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })} ·{' '}
-          {distanceLisible(ctx.distance)}
-        </p>
-        {ctx.arretDomicile.precision === 'approximative' && (
-          <div className="encart encart--attention">
-            <div className="encart__titre">{t('arrets.precisionApproximative')}</div>
-            {t('arrets.precisionApproximativeAide')}
+      {aPied ? (
+        <section className="carte pile pile--serre">
+          <div className="encart encart--info">
+            <div className="encart__titre">{t('enfant.aPied')}</div>
+            {t('enfant.aPiedDetail', {
+              minutes: ctx.temps,
+              site: siteDuCycle(enfant.cycle).nom,
+              prenom: enfant.prenom,
+            })}
           </div>
-        )}
-        {foyer.adresse && (
-          <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretDomicile} />
-        )}
-      </section>
+          {foyer.adresse && <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretEcole} />}
+        </section>
+      ) : (
+        <section className="carte pile pile--serre">
+          <div className="etiquette">{t('enfant.arretLePlusProche')}</div>
+          <strong style={{ fontSize: '1.05rem' }}>{nomArret(ctx.arretDomicile, t)}</strong>
+          <p className="champ__aide">
+            {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })} ·{' '}
+            {distanceLisible(ctx.distance)}
+          </p>
+          {ctx.arretDomicile.precision === 'approximative' && (
+            <div className="encart encart--attention">
+              <div className="encart__titre">{t('arrets.precisionApproximative')}</div>
+              {t('arrets.precisionApproximativeAide')}
+            </div>
+          )}
+          {foyer.adresse && (
+            <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretDomicile} />
+          )}
+        </section>
+      )}
 
-      {JOURS.map((jour) => {
+      {!aPied && JOURS.map((jour) => {
         const journee = semaine.find((j) => j.jour === jour)!
         return (
           <section className="carte pile pile--serre" key={jour}>
@@ -113,11 +132,18 @@ export function Semaine() {
       })}
 
       <section className="pile pile--serre sans-impression">
-        <h3 style={{ fontSize: '1rem' }}>{t('calendrier.titre')}</h3>
-        <button type="button" className="bouton bouton--primaire" onClick={telechargerIcs}>
-          {t('calendrier.ics')}
-        </button>
-        <p className="champ__aide">{t('calendrier.icsAide')}</p>
+        <h3 style={{ fontSize: '1rem' }}>
+          {aPied ? t('impression.titre') : t('calendrier.titre')}
+        </h3>
+        {/* Sans trajet, l'export produirait un calendrier vide : mieux vaut pas de bouton. */}
+        {!aPied && (
+          <>
+            <button type="button" className="bouton bouton--primaire" onClick={telechargerIcs}>
+              {t('calendrier.ics')}
+            </button>
+            <p className="champ__aide">{t('calendrier.icsAide')}</p>
+          </>
+        )}
         <button type="button" className="bouton" onClick={() => window.print()}>
           {t('impression.bouton')}
         </button>
