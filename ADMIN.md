@@ -150,6 +150,24 @@ cd worker
 ./installer.sh
 ```
 
+**Si `wrangler login` échoue** — ce qui arrive régulièrement quand le compte Cloudflare
+passe par Google — utilise un jeton d'API, qui évite complètement le passage par le
+navigateur et reste la méthode recommandée pour un script :
+
+1. [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
+   → **Create Token** ;
+2. modèle **« Edit Cloudflare Workers »** (il couvre Workers Scripts et Workers KV) ;
+3. vérifier que le compte sélectionné est le bon, puis créer le jeton ;
+4. l'exporter et relancer :
+
+```bash
+export CLOUDFLARE_API_TOKEN='le-jeton'
+./installer.sh
+```
+
+Le jeton reste dans ton terminal : il n'est ni affiché, ni écrit dans le dépôt.
+Ferme la session ou fais `unset CLOUDFLARE_API_TOKEN` quand tu as fini.
+
 Il enchaîne tout — dépendances, connexion Cloudflare, création de l'espace de
 stockage, génération des clés, dépôt des quatre secrets, déploiement, déclaration des
 variables côté GitHub, puis vérification — en s'arrêtant aux deux seuls moments qui

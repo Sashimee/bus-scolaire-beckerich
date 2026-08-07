@@ -40,18 +40,42 @@ if printf '%s' "$SOUS_DOMAINE" | grep -qiE 'baskewitsch|alex'; then
 fi
 echo
 
-gras "── 2. Dépendances et connexion ─────────────────────────────────────"
+gras "── 2. Dépendances et authentification ──────────────────────────────"
 [ -d node_modules ] || npm install
-if ! npx wrangler whoami >/dev/null 2>&1; then
-  alerte "Connexion à Cloudflare nécessaire — une page va s'ouvrir."
-  npx wrangler login
+
+if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  vert "Jeton d'API détecté dans l'environnement : pas de connexion navigateur nécessaire."
+elif npx wrangler whoami 2>&1 | grep -q 'You are logged in'; then
+  vert "Déjà connecté via le navigateur."
+else
+  alerte "Pas d'authentification Cloudflare active."
+  echo
+  echo "Deux façons de s'authentifier :"
+  echo
+  echo "  A. Jeton d'API — recommandé, et le seul qui marche à coup sûr."
+  echo "     1. https://dash.cloudflare.com/profile/api-tokens → « Create Token »"
+  echo "     2. Modèle « Edit Cloudflare Workers »"
+  echo "     3. Vérifier que le compte sélectionné est le bon, puis créer"
+  echo "     4. export CLOUDFLARE_API_TOKEN='le-jeton'   puis relancer ce script"
+  echo
+  echo "  B. Connexion navigateur : npx wrangler login"
+  echo "     Échoue parfois quand le compte Cloudflare passe par Google."
+  echo
+  read -rp "Tenter la connexion navigateur maintenant ? [o/N] " REPONSE
+  case "$REPONSE" in
+    [oO]*) npx wrangler login ;;
+    *) echo "Interrompu — définis CLOUDFLARE_API_TOKEN puis relance."; exit 0 ;;
+  esac
 fi
-npx wrangler whoami | tail -3
+
+npx wrangler whoami 2>&1 | tail -4
 echo
 
 gras "── 3. Espace de stockage des abonnements ───────────────────────────"
 if grep -q 'à-remplacer-après-création' wrangler.toml; then
-  SORTIE="$(npx wrangler kv namespace create ABONNEMENTS 2>&1)"
+  # La syntaxe de cette commande a changé au fil des versions de wrangler :
+  # « kv namespace » sur les récentes, « kv:namespace » sur les plus anciennes.
+  SORTIE="$(npx wrangler kv namespace create ABONNEMENTS 2>&1 || npx wrangler kv:namespace create ABONNEMENTS 2>&1)"
   echo "$SORTIE"
   ID_KV="$(printf '%s' "$SORTIE" | grep -oE '[0-9a-f]{32}' | head -1)"
   if [ -z "$ID_KV" ]; then
