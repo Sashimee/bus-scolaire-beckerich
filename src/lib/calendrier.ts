@@ -33,10 +33,32 @@ export function jourDeSemaine(d: Date): Jour | null {
   return i >= 1 && i <= 5 ? JOURS[i - 1] : null
 }
 
-/** L'année scolaire couvrant cette date, si elle est connue. */
+/**
+ * L'année scolaire couvrant cette date, si elle est connue.
+ *
+ * La couverture va au-delà du dernier jour de cours : le congé d'été déborde sur la
+ * rentrée suivante, et c'est précisément en août qu'un parent risque d'ouvrir
+ * l'application pour préparer la rentrée.
+ */
 export function anneePour(d: Date): AnneeVacances | null {
   const iso = isoDate(d)
-  return vacances.annees.find((a) => iso >= a.debut && iso <= a.fin) ?? null
+  return (
+    vacances.annees.find((a) => {
+      const finCouverture = a.vacances.reduce((max, v) => (v.au > max ? v.au : max), a.fin)
+      return iso >= a.debut && iso <= finCouverture
+    }) ?? null
+  )
+}
+
+/**
+ * L'année scolaire à exporter vers les agendas : celle en cours si elle est
+ * complètement renseignée, sinon la prochaine qui l'est. On n'exporte jamais une
+ * année partielle, dont les vacances manquantes produiraient des rappels erronés.
+ */
+export function anneeAExporter(aujourdhui = new Date()): AnneeVacances | null {
+  const iso = isoDate(aujourdhui)
+  const completes = vacances.annees.filter((a) => !a.partiel)
+  return completes.find((a) => iso <= a.fin) ?? completes.at(-1) ?? null
 }
 
 export type RaisonSansEcole = 'weekend' | 'vacances' | 'ferie' | 'annee-inconnue'
@@ -66,6 +88,9 @@ export function etatDuJour(d: Date): EtatJour {
 
   const ferie = annee.feries.find((f) => f.date === iso)
   if (ferie) return { ecole: false, raison: 'ferie', id: ferie.id }
+
+  // Année partiellement renseignée : hors des périodes connues, on ne conclut pas.
+  if (annee.partiel) return { ecole: false, raison: 'annee-inconnue' }
 
   return { ecole: true }
 }
@@ -140,7 +165,8 @@ export interface OptionsIcs {
  * annoncerait un bus en plein mois de février.
  */
 export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
-  const annee = vacances.annees[0]
+  const annee = anneeAExporter()
+  if (!annee) return ''
   const semaine = semaineEnfant(ctx)
 
   // Regroupe les trajets identiques (même ligne, même heure, mêmes arrêts) et note
@@ -226,7 +252,8 @@ export function lienGoogleAgenda(
   titre: string,
   lieu: string,
 ): string {
-  const annee = vacances.annees[0]
+  const annee = anneeAExporter()
+  if (!annee) return ''
   const heure = trajet.depart.heure ?? '08:00'
   const debut = premiereOccurrence(annee.debut, jours)
   const fin = new Date(debut)

@@ -28,6 +28,8 @@ export interface AnneeVacances {
   anneeScolaire: string
   debut: string
   fin: string
+  /** Seules certaines périodes sont renseignées : ne rien affirmer en dehors. */
+  partiel?: boolean
   vacances: { id: string; du: string; au: string }[]
   feries: { id: string; date: string }[]
 }

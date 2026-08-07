@@ -182,11 +182,27 @@ describe('cas particulier de Huttange', () => {
 })
 
 describe('incertitudes assumées', () => {
-  it('marque les retours du soir comme reposant sur une hypothèse', () => {
+  it("signale l'ambiguïté le mardi, là où elle a une conséquence", () => {
+    const ctx = contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)
+    const mardi = trajetsDuJour(ctx!, 'mardi')
+    expect(mardi.incertitudes).toContain('retours-apres-midi-mardi-jeudi')
+    expect(plan.incertitudes.some((i) => i.id === mardi.incertitudes[0])).toBe(true)
+  })
+
+  it("ne l'affiche pas le lundi, où le retour du soir est certain", () => {
+    // Avertir un parent le lundi d'une ambiguïté qui ne concerne que le mardi ne
+    // ferait que l'inquiéter à tort.
+    const ctx = contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)
+    const lundi = trajetsDuJour(ctx!, 'lundi')
+    expect(lundi.incertitudes).toHaveLength(0)
+    expect(lundi.trajets.some((t) => t.type === 'retour-soir')).toBe(true)
+  })
+
+  it("n'inquiète pas un enfant qui rentre manger le mardi", () => {
     const ctx = contexteEnfant(enfant('c2', 'maison'), HOVELANGE)
-    const soir = trajetsDuJour(ctx!, 'lundi').trajets.find((t) => t.type === 'retour-soir')
-    expect(soir?.incertitude).toBe('retours-apres-midi-mardi-jeudi')
-    expect(plan.incertitudes.some((i) => i.id === soir?.incertitude)).toBe(true)
+    const mardi = trajetsDuJour(ctx!, 'mardi')
+    expect(mardi.incertitudes).toHaveLength(0)
+    expect(mardi.manquants).toHaveLength(0)
   })
 })
 

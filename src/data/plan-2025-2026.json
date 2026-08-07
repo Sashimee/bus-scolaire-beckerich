@@ -261,7 +261,6 @@
           "id": "retour-1-soir",
           "periode": "soir",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "incertitude": "retours-apres-midi-mardi-jeudi",
           "arrets": [
             { "arret": "oberpallen-ecole", "heure": "15:45" },
             { "arret": "beckerich-ecole", "heure": "15:55" },
@@ -315,7 +314,6 @@
           "id": "retour-2-soir",
           "periode": "soir",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "incertitude": "retours-apres-midi-mardi-jeudi",
           "arrets": [
             { "arret": "oberpallen-ecole", "heure": "15:45" },
             { "arret": "levelange", "heure": "15:49" },

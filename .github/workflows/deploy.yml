@@ -1,0 +1,66 @@
+name: Déploiement GitHub Pages
+
+# Chaque push sur main met à jour le site ET la webapp installée chez les parents :
+# le service worker détecte la nouvelle version et propose le rechargement.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# On laisse toujours finir un déploiement en cours plutôt que de l'annuler : une
+# interruption laisserait le site dans un état intermédiaire.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  controle:
+    name: Tests et vérification des types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  construction:
+    name: Construction du site
+    needs: controle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Construire
+        run: npm run build
+        env:
+          # Chemin de base du site projet. À changer ici — et nulle part ailleurs — si
+          # le site déménage sous un autre préfixe ou un domaine propre.
+          BASE_PATH: /${{ github.event.repository.name }}/
+          GITHUB_SHA: ${{ github.sha }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploiement:
+    name: Mise en ligne
+    needs: construction
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4

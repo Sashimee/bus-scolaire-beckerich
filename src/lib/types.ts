@@ -202,4 +202,11 @@ export interface JourneeEnfant {
   trajets: Trajet[]
   /** Déplacements attendus qu'aucune ligne du plan ne couvre. */
   manquants: TypeTrajet[]
+  /**
+   * Incertitudes du plan qui pèsent sur CE jour précisément.
+   *
+   * On ne les signale que là où elles changent la réponse : avertir un parent le
+   * lundi d'une ambiguïté qui ne concerne que le mardi ne fait qu'inquiéter à tort.
+   */
+  incertitudes: string[]
 }

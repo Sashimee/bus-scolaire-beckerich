@@ -44,16 +44,32 @@ export default defineConfig({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json,pdf}'],
-        // Les tuiles de carte sont le seul appel réseau de l'app : on les met en cache
-        // au fil de l'eau, mais leur absence ne doit jamais casser une page.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
+        // `version.json` sert justement à détecter les nouveaux déploiements : le
+        // mettre en cache le rendrait aveugle. Le PDF, lui, pèse 2,2 Mo — l'imposer
+        // à l'installation coûterait cher en données mobiles pour un fichier que
+        // beaucoup de parents n'ouvriront jamais.
+        globIgnores: ['**/version.json', '**/plan-bus-*.pdf'],
         runtimeCaching: [
           {
+            // Les tuiles de carte sont le seul appel réseau récurrent de l'app : on
+            // les garde au fil de l'eau, mais leur absence ne casse jamais une page.
             urlPattern: /^https:\/\/[abc]\.tile\.openstreetmap\.org\//,
             handler: 'CacheFirst',
             options: {
               cacheName: 'tuiles-osm',
               expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            // Le plan officiel est mis en cache dès la première consultation : un
+            // parent qui l'a ouvert une fois y a ensuite accès hors ligne.
+            urlPattern: /plan-bus-.*\.pdf$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'plan-officiel',
+              expiration: { maxEntries: 3, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],

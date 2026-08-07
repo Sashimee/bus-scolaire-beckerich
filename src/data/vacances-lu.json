@@ -9,6 +9,15 @@
 
   "annees": [
     {
+      "$commentaire": "Année écoulée, conservée UNIQUEMENT pour son congé d'été, qui déborde sur la rentrée suivante : sans elle, l'application ne saurait pas quoi répondre au mois d'août. `partiel` indique que les autres périodes ne sont pas renseignées — hors congé d'été, l'application dira donc qu'elle ne sait pas, au lieu d'affirmer qu'il y a école.",
+      "anneeScolaire": "2025/2026",
+      "partiel": true,
+      "debut": "2025-09-15",
+      "fin": "2026-07-15",
+      "vacances": [{ "id": "ete", "du": "2026-07-16", "au": "2026-09-14" }],
+      "feries": []
+    },
+    {
       "anneeScolaire": "2026/2027",
       "debut": "2026-09-15",
       "fin": "2027-07-15",

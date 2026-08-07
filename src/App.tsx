@@ -1,122 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Link, NavLink, Route, Routes } from 'react-router-dom'
+import { useT } from './i18n'
+import { useFoyer } from './etat'
+import { plan } from './lib/donnees'
+import { planPerime } from './lib/affichage'
+import { BandeauVersion } from './composants/BandeauVersion'
+import { AvertissementInitial } from './composants/AvertissementInitial'
+import { ReceptionPartage } from './composants/ReceptionPartage'
+import { Accueil } from './pages/Accueil'
+import { Configurer } from './pages/Configurer'
+import { Semaine } from './pages/Semaine'
+import { PagePlan } from './pages/Plan'
+import { Limites, Independance } from './pages/Infos'
+import { Installer } from './pages/Installer'
+import { Reglages } from './pages/Reglages'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { t } = useT()
+  const { configure } = useFoyer()
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+      <a className="saut-contenu bouton" href="#contenu">
+        {t('nav.menu')}
+      </a>
+
+      <BandeauVersion />
+      {planPerime() && (
+        <div className="bandeau" role="status">
+          <div className="bandeau__interne">
+            <strong>⚠</strong>
+            <span>{t('validite.perime', { fin: plan.valideAu })}</span>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
+      )}
+
+      <header className="entete">
+        <div className="entete__interne">
+          <h1 className="entete__titre">
+            <Link to="/">{t('app.court')}</Link>
+          </h1>
+          <nav className="rangee" aria-label={t('nav.menu')}>
+            {configure && (
+              <NavLink to="/" className="bouton bouton--discret" end>
+                {t('nav.accueil')}
+              </NavLink>
+            )}
+            <NavLink to="/reglages" className="bouton bouton--discret">
+              {t('nav.reglages')}
+            </NavLink>
+          </nav>
+        </div>
+      </header>
+
+      <AvertissementInitial />
+      <ReceptionPartage />
+
+      <main className="page" id="contenu">
+        <Routes>
+          <Route path="/" element={<Accueil />} />
+          <Route path="/configurer" element={<Configurer />} />
+          <Route path="/enfant/:id" element={<Semaine />} />
+          <Route path="/plan" element={<PagePlan />} />
+          <Route path="/limites" element={<Limites />} />
+          <Route path="/independance" element={<Independance />} />
+          <Route path="/installer" element={<Installer />} />
+          <Route path="/reglages" element={<Reglages />} />
+          <Route path="*" element={<Accueil />} />
+        </Routes>
+
+        <footer className="pied">
+          <nav aria-label={t('nav.menu')}>
+            <Link to="/plan">{t('nav.plan')}</Link>
+            <Link to="/limites">{t('nav.limites')}</Link>
+            <Link to="/independance">{t('nav.independance')}</Link>
+            <Link to="/installer">{t('nav.installer')}</Link>
+          </nav>
+          <p>{t('avertissement.independance')}</p>
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            {t('validite.couverte', { annees: plan.anneesCouvertes.join(' · ') })} —{' '}
+            {t('validite.releve', { date: plan.source.dateReleve })} —{' '}
+            {t('maj.version', { version: __VERSION__ })}
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+        </footer>
+      </main>
     </>
   )
 }
-
-export default App

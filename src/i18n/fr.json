@@ -1,0 +1,331 @@
+{
+  "langue": "Français",
+
+  "app": {
+    "titre": "Bus scolaire Beckerich",
+    "court": "Bus scolaire",
+    "baseline": "Les horaires du bus de vos enfants, sans y réfléchir"
+  },
+
+  "nav": {
+    "accueil": "Aujourd'hui",
+    "semaine": "La semaine",
+    "reglages": "Réglages",
+    "plan": "Plan officiel",
+    "limites": "Limites du site",
+    "independance": "Site indépendant",
+    "installer": "Installer l'application",
+    "menu": "Menu",
+    "retour": "Retour"
+  },
+
+  "avertissement": {
+    "titre": "Avant de commencer",
+    "independance": "Ce site n'a aucun lien avec la commune de Beckerich ni avec l'école. Il est réalisé par un parent, à titre privé.",
+    "modification": "Le plan officiel peut être modifié à tout moment sans préavis de la part de la commune.",
+    "effort": "Le meilleur effort sera fourni pour tenir ce site à jour, sans engagement de résultat.",
+    "priorite": "En cas de doute, le document officiel de la commune fait foi.",
+    "accepter": "J'ai compris",
+    "detail": "Lire toutes les limites"
+  },
+
+  "onboarding": {
+    "bienvenue": "Bienvenue",
+    "intro": "Indiquez votre adresse et vos enfants. L'application en déduit, pour chacun, l'arrêt le plus proche et ses horaires. Tout reste sur votre appareil.",
+    "etapeAdresse": "Votre adresse",
+    "etapeEnfants": "Vos enfants",
+    "commencer": "Commencer",
+    "terminer": "Terminer",
+    "suivant": "Continuer",
+    "precedent": "Retour"
+  },
+
+  "adresse": {
+    "label": "Adresse du domicile",
+    "aide": "Tapez le début de votre rue, puis le numéro. Par exemple « haapt 76 ».",
+    "placeholder": "Rue et numéro",
+    "aucunResultat": "Aucune adresse trouvée dans la commune de Beckerich.",
+    "aucunResultatAide": "Vérifiez l'orthographe. Ce site ne couvre que les adresses de la commune.",
+    "choisie": "Adresse retenue",
+    "modifier": "Modifier l'adresse",
+    "confidentialite": "Votre adresse est recherchée sur votre appareil. Elle n'est envoyée nulle part."
+  },
+
+  "enfant": {
+    "prenom": "Prénom",
+    "prenomPlaceholder": "Prénom de l'enfant",
+    "cycle": "Cycle",
+    "cycleAide": "Le site scolaire est déduit du cycle. Changez le cycle à la rentrée : tout le plan se met à jour.",
+    "ajouter": "Ajouter un enfant",
+    "supprimer": "Supprimer",
+    "supprimerConfirmation": "Supprimer {prenom} ?",
+    "aucun": "Aucun enfant enregistré pour l'instant.",
+    "scolariseA": "Scolarisé·e à {site}",
+    "arretLePlusProche": "Arrêt le plus proche",
+    "tempsMarche": "{minutes} min à pied",
+    "tempsMarcheEstimation": "environ {minutes} min à pied (estimation)",
+    "distance": "{metres} m",
+    "voirSemaine": "Voir la semaine",
+    "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel."
+  },
+
+  "repas": {
+    "titre": "Repas de midi",
+    "aide": "Réglable jour par jour : un enfant peut manger au Dillendapp le lundi et rentrer le mardi.",
+    "maison": "Rentre manger",
+    "maisonCourt": "Maison",
+    "dillendapp": "Mange au Dillendapp",
+    "dillendappCourt": "Dillendapp",
+    "touteLaSemaine": "Appliquer à toute la semaine",
+    "sansCoursApresMidi": "Pas de cours l'après-midi"
+  },
+
+  "cycles": {
+    "precoce": "Précoce",
+    "c1": "Cycle 1",
+    "c2": "Cycle 2",
+    "c3": "Cycle 3",
+    "c4": "Cycle 4"
+  },
+
+  "jours": {
+    "lundi": "Lundi",
+    "mardi": "Mardi",
+    "mercredi": "Mercredi",
+    "jeudi": "Jeudi",
+    "vendredi": "Vendredi",
+    "lundiCourt": "Lun",
+    "mardiCourt": "Mar",
+    "mercrediCourt": "Mer",
+    "jeudiCourt": "Jeu",
+    "vendrediCourt": "Ven"
+  },
+
+  "trajets": {
+    "aller-matin": "Départ pour l'école",
+    "retour-midi": "Retour à la maison, midi",
+    "aller-apres-midi": "Retour en classe, après-midi",
+    "retour-soir": "Retour à la maison, soir",
+    "navette-dillendapp-midi": "École → Dillendapp",
+    "navette-dillendapp-retour": "Dillendapp → école",
+    "depuis": "de {arret}",
+    "vers": "vers {arret}",
+    "a": "à {heure}",
+    "heureNonPubliee": "horaire non publié",
+    "ligne": "Ligne",
+    "alternative": "Aussi possible : {ligne} à {heure}",
+    "interne": "Pendant la journée d'école",
+    "concerneParent": "Vos trajets",
+    "aucun": "Aucun trajet ce jour-là."
+  },
+
+  "manquants": {
+    "titre": "Non couvert par le plan",
+    "retour-soir": "Le plan officiel ne prévoit pas de bus de retour ce jour-là pour un enfant resté au Dillendapp. Renseignez-vous auprès de la maison relais.",
+    "generique": "Le plan officiel ne prévoit pas de bus pour ce déplacement."
+  },
+
+  "aujourdhui": {
+    "titre": "Aujourd'hui",
+    "prochainTrajet": "Prochain trajet",
+    "dans": "dans {minutes} min",
+    "partirMaintenant": "Il est temps de partir",
+    "plusDeBus": "Plus de bus prévu aujourd'hui.",
+    "demain": "Demain",
+    "pasEcole": "Pas d'école aujourd'hui",
+    "raisonWeekend": "C'est le week-end.",
+    "raisonVacances": "Vacances : {periode}.",
+    "raisonFerie": "Jour férié : {jour}.",
+    "raisonInconnue": "Le calendrier scolaire de cette année n'est pas encore renseigné dans l'application. Vérifiez le calendrier officiel."
+  },
+
+  "vacances": {
+    "toussaint": "congé de la Toussaint",
+    "noel": "vacances de Noël",
+    "carnaval": "congé de Carnaval",
+    "paques": "vacances de Pâques",
+    "pentecote": "congé de la Pentecôte",
+    "ete": "vacances d'été"
+  },
+
+  "feries": {
+    "ascension": "Ascension",
+    "lundi-pentecote": "lundi de Pentecôte",
+    "fete-nationale": "fête nationale"
+  },
+
+  "arrets": {
+    "ecole": "École",
+    "gare": "Gare",
+    "pont": "Pont",
+    "village": "Village",
+    "precisionApproximative": "Position approximative",
+    "precisionApproximativeAide": "L'emplacement exact de cet arrêt n'a pas pu être vérifié. Le temps de marche est donc encore plus indicatif que d'ordinaire.",
+    "signaler": "Signaler une erreur"
+  },
+
+  "notes": {
+    "huttange-c3-uniquement": "Ce départ est réservé aux enfants de Huttange scolarisés à Elvange (cycle 3). Les enfants de Huttange scolarisés à Noerdange (cycle 2) prennent l'Aller 3.",
+    "voir-aller-3": "Huttange n'est pas desservi par cette ligne : voir l'horaire « Aller Bus 3 ».",
+    "huttange-retour-dillendapp-1345": "Les enfants de Huttange peuvent prendre le bus « Retour Bus Dillendapp » à 13:45 à Huttange.",
+    "depart-non-precise": "Le plan officiel ne précise pas l'arrêt exact de ce départ à Beckerich.",
+    "vendredi-hall-sportif": "Le vendredi, le départ se fait depuis le hall sportif et non depuis l'école.",
+    "horaire-intermediaire-non-publie": "Le plan officiel ne publie pas l'heure de passage à cet arrêt."
+  },
+
+  "incertitudes": {
+    "titre": "Point non tranché par le plan officiel",
+    "retours-apres-midi-mardi-jeudi": "Le plan ne dit pas si les retours de fin d'après-midi circulent le mardi et le jeudi, jours sans cours l'après-midi. L'application suppose qu'ils ne circulent pas. À vérifier auprès de la commune."
+  },
+
+  "calendrier": {
+    "titre": "Ajouter à un agenda",
+    "ics": "Télécharger pour mon agenda (.ics)",
+    "icsAide": "Fonctionne avec Google Agenda, Apple Calendrier et Outlook. Les vacances scolaires sont déjà exclues.",
+    "google": "Ajouter à Google Agenda",
+    "googleAide": "Ajout rapide, mais Google gère mal les exclusions de vacances : le fichier .ics est plus fidèle.",
+    "tousLesEnfants": "Tous les enfants"
+  },
+
+  "partage": {
+    "titre": "Partager cette configuration",
+    "aide": "Envoyez ce lien à l'autre parent, aux grands-parents ou à la nounou : ils verront exactement le même écran.",
+    "copier": "Copier le lien",
+    "copie": "Lien copié",
+    "qr": "Afficher le QR code",
+    "confidentialite": "Les données voyagent dans le lien lui-même et ne transitent par aucun serveur.",
+    "recu": "Configuration reçue par lien",
+    "recuAide": "Voulez-vous remplacer votre configuration actuelle par celle-ci ?",
+    "accepter": "Utiliser cette configuration",
+    "refuser": "Garder la mienne"
+  },
+
+  "impression": {
+    "titre": "Fiche à imprimer",
+    "bouton": "Imprimer la semaine",
+    "aide": "Une page A4 par enfant, à coller sur le frigo."
+  },
+
+  "carte": {
+    "titre": "Trajet à pied",
+    "domicile": "Domicile",
+    "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne.",
+    "ouvrirItineraire": "Ouvrir l'itinéraire"
+  },
+
+  "reglages": {
+    "titre": "Réglages",
+    "langue": "Langue",
+    "theme": "Thème",
+    "themeSombre": "Sombre",
+    "themeClair": "Clair",
+    "themeAuto": "Automatique",
+    "donnees": "Mes données",
+    "effacer": "Effacer toutes mes données",
+    "effacerConfirmation": "Effacer l'adresse, les enfants et les préférences enregistrés sur cet appareil ?",
+    "efface": "Données effacées."
+  },
+
+  "plan": {
+    "titre": "Plan officiel",
+    "intro": "Les horaires ci-dessous sont la transcription du plan officiel de la commune. En cas d'écart, c'est le document original qui fait foi.",
+    "telecharger": "Télécharger le plan officiel (PDF)",
+    "voirEnLigne": "Voir la page officielle de l'école",
+    "anneeScolaire": "Année scolaire {annee}",
+    "matin": "Matin",
+    "midi": "Midi",
+    "apresMidi": "Après-midi",
+    "soir": "Soir",
+    "circule": "Circule",
+    "reserve": "Ligne réservée",
+    "horairesEcole": "Horaires de l'école",
+    "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi."
+  },
+
+  "validite": {
+    "couverte": "Plan valable pour {annees}",
+    "confirme": "Confirmé par {personne} en {date}.",
+    "confirmeOral": "Cette confirmation étant orale, elle reste à revérifier à chaque rentrée.",
+    "perime": "Attention : ce plan a dépassé sa période de validité déclarée ({fin}). Vérifiez le plan officiel avant de vous y fier.",
+    "releve": "Relevé le {date}"
+  },
+
+  "limites": {
+    "titre": "Ce que ce site sait faire, et ce qu'il ne sait pas faire",
+    "intro": "Ce site est un outil de confort. Il ne remplace pas le plan officiel et ne garantit rien. Voici précisément ses limites.",
+    "marcheTitre": "Les temps de marche sont des estimations",
+    "marcheCorps": "La distance est calculée à vol d'oiseau puis majorée d'un tiers pour tenir compte du tracé des rues, à une vitesse de 4,5 km/h. Le site ne connaît ni les trottoirs, ni les dénivelés, ni les traversées de route. Prévoyez une marge.",
+    "arretsTitre": "Certaines positions d'arrêts sont approximatives",
+    "arretsCorps": "Les arrêts du plan communal ne figurent pas tous dans les bases publiques. Ceux dont la position n'a pas pu être vérifiée sont signalés comme tels dans l'application.",
+    "tempsReelTitre": "Aucune information en temps réel",
+    "tempsReelCorps": "Le site affiche les horaires théoriques. Il ne sait rien des retards, des déviations, des pannes, des grèves ni des conditions météo.",
+    "planTitre": "Le plan peut changer sans que le site le sache",
+    "planCorps": "La commune peut modifier les horaires à tout moment. Le site est mis à jour manuellement, avec le meilleur effort, mais un décalage est possible.",
+    "incertitudesTitre": "Certaines règles du plan restent ambiguës",
+    "incertitudesCorps": "Là où le document officiel ne tranche pas, le site affiche son hypothèse et le signale, plutôt que de présenter une réponse comme certaine.",
+    "donneesTitre": "Vos données restent chez vous",
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais."
+  },
+
+  "independance": {
+    "titre": "Site indépendant",
+    "corps1": "Ce site n'a aucun lien avec la commune de Beckerich, avec l'école fondamentale ni avec la maison relais Dillendapp. Il n'est ni commandé, ni validé, ni relu par elles.",
+    "corps2": "Il a été réalisé par un parent, à titre privé et gratuit, pour éviter d'avoir à relire le PDF chaque matin.",
+    "corps3": "Le plan de bus reste la propriété de la commune. Il peut être modifié à tout moment, sans préavis et sans que ce site en soit informé.",
+    "corps4": "Le meilleur effort sera fourni pour mettre le site à jour rapidement après chaque changement connu, mais aucun engagement de résultat n'est pris.",
+    "corps5": "En cas de doute ou de divergence, le document officiel de la commune fait foi.",
+    "lienOfficiel": "Consulter la page officielle de l'école",
+    "lienPdf": "Télécharger le plan officiel",
+    "contact": "Signaler une erreur"
+  },
+
+  "installer": {
+    "titre": "Installer l'application",
+    "intro": "Installée sur l'écran d'accueil, l'application s'ouvre en plein écran, se lance instantanément et fonctionne sans réseau.",
+    "detecte": "Votre appareil",
+    "autres": "Autres appareils",
+    "ios": "iPhone ou iPad (Safari)",
+    "iosEtapes": [
+      "Ouvrez ce site dans Safari.",
+      "Touchez le bouton Partager (le carré avec une flèche vers le haut), en bas de l'écran.",
+      "Faites défiler et choisissez « Sur l'écran d'accueil ».",
+      "Touchez « Ajouter » en haut à droite."
+    ],
+    "iosNote": "Sur iPhone et iPad, seul Safari sait installer une application web. Chrome et Firefox pour iOS ne le proposent pas.",
+    "android": "Android (Chrome)",
+    "androidEtapes": [
+      "Ouvrez ce site dans Chrome.",
+      "Touchez le menu ⋮ en haut à droite.",
+      "Choisissez « Installer l'application » ou « Ajouter à l'écran d'accueil ».",
+      "Confirmez avec « Installer »."
+    ],
+    "bureau": "Ordinateur (Chrome ou Edge)",
+    "bureauEtapes": [
+      "Ouvrez ce site dans Chrome ou Edge.",
+      "Cliquez sur l'icône d'installation dans la barre d'adresse, à droite.",
+      "Confirmez avec « Installer »."
+    ],
+    "firefox": "Firefox",
+    "firefoxNote": "Firefox pour ordinateur ne permet pas d'installer les applications web. Ajoutez plutôt le site à vos marque-pages. Sur Android, Firefox propose « Ajouter à l'écran d'accueil » dans son menu.",
+    "boutonInstaller": "Installer maintenant",
+    "dejaInstallee": "L'application est déjà installée sur cet appareil."
+  },
+
+  "maj": {
+    "disponible": "Une nouvelle version est disponible.",
+    "recharger": "Recharger",
+    "version": "Version {version}",
+    "horsLigne": "Hors ligne — les horaires restent consultables."
+  },
+
+  "commun": {
+    "fermer": "Fermer",
+    "modifier": "Modifier",
+    "annuler": "Annuler",
+    "confirmer": "Confirmer",
+    "enregistrer": "Enregistrer",
+    "chargement": "Chargement…",
+    "erreur": "Une erreur est survenue.",
+    "et": "et"
+  }
+}

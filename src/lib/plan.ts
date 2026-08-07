@@ -268,8 +268,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
 
   const trajets: Trajet[] = []
   const manquants: TypeTrajet[] = []
+  const incertitudes: string[] = []
 
-  if (ctx.marcheDirecte) return { jour, trajets, manquants }
+  if (ctx.marcheDirecte) return { jour, trajets, manquants, incertitudes }
 
   const base = {
     jour,
@@ -358,7 +359,11 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       directions: ['vers-domicile'],
     })
   } else if (repas === 'dillendapp') {
+    // Pas de cours l'après-midi, mais l'enfant est resté à la maison relais : le plan
+    // ne prévoit rien pour son retour. C'est ici, et ici seulement, que l'ambiguïté
+    // du plan a une conséquence pour le parent.
     manquants.push('retour-soir')
+    incertitudes.push('retours-apres-midi-mardi-jeudi')
   }
 
   trajets.sort((a, b) => {
@@ -369,7 +374,7 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     return ha - hb
   })
 
-  return { jour, trajets, manquants }
+  return { jour, trajets, manquants, incertitudes }
 }
 
 /** La semaine complète d'un enfant. */

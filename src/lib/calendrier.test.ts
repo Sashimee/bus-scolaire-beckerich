@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { depuisIso, etatDuJour, genererIcs, isoDate, jourDeSemaine } from './calendrier'
+import {
+  anneeAExporter,
+  depuisIso,
+  etatDuJour,
+  genererIcs,
+  isoDate,
+  jourDeSemaine,
+} from './calendrier'
 import { contexteEnfant } from './plan'
 import { encoderFoyer, decoderFoyer } from './partage'
 import { repasParDefaut } from './stockage'
@@ -53,6 +60,27 @@ describe('y a-t-il école ?', () => {
 
   it("avoue son ignorance hors des années connues plutôt que d'affirmer", () => {
     expect(etatDuJour(depuisIso('2030-03-04')).raison).toBe('annee-inconnue')
+  })
+
+  it("reconnaît le congé d'été qui précède la rentrée", () => {
+    // Cas réel : un parent ouvre l'application en août pour préparer la rentrée.
+    // Le congé d'été déborde de l'année scolaire qui vient de finir, il ne doit pas
+    // tomber dans un trou de couverture.
+    const e = etatDuJour(depuisIso('2026-08-07'))
+    expect(e.ecole).toBe(false)
+    expect(e.raison).toBe('vacances')
+    expect(e.id).toBe('ete')
+  })
+
+  it("ne conclut rien sur une année seulement partielle", () => {
+    // Mars 2026 appartient à une année dont on n'a enregistré que le congé d'été.
+    expect(etatDuJour(depuisIso('2026-03-10')).raison).toBe('annee-inconnue')
+  })
+
+  it("n'exporte jamais une année scolaire partiellement renseignée", () => {
+    const annee = anneeAExporter(depuisIso('2026-08-07'))
+    expect(annee?.anneeScolaire).toBe('2026/2027')
+    expect(annee?.partiel).toBeFalsy()
   })
 })
 

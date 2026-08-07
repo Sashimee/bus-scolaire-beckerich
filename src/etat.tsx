@@ -1,0 +1,132 @@
+/**
+ * État partagé du foyer.
+ *
+ * Une seule source de vérité pour l'adresse et les enfants, persistée dans
+ * `localStorage` à chaque changement. Les contextes de calcul (arrêt le plus proche,
+ * école) sont dérivés et mémorisés : changer le cycle d'un enfant suffit à tout
+ * recalculer, sans qu'aucun composant ait à s'en préoccuper.
+ */
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import { chargerFoyer, enregistrerFoyer, repasParDefaut } from './lib/stockage'
+import { contexteEnfant, type ContexteEnfant } from './lib/plan'
+import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi } from './lib/types'
+
+export type Theme = 'auto' | 'clair' | 'sombre'
+
+interface EtatFoyer {
+  foyer: Foyer
+  /** Contexte de calcul par enfant, `null` si aucun arrêt ne dessert son école. */
+  contextes: Map<string, ContexteEnfant | null>
+  configure: boolean
+  definirAdresse: (a: Adresse) => void
+  ajouterEnfant: (prenom: string, cycle: Cycle) => void
+  modifierEnfant: (id: string, champs: Partial<Omit<Enfant, 'id'>>) => void
+  definirRepas: (id: string, jour: Jour, repas: RepasMidi) => void
+  definirRepasSemaine: (id: string, repas: RepasMidi) => void
+  supprimerEnfant: (id: string) => void
+  remplacerFoyer: (f: Foyer) => void
+  theme: Theme
+  definirTheme: (t: Theme) => void
+}
+
+const Contexte = createContext<EtatFoyer | null>(null)
+
+const CLE_THEME = 'bus-beckerich.theme'
+
+function themeInitial(): Theme {
+  try {
+    const v = localStorage.getItem(CLE_THEME)
+    return v === 'clair' || v === 'sombre' ? v : 'auto'
+  } catch {
+    return 'auto'
+  }
+}
+
+export function FournisseurFoyer({ children }: { children: ReactNode }) {
+  const [foyer, setFoyer] = useState<Foyer>(chargerFoyer)
+  const [theme, setThemeEtat] = useState<Theme>(themeInitial)
+
+  useEffect(() => {
+    enregistrerFoyer(foyer)
+  }, [foyer])
+
+  useEffect(() => {
+    const racine = document.documentElement
+    if (theme === 'auto') racine.removeAttribute('data-theme')
+    else racine.dataset.theme = theme
+    try {
+      localStorage.setItem(CLE_THEME, theme)
+    } catch {
+      /* stockage indisponible : le thème vaudra pour la session seulement */
+    }
+  }, [theme])
+
+  const contextes = useMemo(() => {
+    const m = new Map<string, ContexteEnfant | null>()
+    if (!foyer.adresse) return m
+    for (const e of foyer.enfants) m.set(e.id, contexteEnfant(e, foyer.adresse))
+    return m
+  }, [foyer])
+
+  const majEnfant = useCallback((id: string, transformer: (e: Enfant) => Enfant) => {
+    setFoyer((f) => ({
+      ...f,
+      enfants: f.enfants.map((e) => (e.id === id ? transformer(e) : e)),
+    }))
+  }, [])
+
+  const valeur = useMemo<EtatFoyer>(
+    () => ({
+      foyer,
+      contextes,
+      configure: foyer.adresse !== null && foyer.enfants.length > 0,
+
+      definirAdresse: (adresse) => setFoyer((f) => ({ ...f, adresse })),
+
+      ajouterEnfant: (prenom, cycle) =>
+        setFoyer((f) => ({
+          ...f,
+          enfants: [
+            ...f.enfants,
+            {
+              id: `${Date.now().toString(36)}-${f.enfants.length}`,
+              prenom: prenom.trim(),
+              cycle,
+              repas: repasParDefaut(),
+            },
+          ],
+        })),
+
+      modifierEnfant: (id, champs) => majEnfant(id, (e) => ({ ...e, ...champs })),
+
+      definirRepas: (id, jour, repas) =>
+        majEnfant(id, (e) => ({ ...e, repas: { ...e.repas, [jour]: repas } })),
+
+      definirRepasSemaine: (id, repas) =>
+        majEnfant(id, (e) => ({
+          ...e,
+          repas: Object.fromEntries(
+            Object.keys(e.repas).map((j) => [j, repas]),
+          ) as Record<Jour, RepasMidi>,
+        })),
+
+      supprimerEnfant: (id) =>
+        setFoyer((f) => ({ ...f, enfants: f.enfants.filter((e) => e.id !== id) })),
+
+      remplacerFoyer: setFoyer,
+
+      theme,
+      definirTheme: setThemeEtat,
+    }),
+    [foyer, contextes, majEnfant, theme],
+  )
+
+  return <Contexte.Provider value={valeur}>{children}</Contexte.Provider>
+}
+
+export function useFoyer(): EtatFoyer {
+  const ctx = useContext(Contexte)
+  if (!ctx) throw new Error('useFoyer doit être utilisé dans FournisseurFoyer')
+  return ctx
+}

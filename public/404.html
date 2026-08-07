@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- GitHub Pages ne connait pas les routes de l application : on renvoie vers
+         index.html en conservant le chemin demande, que le routeur relira ensuite. -->
+    <script>
+      sessionStorage.setItem("redirection", location.pathname + location.search + location.hash)
+      location.replace(location.pathname.split("/").slice(0, 2).join("/") + "/")
+    </script>
+  </head>
+  <body></body>
+</html>

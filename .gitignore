@@ -23,5 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# Données générées par les scripts (voir DONNEES.md)
-src/data/adresses-beckerich.json
