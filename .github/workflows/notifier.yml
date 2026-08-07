@@ -60,7 +60,7 @@ jobs:
         if: steps.nouvelles.outputs.aucune == 'false'
         run: |
           reponse=$(curl -sS -w '\n%{http_code}' -X POST "${{ vars.URL_WORKER }}/notifier" \
-            -H "Authorization: Bearer ${{ secrets.SECRET_NOTIFICATION }}" \\
+            -H "Authorization: Bearer ${{ secrets.SECRET_NOTIFICATION }}" \
             -H 'Content-Type: application/json' \
             -d '${{ steps.nouvelles.outputs.charge }}')
           corps=$(echo "$reponse" | head -n -1)
