@@ -1,3 +1,331 @@
 {
-  "$commentaire": "Traductions en cours. Toute clé absente retombe automatiquement sur le français (voir src/i18n/index.tsx)."
+  "langue": "Deutsch",
+
+  "app": {
+    "titre": "Schulbus Beckerich",
+    "court": "Schulbus",
+    "baseline": "Die Buszeiten Ihrer Kinder, ohne nachzudenken"
+  },
+
+  "nav": {
+    "accueil": "Heute",
+    "semaine": "Die Woche",
+    "reglages": "Einstellungen",
+    "plan": "Offizieller Plan",
+    "limites": "Grenzen der Website",
+    "independance": "Unabhängige Website",
+    "installer": "App installieren",
+    "menu": "Menü",
+    "retour": "Zurück"
+  },
+
+  "avertissement": {
+    "titre": "Bevor Sie beginnen",
+    "independance": "Diese Website steht in keiner Verbindung zur Gemeinde Beckerich oder zur Schule. Sie wurde von einem Elternteil privat erstellt.",
+    "modification": "Der offizielle Plan kann jederzeit ohne Vorankündigung durch die Gemeinde geändert werden.",
+    "effort": "Es wird nach bestem Bemühen versucht, diese Website aktuell zu halten, ohne Gewähr.",
+    "priorite": "Im Zweifelsfall gilt das offizielle Dokument der Gemeinde.",
+    "accepter": "Verstanden",
+    "detail": "Alle Grenzen lesen"
+  },
+
+  "onboarding": {
+    "bienvenue": "Willkommen",
+    "intro": "Geben Sie Ihre Adresse und Ihre Kinder an. Die App ermittelt daraus für jedes Kind die nächste Haltestelle und die Fahrzeiten. Alles bleibt auf Ihrem Gerät.",
+    "etapeAdresse": "Ihre Adresse",
+    "etapeEnfants": "Ihre Kinder",
+    "commencer": "Beginnen",
+    "terminer": "Fertig",
+    "suivant": "Weiter",
+    "precedent": "Zurück"
+  },
+
+  "adresse": {
+    "label": "Wohnadresse",
+    "aide": "Tippen Sie den Anfang Ihrer Straße, dann die Hausnummer. Zum Beispiel „haapt 76“.",
+    "placeholder": "Straße und Hausnummer",
+    "aucunResultat": "Keine Adresse in der Gemeinde Beckerich gefunden.",
+    "aucunResultatAide": "Bitte die Schreibweise prüfen. Diese Website deckt nur Adressen der Gemeinde ab.",
+    "choisie": "Gewählte Adresse",
+    "modifier": "Adresse ändern",
+    "confidentialite": "Ihre Adresse wird auf Ihrem Gerät gesucht. Sie wird nirgendwohin gesendet."
+  },
+
+  "enfant": {
+    "prenom": "Vorname",
+    "prenomPlaceholder": "Vorname des Kindes",
+    "cycle": "Zyklus",
+    "cycleAide": "Der Schulstandort ergibt sich aus dem Zyklus. Ändern Sie den Zyklus zum Schuljahresbeginn: der gesamte Plan aktualisiert sich.",
+    "ajouter": "Kind hinzufügen",
+    "supprimer": "Löschen",
+    "supprimerConfirmation": "{prenom} löschen?",
+    "aucun": "Noch kein Kind erfasst.",
+    "scolariseA": "Besucht {site}",
+    "arretLePlusProche": "Nächste Haltestelle",
+    "tempsMarche": "{minutes} Min. zu Fuß",
+    "tempsMarcheEstimation": "etwa {minutes} Min. zu Fuß (Schätzung)",
+    "distance": "{metres} m",
+    "voirSemaine": "Woche ansehen",
+    "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan."
+  },
+
+  "repas": {
+    "titre": "Mittagessen",
+    "aide": "Tageweise einstellbar: ein Kind kann montags im Dillendapp essen und dienstags nach Hause fahren.",
+    "maison": "Fährt zum Essen heim",
+    "maisonCourt": "Zuhause",
+    "dillendapp": "Isst im Dillendapp",
+    "dillendappCourt": "Dillendapp",
+    "touteLaSemaine": "Auf die ganze Woche anwenden",
+    "sansCoursApresMidi": "Kein Nachmittagsunterricht"
+  },
+
+  "cycles": {
+    "precoce": "Früherziehung",
+    "c1": "Zyklus 1",
+    "c2": "Zyklus 2",
+    "c3": "Zyklus 3",
+    "c4": "Zyklus 4"
+  },
+
+  "jours": {
+    "lundi": "Montag",
+    "mardi": "Dienstag",
+    "mercredi": "Mittwoch",
+    "jeudi": "Donnerstag",
+    "vendredi": "Freitag",
+    "lundiCourt": "Mo",
+    "mardiCourt": "Di",
+    "mercrediCourt": "Mi",
+    "jeudiCourt": "Do",
+    "vendrediCourt": "Fr"
+  },
+
+  "trajets": {
+    "aller-matin": "Abfahrt zur Schule",
+    "retour-midi": "Heimfahrt, mittags",
+    "aller-apres-midi": "Rückfahrt zur Schule, nachmittags",
+    "retour-soir": "Heimfahrt, abends",
+    "navette-dillendapp-midi": "Schule → Dillendapp",
+    "navette-dillendapp-retour": "Dillendapp → Schule",
+    "depuis": "ab {arret}",
+    "vers": "nach {arret}",
+    "a": "um {heure}",
+    "heureNonPubliee": "Uhrzeit nicht veröffentlicht",
+    "ligne": "Linie",
+    "alternative": "Ebenfalls möglich: {ligne} um {heure}",
+    "interne": "Während des Schultags",
+    "concerneParent": "Ihre Fahrten",
+    "aucun": "An diesem Tag keine Fahrt."
+  },
+
+  "manquants": {
+    "titre": "Vom Plan nicht abgedeckt",
+    "retour-soir": "Der offizielle Plan sieht an diesem Tag keinen Rückbus für ein Kind vor, das im Dillendapp geblieben ist. Bitte erkundigen Sie sich bei der Maison Relais.",
+    "generique": "Der offizielle Plan sieht für diese Fahrt keinen Bus vor."
+  },
+
+  "aujourdhui": {
+    "titre": "Heute",
+    "prochainTrajet": "Nächste Fahrt",
+    "dans": "in {minutes} Min.",
+    "partirMaintenant": "Zeit loszugehen",
+    "plusDeBus": "Heute fährt kein Bus mehr.",
+    "demain": "Morgen",
+    "pasEcole": "Heute keine Schule",
+    "raisonWeekend": "Es ist Wochenende.",
+    "raisonVacances": "Ferien: {periode}.",
+    "raisonFerie": "Feiertag: {jour}.",
+    "raisonInconnue": "Der Schulkalender dieses Jahres ist in der App noch nicht hinterlegt. Bitte prüfen Sie den offiziellen Kalender."
+  },
+
+  "vacances": {
+    "toussaint": "Allerheiligenferien",
+    "noel": "Weihnachtsferien",
+    "carnaval": "Fastnachtsferien",
+    "paques": "Osterferien",
+    "pentecote": "Pfingstferien",
+    "ete": "Sommerferien"
+  },
+
+  "feries": {
+    "ascension": "Christi Himmelfahrt",
+    "lundi-pentecote": "Pfingstmontag",
+    "fete-nationale": "Nationalfeiertag"
+  },
+
+  "arrets": {
+    "ecole": "Schule",
+    "gare": "Bahnhof",
+    "pont": "Brücke",
+    "village": "Ort",
+    "precisionApproximative": "Ungefähre Position",
+    "precisionApproximativeAide": "Der genaue Standort dieser Haltestelle konnte nicht überprüft werden. Die Gehzeit ist daher noch ungenauer als sonst.",
+    "signaler": "Fehler melden"
+  },
+
+  "notes": {
+    "huttange-c3-uniquement": "Diese Abfahrt ist Kindern aus Huttange vorbehalten, die die Schule in Elvange besuchen (Zyklus 3). Kinder aus Huttange, die in Noerdange zur Schule gehen (Zyklus 2), nehmen den Aller 3.",
+    "voir-aller-3": "Huttange wird von dieser Linie nicht bedient: siehe Fahrplan „Aller Bus 3“.",
+    "huttange-retour-dillendapp-1345": "Kinder aus Huttange können den Bus „Retour Bus Dillendapp“ um 13:45 Uhr in Huttange nehmen.",
+    "depart-non-precise": "Der offizielle Plan nennt die genaue Haltestelle dieser Abfahrt in Beckerich nicht.",
+    "vendredi-hall-sportif": "Freitags erfolgt die Abfahrt an der Sporthalle statt an der Schule.",
+    "horaire-intermediaire-non-publie": "Der offizielle Plan veröffentlicht für diese Haltestelle keine Uhrzeit."
+  },
+
+  "incertitudes": {
+    "titre": "Vom offiziellen Plan nicht geklärt",
+    "retours-apres-midi-mardi-jeudi": "Der Plan sagt nicht, ob die späten Nachmittagsfahrten dienstags und donnerstags verkehren, also an Tagen ohne Nachmittagsunterricht. Die App geht davon aus, dass sie nicht fahren. Bitte bei der Gemeinde nachfragen."
+  },
+
+  "calendrier": {
+    "titre": "Zum Kalender hinzufügen",
+    "ics": "Für meinen Kalender herunterladen (.ics)",
+    "icsAide": "Funktioniert mit Google Kalender, Apple Kalender und Outlook. Die Schulferien sind bereits ausgenommen.",
+    "google": "Zu Google Kalender hinzufügen",
+    "googleAide": "Schnell hinzugefügt, aber Google berücksichtigt Ferienausnahmen schlecht: die .ics-Datei ist genauer.",
+    "tousLesEnfants": "Alle Kinder"
+  },
+
+  "partage": {
+    "titre": "Diese Konfiguration teilen",
+    "aide": "Senden Sie diesen Link an den anderen Elternteil, die Großeltern oder die Tagesmutter: sie sehen genau dieselbe Ansicht.",
+    "copier": "Link kopieren",
+    "copie": "Link kopiert",
+    "qr": "QR-Code anzeigen",
+    "confidentialite": "Die Daten stecken im Link selbst und laufen über keinen Server.",
+    "recu": "Konfiguration per Link erhalten",
+    "recuAide": "Möchten Sie Ihre aktuelle Konfiguration dadurch ersetzen?",
+    "accepter": "Diese Konfiguration übernehmen",
+    "refuser": "Meine behalten"
+  },
+
+  "impression": {
+    "titre": "Blatt zum Ausdrucken",
+    "bouton": "Woche drucken",
+    "aide": "Eine A4-Seite pro Kind, für den Kühlschrank."
+  },
+
+  "carte": {
+    "titre": "Fußweg",
+    "domicile": "Zuhause",
+    "horsLigne": "Die Karte benötigt eine Verbindung. Der Rest der App funktioniert offline.",
+    "ouvrirItineraire": "Route öffnen"
+  },
+
+  "reglages": {
+    "titre": "Einstellungen",
+    "langue": "Sprache",
+    "theme": "Darstellung",
+    "themeSombre": "Dunkel",
+    "themeClair": "Hell",
+    "themeAuto": "Automatisch",
+    "donnees": "Meine Daten",
+    "effacer": "Alle meine Daten löschen",
+    "effacerConfirmation": "Adresse, Kinder und Einstellungen auf diesem Gerät löschen?",
+    "efface": "Daten gelöscht."
+  },
+
+  "plan": {
+    "titre": "Offizieller Plan",
+    "intro": "Die folgenden Zeiten sind die Übertragung des offiziellen Gemeindeplans. Bei Abweichungen gilt das Originaldokument.",
+    "telecharger": "Offiziellen Plan herunterladen (PDF)",
+    "voirEnLigne": "Offizielle Seite der Schule ansehen",
+    "anneeScolaire": "Schuljahr {annee}",
+    "matin": "Morgens",
+    "midi": "Mittags",
+    "apresMidi": "Nachmittags",
+    "soir": "Abends",
+    "circule": "Verkehrt",
+    "reserve": "Linie vorbehalten",
+    "horairesEcole": "Schulzeiten",
+    "horairesEcoleDetail": "Unterricht von {matinDebut} bis {matinFin} von Montag bis Freitag, sowie von {apresMidiDebut} bis {apresMidiFin} montags, mittwochs und freitags."
+  },
+
+  "validite": {
+    "couverte": "Plan gültig für {annees}",
+    "confirme": "Bestätigt durch {personne} im {date}.",
+    "confirmeOral": "Da diese Bestätigung mündlich erfolgte, ist sie zu jedem Schuljahresbeginn erneut zu prüfen.",
+    "perime": "Achtung: dieser Plan hat seinen angegebenen Gültigkeitszeitraum überschritten ({fin}). Bitte prüfen Sie den offiziellen Plan, bevor Sie sich darauf verlassen.",
+    "releve": "Erfasst am {date}"
+  },
+
+  "limites": {
+    "titre": "Was diese Website kann — und was nicht",
+    "intro": "Diese Website ist eine Erleichterung. Sie ersetzt den offiziellen Plan nicht und garantiert nichts. Hier sind ihre Grenzen im Einzelnen.",
+    "marcheTitre": "Die Gehzeiten sind Schätzungen",
+    "marcheCorps": "Die Entfernung wird in Luftlinie berechnet, um ein Drittel für den Straßenverlauf erhöht, bei 4,5 km/h. Die Website kennt weder Gehwege noch Steigungen noch Straßenquerungen. Planen Sie Puffer ein.",
+    "arretsTitre": "Einige Haltestellenpositionen sind ungefähr",
+    "arretsCorps": "Nicht alle Haltestellen des Gemeindeplans sind in öffentlichen Datenbanken erfasst. Nicht überprüfte Positionen werden in der App als solche gekennzeichnet.",
+    "tempsReelTitre": "Keine Echtzeitinformationen",
+    "tempsReelCorps": "Die Website zeigt die theoretischen Fahrzeiten. Sie weiß nichts über Verspätungen, Umleitungen, Pannen, Streiks oder Wetterlagen.",
+    "planTitre": "Der Plan kann sich ändern, ohne dass die Website davon erfährt",
+    "planCorps": "Die Gemeinde kann die Fahrzeiten jederzeit ändern. Die Website wird von Hand nachgeführt, nach bestem Bemühen, doch eine Verzögerung ist möglich.",
+    "incertitudesTitre": "Manche Regeln des Plans bleiben mehrdeutig",
+    "incertitudesCorps": "Wo das offizielle Dokument keine Klarheit schafft, zeigt die Website ihre Annahme und weist darauf hin, statt eine Antwort als sicher darzustellen.",
+    "donneesTitre": "Ihre Daten bleiben bei Ihnen",
+    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält."
+  },
+
+  "independance": {
+    "titre": "Unabhängige Website",
+    "corps1": "Diese Website steht in keiner Verbindung zur Gemeinde Beckerich, zur Grundschule oder zur Maison Relais Dillendapp. Sie wurde von diesen weder beauftragt noch genehmigt noch geprüft.",
+    "corps2": "Sie wurde von einem Elternteil privat und kostenlos erstellt, um nicht jeden Morgen das PDF durchlesen zu müssen.",
+    "corps3": "Der Busplan bleibt Eigentum der Gemeinde. Er kann jederzeit ohne Vorankündigung geändert werden, ohne dass diese Website davon erfährt.",
+    "corps4": "Es wird nach bestem Bemühen versucht, die Website nach jeder bekannten Änderung rasch zu aktualisieren; eine Gewähr wird nicht übernommen.",
+    "corps5": "Im Zweifels- oder Abweichungsfall gilt das offizielle Dokument der Gemeinde.",
+    "lienOfficiel": "Offizielle Seite der Schule aufrufen",
+    "lienPdf": "Offiziellen Plan herunterladen",
+    "contact": "Fehler melden"
+  },
+
+  "installer": {
+    "titre": "App installieren",
+    "intro": "Auf dem Startbildschirm installiert, öffnet sich die App im Vollbild, startet sofort und funktioniert ohne Netz.",
+    "detecte": "Ihr Gerät",
+    "autres": "Andere Geräte",
+    "ios": "iPhone oder iPad (Safari)",
+    "iosEtapes": [
+      "Öffnen Sie diese Website in Safari.",
+      "Tippen Sie unten auf die Teilen-Schaltfläche (Quadrat mit Pfeil nach oben).",
+      "Scrollen Sie und wählen Sie „Zum Home-Bildschirm“.",
+      "Tippen Sie oben rechts auf „Hinzufügen“."
+    ],
+    "iosNote": "Auf iPhone und iPad kann nur Safari eine Web-App installieren. Chrome und Firefox für iOS bieten dies nicht an.",
+    "android": "Android (Chrome)",
+    "androidEtapes": [
+      "Öffnen Sie diese Website in Chrome.",
+      "Tippen Sie oben rechts auf das Menü ⋮.",
+      "Wählen Sie „App installieren“ oder „Zum Startbildschirm hinzufügen“.",
+      "Bestätigen Sie mit „Installieren“."
+    ],
+    "bureau": "Computer (Chrome oder Edge)",
+    "bureauEtapes": [
+      "Öffnen Sie diese Website in Chrome oder Edge.",
+      "Klicken Sie rechts in der Adressleiste auf das Installationssymbol.",
+      "Bestätigen Sie mit „Installieren“."
+    ],
+    "firefox": "Firefox",
+    "firefoxNote": "Firefox am Computer kann keine Web-Apps installieren. Setzen Sie die Website stattdessen auf Ihre Lesezeichen. Unter Android bietet Firefox im Menü „Zum Startbildschirm hinzufügen“ an.",
+    "boutonInstaller": "Jetzt installieren",
+    "dejaInstallee": "Die App ist auf diesem Gerät bereits installiert."
+  },
+
+  "maj": {
+    "disponible": "Eine neue Version ist verfügbar.",
+    "recharger": "Neu laden",
+    "version": "Version {version}",
+    "horsLigne": "Offline — die Fahrzeiten bleiben abrufbar."
+  },
+
+  "commun": {
+    "fermer": "Schließen",
+    "modifier": "Ändern",
+    "annuler": "Abbrechen",
+    "confirmer": "Bestätigen",
+    "enregistrer": "Speichern",
+    "chargement": "Wird geladen…",
+    "erreur": "Ein Fehler ist aufgetreten.",
+    "et": "und"
+  }
 }

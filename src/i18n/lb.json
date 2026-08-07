@@ -1,3 +1,331 @@
 {
-  "$commentaire": "Traductions en cours. Toute clé absente retombe automatiquement sur le français (voir src/i18n/index.tsx)."
+  "langue": "Lëtzebuergesch",
+
+  "app": {
+    "titre": "Schoulbus Biekerech",
+    "court": "Schoulbus",
+    "baseline": "D'Busziichten vun Ären Kanner, ouni ze iwwerleeën"
+  },
+
+  "nav": {
+    "accueil": "Haut",
+    "semaine": "D'Woch",
+    "reglages": "Astellungen",
+    "plan": "Offizielle Plang",
+    "limites": "Grenze vun der Säit",
+    "independance": "Onofhängeg Säit",
+    "installer": "App installéieren",
+    "menu": "Menü",
+    "retour": "Zréck"
+  },
+
+  "avertissement": {
+    "titre": "Ier Dir ufänkt",
+    "independance": "Dës Säit huet keng Verbindung mat der Gemeng Biekerech oder mat der Schoul. Si gouf vun engem Elterendeel privat gemaach.",
+    "modification": "Den offizielle Plang kann zu all Moment ouni Virwarnung vun der Gemeng geännert ginn.",
+    "effort": "Et gëtt de beschte Effort gemaach fir dës Säit aktuell ze halen, ouni Garantie.",
+    "priorite": "Am Zweiwelsfall gëllt dat offiziellt Dokument vun der Gemeng.",
+    "accepter": "Verstanen",
+    "detail": "All Grenze liesen"
+  },
+
+  "onboarding": {
+    "bienvenue": "Wëllkomm",
+    "intro": "Gitt Är Adress an Är Kanner un. D'App fënnt doraus fir all Kand déi nooste Statioun an d'Ziichten. Alles bleift op Ärem Apparat.",
+    "etapeAdresse": "Är Adress",
+    "etapeEnfants": "Är Kanner",
+    "commencer": "Ufänken",
+    "terminer": "Fäerdeg",
+    "suivant": "Weider",
+    "precedent": "Zréck"
+  },
+
+  "adresse": {
+    "label": "Wunnadress",
+    "aide": "Tippt den Ufank vun Ärer Strooss, dann d'Nummer. Zum Beispill „haapt 76“.",
+    "placeholder": "Strooss an Nummer",
+    "aucunResultat": "Keng Adress an der Gemeng Biekerech fonnt.",
+    "aucunResultatAide": "Kuckt d'Schreifweis no. Dës Säit deckt nëmmen Adresse vun der Gemeng of.",
+    "choisie": "Gewielten Adress",
+    "modifier": "Adress änneren",
+    "confidentialite": "Är Adress gëtt op Ärem Apparat gesicht. Si gëtt néierens higeschéckt."
+  },
+
+  "enfant": {
+    "prenom": "Virnumm",
+    "prenomPlaceholder": "Virnumm vum Kand",
+    "cycle": "Cycle",
+    "cycleAide": "De Schoulstanduert ergëtt sech aus dem Cycle. Ännert de Cycle bei der Rentrée: de ganze Plang passt sech un.",
+    "ajouter": "Kand derbäisetzen",
+    "supprimer": "Läschen",
+    "supprimerConfirmation": "{prenom} läschen?",
+    "aucun": "Nach kee Kand agedroen.",
+    "scolariseA": "Geet an {site}",
+    "arretLePlusProche": "Nooste Statioun",
+    "tempsMarche": "{minutes} Min. zu Fouss",
+    "tempsMarcheEstimation": "ongeféier {minutes} Min. zu Fouss (Schätzung)",
+    "distance": "{metres} m",
+    "voirSemaine": "D'Woch kucken",
+    "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no."
+  },
+
+  "repas": {
+    "titre": "Mëttegiessen",
+    "aide": "Dag fir Dag astellbar: e Kand kann méindes am Dillendapp iessen an dënschdes heemfueren.",
+    "maison": "Fiert heem iessen",
+    "maisonCourt": "Doheem",
+    "dillendapp": "Ësst am Dillendapp",
+    "dillendappCourt": "Dillendapp",
+    "touteLaSemaine": "Op déi ganz Woch uwenden",
+    "sansCoursApresMidi": "Kee Cours nomëttes"
+  },
+
+  "cycles": {
+    "precoce": "Précoce",
+    "c1": "Cycle 1",
+    "c2": "Cycle 2",
+    "c3": "Cycle 3",
+    "c4": "Cycle 4"
+  },
+
+  "jours": {
+    "lundi": "Méindeg",
+    "mardi": "Dënschdeg",
+    "mercredi": "Mëttwoch",
+    "jeudi": "Donneschdeg",
+    "vendredi": "Freideg",
+    "lundiCourt": "Méi",
+    "mardiCourt": "Dën",
+    "mercrediCourt": "Mët",
+    "jeudiCourt": "Don",
+    "vendrediCourt": "Fre"
+  },
+
+  "trajets": {
+    "aller-matin": "Offahrt an d'Schoul",
+    "retour-midi": "Heemfahrt, mëttes",
+    "aller-apres-midi": "Zréck an d'Schoul, nomëttes",
+    "retour-soir": "Heemfahrt, owes",
+    "navette-dillendapp-midi": "Schoul → Dillendapp",
+    "navette-dillendapp-retour": "Dillendapp → Schoul",
+    "depuis": "vun {arret}",
+    "vers": "op {arret}",
+    "a": "um {heure}",
+    "heureNonPubliee": "Auerzäit net publizéiert",
+    "ligne": "Linn",
+    "alternative": "Och méiglech: {ligne} um {heure}",
+    "interne": "Wärend dem Schouldag",
+    "concerneParent": "Är Fahrten",
+    "aucun": "Keng Fahrt un dësem Dag."
+  },
+
+  "manquants": {
+    "titre": "Net vum Plang ofgedeckt",
+    "retour-soir": "Den offizielle Plang gesäit un dësem Dag kee Retourbus fir e Kand vir, dat am Dillendapp bliwwen ass. Frot w.e.g. bei der Maison Relais no.",
+    "generique": "Den offizielle Plang gesäit fir dës Fahrt kee Bus vir."
+  },
+
+  "aujourdhui": {
+    "titre": "Haut",
+    "prochainTrajet": "Nächst Fahrt",
+    "dans": "an {minutes} Min.",
+    "partirMaintenant": "Et ass Zäit lasszegoen",
+    "plusDeBus": "Haut fiert kee Bus méi.",
+    "demain": "Muer",
+    "pasEcole": "Haut keng Schoul",
+    "raisonWeekend": "Et ass Weekend.",
+    "raisonVacances": "Vakanz: {periode}.",
+    "raisonFerie": "Feierdag: {jour}.",
+    "raisonInconnue": "De Schoulkalenner vun dësem Joer ass an der App nach net hannerluecht. Kuckt w.e.g. den offizielle Kalenner."
+  },
+
+  "vacances": {
+    "toussaint": "Allerhellegevakanz",
+    "noel": "Chrëschtvakanz",
+    "carnaval": "Fuesvakanz",
+    "paques": "Ouschtervakanz",
+    "pentecote": "Péngschtvakanz",
+    "ete": "Summervakanz"
+  },
+
+  "feries": {
+    "ascension": "Christi Himmelfaart",
+    "lundi-pentecote": "Péngschtméindeg",
+    "fete-nationale": "Nationalfeierdag"
+  },
+
+  "arrets": {
+    "ecole": "Schoul",
+    "gare": "Gare",
+    "pont": "Bréck",
+    "village": "Duerf",
+    "precisionApproximative": "Ongeféier Positioun",
+    "precisionApproximativeAide": "De genaue Standuert vun dëser Statioun konnt net nogepréift ginn. D'Zäit zu Fouss ass dofir nach méi ongenau wéi soss.",
+    "signaler": "Feeler mellen"
+  },
+
+  "notes": {
+    "huttange-c3-uniquement": "Dës Offahrt ass de Kanner aus Hüttingen reservéiert, déi d'Schoul zu Elwen besichen (Cycle 3). Kanner aus Hüttingen, déi zu Näerden an d'Schoul ginn (Cycle 2), huelen den Aller 3.",
+    "voir-aller-3": "Hüttingen gëtt vun dëser Linn net bedéngt: kuckt den Horaire „Aller Bus 3“.",
+    "huttange-retour-dillendapp-1345": "Kanner aus Hüttingen kënnen de Bus „Retour Bus Dillendapp“ um 13:45 zu Hüttingen huelen.",
+    "depart-non-precise": "Den offizielle Plang nennt déi genee Statioun vun dëser Offahrt zu Biekerech net.",
+    "vendredi-hall-sportif": "Freides ass d'Offahrt bei der Sportshal an net bei der Schoul.",
+    "horaire-intermediaire-non-publie": "Den offizielle Plang publizéiert fir dës Statioun keng Auerzäit."
+  },
+
+  "incertitudes": {
+    "titre": "Vum offizielle Plang net gekläert",
+    "retours-apres-midi-mardi-jeudi": "De Plang seet net, ob déi spéit Nomëttesfahrten dënschdes an donneschdes fueren, also un Deeg ouni Cours nomëttes. D'App geet dovun aus, datt se net fueren. Frot w.e.g. bei der Gemeng no."
+  },
+
+  "calendrier": {
+    "titre": "An e Kalenner derbäisetzen",
+    "ics": "Fir mäi Kalenner eroflueden (.ics)",
+    "icsAide": "Funktionéiert mat Google Kalenner, Apple Kalenner an Outlook. D'Schoulvakanze sinn scho erausgeholl.",
+    "google": "An de Google Kalenner derbäisetzen",
+    "googleAide": "Séier derbäigesat, mee Google gëtt schlecht mat de Vakanzausnamen ëm: d'.ics-Datei ass méi genee.",
+    "tousLesEnfants": "All Kanner"
+  },
+
+  "partage": {
+    "titre": "Dës Konfiguratioun deelen",
+    "aide": "Schéckt dëse Link un deen aneren Elterendeel, un d'Grousselteren oder un d'Kannerbetreiung: si gesinn genee dee selwechte Bildschierm.",
+    "copier": "Link kopéieren",
+    "copie": "Link kopéiert",
+    "qr": "QR-Code weisen",
+    "confidentialite": "D'Donnéeë stiechen am Link selwer a lafen iwwer kee Server.",
+    "recu": "Konfiguratioun iwwer Link kritt",
+    "recuAide": "Wëllt Dir Är aktuell Konfiguratioun dodurch ersetzen?",
+    "accepter": "Dës Konfiguratioun huelen",
+    "refuser": "Meng behalen"
+  },
+
+  "impression": {
+    "titre": "Blat fir auszedrécken",
+    "bouton": "D'Woch drécken",
+    "aide": "Eng A4-Säit pro Kand, fir op de Frigo."
+  },
+
+  "carte": {
+    "titre": "Wee zu Fouss",
+    "domicile": "Doheem",
+    "horsLigne": "D'Kaart brauch eng Verbindung. De Rescht vun der App funktionéiert offline.",
+    "ouvrirItineraire": "Streck opmaachen"
+  },
+
+  "reglages": {
+    "titre": "Astellungen",
+    "langue": "Sprooch",
+    "theme": "Duerstellung",
+    "themeSombre": "Däischter",
+    "themeClair": "Hell",
+    "themeAuto": "Automatesch",
+    "donnees": "Meng Donnéeën",
+    "effacer": "All meng Donnéeë läschen",
+    "effacerConfirmation": "Adress, Kanner an Astellungen op dësem Apparat läschen?",
+    "efface": "Donnéeë geläscht."
+  },
+
+  "plan": {
+    "titre": "Offizielle Plang",
+    "intro": "D'Ziichten hei drënner sinn d'Iwwerdroung vum offizielle Gemengeplang. Bei Ofwäichungen gëllt dat originalt Dokument.",
+    "telecharger": "Offizielle Plang eroflueden (PDF)",
+    "voirEnLigne": "Offiziell Säit vun der Schoul kucken",
+    "anneeScolaire": "Schouljoer {annee}",
+    "matin": "Moies",
+    "midi": "Mëttes",
+    "apresMidi": "Nomëttes",
+    "soir": "Owes",
+    "circule": "Fiert",
+    "reserve": "Linn reservéiert",
+    "horairesEcole": "Schoulziichten",
+    "horairesEcoleDetail": "Cours vun {matinDebut} bis {matinFin} vu méindes bis freides, a vun {apresMidiDebut} bis {apresMidiFin} méindes, mëttwochs a freides."
+  },
+
+  "validite": {
+    "couverte": "Plang gëlteg fir {annees}",
+    "confirme": "Bestätegt vum {personne} am {date}.",
+    "confirmeOral": "Well dës Bestätegung mëndlech war, muss se bei all Rentrée nei nogepréift ginn.",
+    "perime": "Opgepasst: dëse Plang huet seng ugewisen Gëltegkeetsperiod iwwerschratt ({fin}). Kuckt den offizielle Plang no, ier Dir Iech drop verloosst.",
+    "releve": "Erfaasst den {date}"
+  },
+
+  "limites": {
+    "titre": "Wat dës Säit kann — a wat net",
+    "intro": "Dës Säit ass en Hëllefsmëttel. Si ersetzt den offizielle Plang net a garantéiert näischt. Hei sinn hir Grenzen am Detail.",
+    "marcheTitre": "D'Zäite zu Fouss sinn Schätzungen",
+    "marcheCorps": "D'Distanz gëtt an der Loftlinn berechent, ëm en Drëttel erhéicht fir de Stroosseverlaf, bei 4,5 km/h. D'Säit kennt weder Trottoiren nach Steigungen nach Stroossequerungen. Plangt Reserv an.",
+    "arretsTitre": "E puer Statiounspositioune sinn ongeféier",
+    "arretsCorps": "Net all Statioune vum Gemengeplang stinn an ëffentlechen Datebanken. Positiounen, déi net nogepréift konnte ginn, ginn an der App als sou markéiert.",
+    "tempsReelTitre": "Keng Informatiounen an Echtzäit",
+    "tempsReelCorps": "D'Säit weist déi theoretesch Ziichten. Si weess näischt vu Verspéidungen, Ëmleedungen, Pannen, Streik oder Wieder.",
+    "planTitre": "De Plang kann änneren, ouni datt d'Säit et gewuer gëtt",
+    "planCorps": "D'Gemeng kann d'Ziichten zu all Moment änneren. D'Säit gëtt vun Hand nogefouert, mam beschten Effort, mee eng Verspéidung ass méiglech.",
+    "incertitudesTitre": "E puer Regele vum Plang bleiwen zweideiteg",
+    "incertitudesCorps": "Wou dat offiziellt Dokument net kloer ass, weist d'Säit hir Unhuelung a weist drop hin, amplaz eng Äntwert als sécher duerzestellen.",
+    "donneesTitre": "Är Donnéeë bleiwen bei Iech",
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt."
+  },
+
+  "independance": {
+    "titre": "Onofhängeg Säit",
+    "corps1": "Dës Säit huet keng Verbindung mat der Gemeng Biekerech, mat der Grondschoul oder mat der Maison Relais Dillendapp. Si gouf vun hinne weder bestallt nach guttgeheescht nach nogelies.",
+    "corps2": "Si gouf vun engem Elterendeel privat a gratis gemaach, fir net all Moie mussen d'PDF duerchzeliesen.",
+    "corps3": "De Busplang bleift Eegentum vun der Gemeng. Hie kann zu all Moment ouni Virwarnung geännert ginn, ouni datt dës Säit et gewuer gëtt.",
+    "corps4": "Et gëtt de beschten Effort gemaach fir d'Säit no all bekannter Ännerung séier ze aktualiséieren; eng Garantie gëtt net ginn.",
+    "corps5": "Am Zweiwels- oder Ofwäichungsfall gëllt dat offiziellt Dokument vun der Gemeng.",
+    "lienOfficiel": "Offiziell Säit vun der Schoul opmaachen",
+    "lienPdf": "Offizielle Plang eroflueden",
+    "contact": "Feeler mellen"
+  },
+
+  "installer": {
+    "titre": "App installéieren",
+    "intro": "Um Startbildschierm installéiert, geet d'App am Vollbild op, start direkt a funktionéiert ouni Netz.",
+    "detecte": "Ären Apparat",
+    "autres": "Aner Apparater",
+    "ios": "iPhone oder iPad (Safari)",
+    "iosEtapes": [
+      "Maacht dës Säit am Safari op.",
+      "Tippt ënnen op de Deele-Knäppchen (Quadrat mat engem Feil no uewen).",
+      "Scrollt an wielt „Op den Home-Bildschierm“.",
+      "Tippt uewe riets op „Derbäisetzen“."
+    ],
+    "iosNote": "Um iPhone an iPad kann nëmmen de Safari eng Web-App installéieren. Chrome a Firefox fir iOS bidden dat net un.",
+    "android": "Android (Chrome)",
+    "androidEtapes": [
+      "Maacht dës Säit am Chrome op.",
+      "Tippt uewe riets op de Menü ⋮.",
+      "Wielt „App installéieren“ oder „Op den Startbildschierm setzen“.",
+      "Bestätegt mat „Installéieren“."
+    ],
+    "bureau": "Computer (Chrome oder Edge)",
+    "bureauEtapes": [
+      "Maacht dës Säit am Chrome oder Edge op.",
+      "Klickt riets an der Adressleescht op d'Installatiounsikon.",
+      "Bestätegt mat „Installéieren“."
+    ],
+    "firefox": "Firefox",
+    "firefoxNote": "De Firefox um Computer kann keng Web-Apps installéieren. Setzt d'Säit amplaz op Är Lieszeechen. Um Android bitt de Firefox am Menü „Op den Startbildschierm setzen“ un.",
+    "boutonInstaller": "Elo installéieren",
+    "dejaInstallee": "D'App ass op dësem Apparat scho installéiert."
+  },
+
+  "maj": {
+    "disponible": "Eng nei Versioun ass verfügbar.",
+    "recharger": "Nei lueden",
+    "version": "Versioun {version}",
+    "horsLigne": "Offline — d'Ziichte bleiwen ofrufbar."
+  },
+
+  "commun": {
+    "fermer": "Zoumaachen",
+    "modifier": "Änneren",
+    "annuler": "Ofbriechen",
+    "confirmer": "Bestätegen",
+    "enregistrer": "Späicheren",
+    "chargement": "Gëtt gelueden…",
+    "erreur": "E Feeler ass opgetrueden.",
+    "et": "an"
+  }
 }

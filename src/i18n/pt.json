@@ -1,3 +1,331 @@
 {
-  "$commentaire": "Traductions en cours. Toute clé absente retombe automatiquement sur le français (voir src/i18n/index.tsx)."
+  "langue": "Português",
+
+  "app": {
+    "titre": "Autocarro escolar de Beckerich",
+    "court": "Autocarro escolar",
+    "baseline": "Os horários do autocarro dos seus filhos, sem ter de pensar"
+  },
+
+  "nav": {
+    "accueil": "Hoje",
+    "semaine": "A semana",
+    "reglages": "Definições",
+    "plan": "Plano oficial",
+    "limites": "Limites do site",
+    "independance": "Site independente",
+    "installer": "Instalar a aplicação",
+    "menu": "Menu",
+    "retour": "Voltar"
+  },
+
+  "avertissement": {
+    "titre": "Antes de começar",
+    "independance": "Este site não tem qualquer ligação com o município de Beckerich nem com a escola. Foi criado por um pai, a título privado.",
+    "modification": "O plano oficial pode ser alterado a qualquer momento, sem aviso prévio por parte do município.",
+    "effort": "Serão feitos todos os esforços para manter este site atualizado, sem garantia de resultado.",
+    "priorite": "Em caso de dúvida, prevalece o documento oficial do município.",
+    "accepter": "Compreendi",
+    "detail": "Ler todos os limites"
+  },
+
+  "onboarding": {
+    "bienvenue": "Bem-vindo",
+    "intro": "Indique a sua morada e os seus filhos. A aplicação determina, para cada um, a paragem mais próxima e os horários. Tudo fica no seu dispositivo.",
+    "etapeAdresse": "A sua morada",
+    "etapeEnfants": "Os seus filhos",
+    "commencer": "Começar",
+    "terminer": "Concluir",
+    "suivant": "Continuar",
+    "precedent": "Voltar"
+  },
+
+  "adresse": {
+    "label": "Morada de residência",
+    "aide": "Escreva o início da sua rua e depois o número. Por exemplo «haapt 76».",
+    "placeholder": "Rua e número",
+    "aucunResultat": "Nenhuma morada encontrada no município de Beckerich.",
+    "aucunResultatAide": "Verifique a ortografia. Este site abrange apenas as moradas do município.",
+    "choisie": "Morada escolhida",
+    "modifier": "Alterar a morada",
+    "confidentialite": "A sua morada é pesquisada no seu dispositivo. Não é enviada para lado nenhum."
+  },
+
+  "enfant": {
+    "prenom": "Nome próprio",
+    "prenomPlaceholder": "Nome da criança",
+    "cycle": "Ciclo",
+    "cycleAide": "O estabelecimento decorre do ciclo. Altere o ciclo no início do ano letivo: todo o plano se atualiza.",
+    "ajouter": "Adicionar uma criança",
+    "supprimer": "Eliminar",
+    "supprimerConfirmation": "Eliminar {prenom}?",
+    "aucun": "Ainda nenhuma criança registada.",
+    "scolariseA": "Frequenta {site}",
+    "arretLePlusProche": "Paragem mais próxima",
+    "tempsMarche": "{minutes} min a pé",
+    "tempsMarcheEstimation": "cerca de {minutes} min a pé (estimativa)",
+    "distance": "{metres} m",
+    "voirSemaine": "Ver a semana",
+    "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial."
+  },
+
+  "repas": {
+    "titre": "Almoço",
+    "aide": "Configurável dia a dia: uma criança pode almoçar no Dillendapp à segunda-feira e regressar a casa à terça.",
+    "maison": "Volta para almoçar",
+    "maisonCourt": "Casa",
+    "dillendapp": "Almoça no Dillendapp",
+    "dillendappCourt": "Dillendapp",
+    "touteLaSemaine": "Aplicar a toda a semana",
+    "sansCoursApresMidi": "Sem aulas à tarde"
+  },
+
+  "cycles": {
+    "precoce": "Precoce",
+    "c1": "Ciclo 1",
+    "c2": "Ciclo 2",
+    "c3": "Ciclo 3",
+    "c4": "Ciclo 4"
+  },
+
+  "jours": {
+    "lundi": "Segunda-feira",
+    "mardi": "Terça-feira",
+    "mercredi": "Quarta-feira",
+    "jeudi": "Quinta-feira",
+    "vendredi": "Sexta-feira",
+    "lundiCourt": "Seg",
+    "mardiCourt": "Ter",
+    "mercrediCourt": "Qua",
+    "jeudiCourt": "Qui",
+    "vendrediCourt": "Sex"
+  },
+
+  "trajets": {
+    "aller-matin": "Partida para a escola",
+    "retour-midi": "Regresso a casa, meio-dia",
+    "aller-apres-midi": "Regresso às aulas, à tarde",
+    "retour-soir": "Regresso a casa, ao fim do dia",
+    "navette-dillendapp-midi": "Escola → Dillendapp",
+    "navette-dillendapp-retour": "Dillendapp → escola",
+    "depuis": "de {arret}",
+    "vers": "para {arret}",
+    "a": "às {heure}",
+    "heureNonPubliee": "horário não publicado",
+    "ligne": "Linha",
+    "alternative": "Também possível: {ligne} às {heure}",
+    "interne": "Durante o dia de escola",
+    "concerneParent": "As suas deslocações",
+    "aucun": "Nenhuma deslocação nesse dia."
+  },
+
+  "manquants": {
+    "titre": "Não coberto pelo plano",
+    "retour-soir": "O plano oficial não prevê autocarro de regresso nesse dia para uma criança que ficou no Dillendapp. Informe-se junto da maison relais.",
+    "generique": "O plano oficial não prevê autocarro para esta deslocação."
+  },
+
+  "aujourdhui": {
+    "titre": "Hoje",
+    "prochainTrajet": "Próxima deslocação",
+    "dans": "dentro de {minutes} min",
+    "partirMaintenant": "Está na hora de sair",
+    "plusDeBus": "Não há mais autocarros hoje.",
+    "demain": "Amanhã",
+    "pasEcole": "Hoje não há escola",
+    "raisonWeekend": "É fim de semana.",
+    "raisonVacances": "Férias: {periode}.",
+    "raisonFerie": "Feriado: {jour}.",
+    "raisonInconnue": "O calendário escolar deste ano ainda não está registado na aplicação. Consulte o calendário oficial."
+  },
+
+  "vacances": {
+    "toussaint": "férias de Todos os Santos",
+    "noel": "férias de Natal",
+    "carnaval": "férias de Carnaval",
+    "paques": "férias da Páscoa",
+    "pentecote": "férias do Pentecostes",
+    "ete": "férias de verão"
+  },
+
+  "feries": {
+    "ascension": "Ascensão",
+    "lundi-pentecote": "segunda-feira de Pentecostes",
+    "fete-nationale": "festa nacional"
+  },
+
+  "arrets": {
+    "ecole": "Escola",
+    "gare": "Estação",
+    "pont": "Ponte",
+    "village": "Aldeia",
+    "precisionApproximative": "Posição aproximada",
+    "precisionApproximativeAide": "Não foi possível verificar a localização exata desta paragem. O tempo a pé é, por isso, ainda mais indicativo do que o habitual.",
+    "signaler": "Comunicar um erro"
+  },
+
+  "notes": {
+    "huttange-c3-uniquement": "Esta partida está reservada às crianças de Huttange que frequentam a escola de Elvange (ciclo 3). As crianças de Huttange que frequentam Noerdange (ciclo 2) apanham o Aller 3.",
+    "voir-aller-3": "Huttange não é servida por esta linha: consulte o horário «Aller Bus 3».",
+    "huttange-retour-dillendapp-1345": "As crianças de Huttange podem apanhar o autocarro «Retour Bus Dillendapp» às 13:45 em Huttange.",
+    "depart-non-precise": "O plano oficial não indica a paragem exata desta partida em Beckerich.",
+    "vendredi-hall-sportif": "À sexta-feira, a partida faz-se a partir do pavilhão desportivo e não da escola.",
+    "horaire-intermediaire-non-publie": "O plano oficial não publica a hora de passagem nesta paragem."
+  },
+
+  "incertitudes": {
+    "titre": "Ponto não esclarecido pelo plano oficial",
+    "retours-apres-midi-mardi-jeudi": "O plano não indica se os regressos do fim da tarde circulam à terça e à quinta-feira, dias sem aulas à tarde. A aplicação parte do princípio de que não circulam. A confirmar junto do município."
+  },
+
+  "calendrier": {
+    "titre": "Adicionar a um calendário",
+    "ics": "Transferir para o meu calendário (.ics)",
+    "icsAide": "Funciona com o Google Agenda, o Calendário Apple e o Outlook. As férias escolares já estão excluídas.",
+    "google": "Adicionar ao Google Agenda",
+    "googleAide": "Adição rápida, mas o Google lida mal com as exclusões de férias: o ficheiro .ics é mais fiel.",
+    "tousLesEnfants": "Todas as crianças"
+  },
+
+  "partage": {
+    "titre": "Partilhar esta configuração",
+    "aide": "Envie esta ligação ao outro progenitor, aos avós ou à ama: verão exatamente o mesmo ecrã.",
+    "copier": "Copiar a ligação",
+    "copie": "Ligação copiada",
+    "qr": "Mostrar o código QR",
+    "confidentialite": "Os dados viajam na própria ligação e não passam por nenhum servidor.",
+    "recu": "Configuração recebida por ligação",
+    "recuAide": "Deseja substituir a sua configuração atual por esta?",
+    "accepter": "Utilizar esta configuração",
+    "refuser": "Manter a minha"
+  },
+
+  "impression": {
+    "titre": "Folha para imprimir",
+    "bouton": "Imprimir a semana",
+    "aide": "Uma página A4 por criança, para colar no frigorífico."
+  },
+
+  "carte": {
+    "titre": "Percurso a pé",
+    "domicile": "Casa",
+    "horsLigne": "O mapa necessita de ligação. O resto da aplicação funciona sem rede.",
+    "ouvrirItineraire": "Abrir o itinerário"
+  },
+
+  "reglages": {
+    "titre": "Definições",
+    "langue": "Idioma",
+    "theme": "Tema",
+    "themeSombre": "Escuro",
+    "themeClair": "Claro",
+    "themeAuto": "Automático",
+    "donnees": "Os meus dados",
+    "effacer": "Apagar todos os meus dados",
+    "effacerConfirmation": "Apagar a morada, as crianças e as preferências guardadas neste dispositivo?",
+    "efface": "Dados apagados."
+  },
+
+  "plan": {
+    "titre": "Plano oficial",
+    "intro": "Os horários abaixo são a transcrição do plano oficial do município. Em caso de divergência, prevalece o documento original.",
+    "telecharger": "Transferir o plano oficial (PDF)",
+    "voirEnLigne": "Ver a página oficial da escola",
+    "anneeScolaire": "Ano letivo {annee}",
+    "matin": "Manhã",
+    "midi": "Meio-dia",
+    "apresMidi": "Tarde",
+    "soir": "Fim do dia",
+    "circule": "Circula",
+    "reserve": "Linha reservada",
+    "horairesEcole": "Horário da escola",
+    "horairesEcoleDetail": "Aulas das {matinDebut} às {matinFin} de segunda a sexta-feira, e das {apresMidiDebut} às {apresMidiFin} às segundas, quartas e sextas-feiras."
+  },
+
+  "validite": {
+    "couverte": "Plano válido para {annees}",
+    "confirme": "Confirmado por {personne} em {date}.",
+    "confirmeOral": "Sendo esta confirmação verbal, deve ser reverificada no início de cada ano letivo.",
+    "perime": "Atenção: este plano ultrapassou o seu período de validade declarado ({fin}). Verifique o plano oficial antes de confiar nele.",
+    "releve": "Registado em {date}"
+  },
+
+  "limites": {
+    "titre": "O que este site sabe fazer, e o que não sabe",
+    "intro": "Este site é uma ferramenta de conveniência. Não substitui o plano oficial e não garante nada. Eis os seus limites, em concreto.",
+    "marcheTitre": "Os tempos a pé são estimativas",
+    "marcheCorps": "A distância é calculada em linha reta e depois aumentada em um terço para ter em conta o traçado das ruas, a 4,5 km/h. O site não conhece os passeios, os declives nem as travessias. Preveja uma margem.",
+    "arretsTitre": "Algumas posições de paragens são aproximadas",
+    "arretsCorps": "Nem todas as paragens do plano municipal constam das bases de dados públicas. Aquelas cuja posição não pôde ser verificada são assinaladas como tal na aplicação.",
+    "tempsReelTitre": "Nenhuma informação em tempo real",
+    "tempsReelCorps": "O site apresenta os horários teóricos. Não sabe nada sobre atrasos, desvios, avarias, greves ou condições meteorológicas.",
+    "planTitre": "O plano pode mudar sem que o site saiba",
+    "planCorps": "O município pode alterar os horários a qualquer momento. O site é atualizado manualmente, com o melhor esforço, mas é possível um desfasamento.",
+    "incertitudesTitre": "Algumas regras do plano permanecem ambíguas",
+    "incertitudesCorps": "Onde o documento oficial não decide, o site mostra a sua hipótese e assinala-a, em vez de apresentar uma resposta como certa.",
+    "donneesTitre": "Os seus dados ficam consigo",
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. Uma ligação de partilha transporta os dados no seu fragmento, que o servidor nunca recebe."
+  },
+
+  "independance": {
+    "titre": "Site independente",
+    "corps1": "Este site não tem qualquer ligação com o município de Beckerich, com a escola fundamental nem com a maison relais Dillendapp. Não foi encomendado, validado nem revisto por eles.",
+    "corps2": "Foi criado por um pai, a título privado e gratuito, para evitar ter de reler o PDF todas as manhãs.",
+    "corps3": "O plano de autocarros continua a ser propriedade do município. Pode ser alterado a qualquer momento, sem aviso prévio e sem que este site seja informado.",
+    "corps4": "Serão feitos todos os esforços para atualizar o site rapidamente após cada alteração conhecida, mas não é assumido qualquer compromisso de resultado.",
+    "corps5": "Em caso de dúvida ou divergência, prevalece o documento oficial do município.",
+    "lienOfficiel": "Consultar a página oficial da escola",
+    "lienPdf": "Transferir o plano oficial",
+    "contact": "Comunicar um erro"
+  },
+
+  "installer": {
+    "titre": "Instalar a aplicação",
+    "intro": "Instalada no ecrã principal, a aplicação abre em ecrã inteiro, arranca de imediato e funciona sem rede.",
+    "detecte": "O seu dispositivo",
+    "autres": "Outros dispositivos",
+    "ios": "iPhone ou iPad (Safari)",
+    "iosEtapes": [
+      "Abra este site no Safari.",
+      "Toque no botão Partilhar (o quadrado com uma seta para cima), na parte inferior do ecrã.",
+      "Desça e escolha «Adicionar ao ecrã principal».",
+      "Toque em «Adicionar», no canto superior direito."
+    ],
+    "iosNote": "No iPhone e no iPad, apenas o Safari consegue instalar uma aplicação web. O Chrome e o Firefox para iOS não o permitem.",
+    "android": "Android (Chrome)",
+    "androidEtapes": [
+      "Abra este site no Chrome.",
+      "Toque no menu ⋮ no canto superior direito.",
+      "Escolha «Instalar aplicação» ou «Adicionar ao ecrã principal».",
+      "Confirme com «Instalar»."
+    ],
+    "bureau": "Computador (Chrome ou Edge)",
+    "bureauEtapes": [
+      "Abra este site no Chrome ou no Edge.",
+      "Clique no ícone de instalação na barra de endereço, à direita.",
+      "Confirme com «Instalar»."
+    ],
+    "firefox": "Firefox",
+    "firefoxNote": "O Firefox para computador não permite instalar aplicações web. Adicione antes o site aos seus marcadores. No Android, o Firefox oferece «Adicionar ao ecrã principal» no seu menu.",
+    "boutonInstaller": "Instalar agora",
+    "dejaInstallee": "A aplicação já está instalada neste dispositivo."
+  },
+
+  "maj": {
+    "disponible": "Está disponível uma nova versão.",
+    "recharger": "Recarregar",
+    "version": "Versão {version}",
+    "horsLigne": "Sem rede — os horários continuam consultáveis."
+  },
+
+  "commun": {
+    "fermer": "Fechar",
+    "modifier": "Alterar",
+    "annuler": "Cancelar",
+    "confirmer": "Confirmar",
+    "enregistrer": "Guardar",
+    "chargement": "A carregar…",
+    "erreur": "Ocorreu um erro.",
+    "et": "e"
+  }
 }

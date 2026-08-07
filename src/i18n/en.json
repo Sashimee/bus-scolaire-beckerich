@@ -1,3 +1,331 @@
 {
-  "$commentaire": "Traductions en cours. Toute clé absente retombe automatiquement sur le français (voir src/i18n/index.tsx)."
+  "langue": "English",
+
+  "app": {
+    "titre": "Beckerich school bus",
+    "court": "School bus",
+    "baseline": "Your children's bus times, without thinking about it"
+  },
+
+  "nav": {
+    "accueil": "Today",
+    "semaine": "The week",
+    "reglages": "Settings",
+    "plan": "Official plan",
+    "limites": "Limits of this site",
+    "independance": "Independent site",
+    "installer": "Install the app",
+    "menu": "Menu",
+    "retour": "Back"
+  },
+
+  "avertissement": {
+    "titre": "Before you start",
+    "independance": "This site has no connection with the municipality of Beckerich or with the school. It was made by a parent, privately.",
+    "modification": "The official plan may be changed at any time, without notice from the municipality.",
+    "effort": "Best efforts will be made to keep this site up to date, with no guarantee.",
+    "priorite": "In case of doubt, the municipality's official document prevails.",
+    "accepter": "Understood",
+    "detail": "Read all the limits"
+  },
+
+  "onboarding": {
+    "bienvenue": "Welcome",
+    "intro": "Enter your address and your children. The app works out, for each of them, the nearest stop and the times. Everything stays on your device.",
+    "etapeAdresse": "Your address",
+    "etapeEnfants": "Your children",
+    "commencer": "Get started",
+    "terminer": "Done",
+    "suivant": "Continue",
+    "precedent": "Back"
+  },
+
+  "adresse": {
+    "label": "Home address",
+    "aide": "Type the start of your street, then the number. For example \"haapt 76\".",
+    "placeholder": "Street and number",
+    "aucunResultat": "No address found in the municipality of Beckerich.",
+    "aucunResultatAide": "Check the spelling. This site only covers addresses within the municipality.",
+    "choisie": "Selected address",
+    "modifier": "Change address",
+    "confidentialite": "Your address is searched on your device. It is never sent anywhere."
+  },
+
+  "enfant": {
+    "prenom": "First name",
+    "prenomPlaceholder": "Child's first name",
+    "cycle": "Cycle",
+    "cycleAide": "The school site follows from the cycle. Change the cycle at the start of the school year and the whole plan updates itself.",
+    "ajouter": "Add a child",
+    "supprimer": "Delete",
+    "supprimerConfirmation": "Delete {prenom}?",
+    "aucun": "No child recorded yet.",
+    "scolariseA": "Attends {site}",
+    "arretLePlusProche": "Nearest stop",
+    "tempsMarche": "{minutes} min walk",
+    "tempsMarcheEstimation": "about {minutes} min walk (estimate)",
+    "distance": "{metres} m",
+    "voirSemaine": "View the week",
+    "aucunArret": "From your address, no stop serves this child's school. Please check the official plan."
+  },
+
+  "repas": {
+    "titre": "Lunch",
+    "aide": "Set day by day: a child can eat at the Dillendapp on Monday and come home on Tuesday.",
+    "maison": "Comes home for lunch",
+    "maisonCourt": "Home",
+    "dillendapp": "Eats at the Dillendapp",
+    "dillendappCourt": "Dillendapp",
+    "touteLaSemaine": "Apply to the whole week",
+    "sansCoursApresMidi": "No afternoon classes"
+  },
+
+  "cycles": {
+    "precoce": "Early years",
+    "c1": "Cycle 1",
+    "c2": "Cycle 2",
+    "c3": "Cycle 3",
+    "c4": "Cycle 4"
+  },
+
+  "jours": {
+    "lundi": "Monday",
+    "mardi": "Tuesday",
+    "mercredi": "Wednesday",
+    "jeudi": "Thursday",
+    "vendredi": "Friday",
+    "lundiCourt": "Mon",
+    "mardiCourt": "Tue",
+    "mercrediCourt": "Wed",
+    "jeudiCourt": "Thu",
+    "vendrediCourt": "Fri"
+  },
+
+  "trajets": {
+    "aller-matin": "Departure for school",
+    "retour-midi": "Home again, midday",
+    "aller-apres-midi": "Back to school, afternoon",
+    "retour-soir": "Home again, evening",
+    "navette-dillendapp-midi": "School → Dillendapp",
+    "navette-dillendapp-retour": "Dillendapp → school",
+    "depuis": "from {arret}",
+    "vers": "to {arret}",
+    "a": "at {heure}",
+    "heureNonPubliee": "time not published",
+    "ligne": "Line",
+    "alternative": "Also possible: {ligne} at {heure}",
+    "interne": "During the school day",
+    "concerneParent": "Your journeys",
+    "aucun": "No journey that day."
+  },
+
+  "manquants": {
+    "titre": "Not covered by the plan",
+    "retour-soir": "The official plan provides no return bus that day for a child who stayed at the Dillendapp. Please ask the maison relais.",
+    "generique": "The official plan provides no bus for this journey."
+  },
+
+  "aujourdhui": {
+    "titre": "Today",
+    "prochainTrajet": "Next journey",
+    "dans": "in {minutes} min",
+    "partirMaintenant": "Time to leave",
+    "plusDeBus": "No more buses today.",
+    "demain": "Tomorrow",
+    "pasEcole": "No school today",
+    "raisonWeekend": "It's the weekend.",
+    "raisonVacances": "Holidays: {periode}.",
+    "raisonFerie": "Public holiday: {jour}.",
+    "raisonInconnue": "This year's school calendar is not yet recorded in the app. Please check the official calendar."
+  },
+
+  "vacances": {
+    "toussaint": "All Saints' break",
+    "noel": "Christmas holidays",
+    "carnaval": "Carnival break",
+    "paques": "Easter holidays",
+    "pentecote": "Whitsun break",
+    "ete": "summer holidays"
+  },
+
+  "feries": {
+    "ascension": "Ascension Day",
+    "lundi-pentecote": "Whit Monday",
+    "fete-nationale": "National Day"
+  },
+
+  "arrets": {
+    "ecole": "School",
+    "gare": "Station",
+    "pont": "Bridge",
+    "village": "Village",
+    "precisionApproximative": "Approximate position",
+    "precisionApproximativeAide": "The exact location of this stop could not be verified. The walking time is therefore even more indicative than usual.",
+    "signaler": "Report an error"
+  },
+
+  "notes": {
+    "huttange-c3-uniquement": "This departure is reserved for children from Huttange attending the school in Elvange (cycle 3). Children from Huttange attending Noerdange (cycle 2) take the Aller 3.",
+    "voir-aller-3": "Huttange is not served by this line: see the \"Aller Bus 3\" timetable.",
+    "huttange-retour-dillendapp-1345": "Children from Huttange may take the \"Retour Bus Dillendapp\" at 13:45 in Huttange.",
+    "depart-non-precise": "The official plan does not state the exact stop for this departure in Beckerich.",
+    "vendredi-hall-sportif": "On Fridays, departure is from the sports hall rather than the school.",
+    "horaire-intermediaire-non-publie": "The official plan does not publish a time for this stop."
+  },
+
+  "incertitudes": {
+    "titre": "Not settled by the official plan",
+    "retours-apres-midi-mardi-jeudi": "The plan does not say whether the late-afternoon return buses run on Tuesdays and Thursdays, days without afternoon classes. The app assumes they do not. To be confirmed with the municipality."
+  },
+
+  "calendrier": {
+    "titre": "Add to a calendar",
+    "ics": "Download for my calendar (.ics)",
+    "icsAide": "Works with Google Calendar, Apple Calendar and Outlook. School holidays are already excluded.",
+    "google": "Add to Google Calendar",
+    "googleAide": "Quick to add, but Google handles holiday exclusions poorly: the .ics file is more accurate.",
+    "tousLesEnfants": "All children"
+  },
+
+  "partage": {
+    "titre": "Share this setup",
+    "aide": "Send this link to the other parent, the grandparents or the childminder: they will see exactly the same screen.",
+    "copier": "Copy the link",
+    "copie": "Link copied",
+    "qr": "Show the QR code",
+    "confidentialite": "The data travels inside the link itself and passes through no server.",
+    "recu": "Setup received by link",
+    "recuAide": "Do you want to replace your current setup with this one?",
+    "accepter": "Use this setup",
+    "refuser": "Keep mine"
+  },
+
+  "impression": {
+    "titre": "Printable sheet",
+    "bouton": "Print the week",
+    "aide": "One A4 page per child, for the fridge door."
+  },
+
+  "carte": {
+    "titre": "Walking route",
+    "domicile": "Home",
+    "horsLigne": "The map needs a connection. The rest of the app works offline.",
+    "ouvrirItineraire": "Open the route"
+  },
+
+  "reglages": {
+    "titre": "Settings",
+    "langue": "Language",
+    "theme": "Theme",
+    "themeSombre": "Dark",
+    "themeClair": "Light",
+    "themeAuto": "Automatic",
+    "donnees": "My data",
+    "effacer": "Erase all my data",
+    "effacerConfirmation": "Erase the address, children and preferences saved on this device?",
+    "efface": "Data erased."
+  },
+
+  "plan": {
+    "titre": "Official plan",
+    "intro": "The times below are a transcription of the municipality's official plan. In case of any discrepancy, the original document prevails.",
+    "telecharger": "Download the official plan (PDF)",
+    "voirEnLigne": "View the school's official page",
+    "anneeScolaire": "School year {annee}",
+    "matin": "Morning",
+    "midi": "Midday",
+    "apresMidi": "Afternoon",
+    "soir": "Evening",
+    "circule": "Runs",
+    "reserve": "Restricted line",
+    "horairesEcole": "School hours",
+    "horairesEcoleDetail": "Classes from {matinDebut} to {matinFin} Monday to Friday, and from {apresMidiDebut} to {apresMidiFin} on Mondays, Wednesdays and Fridays."
+  },
+
+  "validite": {
+    "couverte": "Plan valid for {annees}",
+    "confirme": "Confirmed by {personne} in {date}.",
+    "confirmeOral": "As this confirmation was verbal, it should be checked again at the start of each school year.",
+    "perime": "Warning: this plan has passed its stated validity period ({fin}). Check the official plan before relying on it.",
+    "releve": "Recorded on {date}"
+  },
+
+  "limites": {
+    "titre": "What this site can do, and what it cannot",
+    "intro": "This site is a convenience. It does not replace the official plan and guarantees nothing. Here are its limits, precisely.",
+    "marcheTitre": "Walking times are estimates",
+    "marcheCorps": "The distance is measured as the crow flies, then increased by a third to account for the layout of the streets, at 4.5 km/h. The site knows nothing of pavements, gradients or road crossings. Allow yourself a margin.",
+    "arretsTitre": "Some stop positions are approximate",
+    "arretsCorps": "Not every stop in the municipal plan appears in public databases. Those whose position could not be verified are flagged as such in the app.",
+    "tempsReelTitre": "No real-time information",
+    "tempsReelCorps": "The site shows scheduled times. It knows nothing about delays, diversions, breakdowns, strikes or the weather.",
+    "planTitre": "The plan can change without the site knowing",
+    "planCorps": "The municipality may change the times at any moment. The site is updated by hand, with best effort, but a lag is possible.",
+    "incertitudesTitre": "Some rules in the plan remain ambiguous",
+    "incertitudesCorps": "Where the official document does not decide, the site shows its assumption and says so, rather than presenting an answer as certain.",
+    "donneesTitre": "Your data stays with you",
+    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. A share link carries the data in its fragment, which the server never receives."
+  },
+
+  "independance": {
+    "titre": "Independent site",
+    "corps1": "This site has no connection with the municipality of Beckerich, with the fundamental school or with the Dillendapp maison relais. It was neither commissioned, approved nor reviewed by them.",
+    "corps2": "It was made by a parent, privately and free of charge, to avoid having to reread the PDF every morning.",
+    "corps3": "The bus plan remains the property of the municipality. It may be changed at any time, without notice and without this site being informed.",
+    "corps4": "Best efforts will be made to update the site promptly after any known change, but no guarantee of result is given.",
+    "corps5": "In case of doubt or discrepancy, the municipality's official document prevails.",
+    "lienOfficiel": "Open the school's official page",
+    "lienPdf": "Download the official plan",
+    "contact": "Report an error"
+  },
+
+  "installer": {
+    "titre": "Install the app",
+    "intro": "Installed on your home screen, the app opens full screen, starts instantly and works without a connection.",
+    "detecte": "Your device",
+    "autres": "Other devices",
+    "ios": "iPhone or iPad (Safari)",
+    "iosEtapes": [
+      "Open this site in Safari.",
+      "Tap the Share button (the square with an upward arrow) at the bottom of the screen.",
+      "Scroll down and choose \"Add to Home Screen\".",
+      "Tap \"Add\" in the top right."
+    ],
+    "iosNote": "On iPhone and iPad, only Safari can install a web app. Chrome and Firefox for iOS do not offer it.",
+    "android": "Android (Chrome)",
+    "androidEtapes": [
+      "Open this site in Chrome.",
+      "Tap the ⋮ menu in the top right.",
+      "Choose \"Install app\" or \"Add to Home screen\".",
+      "Confirm with \"Install\"."
+    ],
+    "bureau": "Computer (Chrome or Edge)",
+    "bureauEtapes": [
+      "Open this site in Chrome or Edge.",
+      "Click the install icon in the address bar, on the right.",
+      "Confirm with \"Install\"."
+    ],
+    "firefox": "Firefox",
+    "firefoxNote": "Firefox on desktop cannot install web apps. Bookmark the site instead. On Android, Firefox offers \"Add to Home screen\" in its menu.",
+    "boutonInstaller": "Install now",
+    "dejaInstallee": "The app is already installed on this device."
+  },
+
+  "maj": {
+    "disponible": "A new version is available.",
+    "recharger": "Reload",
+    "version": "Version {version}",
+    "horsLigne": "Offline — the timetables remain available."
+  },
+
+  "commun": {
+    "fermer": "Close",
+    "modifier": "Change",
+    "annuler": "Cancel",
+    "confirmer": "Confirm",
+    "enregistrer": "Save",
+    "chargement": "Loading…",
+    "erreur": "Something went wrong.",
+    "et": "and"
+  }
 }
