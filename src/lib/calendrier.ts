@@ -61,6 +61,29 @@ export function anneeAExporter(aujourdhui = new Date()): AnneeVacances | null {
   return completes.find((a) => iso <= a.fin) ?? completes.at(-1) ?? null
 }
 
+/**
+ * Les dates du lundi au vendredi de la semaine en cours.
+ *
+ * Sert à rattacher une perturbation, qui porte une date, à la fiche hebdomadaire d'un
+ * enfant, qui raisonne en jours de semaine. Le week-end, on affiche la semaine à venir :
+ * un parent qui consulte le samedi prépare le lundi, pas la veille.
+ */
+export function datesDeLaSemaine(reference = new Date()): Record<Jour, Date> {
+  const base = new Date(reference)
+  base.setHours(0, 0, 0, 0)
+  const jourSemaine = base.getDay()
+  const decalageLundi = jourSemaine === 0 ? 1 : jourSemaine === 6 ? 2 : 1 - jourSemaine
+  base.setDate(base.getDate() + decalageLundi)
+
+  return Object.fromEntries(
+    JOURS.map((j, i) => {
+      const d = new Date(base)
+      d.setDate(base.getDate() + i)
+      return [j, d]
+    }),
+  ) as Record<Jour, Date>
+}
+
 export type RaisonSansEcole = 'weekend' | 'vacances' | 'ferie' | 'annee-inconnue'
 
 export interface EtatJour {

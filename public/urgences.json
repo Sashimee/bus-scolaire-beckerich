@@ -1,0 +1,6 @@
+{
+  "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
+  "version": 1,
+  "misAJour": "2026-08-07T18:00:00.000Z",
+  "perturbations": []
+}

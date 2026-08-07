@@ -49,8 +49,21 @@ export default defineConfig({
         // mettre en cache le rendrait aveugle. Le PDF, lui, pèse 2,2 Mo — l'imposer
         // à l'installation coûterait cher en données mobiles pour un fichier que
         // beaucoup de parents n'ouvriront jamais.
-        globIgnores: ['**/version.json', '**/plan-bus-*.pdf'],
+        globIgnores: ['**/version.json', '**/plan-bus-*.pdf', '**/urgences.json'],
+        // Ajoute les écouteurs push au service worker généré par Workbox.
+        importScripts: ['push-handler.js'],
         runtimeCaching: [
+          {
+            // Les urgences doivent toujours être relues en ligne ; le cache ne sert
+            // que de filet hors réseau, pour ne pas perdre une annulation déjà connue.
+            urlPattern: /urgences\.json$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'urgences',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 1, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
           {
             // Les tuiles de carte sont le seul appel réseau récurrent de l'app : on
             // les garde au fil de l'eau, mais leur absence ne casse jamais une page.

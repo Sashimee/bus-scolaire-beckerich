@@ -254,7 +254,7 @@
     "incertitudesTitre": "Manche Regeln des Plans bleiben mehrdeutig",
     "incertitudesCorps": "Wo das offizielle Dokument keine Klarheit schafft, zeigt die Website ihre Annahme und weist darauf hin, statt eine Antwort als sicher darzustellen.",
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
-    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält."
+    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Einzige Ausnahme: Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht."
   },
   "independance": {
     "titre": "Unabhängige Website",
@@ -313,5 +313,89 @@
     "chargement": "Wird geladen…",
     "erreur": "Ein Fehler ist aufgetreten.",
     "et": "und"
+  },
+  "urgences": {
+    "titre": "Aktuelle Störungen",
+    "type": {
+      "annulation": "Fahrt fällt aus",
+      "retard": "Verspätung",
+      "arret-deplace": "Haltestelle verlegt",
+      "message": "Information"
+    },
+    "retardDe": "Angekündigte Verspätung von {minutes} Min.",
+    "remplacePar": "Haltestelle ersetzt durch {arret}.",
+    "publiePar": "Veröffentlicht von {personne}, am {date}.",
+    "avertissementFiabilite": "Diese Angaben werden von Hand und nach bestem Bemühen veröffentlicht. Sie garantieren nichts: Wenden Sie sich im Zweifel an die Schule oder die Gemeinde.",
+    "annule": "Fällt aus",
+    "horaireModifie": "Zeit geändert",
+    "aucune": "Keine Störung gemeldet."
+  },
+  "notifications": {
+    "titre": "Bei Änderungen benachrichtigt werden",
+    "aide": "Erhalten Sie eine Benachrichtigung auf diesem Telefon, wenn ein Bus ausfällt oder sich ändert. Sie können sich jederzeit abmelden.",
+    "activer": "Benachrichtigungen aktivieren",
+    "desactiver": "Benachrichtigungen deaktivieren",
+    "activees": "Benachrichtigungen auf diesem Gerät aktiviert.",
+    "refusees": "Benachrichtigungen wurden in Ihren Browsereinstellungen abgelehnt. Sie müssen sie in den Website-Einstellungen wieder erlauben.",
+    "nonSupportees": "Dieser Browser unterstützt keine Benachrichtigungen.",
+    "nonConfigurees": "Benachrichtigungen sind auf dieser Website noch nicht eingerichtet.",
+    "iosNote": "Auf iPhone und iPad funktionieren Benachrichtigungen nur, wenn die App zum Home-Bildschirm hinzugefügt wurde.",
+    "confidentialite": "Das Aktivieren speichert eine anonyme Gerätekennung auf einem Server, solange das Abonnement besteht. Es ist die einzige Angabe, die Ihr Telefon verlässt, und sie wird beim Abmelden gelöscht.",
+    "erreur": "Das Abonnement ist fehlgeschlagen. Bitte später erneut versuchen."
+  },
+  "admin": {
+    "titre": "Verwaltung",
+    "intro": "Eine punktuelle Störung veröffentlichen: Ausfall, Verspätung, verlegte Haltestelle oder einfache Information. Der Referenzplan bleibt unverändert.",
+    "pasUnVerrou": "Diese Seite ist kein Schloss",
+    "pasUnVerrouDetail": "Jeder kann sie öffnen, sie ist öffentlich. Was die Veröffentlichung schützt, ist das Schreibrecht am GitHub-Repository, das nur ein berechtigtes Konto besitzt.",
+    "connexionGithub": "Mit GitHub anmelden",
+    "jetonTitre": "Zugriffstoken verwenden",
+    "jetonAide": "Ausweichlösung, wenn die GitHub-Anmeldung nicht verfügbar ist. Verwenden Sie ein Token, das auf dieses eine Repository beschränkt ist, mit Schreibrecht auf Inhalte. Es wird nur für die Dauer des Tabs behalten.",
+    "jetonLabel": "GitHub-Zugriffstoken",
+    "verifier": "Prüfen",
+    "editerSurGithub": "Datei direkt auf GitHub bearbeiten",
+    "accesRefuse": "Zugriff verweigert",
+    "accesRefuseDetail": "Das Konto {login} hat kein Schreibrecht in diesem Repository. Bitte fragen Sie beim Verantwortlichen der Website nach.",
+    "deconnexion": "Abmelden",
+    "responsabilite": "Mit Bedacht verwenden",
+    "responsabiliteDetail": "Was Sie hier veröffentlichen, erscheint bei allen Eltern und kann eine Benachrichtigung auslösen. Eine falsche Meldung ließe Kinder draußen warten. Prüfen Sie Linie, Datum und Text vor dem Veröffentlichen.",
+    "publiee": "Störung veröffentlicht. Sie erscheint bei den Eltern in ein bis zwei Minuten.",
+    "nouvelle": "Neue Störung",
+    "type": "Art",
+    "ligne": "Betroffene Linie",
+    "toutesLignes": "Alle Linien",
+    "course": "Fahrt",
+    "toutesCourses": "Alle Fahrten",
+    "arret": "Betroffene Haltestelle",
+    "tousArrets": "Alle Haltestellen",
+    "minutes": "Verspätung in Minuten",
+    "remplacement": "Ersatzhaltestelle",
+    "du": "Von",
+    "au": "Bis",
+    "expiration": "Die Störung verschwindet am Tag nach dem Enddatum von selbst.",
+    "gravite": "Wichtigkeit",
+    "gravites": {
+      "info": "Information",
+      "attention": "Achtung",
+      "alerte": "Warnung"
+    },
+    "message": "Nachricht an die Eltern",
+    "messagePlaceholder": "Straße in Hovelange gesperrt, der Bus fährt nicht.",
+    "messageAide": "Ein kurzer, konkreter Satz. Genau das lesen die Eltern auf ihrem Telefon.",
+    "messageLangue": "Die Nachricht wird unverändert in der von Ihnen geschriebenen Sprache veröffentlicht. Die Eltern sehen sie in dieser Sprache.",
+    "apercu": "Vorschau",
+    "apercuAide": "Genau das werden die betroffenen Eltern sehen.",
+    "publier": "Störung veröffentlichen",
+    "delai": "Die Veröffentlichung erzeugt einen Commit im Repository. Die Website aktualisiert sich in ein bis zwei Minuten.",
+    "enCours": "Laufende Störungen ({nombre})",
+    "aucune": "Derzeit keine veröffentlichte Störung.",
+    "retirer": "Entfernen",
+    "retirerConfirmation": "Diese Störung entfernen?",
+    "erreur": {
+      "jeton-invalide": "Token von GitHub abgelehnt. Prüfen Sie, ob es gültig und nicht abgelaufen ist.",
+      "conflit": "Jemand hat die Datei zwischenzeitlich geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+      "lecture-impossible": "Die Störungsdatei konnte auf GitHub nicht gelesen werden.",
+      "publication-impossible": "Die Veröffentlichung ist fehlgeschlagen."
+    }
   }
 }

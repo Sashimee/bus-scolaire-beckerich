@@ -254,7 +254,7 @@
     "incertitudesTitre": "Algumas regras do plano permanecem ambíguas",
     "incertitudesCorps": "Onde o documento oficial não decide, o site mostra a sua hipótese e assinala-a, em vez de apresentar uma resposta como certa.",
     "donneesTitre": "Os seus dados ficam consigo",
-    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. Uma ligação de partilha transporta os dados no seu fragmento, que o servidor nunca recebe."
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. Uma ligação de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Única exceção: se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar."
   },
   "independance": {
     "titre": "Site independente",
@@ -313,5 +313,89 @@
     "chargement": "A carregar…",
     "erreur": "Ocorreu um erro.",
     "et": "e"
+  },
+  "urgences": {
+    "titre": "Perturbações em curso",
+    "type": {
+      "annulation": "Viagem cancelada",
+      "retard": "Atraso",
+      "arret-deplace": "Paragem deslocada",
+      "message": "Informação"
+    },
+    "retardDe": "Atraso anunciado de {minutes} min.",
+    "remplacePar": "Paragem substituída por {arret}.",
+    "publiePar": "Publicado por {personne}, em {date}.",
+    "avertissementFiabilite": "Estas informações são publicadas manualmente e com o melhor esforço. Não garantem nada: em caso de dúvida, contacte a escola ou o município.",
+    "annule": "Cancelado",
+    "horaireModifie": "Horário alterado",
+    "aucune": "Nenhuma perturbação assinalada."
+  },
+  "notifications": {
+    "titre": "Ser avisado em caso de alteração",
+    "aide": "Receba uma notificação neste telemóvel quando um autocarro for cancelado ou alterado. Pode cancelar a subscrição a qualquer momento.",
+    "activer": "Ativar as notificações",
+    "desactiver": "Desativar as notificações",
+    "activees": "Notificações ativadas neste dispositivo.",
+    "refusees": "As notificações foram recusadas nas definições do seu navegador. Terá de as autorizar novamente nas definições do site.",
+    "nonSupportees": "Este navegador não suporta notificações.",
+    "nonConfigurees": "As notificações ainda não estão configuradas neste site.",
+    "iosNote": "No iPhone e no iPad, as notificações só funcionam se a aplicação tiver sido adicionada ao ecrã principal.",
+    "confidentialite": "Ativar as notificações guarda um identificador anónimo do aparelho num servidor, enquanto durar a subscrição. É o único dado que sai do seu telemóvel e é apagado assim que cancelar.",
+    "erreur": "A subscrição falhou. Tente novamente mais tarde."
+  },
+  "admin": {
+    "titre": "Administração",
+    "intro": "Publicar uma perturbação pontual: cancelamento, atraso, paragem deslocada ou simples informação. O plano de referência não é alterado.",
+    "pasUnVerrou": "Esta página não é um cadeado",
+    "pasUnVerrouDetail": "Qualquer pessoa a pode abrir: é pública. O que protege a publicação é o direito de escrita no repositório GitHub, que só uma conta autorizada possui.",
+    "connexionGithub": "Iniciar sessão com o GitHub",
+    "jetonTitre": "Utilizar um token de acesso",
+    "jetonAide": "Solução de recurso se o início de sessão GitHub não estiver disponível. Use um token restrito a este único repositório, com direito de escrita no conteúdo. Só é guardado durante o separador.",
+    "jetonLabel": "Token de acesso GitHub",
+    "verifier": "Verificar",
+    "editerSurGithub": "Editar o ficheiro diretamente no GitHub",
+    "accesRefuse": "Acesso recusado",
+    "accesRefuseDetail": "A conta {login} não tem direito de escrita neste repositório. Peça acesso ao responsável do site.",
+    "deconnexion": "Terminar sessão",
+    "responsabilite": "A usar com cuidado",
+    "responsabiliteDetail": "O que publicar aqui aparece a todos os pais e pode desencadear uma notificação. Um anúncio falso deixaria crianças à espera na rua. Verifique a linha, a data e a mensagem antes de publicar.",
+    "publiee": "Perturbação publicada. Aparecerá aos pais dentro de um a dois minutos.",
+    "nouvelle": "Nova perturbação",
+    "type": "Tipo",
+    "ligne": "Linha em causa",
+    "toutesLignes": "Todas as linhas",
+    "course": "Circulação",
+    "toutesCourses": "Todas as circulações",
+    "arret": "Paragem em causa",
+    "tousArrets": "Todas as paragens",
+    "minutes": "Atraso em minutos",
+    "remplacement": "Paragem de substituição",
+    "du": "De",
+    "au": "Até",
+    "expiration": "A perturbação desaparece sozinha no dia seguinte à data de fim.",
+    "gravite": "Importância",
+    "gravites": {
+      "info": "Informação",
+      "attention": "Atenção",
+      "alerte": "Alerta"
+    },
+    "message": "Mensagem aos pais",
+    "messagePlaceholder": "Estrada cortada em Hovelange, o autocarro não passa.",
+    "messageAide": "Uma frase curta e concreta. É o que o pai vai ler no telemóvel.",
+    "messageLangue": "A mensagem é publicada tal como a escreve. Os pais vê-la-ão nessa língua.",
+    "apercu": "Pré-visualização",
+    "apercuAide": "É exatamente isto que os pais em causa vão ver.",
+    "publier": "Publicar a perturbação",
+    "delai": "A publicação cria um commit no repositório. O site atualiza-se em um a dois minutos.",
+    "enCours": "Perturbações em curso ({nombre})",
+    "aucune": "Nenhuma perturbação publicada de momento.",
+    "retirer": "Remover",
+    "retirerConfirmation": "Remover esta perturbação?",
+    "erreur": {
+      "jeton-invalide": "Token recusado pelo GitHub. Verifique se é válido e não expirou.",
+      "conflit": "Alguém alterou o ficheiro entretanto. Recarregue a página e tente novamente.",
+      "lecture-impossible": "Não foi possível ler o ficheiro das perturbações no GitHub.",
+      "publication-impossible": "A publicação falhou."
+    }
   }
 }

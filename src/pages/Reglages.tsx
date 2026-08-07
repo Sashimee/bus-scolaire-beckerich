@@ -5,6 +5,7 @@ import { useFoyer, type Theme } from '../etat'
 import { lienPartage } from '../lib/partage'
 import { toutEffacer } from '../lib/stockage'
 import { sourceAdresses } from '../lib/adresses'
+import { Notifications } from '../composants/Notifications'
 
 const THEMES: Theme[] = ['auto', 'clair', 'sombre']
 
@@ -106,6 +107,8 @@ export function Reglages() {
           <p className="champ__aide">{t('partage.confidentialite')}</p>
         </section>
       )}
+
+      <Notifications />
 
       <section className="carte pile pile--serre">
         <h3 style={{ fontSize: '1rem' }}>{t('reglages.donnees')}</h3>

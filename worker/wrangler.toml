@@ -1,0 +1,25 @@
+name = "bus-beckerich"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Stockage des abonnements push et des états OAuth temporaires.
+# Créer l'espace avant le premier déploiement :
+#   npx wrangler kv namespace create ABONNEMENTS
+# puis reporter l'identifiant renvoyé ci-dessous.
+[[kv_namespaces]]
+binding = "ABONNEMENTS"
+id = "à-remplacer-après-création"
+
+[vars]
+# Seules ces origines peuvent recevoir un jeton OAuth en retour.
+# Sans cette liste, le Worker serait une redirection ouverte.
+ORIGINES_AUTORISEES = "https://sashimee.github.io,http://localhost:5173"
+# Contact exigé par la spécification VAPID, transmis aux services de push.
+CONTACT_VAPID = "mailto:contact@example.org"
+
+# Secrets à définir séparément, jamais dans ce fichier :
+#   npx wrangler secret put GITHUB_CLIENT_ID
+#   npx wrangler secret put GITHUB_CLIENT_SECRET
+#   npx wrangler secret put VAPID_JWK
+#   npx wrangler secret put SECRET_NOTIFICATION

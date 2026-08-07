@@ -50,6 +50,12 @@ jobs:
           # le site déménage sous un autre préfixe ou un domaine propre.
           BASE_PATH: /${{ github.event.repository.name }}/
           GITHUB_SHA: ${{ github.sha }}
+          # Notifications et connexion GitHub. Variables de dépôt, pas des secrets :
+          # ces deux valeurs sont publiques par nature (l'URL du Worker et la clé
+          # publique VAPID se retrouvent de toute façon dans le code servi).
+          # Vides, l'application fonctionne à l'identique, sans ces fonctionnalités.
+          VITE_URL_WORKER: ${{ vars.URL_WORKER }}
+          VITE_CLE_VAPID: ${{ vars.CLE_VAPID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

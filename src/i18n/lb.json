@@ -254,7 +254,7 @@
     "incertitudesTitre": "E puer Regele vum Plang bleiwen zweideiteg",
     "incertitudesCorps": "Wou dat offiziellt Dokument net kloer ass, weist d'Säit hir Unhuelung a weist drop hin, amplaz eng Äntwert als sécher duerzestellen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
-    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt."
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Eenzeg Ausnam: wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparatkennung fir d'Dauer vum Abonnement op engem Server gespäichert, a beim Ausschalten erëm geläscht."
   },
   "independance": {
     "titre": "Onofhängeg Säit",
@@ -313,5 +313,89 @@
     "chargement": "Gëtt gelueden…",
     "erreur": "E Feeler ass opgetrueden.",
     "et": "an"
+  },
+  "urgences": {
+    "titre": "Aktuell Stéierungen",
+    "type": {
+      "annulation": "Fahrt fält aus",
+      "retard": "Verspéidung",
+      "arret-deplace": "Statioun verluecht",
+      "message": "Informatioun"
+    },
+    "retardDe": "Ugekënnegt Verspéidung vun {minutes} Min.",
+    "remplacePar": "Statioun ersat duerch {arret}.",
+    "publiePar": "Publizéiert vum {personne}, den {date}.",
+    "avertissementFiabilite": "Dës Informatioune gi mat der Hand a mam beschten Effort publizéiert. Si garantéieren näischt: am Zweiwel rufft d'Schoul oder d'Gemeng un.",
+    "annule": "Fält aus",
+    "horaireModifie": "Zäit geännert",
+    "aucune": "Keng Stéierung gemellt."
+  },
+  "notifications": {
+    "titre": "Bei Ännerunge bescheed kréien",
+    "aide": "Kritt eng Notifikatioun op dësem Telefon, wann e Bus ausfält oder geännert gëtt. Dir kënnt Iech zu all Moment ofmellen.",
+    "activer": "Notifikatiounen aschalten",
+    "desactiver": "Notifikatiounen ausschalten",
+    "activees": "Notifikatiounen op dësem Apparat ageschalt.",
+    "refusees": "D'Notifikatioune goufen an Ären Browserastellungen refuséiert. Dir musst se an den Astellunge vun der Säit erëm erlaben.",
+    "nonSupportees": "Dëse Browser ënnerstëtzt keng Notifikatiounen.",
+    "nonConfigurees": "D'Notifikatioune sinn op dëser Säit nach net ariicht.",
+    "iosNote": "Um iPhone an iPad funktionéieren d'Notifikatioune nëmmen, wann d'App op den Home-Bildschierm gesat gouf.",
+    "confidentialite": "D'Aschalte späichert eng anonym Apparatkennung op engem Server, sou laang wéi den Abonnement dauert. Dat ass déi eenzeg Donnée, déi Äert Telefon verléisst, a si gëtt beim Ofmelle geläscht.",
+    "erreur": "Den Abonnement huet net geklappt. Probéiert w.e.g. méi spéit nach eng Kéier."
+  },
+  "admin": {
+    "titre": "Administratioun",
+    "intro": "Eng punktuell Stéierung publizéieren: Ausfall, Verspéidung, verluechte Statioun oder eng einfach Informatioun. De Referenzplang gëtt net geännert.",
+    "pasUnVerrou": "Dës Säit ass kee Schlass",
+    "pasUnVerrouDetail": "Jiddereen ka se opmaachen, si ass ëffentlech. Wat d'Publikatioun schützt, ass d'Schreifrecht um GitHub-Depot, dat nëmmen e berechtegt Kont huet.",
+    "connexionGithub": "Mat GitHub uklënnegen",
+    "jetonTitre": "En Zougangsjeton benotzen",
+    "jetonAide": "Léisung als Reserve, wann d'GitHub-Uklënnegung net disponibel ass. Benotzt e Jeton, deen nëmmen op dëst Depot begrenzt ass, mat Schreifrecht um Inhalt. Hie gëtt nëmme sou laang wéi den Onglet behalen.",
+    "jetonLabel": "GitHub-Zougangsjeton",
+    "verifier": "Iwwerpréiwen",
+    "editerSurGithub": "D'Datei direkt op GitHub änneren",
+    "accesRefuse": "Zougang refuséiert",
+    "accesRefuseDetail": "De Kont {login} huet kee Schreifrecht an dësem Depot. Frot w.e.g. beim Responsabele vun der Säit no.",
+    "deconnexion": "Ofmellen",
+    "responsabilite": "Mat Virsiicht ze benotzen",
+    "responsabiliteDetail": "Wat Dir hei publizéiert, gesinn all Elteren a ka eng Notifikatioun ausléisen. Eng falsch Meldung géif Kanner dobausse waarde loossen. Kuckt Linn, Datum an Text no, ier Dir publizéiert.",
+    "publiee": "Stéierung publizéiert. Si erschéngt bei den Elteren an enger bis zwou Minutten.",
+    "nouvelle": "Nei Stéierung",
+    "type": "Aart",
+    "ligne": "Betraffe Linn",
+    "toutesLignes": "All Linnen",
+    "course": "Fahrt",
+    "toutesCourses": "All Fahrten",
+    "arret": "Betraffe Statioun",
+    "tousArrets": "All Statiounen",
+    "minutes": "Verspéidung a Minutten",
+    "remplacement": "Ersatzstatioun",
+    "du": "Vum",
+    "au": "Bis",
+    "expiration": "D'Stéierung verschwannt den Dag nom Enndatum vun eleng.",
+    "gravite": "Wichtegkeet",
+    "gravites": {
+      "info": "Informatioun",
+      "attention": "Opgepasst",
+      "alerte": "Warnung"
+    },
+    "message": "Message un d'Elteren",
+    "messagePlaceholder": "Strooss zu Huewel gespaart, de Bus fiert net.",
+    "messageAide": "E kuerze, konkrete Saz. Genee dat liesen d'Elteren op hirem Telefon.",
+    "messageLangue": "De Message gëtt onverännert an der Sprooch publizéiert, an däer Dir schreift. D'Elteren gesinn en an dëser Sprooch.",
+    "apercu": "Virschau",
+    "apercuAide": "Genee dat gesinn déi betraffen Elteren.",
+    "publier": "Stéierung publizéieren",
+    "delai": "D'Publikatioun mécht e Commit um Depot. D'Säit aktualiséiert sech an enger bis zwou Minutten.",
+    "enCours": "Lafend Stéierungen ({nombre})",
+    "aucune": "Am Moment keng publizéiert Stéierung.",
+    "retirer": "Ewechhuelen",
+    "retirerConfirmation": "Dës Stéierung ewechhuelen?",
+    "erreur": {
+      "jeton-invalide": "Jeton vu GitHub refuséiert. Kuckt no, ob e gëlteg an net ofgelaf ass.",
+      "conflit": "Een huet d'Datei an der Tëschenzäit geännert. Luet d'Säit nei a probéiert nach eng Kéier.",
+      "lecture-impossible": "D'Stéierungsdatei konnt op GitHub net gelies ginn.",
+      "publication-impossible": "D'Publikatioun huet net geklappt."
+    }
   }
 }

@@ -254,7 +254,7 @@
     "incertitudesTitre": "Some rules in the plan remain ambiguous",
     "incertitudesCorps": "Where the official document does not decide, the site shows its assumption and says so, rather than presenting an answer as certain.",
     "donneesTitre": "Your data stays with you",
-    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. A share link carries the data in its fragment, which the server never receives."
+    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. A share link carries the data in its fragment, which the server never receives. One exception: if you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off."
   },
   "independance": {
     "titre": "Independent site",
@@ -313,5 +313,89 @@
     "chargement": "Loading…",
     "erreur": "Something went wrong.",
     "et": "and"
+  },
+  "urgences": {
+    "titre": "Current disruptions",
+    "type": {
+      "annulation": "Journey cancelled",
+      "retard": "Delay",
+      "arret-deplace": "Stop moved",
+      "message": "Information"
+    },
+    "retardDe": "Announced delay of {minutes} min.",
+    "remplacePar": "Stop replaced by {arret}.",
+    "publiePar": "Published by {personne}, on {date}.",
+    "avertissementFiabilite": "This information is published by hand and with best effort. It guarantees nothing: if in doubt, contact the school or the municipality.",
+    "annule": "Cancelled",
+    "horaireModifie": "Time changed",
+    "aucune": "No disruption reported."
+  },
+  "notifications": {
+    "titre": "Be told when something changes",
+    "aide": "Get a notification on this phone when a bus is cancelled or changed. You can unsubscribe at any time.",
+    "activer": "Turn on notifications",
+    "desactiver": "Turn off notifications",
+    "activees": "Notifications are on for this device.",
+    "refusees": "Notifications were blocked in your browser settings. You need to allow them again from the site settings.",
+    "nonSupportees": "This browser does not support notifications.",
+    "nonConfigurees": "Notifications are not set up on this site yet.",
+    "iosNote": "On iPhone and iPad, notifications only work once the app has been added to the Home Screen.",
+    "confidentialite": "Turning notifications on stores an anonymous device identifier on a server for as long as the subscription lasts. It is the only data that leaves your phone, and it is deleted as soon as you unsubscribe.",
+    "erreur": "Subscription failed. Please try again later."
+  },
+  "admin": {
+    "titre": "Administration",
+    "intro": "Publish a one-off disruption: cancellation, delay, moved stop or plain information. The reference plan is left untouched.",
+    "pasUnVerrou": "This page is not a lock",
+    "pasUnVerrouDetail": "Anyone can open it — it is a public page. What protects publishing is write access to the GitHub repository, which only an authorised account has.",
+    "connexionGithub": "Sign in with GitHub",
+    "jetonTitre": "Use an access token",
+    "jetonAide": "Fallback if GitHub sign-in is unavailable. Use a token restricted to this single repository, with write access to contents. It is only kept for the lifetime of the tab.",
+    "jetonLabel": "GitHub access token",
+    "verifier": "Check",
+    "editerSurGithub": "Edit the file directly on GitHub",
+    "accesRefuse": "Access denied",
+    "accesRefuseDetail": "The account {login} does not have write access to this repository. Ask the site owner for access.",
+    "deconnexion": "Sign out",
+    "responsabilite": "Handle with care",
+    "responsabiliteDetail": "What you publish here appears to every parent and may trigger a notification. A false announcement would leave children waiting outside. Check the line, the date and the wording before publishing.",
+    "publiee": "Disruption published. Parents will see it within one to two minutes.",
+    "nouvelle": "New disruption",
+    "type": "Type",
+    "ligne": "Line affected",
+    "toutesLignes": "All lines",
+    "course": "Run",
+    "toutesCourses": "All runs",
+    "arret": "Stop affected",
+    "tousArrets": "All stops",
+    "minutes": "Delay in minutes",
+    "remplacement": "Replacement stop",
+    "du": "From",
+    "au": "To",
+    "expiration": "The disruption clears itself the day after the end date.",
+    "gravite": "Importance",
+    "gravites": {
+      "info": "Information",
+      "attention": "Attention",
+      "alerte": "Alert"
+    },
+    "message": "Message to parents",
+    "messagePlaceholder": "Road closed in Hovelange, the bus will not run.",
+    "messageAide": "One short, concrete sentence. This is what the parent reads on their phone.",
+    "messageLangue": "The message is published as written, in your language. Parents will see it in that language.",
+    "apercu": "Preview",
+    "apercuAide": "This is exactly what the affected parents will see.",
+    "publier": "Publish the disruption",
+    "delai": "Publishing creates a commit on the repository. The site updates within one to two minutes.",
+    "enCours": "Current disruptions ({nombre})",
+    "aucune": "No disruption published at the moment.",
+    "retirer": "Remove",
+    "retirerConfirmation": "Remove this disruption?",
+    "erreur": {
+      "jeton-invalide": "Token rejected by GitHub. Check that it is valid and has not expired.",
+      "conflit": "Someone changed the file in the meantime. Reload the page and try again.",
+      "lecture-impossible": "Could not read the disruptions file on GitHub.",
+      "publication-impossible": "Publishing failed."
+    }
   }
 }

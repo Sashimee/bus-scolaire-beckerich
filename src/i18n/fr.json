@@ -254,7 +254,7 @@
     "incertitudesTitre": "Certaines règles du plan restent ambiguës",
     "incertitudesCorps": "Là où le document officiel ne tranche pas, le site affiche son hypothèse et le signale, plutôt que de présenter une réponse comme certaine.",
     "donneesTitre": "Vos données restent chez vous",
-    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais."
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Seule exception : si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez."
   },
   "independance": {
     "titre": "Site indépendant",
@@ -313,5 +313,89 @@
     "chargement": "Chargement…",
     "erreur": "Une erreur est survenue.",
     "et": "et"
+  },
+  "urgences": {
+    "titre": "Perturbations en cours",
+    "type": {
+      "annulation": "Trajet annulé",
+      "retard": "Retard",
+      "arret-deplace": "Arrêt déplacé",
+      "message": "Information"
+    },
+    "retardDe": "Retard annoncé de {minutes} min.",
+    "remplacePar": "Arrêt remplacé par {arret}.",
+    "publiePar": "Publié par {personne}, le {date}.",
+    "avertissementFiabilite": "Ces informations sont publiées manuellement et au mieux. Elles ne garantissent rien : en cas de doute, contactez l'école ou la commune.",
+    "annule": "Annulé",
+    "horaireModifie": "Horaire modifié",
+    "aucune": "Aucune perturbation signalée."
+  },
+  "notifications": {
+    "titre": "Être prévenu en cas de changement",
+    "aide": "Recevez une notification sur ce téléphone quand un bus est annulé ou modifié. Vous pouvez vous désabonner à tout moment.",
+    "activer": "Activer les notifications",
+    "desactiver": "Désactiver les notifications",
+    "activees": "Notifications activées sur cet appareil.",
+    "refusees": "Les notifications ont été refusées dans les réglages de votre navigateur. Il faut les réautoriser depuis les paramètres du site.",
+    "nonSupportees": "Ce navigateur ne prend pas en charge les notifications.",
+    "nonConfigurees": "Les notifications ne sont pas encore activées sur ce site.",
+    "iosNote": "Sur iPhone et iPad, les notifications ne fonctionnent que si l'application a été ajoutée à l'écran d'accueil.",
+    "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. C'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
+    "erreur": "L'abonnement a échoué. Réessayez plus tard."
+  },
+  "admin": {
+    "titre": "Administration",
+    "intro": "Publier une perturbation ponctuelle : annulation, retard, arrêt déplacé ou simple information. Le plan de référence n'est pas modifié.",
+    "pasUnVerrou": "Cette page n'est pas un verrou",
+    "pasUnVerrouDetail": "N'importe qui peut l'ouvrir : c'est une page publique. Ce qui protège la publication, c'est le droit d'écriture sur le dépôt GitHub, que seul un compte autorisé possède.",
+    "connexionGithub": "Se connecter avec GitHub",
+    "jetonTitre": "Utiliser un jeton d'accès",
+    "jetonAide": "Solution de secours si la connexion GitHub n'est pas disponible. Utilisez un jeton restreint à ce seul dépôt, avec le droit d'écriture sur le contenu. Il n'est gardé que le temps de l'onglet.",
+    "jetonLabel": "Jeton d'accès GitHub",
+    "verifier": "Vérifier",
+    "editerSurGithub": "Modifier le fichier directement sur GitHub",
+    "accesRefuse": "Accès refusé",
+    "accesRefuseDetail": "Le compte {login} n'a pas le droit d'écrire dans ce dépôt. Demandez l'accès au responsable du site.",
+    "deconnexion": "Se déconnecter",
+    "responsabilite": "À manier avec précaution",
+    "responsabiliteDetail": "Ce que vous publiez ici s'affiche chez tous les parents et peut déclencher une notification. Une fausse annonce laisserait des enfants attendre dehors. Vérifiez la ligne, la date et le message avant de publier.",
+    "publiee": "Perturbation publiée. Elle apparaîtra chez les parents d'ici une à deux minutes.",
+    "nouvelle": "Nouvelle perturbation",
+    "type": "Type",
+    "ligne": "Ligne concernée",
+    "toutesLignes": "Toutes les lignes",
+    "course": "Course",
+    "toutesCourses": "Toutes les courses",
+    "arret": "Arrêt concerné",
+    "tousArrets": "Tous les arrêts",
+    "minutes": "Retard en minutes",
+    "remplacement": "Arrêt de remplacement",
+    "du": "Du",
+    "au": "Au",
+    "expiration": "La perturbation disparaît d'elle-même au lendemain de la date de fin.",
+    "gravite": "Importance",
+    "gravites": {
+      "info": "Information",
+      "attention": "Attention",
+      "alerte": "Alerte"
+    },
+    "message": "Message aux parents",
+    "messagePlaceholder": "Route barrée à Hovelange, le bus ne passera pas.",
+    "messageAide": "Une phrase courte et concrète. C'est ce que le parent lira sur son téléphone.",
+    "messageLangue": "Le message est publié tel quel, dans la langue que vous écrivez. Les parents le verront dans cette langue.",
+    "apercu": "Aperçu",
+    "apercuAide": "Voici exactement ce que verront les parents concernés.",
+    "publier": "Publier la perturbation",
+    "delai": "La publication crée un commit sur le dépôt. Le site se met à jour en une à deux minutes.",
+    "enCours": "Perturbations en cours ({nombre})",
+    "aucune": "Aucune perturbation publiée pour l'instant.",
+    "retirer": "Retirer",
+    "retirerConfirmation": "Retirer cette perturbation ?",
+    "erreur": {
+      "jeton-invalide": "Jeton refusé par GitHub. Vérifiez qu'il est valide et non expiré.",
+      "conflit": "Quelqu'un a modifié le fichier entre-temps. Rechargez la page et recommencez.",
+      "lecture-impossible": "Impossible de lire le fichier des urgences sur GitHub.",
+      "publication-impossible": "La publication a échoué."
+    }
   }
 }

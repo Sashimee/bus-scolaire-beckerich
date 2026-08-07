@@ -3,17 +3,23 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
-import { genererIcs } from '../lib/calendrier'
+import { datesDeLaSemaine, genererIcs } from '../lib/calendrier'
 import { semaineEnfant } from '../lib/plan'
 import { distanceLisible, nomArret, nomArretParId } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
 import { JOURS } from '../lib/types'
+import { useUrgences } from '../urgences-contexte'
+import { perturbationsDuJour } from '../lib/urgences'
 
 /** Fiche d'un enfant, organisée en semaine : les trajets diffèrent d'un jour à l'autre. */
 export function Semaine() {
   const { t } = useT()
   const { id } = useParams()
   const { foyer, contextes } = useFoyer()
+  const { urgences } = useUrgences()
+  // Les perturbations portent une date ; la fiche raisonne en jours de semaine.
+  // On rattache donc chaque jour à sa date réelle dans la semaine en cours.
+  const dates = datesDeLaSemaine()
 
   const enfant = foyer.enfants.find((e) => e.id === id)
   const ctx = id ? contextes.get(id) : null
@@ -91,7 +97,10 @@ export function Semaine() {
             {(enfant.bus?.[jour] ?? 'aller-retour') === 'aucun' ? (
               <p className="champ__aide">{t('bus.sansBus')}</p>
             ) : (
-              <JourneeTrajets journee={journee} />
+              <JourneeTrajets
+                journee={journee}
+                perturbations={perturbationsDuJour(urgences, dates[jour])}
+              />
             )}
           </section>
         )

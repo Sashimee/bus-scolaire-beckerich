@@ -13,6 +13,8 @@ import { PagePlan } from './pages/Plan'
 import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
 import { Reglages } from './pages/Reglages'
+import { Admin } from './pages/Admin'
+import { BandeauUrgences } from './composants/BandeauUrgences'
 
 export default function App() {
   const { t } = useT()
@@ -53,6 +55,7 @@ export default function App() {
       </header>
 
       <AvertissementInitial />
+      <BandeauUrgences />
       <ReceptionPartage />
 
       <main className="page" id="contenu">
@@ -65,6 +68,7 @@ export default function App() {
           <Route path="/independance" element={<Independance />} />
           <Route path="/installer" element={<Installer />} />
           <Route path="/reglages" element={<Reglages />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Accueil />} />
         </Routes>
 
