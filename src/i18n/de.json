@@ -170,7 +170,11 @@
     "village": "Ort",
     "precisionApproximative": "Ungefähre Position",
     "precisionApproximativeAide": "Der genaue Standort dieser Haltestelle konnte nicht überprüft werden. Die Gehzeit ist daher noch ungenauer als sonst.",
-    "signaler": "Fehler melden"
+    "signaler": "Fehler melden",
+    "precision": {
+      "verifiee": "Position geprüft",
+      "approximative": "Position ungefähr"
+    }
   },
   "notes": {
     "huttange-c3-uniquement": "Diese Abfahrt ist Kindern aus Huttange vorbehalten, die die Schule in Elvange besuchen (Zyklus 3). Kinder aus Huttange, die in Noerdange zur Schule gehen (Zyklus 2), nehmen den Aller 3.",
@@ -412,5 +416,46 @@
       "lecture-impossible": "Die Störungsdatei konnte auf GitHub nicht gelesen werden.",
       "publication-impossible": "Die Veröffentlichung ist fehlgeschlagen."
     }
+  },
+  "adminArrets": {
+    "titre": "Position der Haltestellen",
+    "aide": "Prüfen Sie jede Haltestelle auf der Karte. Grüne Punkte sind bestätigt, orange bleiben ungefähr.",
+    "aVerifier": "{nombre} Haltestelle(n) zu bestätigen",
+    "mode": "Klicken Sie einen Punkt an, um die Haltestelle zu wählen, dann die Karte an der genauen Stelle.",
+    "actuelle": "Aktuelle Position",
+    "nouvelle": "Neue Position",
+    "deplace": "um {metres} m verschoben",
+    "jusqua": "Bis zum (optional)",
+    "jusquaAide": "Ein Enddatum betrifft nur die vorübergehende Korrektur; leer gelassen gilt sie bis zur Rücknahme.",
+    "temporaire": "Vorübergehend korrigieren",
+    "definitive": "Dauerhaft korrigieren",
+    "differenceAide": "Vorübergehend: wirkt binnen einer Minute, ohne Neuaufbau, und ist umkehrbar. Dauerhaft: ändert die Referenzdaten, wirkt nach dem Neuaufbau.",
+    "cliquerCarte": "Klicken Sie auf die Karte, um die genaue Position anzugeben.",
+    "enCours": "Laufende vorübergehende Korrekturen ({nombre})",
+    "expire": "läuft ab am {date}"
+  },
+  "adminPlan": {
+    "titre": "Gesamten Plan aktualisieren",
+    "aide": "Ersetzen Sie den Referenzplan durch eine neue JSON-Datei. Der Dateiname bleibt, nur der Inhalt ändert sich.",
+    "prudence": "Der riskanteste Vorgang der Website",
+    "prudenceDetail": "Ein fehlerhafter Plan würde die Fahrzeiten aller Familien auf einmal verfälschen. Solange ein Fehler besteht, wird nichts veröffentlicht, und die Tests prüfen vor der Veröffentlichung erneut.",
+    "actuel": "Aktueller Plan: {annee} — {lignes} Linien, {courses} Fahrten, {arrets} bediente Haltestellen.",
+    "publie": "Plan veröffentlicht. Die Tests laufen, dann aktualisiert sich die Website.",
+    "fichier": "Datei wählen",
+    "coller": "Oder Inhalt einfügen",
+    "jsonInvalide": "Der Inhalt ist kein gültiges JSON:",
+    "aucunProbleme": "Kein Problem gefunden. Der Plan ist veröffentlichbar.",
+    "erreurs": "{nombre} Fehler — Veröffentlichung blockiert",
+    "avertissements": "{nombre} Hinweis(e) — zu prüfen, aber nicht blockierend",
+    "etAutres": "… und {nombre} weitere.",
+    "comparaison": "Vergleich mit dem aktuellen Plan",
+    "avant": "Aktuell",
+    "apres": "Neu",
+    "lignes": "Linien",
+    "courses": "Fahrten",
+    "arrets": "Bediente Haltestellen",
+    "moinsQuAvant": "Der neue Plan enthält weniger Fahrten als der aktuelle. Prüfen Sie, ob er vollständig ist.",
+    "publier": "Neuen Plan veröffentlichen",
+    "filet": "Nach der Veröffentlichung laufen die Tests vor dem Deployment. Schlagen sie fehl, bleibt die Website auf der vorherigen Version."
   }
 }

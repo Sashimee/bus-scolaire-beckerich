@@ -170,7 +170,11 @@
     "village": "Aldeia",
     "precisionApproximative": "Posição aproximada",
     "precisionApproximativeAide": "Não foi possível verificar a localização exata desta paragem. O tempo a pé é, por isso, ainda mais indicativo do que o habitual.",
-    "signaler": "Comunicar um erro"
+    "signaler": "Comunicar um erro",
+    "precision": {
+      "verifiee": "posição verificada",
+      "approximative": "posição aproximada"
+    }
   },
   "notes": {
     "huttange-c3-uniquement": "Esta partida está reservada às crianças de Huttange que frequentam a escola de Elvange (ciclo 3). As crianças de Huttange que frequentam Noerdange (ciclo 2) apanham o Aller 3.",
@@ -412,5 +416,46 @@
       "lecture-impossible": "Não foi possível ler o ficheiro das perturbações no GitHub.",
       "publication-impossible": "A publicação falhou."
     }
+  },
+  "adminArrets": {
+    "titre": "Posição das paragens",
+    "aide": "Verifique cada paragem no mapa. Os pontos verdes estão confirmados, os laranja continuam aproximados.",
+    "aVerifier": "{nombre} paragem(ns) a confirmar",
+    "mode": "Clique num ponto para escolher a paragem, depois clique no mapa no local exato.",
+    "actuelle": "Posição atual",
+    "nouvelle": "Nova posição",
+    "deplace": "deslocada {metres} m",
+    "jusqua": "Até (opcional)",
+    "jusquaAide": "Uma data de fim só diz respeito à correção temporária; deixada vazia, vale até ser retirada.",
+    "temporaire": "Corrigir temporariamente",
+    "definitive": "Corrigir definitivamente",
+    "differenceAide": "Temporária: efeito em um minuto, sem reconstruir o site, e reversível. Definitiva: altera os dados de referência, efeito após a reconstrução.",
+    "cliquerCarte": "Clique no mapa para indicar a posição exata.",
+    "enCours": "Correções temporárias em curso ({nombre})",
+    "expire": "expira a {date}"
+  },
+  "adminPlan": {
+    "titre": "Atualizar o plano completo",
+    "aide": "Substitua o plano de referência por um novo ficheiro JSON. O nome do ficheiro não muda, apenas o conteúdo.",
+    "prudence": "A operação mais arriscada do site",
+    "prudenceDetail": "Um plano incorreto falsearia os horários de todas as famílias de uma vez. Nada é publicado enquanto houver um erro, e os testes voltam a verificar antes da publicação.",
+    "actuel": "Plano atual: {annee} — {lignes} linhas, {courses} circulações, {arrets} paragens servidas.",
+    "publie": "Plano publicado. Os testes estão a correr e depois o site atualiza-se.",
+    "fichier": "Escolher um ficheiro",
+    "coller": "Ou colar o conteúdo",
+    "jsonInvalide": "O conteúdo não é JSON válido:",
+    "aucunProbleme": "Nenhum problema detetado. O plano pode ser publicado.",
+    "erreurs": "{nombre} erro(s) — publicação bloqueada",
+    "avertissements": "{nombre} aviso(s) — a verificar, mas não bloqueia",
+    "etAutres": "… e mais {nombre}.",
+    "comparaison": "Comparação com o plano atual",
+    "avant": "Atual",
+    "apres": "Novo",
+    "lignes": "Linhas",
+    "courses": "Circulações",
+    "arrets": "Paragens servidas",
+    "moinsQuAvant": "O novo plano tem menos circulações do que o atual. Verifique se não está incompleto.",
+    "publier": "Publicar o novo plano",
+    "filet": "Após a publicação, os testes correm antes da implantação. Se falharem, o site fica na versão anterior."
   }
 }

@@ -170,7 +170,11 @@
     "village": "Village",
     "precisionApproximative": "Approximate position",
     "precisionApproximativeAide": "The exact location of this stop could not be verified. The walking time is therefore even more indicative than usual.",
-    "signaler": "Report an error"
+    "signaler": "Report an error",
+    "precision": {
+      "verifiee": "position verified",
+      "approximative": "position approximate"
+    }
   },
   "notes": {
     "huttange-c3-uniquement": "This departure is reserved for children from Huttange attending the school in Elvange (cycle 3). Children from Huttange attending Noerdange (cycle 2) take the Aller 3.",
@@ -412,5 +416,46 @@
       "lecture-impossible": "Could not read the disruptions file on GitHub.",
       "publication-impossible": "Publishing failed."
     }
+  },
+  "adminArrets": {
+    "titre": "Stop positions",
+    "aide": "Check each stop on the map. Green dots are confirmed, orange ones remain approximate.",
+    "aVerifier": "{nombre} stop(s) to confirm",
+    "mode": "Click a dot to pick the stop, then click the map at the exact spot.",
+    "actuelle": "Current position",
+    "nouvelle": "New position",
+    "deplace": "moved {metres} m",
+    "jusqua": "Until (optional)",
+    "jusquaAide": "An end date only applies to a temporary correction; left empty, it stands until removed.",
+    "temporaire": "Correct temporarily",
+    "definitive": "Correct permanently",
+    "differenceAide": "Temporary: takes effect within a minute, no rebuild, and is reversible. Permanent: changes the reference data, takes effect after a rebuild.",
+    "cliquerCarte": "Click the map to set the exact position.",
+    "enCours": "Temporary corrections in place ({nombre})",
+    "expire": "expires on {date}"
+  },
+  "adminPlan": {
+    "titre": "Update the whole plan",
+    "aide": "Replace the reference plan with a new JSON file. The filename stays the same, only its content changes.",
+    "prudence": "The riskiest operation on the site",
+    "prudenceDetail": "An incorrect plan would skew the timetables of every family at once. Nothing is published while an error remains, and the tests check again before going live.",
+    "actuel": "Current plan: {annee} — {lignes} lines, {courses} runs, {arrets} stops served.",
+    "publie": "Plan published. The tests are running, then the site will update.",
+    "fichier": "Choose a file",
+    "coller": "Or paste the content",
+    "jsonInvalide": "The content is not valid JSON:",
+    "aucunProbleme": "No problem found. The plan can be published.",
+    "erreurs": "{nombre} error(s) — publishing blocked",
+    "avertissements": "{nombre} warning(s) — worth checking, but not blocking",
+    "etAutres": "… and {nombre} more.",
+    "comparaison": "Comparison with the current plan",
+    "avant": "Current",
+    "apres": "New",
+    "lignes": "Lines",
+    "courses": "Runs",
+    "arrets": "Stops served",
+    "moinsQuAvant": "The new plan has fewer runs than the current one. Check that it is not incomplete.",
+    "publier": "Publish the new plan",
+    "filet": "After publishing, the tests run before deployment. If they fail, the site stays on the previous version."
   }
 }

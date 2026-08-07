@@ -170,7 +170,11 @@
     "village": "Village",
     "precisionApproximative": "Position approximative",
     "precisionApproximativeAide": "L'emplacement exact de cet arrêt n'a pas pu être vérifié. Le temps de marche est donc encore plus indicatif que d'ordinaire.",
-    "signaler": "Signaler une erreur"
+    "signaler": "Signaler une erreur",
+    "precision": {
+      "verifiee": "position vérifiée",
+      "approximative": "position approximative"
+    }
   },
   "notes": {
     "huttange-c3-uniquement": "Ce départ est réservé aux enfants de Huttange scolarisés à Elvange (cycle 3). Les enfants de Huttange scolarisés à Noerdange (cycle 2) prennent l'Aller 3.",
@@ -412,5 +416,46 @@
       "lecture-impossible": "Impossible de lire le fichier des urgences sur GitHub.",
       "publication-impossible": "La publication a échoué."
     }
+  },
+  "adminArrets": {
+    "titre": "Position des arrêts",
+    "aide": "Vérifiez chaque arrêt sur la carte. Les points verts sont confirmés, les oranges restent approximatifs.",
+    "aVerifier": "{nombre} arrêt(s) à confirmer",
+    "mode": "Cliquez un point pour choisir l'arrêt, puis cliquez la carte à l'endroit exact.",
+    "actuelle": "Position actuelle",
+    "nouvelle": "Nouvelle position",
+    "deplace": "déplacé de {metres} m",
+    "jusqua": "Jusqu'au (facultatif)",
+    "jusquaAide": "Une date de fin ne concerne que la correction temporaire ; laissée vide, elle vaut jusqu'à son retrait.",
+    "temporaire": "Corriger temporairement",
+    "definitive": "Corriger définitivement",
+    "differenceAide": "Temporaire : effet en une minute, sans reconstruire le site, et réversible. Définitive : modifie les données de référence, effet après reconstruction.",
+    "cliquerCarte": "Cliquez sur la carte pour indiquer la position exacte.",
+    "enCours": "Corrections temporaires en cours ({nombre})",
+    "expire": "expire le {date}"
+  },
+  "adminPlan": {
+    "titre": "Mettre à jour le plan complet",
+    "aide": "Remplacez le plan de référence par un nouveau fichier JSON. Le nom du fichier ne change pas, seul son contenu.",
+    "prudence": "L'opération la plus risquée du site",
+    "prudenceDetail": "Un plan incorrect fausserait les horaires de toutes les familles à la fois. Rien n'est publié tant qu'une erreur subsiste, et les tests refont une vérification avant la mise en ligne.",
+    "actuel": "Plan actuel : {annee} — {lignes} lignes, {courses} courses, {arrets} arrêts desservis.",
+    "publie": "Plan publié. Les tests s'exécutent, puis le site se met à jour.",
+    "fichier": "Choisir un fichier",
+    "coller": "Ou coller le contenu",
+    "jsonInvalide": "Le contenu n'est pas du JSON valide :",
+    "aucunProbleme": "Aucun problème détecté. Le plan est publiable.",
+    "erreurs": "{nombre} erreur(s) — publication bloquée",
+    "avertissements": "{nombre} avertissement(s) — à vérifier, mais non bloquant",
+    "etAutres": "… et {nombre} autre(s).",
+    "comparaison": "Comparaison avec le plan actuel",
+    "avant": "Actuel",
+    "apres": "Nouveau",
+    "lignes": "Lignes",
+    "courses": "Courses",
+    "arrets": "Arrêts desservis",
+    "moinsQuAvant": "Le nouveau plan contient moins de courses que l'actuel. Vérifiez qu'il n'est pas incomplet.",
+    "publier": "Publier le nouveau plan",
+    "filet": "Après publication, les tests s'exécutent avant le déploiement. S'ils échouent, le site reste sur la version précédente."
   }
 }

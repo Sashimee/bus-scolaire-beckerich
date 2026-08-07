@@ -170,7 +170,11 @@
     "village": "Duerf",
     "precisionApproximative": "Ongeféier Positioun",
     "precisionApproximativeAide": "De genaue Standuert vun dëser Statioun konnt net nogepréift ginn. D'Zäit zu Fouss ass dofir nach méi ongenau wéi soss.",
-    "signaler": "Feeler mellen"
+    "signaler": "Feeler mellen",
+    "precision": {
+      "verifiee": "Positioun nogepréift",
+      "approximative": "Positioun ongeféier"
+    }
   },
   "notes": {
     "huttange-c3-uniquement": "Dës Offahrt ass de Kanner aus Hüttingen reservéiert, déi d'Schoul zu Elwen besichen (Cycle 3). Kanner aus Hüttingen, déi zu Näerden an d'Schoul ginn (Cycle 2), huelen den Aller 3.",
@@ -412,5 +416,46 @@
       "lecture-impossible": "D'Stéierungsdatei konnt op GitHub net gelies ginn.",
       "publication-impossible": "D'Publikatioun huet net geklappt."
     }
+  },
+  "adminArrets": {
+    "titre": "Positioun vun de Statiounen",
+    "aide": "Kuckt all Statioun op der Kaart no. Gréng Punkte si bestätegt, orange bleiwen ongeféier.",
+    "aVerifier": "{nombre} Statioun(en) ze bestätegen",
+    "mode": "Klickt op e Punkt fir d'Statioun ze wielen, dann op d'Kaart op déi genee Plaz.",
+    "actuelle": "Aktuell Positioun",
+    "nouvelle": "Nei Positioun",
+    "deplace": "ëm {metres} m verréckelt",
+    "jusqua": "Bis den (fakultativ)",
+    "jusquaAide": "En Enndatum betrëfft nëmmen déi provisoresch Korrektur; leer gelooss gëllt se bis se ewechgeholl gëtt.",
+    "temporaire": "Provisoresch korrigéieren",
+    "definitive": "Definitiv korrigéieren",
+    "differenceAide": "Provisoresch: wierkt an enger Minutt, ouni Neibau, an ass ëmkéierbar. Definitiv: ännert d'Referenzdonnéeën, wierkt nom Neibau.",
+    "cliquerCarte": "Klickt op d'Kaart fir déi genee Positioun unzeginn.",
+    "enCours": "Lafend provisoresch Korrekturen ({nombre})",
+    "expire": "leeft de {date} of"
+  },
+  "adminPlan": {
+    "titre": "De ganze Plang aktualiséieren",
+    "aide": "Ersetzt de Referenzplang duerch eng nei JSON-Datei. Den Dateinumm bleift, nëmmen den Inhalt ännert.",
+    "prudence": "Déi riskantst Operatioun vun der Säit",
+    "prudenceDetail": "E falsche Plang géif d'Ziichte vun alle Familljen op eemol verfälschen. Sou laang en Feeler do ass, gëtt näischt publizéiert, an d'Tester préifen nach eng Kéier virun der Verëffentlechung.",
+    "actuel": "Aktuelle Plang: {annee} — {lignes} Linnen, {courses} Fahrten, {arrets} bedéngte Statiounen.",
+    "publie": "Plang publizéiert. D'Tester lafen, dann aktualiséiert sech d'Säit.",
+    "fichier": "Datei wielen",
+    "coller": "Oder den Inhalt afügen",
+    "jsonInvalide": "Den Inhalt ass kee gëltege JSON:",
+    "aucunProbleme": "Kee Problem fonnt. De Plang ass publizéierbar.",
+    "erreurs": "{nombre} Feeler — Publikatioun blockéiert",
+    "avertissements": "{nombre} Hiweis(er) — ze préifen, mee net blockéierend",
+    "etAutres": "… an {nombre} weider.",
+    "comparaison": "Verglach mam aktuelle Plang",
+    "avant": "Aktuell",
+    "apres": "Nei",
+    "lignes": "Linnen",
+    "courses": "Fahrten",
+    "arrets": "Bedéngte Statiounen",
+    "moinsQuAvant": "Den neie Plang huet manner Fahrten wéi den aktuellen. Kuckt no, ob en net onvollstänneg ass.",
+    "publier": "Neie Plang publizéieren",
+    "filet": "No der Publikatioun lafen d'Tester virum Deployment. Wa se feelschloen, bleift d'Säit op der viregter Versioun."
   }
 }

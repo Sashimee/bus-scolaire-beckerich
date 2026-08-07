@@ -15,6 +15,12 @@ export const DEPOT = {
 /** Chemin du fichier des urgences dans le dépôt. */
 export const CHEMIN_URGENCES = 'public/urgences.json'
 
+/** Position de référence des arrêts. Modifier ce fichier demande une reconstruction. */
+export const CHEMIN_ARRETS = 'src/data/arrets.json'
+
+/** Plan de référence. Le nom du fichier ne change pas : seul son contenu est remplacé. */
+export const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
+
 /**
  * Worker Cloudflare : échange OAuth GitHub et envoi des notifications push.
  * Défini à la construction via VITE_URL_WORKER. Vide = fonctionnalités désactivées.

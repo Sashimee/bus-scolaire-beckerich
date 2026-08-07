@@ -77,3 +77,42 @@ export function arretEcoleDuCycle(id: Cycle): Arret {
 export function incertitude(id: string) {
   return plan.incertitudes.find((i) => i.id === id)
 }
+
+/** État d'origine des arrêts, conservé pour pouvoir revenir en arrière. */
+const arretsOrigine = new Map(arrets.map((a) => [a.id, { coord: a.coord, precision: a.precision }]))
+
+/**
+ * Applique des corrections de position venues du fichier des urgences.
+ *
+ * On modifie les objets en place plutôt que de faire circuler les corrections dans
+ * tout le moteur : les arrêts sont un singleton, et cette mutation contenue évite de
+ * complexifier une dizaine de signatures pour un cas rare. Les positions d'origine
+ * sont mémorisées, si bien que retirer une correction restaure l'état initial.
+ *
+ * Renvoie le nombre d'arrêts effectivement déplacés, ce qui permet à l'interface de
+ * savoir qu'elle doit recalculer les trajets.
+ */
+export function appliquerCorrectionsArrets(
+  corrections: { arret: string; coord: [number, number] }[],
+): number {
+  const corriges = new Map(corrections.map((c) => [c.arret, c.coord]))
+  let modifies = 0
+
+  for (const a of arrets) {
+    const origine = arretsOrigine.get(a.id)!
+    const cible = corriges.get(a.id) ?? origine.coord
+
+    if (a.coord[0] !== cible[0] || a.coord[1] !== cible[1]) {
+      // `coord` est typé en lecture seule pour le reste de l'application ; c'est ici,
+      // et uniquement ici, qu'on assume l'écriture.
+      ;(a as { coord: readonly [number, number] }).coord = cible
+      modifies++
+    }
+
+    // Une position corrigée à la main est par définition vérifiée ; en l'absence de
+    // correction, on restaure la précision d'origine plutôt que de la laisser
+    // faussement à « vérifiée ».
+    a.precision = corriges.has(a.id) ? 'verifiee' : origine.precision
+  }
+  return modifies
+}

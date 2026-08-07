@@ -750,3 +750,18 @@
     min-inline-size: 7rem;
   }
 }
+
+@layer composants {
+  /* Saisie du plan complet : du JSON, donc une chasse fixe et de la place. */
+  textarea {
+    inline-size: 100%;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--rayon-s);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    resize: vertical;
+  }
+}

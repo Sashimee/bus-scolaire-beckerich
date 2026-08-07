@@ -16,6 +16,7 @@ import {
   repasParDefaut,
 } from './lib/stockage'
 import { contexteEnfant, type ContexteEnfant } from './lib/plan'
+import { useUrgences } from './urgences-contexte'
 import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './lib/types'
 import { JOURS } from './lib/types'
 
@@ -56,6 +57,8 @@ function themeInitial(): Theme {
 export function FournisseurFoyer({ children }: { children: ReactNode }) {
   const [foyer, setFoyer] = useState<Foyer>(chargerFoyer)
   const [theme, setThemeEtat] = useState<Theme>(themeInitial)
+  // Une correction de position d'arrêt doit relancer le calcul des trajets.
+  const { versionArrets } = useUrgences()
 
   useEffect(() => {
     enregistrerFoyer(foyer)
@@ -77,7 +80,8 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
     if (!foyer.adresse) return m
     for (const e of foyer.enfants) m.set(e.id, contexteEnfant(e, foyer.adresse))
     return m
-  }, [foyer])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foyer, versionArrets])
 
   const majEnfant = useCallback((id: string, transformer: (e: Enfant) => Enfant) => {
     setFoyer((f) => ({

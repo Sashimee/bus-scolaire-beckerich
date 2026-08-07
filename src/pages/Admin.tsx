@@ -13,6 +13,8 @@ import {
 } from '../lib/github'
 import { nouvelIdentifiant, type Gravite, type Perturbation, type TypePerturbation } from '../lib/urgences'
 import { URL_WORKER, connexionGithubConfiguree, lienEditeurGithub } from '../config'
+import { AdminArrets } from '../composants/AdminArrets'
+import { AdminPlan } from '../composants/AdminPlan'
 
 const CLE_JETON = 'bus-beckerich.jeton-github'
 const TYPES: TypePerturbation[] = ['annulation', 'retard', 'arret-deplace', 'message']
@@ -435,6 +437,14 @@ export function Admin() {
           </div>
         ))}
       </section>
+
+      <hr style={{ border: 0, borderBlockStart: '1px solid var(--line)' }} />
+
+      <AdminArrets jeton={jeton!} auteur={identite.nom ?? identite.login} onErreur={setErreur} />
+
+      <hr style={{ border: 0, borderBlockStart: '1px solid var(--line)' }} />
+
+      <AdminPlan jeton={jeton!} onErreur={setErreur} />
 
       <a className="bouton bouton--discret" href={lienEditeurGithub()} target="_blank" rel="noopener noreferrer">
         {t('admin.editerSurGithub')}

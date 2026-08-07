@@ -63,6 +63,49 @@ export async function verifierAcces(jeton: string): Promise<Identite> {
   }
 }
 
+export interface FichierDepot<T> {
+  contenu: T
+  /** Empreinte du fichier, exigée par GitHub pour éviter d'écraser une écriture concurrente. */
+  sha: string
+}
+
+/** Relit n'importe quel fichier JSON du dépôt, avec son empreinte. */
+export async function lireFichier<T>(jeton: string, chemin: string): Promise<FichierDepot<T>> {
+  const rep = await fetch(
+    `${API}/repos/${DEPOT.proprietaire}/${DEPOT.nom}/contents/${chemin}?ref=${DEPOT.branche}`,
+    { headers: entetes(jeton), cache: 'no-store' },
+  )
+  if (!rep.ok) throw new Error('lecture-impossible')
+  const donnees = (await rep.json()) as { content: string; sha: string }
+  return { contenu: JSON.parse(depuisBase64(donnees.content)) as T, sha: donnees.sha }
+}
+
+/**
+ * Écrit n'importe quel fichier JSON du dépôt.
+ * Le `sha` garantit qu'on n'écrase pas une modification publiée entre-temps.
+ */
+export async function ecrireFichier(
+  jeton: string,
+  chemin: string,
+  contenu: unknown,
+  sha: string,
+  resume: string,
+): Promise<void> {
+  const rep = await fetch(`${API}/repos/${DEPOT.proprietaire}/${DEPOT.nom}/contents/${chemin}`, {
+    method: 'PUT',
+    headers: { ...entetes(jeton), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: resume,
+      content: versBase64(JSON.stringify(contenu, null, 2) + '\n'),
+      sha,
+      branch: DEPOT.branche,
+    }),
+  })
+
+  if (rep.status === 409) throw new Error('conflit')
+  if (!rep.ok) throw new Error(`publication-impossible-${rep.status}`)
+}
+
 export interface FichierUrgences {
   urgences: Urgences
   /** Empreinte du fichier, exigée par GitHub pour éviter d'écraser une écriture concurrente. */

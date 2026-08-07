@@ -34,16 +34,41 @@ export interface Perturbation {
   gravite: Gravite
 }
 
+/**
+ * Correction de position d'un arrêt, appliquée sans reconstruire le site.
+ *
+ * Sert quand on découvre qu'un arrêt est mal placé et qu'on veut corriger tout de
+ * suite, ou quand un arrêt est déplacé pour quelques jours (travaux). Une correction
+ * définitive se fait plutôt dans `arrets.json`, qui reste la référence.
+ */
+export interface CorrectionArret {
+  arret: string
+  coord: [number, number]
+  /** Sans date de fin, la correction vaut jusqu'à son retrait. */
+  jusqua?: string
+  note?: string
+  publieLe: string
+  publiePar: string
+}
+
 export interface Urgences {
   version: number
   misAJour: string
   perturbations: Perturbation[]
+  correctionsArrets?: CorrectionArret[]
 }
 
 export const URGENCES_VIDES: Urgences = {
   version: 1,
   misAJour: new Date(0).toISOString(),
   perturbations: [],
+  correctionsArrets: [],
+}
+
+/** Les corrections d'arrêts encore valables à une date donnée. */
+export function correctionsActives(urgences: Urgences, date: Date): CorrectionArret[] {
+  const iso = isoDate(date)
+  return (urgences.correctionsArrets ?? []).filter((c) => !c.jusqua || iso <= c.jusqua)
 }
 
 /**

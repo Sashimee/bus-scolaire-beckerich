@@ -8,7 +8,13 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { chargerUrgences, URGENCES_VIDES, type Urgences } from './lib/urgences'
+import {
+  chargerUrgences,
+  correctionsActives,
+  URGENCES_VIDES,
+  type Urgences,
+} from './lib/urgences'
+import { appliquerCorrectionsArrets } from './lib/donnees'
 
 const INTERVALLE_MS = 10 * 60 * 1000
 const CLE_CACHE = 'bus-beckerich.urgences'
@@ -16,6 +22,12 @@ const CLE_VUES = 'bus-beckerich.urgences-vues'
 
 interface EtatUrgences {
   urgences: Urgences
+  /**
+   * Incrémenté chaque fois qu'une correction déplace un arrêt. Les calculs de trajet
+   * en dépendent : sans cela, un arrêt corrigé ne serait pris en compte qu'au
+   * prochain rechargement de la page.
+   */
+  versionArrets: number
   /** Identifiants des perturbations déjà vues par ce parent. */
   vues: string[]
   marquerVues: (ids: string[]) => void
@@ -46,6 +58,7 @@ export function FournisseurUrgences({ children }: { children: ReactNode }) {
   // de voir l'annulation publiée hier soir.
   const [urgences, setUrgences] = useState<Urgences>(() => lireCache(CLE_CACHE, URGENCES_VIDES))
   const [vues, setVues] = useState<string[]>(() => lireCache<string[]>(CLE_VUES, []))
+  const [versionArrets, setVersionArrets] = useState(0)
   const enCours = useRef<AbortController | null>(null)
 
   const rafraichir = useCallback(() => {
@@ -56,6 +69,8 @@ export function FournisseurUrgences({ children }: { children: ReactNode }) {
       if (!recu || ctrl.signal.aborted) return
       setUrgences(recu)
       ecrireCache(CLE_CACHE, recu)
+      const deplaces = appliquerCorrectionsArrets(correctionsActives(recu, new Date()))
+      if (deplaces) setVersionArrets((v) => v + 1)
     })
   }, [])
 
@@ -84,8 +99,8 @@ export function FournisseurUrgences({ children }: { children: ReactNode }) {
   }, [])
 
   const valeur = useMemo(
-    () => ({ urgences, vues, marquerVues, rafraichir }),
-    [urgences, vues, marquerVues, rafraichir],
+    () => ({ urgences, versionArrets, vues, marquerVues, rafraichir }),
+    [urgences, versionArrets, vues, marquerVues, rafraichir],
   )
 
   return <Contexte.Provider value={valeur}>{children}</Contexte.Provider>
