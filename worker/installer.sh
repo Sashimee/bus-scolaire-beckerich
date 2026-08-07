@@ -22,10 +22,22 @@ if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
   read -rp "Account ID : " CLOUDFLARE_ACCOUNT_ID
   export CLOUDFLARE_ACCOUNT_ID
 fi
-read -rp "Sous-domaine workers.dev [${CLOUDFLARE_ACCOUNT_ID}] : " SOUS_DOMAINE
-SOUS_DOMAINE="${SOUS_DOMAINE:-$CLOUDFLARE_ACCOUNT_ID}"
+read -rp "Sous-domaine workers.dev [alex-baskewitsch] : " SOUS_DOMAINE
+SOUS_DOMAINE="${SOUS_DOMAINE:-alex-baskewitsch}"
 URL_WORKER="https://bus-beckerich.${SOUS_DOMAINE}.workers.dev"
 vert "Le Worker sera joignable sur : $URL_WORKER"
+
+# Cette URL est compilée dans le JavaScript servi à tous les parents : elle sera
+# donc publique et indexable. Un sous-domaine qui contient un nom de personne
+# réintroduit exactement ce qu'on a retiré du dépôt.
+if printf '%s' "$SOUS_DOMAINE" | grep -qiE 'baskewitsch|alex'; then
+  alerte "Attention : ce sous-domaine contient ton nom, et cette URL apparaîtra"
+  alerte "en clair dans le code public du site."
+  alerte "Tu peux le changer dans Cloudflare (Workers & Pages → Subdomain) pour"
+  alerte "quelque chose de neutre, par exemple « bus-beckerich »."
+  read -rp "Continuer quand même ? [o/N] " REPONSE
+  case "$REPONSE" in [oO]*) ;; *) echo "Interrompu."; exit 0 ;; esac
+fi
 echo
 
 gras "── 2. Dépendances et connexion ─────────────────────────────────────"

@@ -163,6 +163,13 @@ Deux précautions y sont prises :
 - **l'identifiant de compte n'est pas écrit dans le dépôt** : il est lu depuis
   `CLOUDFLARE_ACCOUNT_ID` ou demandé à l'exécution.
 
+> **Le sous-domaine workers.dev sera public.** L'URL du Worker est compilée dans le
+> JavaScript servi à tous les parents : elle apparaît donc en clair dans le code du
+> site, et reste indexable. Un sous-domaine contenant un nom de personne y réintroduit
+> une donnée personnelle. Il se change dans Cloudflare, sous
+> **Workers & Pages → Subdomain** — un nom neutre comme `bus-beckerich` évite le
+> problème. Le script prévient si le sous-domaine choisi ressemble à un nom propre.
+
 Les étapes ci-dessous décrivent la même chose à la main, si tu préfères contrôler
 chaque commande ou si le script échoue quelque part.
 
