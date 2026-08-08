@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from '../composants/ChampAdresse'
@@ -21,19 +21,26 @@ export function Configurer() {
     definirRepasSemaine,
     definirBus,
     definirBusSemaine,
+    definirPeriscolaire,
+    definirDillendappDepuis,
     definirDillendappJusqua,
+    definirAdresseJour,
     supprimerEnfant,
     configure,
   } = useFoyer()
 
+  const naviguer = useNavigate()
   const [prenom, setPrenom] = useState('')
   const [cycle, setCycle] = useState<Cycle>('c1')
 
+  // Un enfant qui vient d'être créé n'a que son prénom : l'assistant enchaîne sur les
+  // questions qui manquent, plutôt que de laisser le parent chercher dans la page.
   const soumettre = (e: React.FormEvent) => {
     e.preventDefault()
     if (!prenom.trim()) return
-    ajouterEnfant(prenom, cycle)
+    const id = ajouterEnfant(prenom, cycle)
     setPrenom('')
+    naviguer(`/enfant/${id}/assistant`)
   }
 
   return (
@@ -90,7 +97,16 @@ export function Configurer() {
               onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
               onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
               onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
-              onDillendapp={(jour, heure) => definirDillendappJusqua(enfant.id, jour, heure)}
+              onPeriscolaire={(inscrit) => definirPeriscolaire(enfant.id, inscrit)}
+              onDillendappDepuis={(jour, heure) =>
+                definirDillendappDepuis(enfant.id, jour, heure)
+              }
+              onDillendappJusqua={(jour, heure) =>
+                definirDillendappJusqua(enfant.id, jour, heure)
+              }
+              onAdresseJour={(jour, sens, adresse) =>
+                definirAdresseJour(enfant.id, jour, sens, adresse)
+              }
             />
 
             <div className="rangee">

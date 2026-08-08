@@ -36,7 +36,19 @@
     "commencer": "Beginnen",
     "terminer": "Fertig",
     "suivant": "Weiter",
-    "precedent": "Zurück"
+    "precedent": "Vorheriger Schritt"
+  },
+  "assistant": {
+    "progression": "Schritt {etape} von {total}",
+    "enfant": "Wer ist dieses Kind?",
+    "adresse": "Wo fährt es morgens los?",
+    "bus": "Nimmt es den Bus?",
+    "midi": "Wo isst es zu Mittag?",
+    "periscolaire": "Zu welchen Zeiten ist es im Dillendapp?",
+    "recapitulatif": "Das ist seine Woche",
+    "terminer": "Übersicht ansehen",
+    "reglageFin": "Alles auf einer Seite einstellen",
+    "reprendre": "Schritt für Schritt einrichten"
   },
   "adresse": {
     "label": "Wohnadresse",
@@ -46,7 +58,19 @@
     "aucunResultatAide": "Bitte die Schreibweise prüfen. Diese Website deckt nur Adressen der Gemeinde ab.",
     "choisie": "Gewählte Adresse",
     "modifier": "Adresse ändern",
-    "confidentialite": "Ihre Adresse wird auf Ihrem Gerät gesucht. Sie wird nirgendwohin gesendet."
+    "confidentialite": "Ihre Adresse wird auf Ihrem Gerät gesucht. Sie wird nirgendwohin gesendet.",
+    "revenirDomicile": "Zurück zum Wohnsitz",
+    "choisirArret": "Genutzte Haltestelle angeben",
+    "arretLabel": "Genutzte Haltestelle",
+    "arretPlaceholder": "Haltestelle wählen",
+    "arretAide": "Adresse außerhalb der Gemeinde: geben Sie die Haltestelle an, an der das Kind ein- oder aussteigt. Die Gehzeit kann dann nicht geschätzt werden."
+  },
+  "adresseJour": {
+    "titre": "Besondere Adressen",
+    "aide": "Standardmäßig fährt das Kind von Ihrem Wohnsitz los und kehrt dorthin zurück. Tragen Sie hier die Tage ein, an denen das nicht so ist — bei den Großeltern, bei der Tagesmutter. Morgens und abends werden getrennt eingestellt.",
+    "domicile": "Wohnsitz",
+    "matin": "Fährt morgens los von",
+    "soir": "Kehrt abends zurück nach"
   },
   "enfant": {
     "prenom": "Vorname",
@@ -75,7 +99,8 @@
     "dillendapp": "Isst im Dillendapp",
     "dillendappCourt": "Dillendapp",
     "touteLaSemaine": "Mittagessen, ganze Woche",
-    "sansCoursApresMidi": "Kein Nachmittagsunterricht"
+    "sansCoursApresMidi": "Kein Nachmittagsunterricht",
+    "sansPeriscolaire": "Dieses Kind isst jeden Tag zu Hause. Kreuzen Sie unten die Anmeldung zur Betreuung an, wenn es manchmal im Dillendapp isst."
   },
   "dillendapp": {
     "titre": "Anwesenheit im Dillendapp",
@@ -87,7 +112,9 @@
     "depuis": "Kommt an ab",
     "aDeposer": "Zum Dillendapp bringen",
     "depose": "Um {heure} zum Dillendapp bringen.",
-    "aideDepuis": "Wenn Sie eine Uhrzeit angeben, bringen Sie das Kind vor dem Unterricht selbst zur Maison Relais: an diesem Morgen fährt kein Bus bei Ihnen ab."
+    "aideDepuis": "Wenn Sie eine Uhrzeit angeben, bringen Sie das Kind vor dem Unterricht selbst zur Maison Relais: an diesem Morgen fährt kein Bus bei Ihnen ab.",
+    "inscription": "Zur Betreuung angemeldet (Dillendapp)",
+    "inscriptionAide": "Abwählen, wenn das Kind nie hingeht: die gesamte Dillendapp-Logik verschwindet dann aus den Einstellungen und aus seiner Übersicht."
   },
   "bus": {
     "titre": "Bus",

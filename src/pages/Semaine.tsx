@@ -4,9 +4,10 @@ import { useFoyer } from '../etat'
 import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { FicheImprimable } from '../composants/FicheImprimable'
-import { datesDeLaSemaine, genererIcs } from '../lib/calendrier'
+import { ActionsEnfant } from '../composants/ActionsEnfant'
+import { datesDeLaSemaine } from '../lib/calendrier'
 import { semaineEnfant } from '../lib/plan'
-import { distanceLisible, nomArret, nomArretParId } from '../lib/affichage'
+import { distanceLisible, nomArret } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
 import { JOURS } from '../lib/types'
 import { useUrgences } from '../urgences-contexte'
@@ -40,22 +41,6 @@ export function Semaine() {
   // cas explicite, la fiche affichait cinq journées vides — « aucun trajet ce jour-là »,
   // répété cinq fois, ce qui se lit comme une panne plutôt que comme une bonne nouvelle.
   const aPied = ctx.marcheDirecte
-
-  const telechargerIcs = () => {
-    const ics = genererIcs(ctx, {
-      libelleTrajet: (trajet) => t(`trajets.${trajet.type}`),
-      nomArret: (idArret) => nomArretParId(idArret, t),
-      minutesMarche: ctx.temps,
-      libelleRecuperation: t('dillendapp.aRecuperer'),
-      libelleDepose: t('dillendapp.aDeposer'),
-    })
-    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }))
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `bus-${enfant.prenom.toLowerCase().replace(/\W+/g, '-')}.ics`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
 
   return (
     <>
@@ -134,19 +119,10 @@ export function Semaine() {
 
       <section className="pile pile--serre sans-impression">
         <h3 className="titre-carte">{aPied ? t('impression.titre') : t('calendrier.titre')}</h3>
-        {/* Sans trajet, l'export produirait un calendrier vide : mieux vaut pas de bouton. */}
-        {!aPied && (
-          <>
-            <button type="button" className="bouton bouton--primaire" onClick={telechargerIcs}>
-              {t('calendrier.ics')}
-            </button>
-            <p className="champ__aide">{t('calendrier.icsAide')}</p>
-          </>
-        )}
-        <button type="button" className="bouton" onClick={() => window.print()}>
-          {t('impression.bouton')}
-        </button>
-        <p className="champ__aide">{t('impression.aide')}</p>
+        <ActionsEnfant ctx={ctx} />
+        <Link to={`/enfant/${enfant.id}/assistant`} className="bouton">
+          {t('assistant.reprendre')}
+        </Link>
         <Link to="/configurer" className="bouton bouton--discret">
           {t('repas.titre')}
         </Link>

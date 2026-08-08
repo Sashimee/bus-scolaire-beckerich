@@ -28,13 +28,22 @@ interface EtatFoyer {
   contextes: Map<string, ContexteEnfant | null>
   configure: boolean
   definirAdresse: (a: Adresse) => void
-  ajouterEnfant: (prenom: string, cycle: Cycle) => void
+  /** Renvoie l'identifiant du nouvel enfant, pour enchaîner sur son assistant. */
+  ajouterEnfant: (prenom: string, cycle: Cycle) => string
   modifierEnfant: (id: string, champs: Partial<Omit<Enfant, 'id'>>) => void
   definirRepas: (id: string, jour: Jour, repas: RepasMidi) => void
   definirRepasSemaine: (id: string, repas: RepasMidi) => void
   definirBus: (id: string, jour: Jour, usage: UsageBus) => void
   definirBusSemaine: (id: string, usage: UsageBus) => void
+  definirPeriscolaire: (id: string, inscrit: boolean) => void
+  definirDillendappDepuis: (id: string, jour: Jour, heure: string | null) => void
   definirDillendappJusqua: (id: string, jour: Jour, heure: string | null) => void
+  definirAdresseJour: (
+    id: string,
+    jour: Jour,
+    sens: 'matin' | 'soir',
+    adresse: Adresse | null,
+  ) => void
   supprimerEnfant: (id: string) => void
   remplacerFoyer: (f: Foyer) => void
   theme: Theme
@@ -98,21 +107,29 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
 
       definirAdresse: (adresse) => setFoyer((f) => ({ ...f, adresse })),
 
-      ajouterEnfant: (prenom, cycle) =>
+      ajouterEnfant: (prenom, cycle) => {
+        // L'identifiant est forgé ici, et non dans le `setFoyer`, pour pouvoir être
+        // renvoyé à l'appelant : c'est lui qui enchaîne sur l'assistant du nouvel enfant.
+        const id = `${Date.now().toString(36)}-${foyer.enfants.length}`
         setFoyer((f) => ({
           ...f,
           enfants: [
             ...f.enfants,
             {
-              id: `${Date.now().toString(36)}-${f.enfants.length}`,
+              id,
               prenom: prenom.trim(),
               cycle,
               repas: repasParDefaut(),
               bus: busParDefaut(),
+              periscolaire: false,
+              dillendappDepuis: dillendappParDefaut(),
               dillendappJusqua: dillendappParDefaut(),
+              adresses: {},
             },
           ],
-        })),
+        }))
+        return id
+      },
 
       modifierEnfant: (id, champs) => majEnfant(id, (e) => ({ ...e, ...champs })),
 
@@ -133,11 +150,34 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
           bus: { ...busParDefaut(), ...e.bus, [jour]: usage },
         })),
 
+      definirPeriscolaire: (id, inscrit) => majEnfant(id, (e) => ({ ...e, periscolaire: inscrit })),
+
+      definirDillendappDepuis: (id, jour, heure) =>
+        majEnfant(id, (e) => ({
+          ...e,
+          dillendappDepuis: { ...dillendappParDefaut(), ...e.dillendappDepuis, [jour]: heure },
+        })),
+
       definirDillendappJusqua: (id, jour, heure) =>
         majEnfant(id, (e) => ({
           ...e,
           dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua, [jour]: heure },
         })),
+
+      /**
+       * Pose ou retire une adresse dérogatoire. Un jour dont les deux sens reviennent
+       * au domicile est retiré de la table plutôt que d'y rester en creux : sans ça, un
+       * `{ matin: null, soir: null }` traînerait dans le stockage et dans les liens de
+       * partage sans rien vouloir dire.
+       */
+      definirAdresseJour: (id, jour, sens, adresse) =>
+        majEnfant(id, (e) => {
+          const duJour = { ...e.adresses?.[jour], [sens]: adresse }
+          const adresses = { ...e.adresses }
+          if (duJour.matin || duJour.soir) adresses[jour] = duJour
+          else delete adresses[jour]
+          return { ...e, adresses }
+        }),
 
       definirBusSemaine: (id, usage) =>
         majEnfant(id, (e) => ({

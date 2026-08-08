@@ -1,11 +1,22 @@
 import { useId, useMemo, useState } from 'react'
 import { chercherAdresses, type AdresseTrouvee } from '../lib/adresses'
+import { arrets } from '../lib/donnees'
+import { nomArret } from '../lib/affichage'
 import { useT } from '../i18n'
 import type { Adresse } from '../lib/types'
 
 interface Props {
   valeur: Adresse | null
   onChoisir: (a: Adresse) => void
+  /**
+   * Proposé quand l'adresse peut être retirée pour revenir au domicile du foyer.
+   * Absent sur l'adresse du foyer elle-même, qui n'a pas de repli.
+   */
+  onEffacer?: () => void
+  /** Libellé du champ. Par défaut, celui de l'adresse du domicile. */
+  libelle?: string
+  /** Version resserrée, pour la grille des adresses particulières. */
+  compact?: boolean
 }
 
 /**
@@ -13,20 +24,39 @@ interface Props {
  *
  * La recherche se fait dans le jeu embarqué : rien ne part sur le réseau, ce qui est
  * le point le plus sensible de l'application — une adresse de domicile d'enfant.
+ *
+ * Ce jeu ne couvre que la commune de Beckerich. Une adresse hors commune est donc
+ * introuvable, et le restera : plutôt que de laisser le parent buter sur un champ
+ * vide, on lui propose alors de désigner directement l'arrêt utilisé. C'est moins
+ * précis — le temps de marche devient inconnu — mais c'est honnête, et cela couvre le
+ * cas réel des grands-parents habitant le village voisin.
  */
-export function ChampAdresse({ valeur, onChoisir }: Props) {
+export function ChampAdresse({ valeur, onChoisir, onEffacer, libelle, compact }: Props) {
   const { t } = useT()
   const [saisie, setSaisie] = useState('')
   const [actif, setActif] = useState(-1)
+  const [choixArret, setChoixArret] = useState(false)
   const idListe = useId()
 
   const suggestions = useMemo(() => chercherAdresses(saisie), [saisie])
   const afficheListe = saisie.trim().length >= 2
+  const aucunResultat = afficheListe && suggestions.length === 0
 
   const choisir = (a: AdresseTrouvee) => {
     onChoisir({ libelle: a.libelle, localite: a.localite, coord: a.coord })
     setSaisie('')
     setActif(-1)
+    setChoixArret(false)
+  }
+
+  const choisirArret = (id: string) => {
+    const a = arrets.find((x) => x.id === id)
+    if (!a) return
+    // L'arrêt devient l'adresse : le calcul n'a besoin que d'un point de départ, et
+    // celui-ci a le mérite d'être exactement celui où l'enfant monte.
+    onChoisir({ libelle: nomArret(a, t), localite: a.village, coord: a.coord })
+    setSaisie('')
+    setChoixArret(false)
   }
 
   const auClavier = (e: React.KeyboardEvent) => {
@@ -45,27 +75,46 @@ export function ChampAdresse({ valeur, onChoisir }: Props) {
     }
   }
 
-  return (
-    <div className="pile pile--serre">
-      {valeur && (
-        <div className="carte carte--accent pile pile--serre">
-          <div>
-            <span className="etiquette">{t('adresse.choisie')}</span>
-          </div>
-          <div>
-            <div className="texte-fort">{valeur.libelle}</div>
-            <div className="localite texte-doux">{valeur.localite}</div>
-          </div>
+  /**
+   * L'adresse retenue. En mode compact elle se glisse SOUS son libellé : au-dessus,
+   * coincée entre deux champs empilés, elle se lisait comme la valeur du champ
+   * précédent — un retour du soir affiché sous « Part le matin de ».
+   */
+  const retenue = valeur && (
+    <div className={compact ? 'adresse-retenue' : 'carte carte--accent pile pile--serre'}>
+      {!compact && (
+        <div>
+          <span className="etiquette">{t('adresse.choisie')}</span>
         </div>
       )}
+      <div className="rangee rangee--espacee">
+        <span>
+          <span className="texte-fort">{valeur.libelle}</span>{' '}
+          <span className="localite texte-doux">{valeur.localite}</span>
+        </span>
+        {onEffacer && (
+          <button type="button" className="bouton bouton--discret" onClick={onEffacer}>
+            {t('adresse.revenirDomicile')}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="pile pile--serre">
+      {!compact && retenue}
 
       <div className="champ">
         <label htmlFor={idListe}>
-          {valeur ? t('adresse.modifier') : t('adresse.label')}
+          {libelle ?? (valeur ? t('adresse.modifier') : t('adresse.label'))}
         </label>
-        <p className="champ__aide" id={`${idListe}-aide`}>
-          {t('adresse.aide')}
-        </p>
+        {compact && retenue}
+        {!compact && (
+          <p className="champ__aide" id={`${idListe}-aide`}>
+            {t('adresse.aide')}
+          </p>
+        )}
         <input
           id={idListe}
           type="search"
@@ -81,7 +130,7 @@ export function ChampAdresse({ valeur, onChoisir }: Props) {
           role="combobox"
           aria-expanded={afficheListe && suggestions.length > 0}
           aria-controls={`${idListe}-suggestions`}
-          aria-describedby={`${idListe}-aide`}
+          {...(compact ? {} : { 'aria-describedby': `${idListe}-aide` })}
         />
       </div>
 
@@ -97,14 +146,40 @@ export function ChampAdresse({ valeur, onChoisir }: Props) {
         </ul>
       )}
 
-      {afficheListe && suggestions.length === 0 && (
-        <div className="encart encart--attention">
-          <div className="encart__titre">{t('adresse.aucunResultat')}</div>
-          {t('adresse.aucunResultatAide')}
+      {aucunResultat && (
+        <div className="encart encart--attention pile pile--serre">
+          <div>
+            <div className="encart__titre">{t('adresse.aucunResultat')}</div>
+            {t('adresse.aucunResultatAide')}
+          </div>
+          {choixArret ? (
+            <div className="champ">
+              <label htmlFor={`${idListe}-arret`}>{t('adresse.arretLabel')}</label>
+              <p className="champ__aide">{t('adresse.arretAide')}</p>
+              <select
+                id={`${idListe}-arret`}
+                defaultValue=""
+                onChange={(e) => choisirArret(e.target.value)}
+              >
+                <option value="" disabled>
+                  {t('adresse.arretPlaceholder')}
+                </option>
+                {arrets.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {nomArret(a, t)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <button type="button" className="bouton" onClick={() => setChoixArret(true)}>
+              {t('adresse.choisirArret')}
+            </button>
+          )}
         </div>
       )}
 
-      <p className="champ__aide">{t('adresse.confidentialite')}</p>
+      {!compact && <p className="champ__aide">{t('adresse.confidentialite')}</p>}
     </div>
   )
 }

@@ -678,6 +678,90 @@
     font-size: var(--texte-xs);
   }
 
+  /*
+   * Deux dispositions de ligne, selon ce que le jour porte : un seul réglage
+   * (repas, bus) ou deux champs horaires côte à côte.
+   */
+  .grille-semaine__jour--simple {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+  }
+
+  .grille-semaine__jour--horaires {
+    grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  @media (max-width: 34rem) {
+    .grille-semaine__jour--simple,
+    .grille-semaine__jour--horaires {
+      grid-template-columns: 1fr;
+    }
+    /* Les deux horaires tiennent côte à côte même sur un téléphone : les séparer
+       ferait une colonne de dix champs pour une seule semaine. */
+    .grille-semaine__jour--horaires {
+      grid-template-columns: 1fr 1fr;
+    }
+    .grille-semaine__jour--horaires > .grille-semaine__nom {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /*
+   * Progression de l'assistant : une barre par étape, remplie jusqu'à l'étape
+   * courante. Purement décorative — le compte « étape 2 sur 6 » l'accompagne en
+   * toutes lettres, et c'est lui que lisent les lecteurs d'écran.
+   */
+  .progression {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: var(--espace-1);
+  }
+
+  .progression__pas {
+    flex: 1 1 0;
+    block-size: 4px;
+    border-radius: 999px;
+    background: var(--bord);
+  }
+
+  .progression__pas--fait {
+    background: var(--accent);
+  }
+
+  /* Case à cocher lisible, avec sa cible tactile et son aide sous le libellé. */
+  .case {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--espace-3);
+    min-block-size: var(--cible);
+    padding-block: var(--espace-1);
+    cursor: pointer;
+  }
+
+  .case input[type='checkbox'] {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    margin-block-start: 0.15rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .case > span {
+    display: grid;
+    gap: var(--espace-1);
+  }
+
+  /* Adresse dérogatoire retenue : une ligne, pas une carte — il y en a dix. */
+  .adresse-retenue {
+    padding: var(--espace-2) var(--espace-3);
+    background: var(--info-fond);
+    border: var(--trait) solid var(--info-bord);
+    border-radius: var(--rayon-s);
+    font-size: var(--texte-m);
+  }
+
   /* Champ de présence au Dillendapp, sous la ligne du jour concerné. */
   .grille-semaine__dillendapp {
     grid-column: 1 / -1;

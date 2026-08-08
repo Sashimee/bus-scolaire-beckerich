@@ -36,7 +36,19 @@
     "commencer": "Ufänken",
     "terminer": "Fäerdeg",
     "suivant": "Weider",
-    "precedent": "Zréck"
+    "precedent": "Virege Schrëtt"
+  },
+  "assistant": {
+    "progression": "Schrëtt {etape} vu {total}",
+    "enfant": "Wien ass dëst Kand?",
+    "adresse": "Vu wou fiert et moies fort?",
+    "bus": "Hëlt et de Bus?",
+    "midi": "Wou ësst et mëttes?",
+    "periscolaire": "Zu wéi engen Zäiten ass et am Dillendapp?",
+    "recapitulatif": "Dat ass seng Woch",
+    "terminer": "Seng Fiche kucken",
+    "reglageFin": "Alles op enger Säit astellen",
+    "reprendre": "Schrëtt fir Schrëtt astellen"
   },
   "adresse": {
     "label": "Wunnadress",
@@ -46,7 +58,19 @@
     "aucunResultatAide": "Kuckt d'Schreifweis no. Dës Säit deckt nëmmen Adresse vun der Gemeng of.",
     "choisie": "Gewielten Adress",
     "modifier": "Adress änneren",
-    "confidentialite": "Är Adress gëtt op Ärem Apparat gesicht. Si gëtt néierens higeschéckt."
+    "confidentialite": "Är Adress gëtt op Ärem Apparat gesicht. Si gëtt néierens higeschéckt.",
+    "revenirDomicile": "Zréck op doheem",
+    "choisirArret": "Den Arrêt uginn",
+    "arretLabel": "Benotzten Arrêt",
+    "arretPlaceholder": "En Arrêt wielen",
+    "arretAide": "Adress baussent der Gemeng: gitt den Arrêt un, wou d'Kand op- oder ofklëmmt. D'Zäit ze Fouss kann dann net geschat ginn."
+  },
+  "adresseJour": {
+    "titre": "Besonnesch Adressen",
+    "aide": "Standardméisseg fiert d'Kand vun Ärem Wunnsëtz fort a kënnt do zréck. Gitt hei d'Deeg un, wou dat net de Fall ass — bei de Grousselteren, bei der Nounou. Moies an owes ginn getrennt agestallt.",
+    "domicile": "Doheem",
+    "matin": "Fiert moies fort vun",
+    "soir": "Kënnt owes zréck op"
   },
   "enfant": {
     "prenom": "Virnumm",
@@ -75,7 +99,8 @@
     "dillendapp": "Ësst am Dillendapp",
     "dillendappCourt": "Dillendapp",
     "touteLaSemaine": "Mëttegiessen, ganz Woch",
-    "sansCoursApresMidi": "Kee Cours nomëttes"
+    "sansCoursApresMidi": "Kee Cours nomëttes",
+    "sansPeriscolaire": "Dëst Kand ësst all Dag doheem. Kräizt hei ënnen d'Umeldung an der Betreiung un, wann et heiansdo am Dillendapp ësst."
   },
   "dillendapp": {
     "titre": "Präsenz am Dillendapp",
@@ -87,7 +112,9 @@
     "depuis": "Kënnt un ab",
     "aDeposer": "An den Dillendapp bréngen",
     "depose": "Um {heure} an den Dillendapp bréngen.",
-    "aideDepuis": "Wann Dir eng Auerzäit uginn, bréngt Dir d'Kand virun der Klass selwer an d'Maison Relais: dee Moie fiert kee Bus bei Iech fort."
+    "aideDepuis": "Wann Dir eng Auerzäit uginn, bréngt Dir d'Kand virun der Klass selwer an d'Maison Relais: dee Moie fiert kee Bus bei Iech fort.",
+    "inscription": "An der Betreiung ugemellt (Dillendapp)",
+    "inscriptionAide": "Ofkräizen, wann d'Kand ni higeet: déi ganz Dillendapp-Mechanik verschwënnt dann aus den Astellungen an aus senger Fiche."
   },
   "bus": {
     "titre": "Bus",

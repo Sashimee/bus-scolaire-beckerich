@@ -357,6 +357,23 @@ avec `dillendappDepuis.lundi` n'a pas de trajet `aller-matin` le lundi et n'a pa
 
 ## Lot 4 — Écrans de configuration : sections Dillendapp et adresses par jour
 
+> **Fait le 2026-08-08.** Les quatre sections sont livrées, avec les trois actions
+> d'état prévues (`definirPeriscolaire`, `definirDillendappDepuis`,
+> `definirAdresseJour`). Écarts et ajouts :
+>
+> - `ChampAdresse` gagne un mode `compact` (pour les dix champs de la grille des
+>   adresses) et **la sortie de secours pour les adresses hors commune**, laissée en
+>   suspens au lot 3 : quand la recherche ne trouve rien, elle propose de désigner
+>   directement l'arrêt utilisé, dans la liste de `src/data/arrets.json`.
+> - `definirAdresseJour` retire le jour de la table quand ses deux sens reviennent au
+>   domicile, plutôt que d'y laisser un `{ matin: null, soir: null }` qui traînerait
+>   ensuite dans le stockage et dans les liens de partage.
+> - `ajouterEnfant` renvoie désormais l'identifiant créé, ce dont le lot 5 a besoin
+>   pour enchaîner sur l'assistant.
+> - Défaut corrigé à la vérification : en mode compact, l'adresse retenue s'affichait
+>   **au-dessus** de son propre libellé, donc sous le champ précédent — un retour du
+>   soir se lisait comme la réponse à « Part le matin de ».
+
 *Dépend des lots 2 et 3.*
 
 Refonte de `GrilleSemaine.tsx`, qui empile aujourd'hui tout dans une seule grille.
@@ -382,6 +399,31 @@ Nouvelles actions dans `src/etat.tsx`, sur le modèle exact des existantes
 ---
 
 ## Lot 5 — Assistant de configuration par enfant (wizard)
+
+> **Fait le 2026-08-08.** Route `/enfant/:id/assistant`, six étapes, proposée
+> automatiquement à la création d'un enfant et par un bouton sur sa fiche. Écarts :
+>
+> - Plutôt qu'un dossier `src/composants/assistant/` de six composants qui auraient
+>   redit ce que `GrilleSemaine` sait déjà faire, ce dernier **exporte ses sections**
+>   (`SectionRepas`, `SectionBus`, `CasePeriscolaire`, `HorairesPeriscolaire`,
+>   `SectionAdresses`). `/configurer` les empile, l'assistant les répartit par écran.
+>   Une seule définition de chaque grille, donc aucune dérive possible entre les deux.
+> - La case `periscolaire` est posée en tête de l'étape « Le midi », qu'elle commande,
+>   et non à l'étape suivante : décochée, la question du repas n'a plus d'objet.
+>   L'étape des horaires disparaît alors, et l'assistant passe de 6 à 5 étapes.
+> - Les actions de fin (imprimer, agenda, partager) sont extraites dans
+>   `ActionsEnfant.tsx`, partagé avec la fiche enfant — `Semaine.tsx` ne porte plus sa
+>   propre copie de la génération ICS.
+> - Défaut corrigé à la vérification : sur l'écran du bus, deux boutons portaient le
+>   libellé « Retour » — l'usage du bus et la navigation. Ambigu au clavier comme au
+>   lecteur d'écran, en français, en allemand et en luxembourgeois.
+>   `onboarding.precedent` devient « Étape précédente ».
+> - Les adresses particulières restent sur `/configurer` : la liste des six étapes du
+>   plan ne leur donne pas d'écran, et elles ne concernent qu'une minorité de familles.
+>
+> Vérifié : les six étapes s'enchaînent sans débordement, la progression suit, et
+> décocher le périscolaire ramène bien l'assistant à cinq étapes. 10 routes × 3
+> largeurs × 2 thèmes = 60 combinaisons, aucun débordement, aucune cible sous 44 px.
 
 *Dépend des lots 2, 3 et 4. Vient **en complément** de `/configurer`, qui reste accessible
 pour les réglages fins.*

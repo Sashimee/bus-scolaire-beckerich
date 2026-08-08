@@ -36,7 +36,19 @@
     "commencer": "Get started",
     "terminer": "Done",
     "suivant": "Continue",
-    "precedent": "Back"
+    "precedent": "Previous step"
+  },
+  "assistant": {
+    "progression": "Step {etape} of {total}",
+    "enfant": "Who is this child?",
+    "adresse": "Where do they leave from in the morning?",
+    "bus": "Do they take the bus?",
+    "midi": "Where do they have lunch?",
+    "periscolaire": "What times are they at the Dillendapp?",
+    "recapitulatif": "Here is their week",
+    "terminer": "See their sheet",
+    "reglageFin": "Set everything on one screen",
+    "reprendre": "Set up step by step"
   },
   "adresse": {
     "label": "Home address",
@@ -46,7 +58,19 @@
     "aucunResultatAide": "Check the spelling. This site only covers addresses within the municipality.",
     "choisie": "Selected address",
     "modifier": "Change address",
-    "confidentialite": "Your address is searched on your device. It is never sent anywhere."
+    "confidentialite": "Your address is searched on your device. It is never sent anywhere.",
+    "revenirDomicile": "Back to home address",
+    "choisirArret": "Name the stop used",
+    "arretLabel": "Stop used",
+    "arretPlaceholder": "Choose a stop",
+    "arretAide": "Address outside the municipality: name the stop where the child gets on or off. Walking time cannot then be estimated."
+  },
+  "adresseJour": {
+    "titre": "Special addresses",
+    "aide": "By default the child leaves from your home and returns to it. Set here the days when that is not the case — at the grandparents', at the childminder's. Morning and evening are set separately.",
+    "domicile": "Home",
+    "matin": "Leaves in the morning from",
+    "soir": "Returns in the evening to"
   },
   "enfant": {
     "prenom": "First name",
@@ -75,7 +99,8 @@
     "dillendapp": "Eats at the Dillendapp",
     "dillendappCourt": "Dillendapp",
     "touteLaSemaine": "Lunch, whole week",
-    "sansCoursApresMidi": "No afternoon classes"
+    "sansCoursApresMidi": "No afternoon classes",
+    "sansPeriscolaire": "This child comes home for lunch every day. Tick the after-school registration below if they sometimes eat at the Dillendapp."
   },
   "dillendapp": {
     "titre": "Time at the Dillendapp",
@@ -87,7 +112,9 @@
     "depuis": "Arrives from",
     "aDeposer": "To drop off at the Dillendapp",
     "depose": "To drop off at the Dillendapp at {heure}.",
-    "aideDepuis": "If you set a time, you drop the child off at the after-school centre yourself before class: no bus leaves from your home that morning."
+    "aideDepuis": "If you set a time, you drop the child off at the after-school centre yourself before class: no bus leaves from your home that morning.",
+    "inscription": "Registered for after-school care (Dillendapp)",
+    "inscriptionAide": "Untick if the child never goes: the whole Dillendapp mechanism then disappears from the settings and from their sheet."
   },
   "bus": {
     "titre": "Bus",

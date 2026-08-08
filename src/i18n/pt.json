@@ -36,7 +36,19 @@
     "commencer": "Começar",
     "terminer": "Concluir",
     "suivant": "Continuar",
-    "precedent": "Voltar"
+    "precedent": "Etapa anterior"
+  },
+  "assistant": {
+    "progression": "Etapa {etape} de {total}",
+    "enfant": "Quem é esta criança?",
+    "adresse": "De onde parte de manhã?",
+    "bus": "Anda de autocarro?",
+    "midi": "Onde almoça?",
+    "periscolaire": "A que horas está no Dillendapp?",
+    "recapitulatif": "Eis a sua semana",
+    "terminer": "Ver a sua ficha",
+    "reglageFin": "Definir tudo num só ecrã",
+    "reprendre": "Configurar passo a passo"
   },
   "adresse": {
     "label": "Morada de residência",
@@ -46,7 +58,19 @@
     "aucunResultatAide": "Verifique a ortografia. Este site abrange apenas as moradas do município.",
     "choisie": "Morada escolhida",
     "modifier": "Alterar a morada",
-    "confidentialite": "A sua morada é pesquisada no seu dispositivo. Não é enviada para lado nenhum."
+    "confidentialite": "A sua morada é pesquisada no seu dispositivo. Não é enviada para lado nenhum.",
+    "revenirDomicile": "Voltar à morada",
+    "choisirArret": "Indicar a paragem utilizada",
+    "arretLabel": "Paragem utilizada",
+    "arretPlaceholder": "Escolher uma paragem",
+    "arretAide": "Endereço fora da comuna: indique a paragem onde a criança entra ou sai. O tempo a pé não poderá ser estimado."
+  },
+  "adresseJour": {
+    "titre": "Endereços especiais",
+    "aide": "Por defeito, a criança parte da sua morada e regressa a ela. Indique aqui os dias em que não é o caso — em casa dos avós, da ama. A manhã e a tarde definem-se separadamente.",
+    "domicile": "Morada",
+    "matin": "Parte de manhã de",
+    "soir": "Regressa à noite a"
   },
   "enfant": {
     "prenom": "Nome próprio",
@@ -75,7 +99,8 @@
     "dillendapp": "Almoça no Dillendapp",
     "dillendappCourt": "Dillendapp",
     "touteLaSemaine": "Almoço, toda a semana",
-    "sansCoursApresMidi": "Sem aulas à tarde"
+    "sansCoursApresMidi": "Sem aulas à tarde",
+    "sansPeriscolaire": "Esta criança vem almoçar a casa todos os dias. Assinale abaixo a inscrição no acolhimento se ela almoçar por vezes no Dillendapp."
   },
   "dillendapp": {
     "titre": "Presença no Dillendapp",
@@ -87,7 +112,9 @@
     "depuis": "Chega a partir das",
     "aDeposer": "A levar ao Dillendapp",
     "depose": "A levar ao Dillendapp às {heure}.",
-    "aideDepuis": "Se indicar uma hora, é você que leva a criança à casa de acolhimento antes das aulas: nenhum autocarro parte de sua casa nessa manhã."
+    "aideDepuis": "Se indicar uma hora, é você que leva a criança à casa de acolhimento antes das aulas: nenhum autocarro parte de sua casa nessa manhã.",
+    "inscription": "Inscrita no acolhimento (Dillendapp)",
+    "inscriptionAide": "Desmarque se a criança nunca lá vai: toda a mecânica do Dillendapp desaparece então das definições e da sua ficha."
   },
   "bus": {
     "titre": "Autocarro",

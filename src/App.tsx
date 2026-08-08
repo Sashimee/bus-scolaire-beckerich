@@ -6,6 +6,7 @@ import { NavigationBasse, NavigationHaute } from './composants/Navigation'
 import { Accueil } from './pages/Accueil'
 import { Configurer } from './pages/Configurer'
 import { Semaine } from './pages/Semaine'
+import { AssistantEnfant } from './pages/AssistantEnfant'
 import { PagePlan } from './pages/Plan'
 import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/" element={<Accueil />} />
           <Route path="/configurer" element={<Configurer />} />
           <Route path="/enfant/:id" element={<Semaine />} />
+          <Route path="/enfant/:id/assistant" element={<AssistantEnfant />} />
           <Route path="/plan" element={<PagePlan />} />
           <Route path="/limites" element={<Limites />} />
           <Route path="/independance" element={<Independance />} />

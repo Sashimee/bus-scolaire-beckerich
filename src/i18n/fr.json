@@ -36,7 +36,19 @@
     "commencer": "Commencer",
     "terminer": "Terminer",
     "suivant": "Continuer",
-    "precedent": "Retour"
+    "precedent": "Étape précédente"
+  },
+  "assistant": {
+    "progression": "Étape {etape} sur {total}",
+    "enfant": "Qui est cet enfant ?",
+    "adresse": "D'où part-il le matin ?",
+    "bus": "Prend-il le bus ?",
+    "midi": "Où déjeune-t-il ?",
+    "periscolaire": "À quelles heures est-il au Dillendapp ?",
+    "recapitulatif": "Voici sa semaine",
+    "terminer": "Voir sa fiche",
+    "reglageFin": "Tout régler d'un seul écran",
+    "reprendre": "Configurer pas à pas"
   },
   "adresse": {
     "label": "Adresse du domicile",
@@ -46,7 +58,19 @@
     "aucunResultatAide": "Vérifiez l'orthographe. Ce site ne couvre que les adresses de la commune.",
     "choisie": "Adresse retenue",
     "modifier": "Modifier l'adresse",
-    "confidentialite": "Votre adresse est recherchée sur votre appareil. Elle n'est envoyée nulle part."
+    "confidentialite": "Votre adresse est recherchée sur votre appareil. Elle n'est envoyée nulle part.",
+    "revenirDomicile": "Revenir au domicile",
+    "choisirArret": "Indiquer l'arrêt utilisé",
+    "arretLabel": "Arrêt utilisé",
+    "arretPlaceholder": "Choisir un arrêt",
+    "arretAide": "Adresse hors commune : indiquez l'arrêt où l'enfant monte ou descend. Le temps de marche ne pourra pas être estimé."
+  },
+  "adresseJour": {
+    "titre": "Adresses particulières",
+    "aide": "Par défaut, l'enfant part de votre domicile et y revient. Indiquez ici les jours où ce n'est pas le cas — chez les grands-parents, chez la nounou. Le matin et le soir se règlent séparément.",
+    "domicile": "Domicile",
+    "matin": "Part le matin de",
+    "soir": "Revient le soir à"
   },
   "enfant": {
     "prenom": "Prénom",
@@ -75,7 +99,8 @@
     "dillendapp": "Mange au Dillendapp",
     "dillendappCourt": "Dillendapp",
     "touteLaSemaine": "Repas, toute la semaine",
-    "sansCoursApresMidi": "Pas de cours l'après-midi"
+    "sansCoursApresMidi": "Pas de cours l'après-midi",
+    "sansPeriscolaire": "Cet enfant rentre manger tous les jours. Cochez l'inscription au périscolaire ci-dessous s'il déjeune parfois au Dillendapp."
   },
   "dillendapp": {
     "titre": "Présence au Dillendapp",
@@ -87,7 +112,9 @@
     "depuis": "Arrive à partir de",
     "aDeposer": "À déposer au Dillendapp",
     "depose": "À déposer au Dillendapp à {heure}.",
-    "aideDepuis": "Si vous indiquez une heure, c'est vous qui déposez l'enfant à la maison relais avant la classe : aucun bus ne part de chez vous ce matin-là."
+    "aideDepuis": "Si vous indiquez une heure, c'est vous qui déposez l'enfant à la maison relais avant la classe : aucun bus ne part de chez vous ce matin-là.",
+    "inscription": "Inscrit au périscolaire (Dillendapp)",
+    "inscriptionAide": "Décochez si l'enfant n'y va jamais : toute la mécanique Dillendapp disparaît alors des réglages et de sa fiche."
   },
   "bus": {
     "titre": "Bus",
