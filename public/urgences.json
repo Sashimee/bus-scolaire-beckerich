@@ -1,20 +1,8 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-08T00:10:16.182Z",
+  "misAJour": "2026-08-08T00:10:20.704Z",
   "perturbations": [
-    {
-      "id": "2026-08-08-a4rif",
-      "du": "2026-08-08",
-      "au": "2026-08-09",
-      "type": "annulation",
-      "message": {
-        "fr": "Test Hallo"
-      },
-      "publieLe": "2026-08-07T22:07:21.969Z",
-      "publiePar": "Alex",
-      "gravite": "alerte"
-    },
     {
       "id": "ci-test-1723075300",
       "du": "2026-08-07",
