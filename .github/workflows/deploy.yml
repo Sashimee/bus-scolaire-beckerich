@@ -29,6 +29,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Une faille connue dans une dépendance ne doit pas partir en production sans que
+      # personne l'ait vue. `high` et non `moderate` : au-dessous, le bruit ferait
+      # ignorer l'étape, ce qui reviendrait à ne pas l'avoir.
+      - name: Vulnérabilités connues des dépendances
+        run: npm audit --audit-level=high
       - run: npm run typecheck
       - run: npm test
 

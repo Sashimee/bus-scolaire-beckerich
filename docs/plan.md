@@ -45,6 +45,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
 | R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
 | R8 | 10 | **Le sélecteur de préférence n'a pas été vu à l'écran.** Il n'apparaît qu'une fois les notifications actives, ce qui exige d'accorder la permission du navigateur. | Activer les notifications sur un appareil réel et vérifier que les trois options s'affichent et se transmettent au Worker. |
+| R9 | 11 | **La CSP n'a pas été vérifiée en production.** Éprouvée sur le build local via `vite preview` — carte, service worker, QR code, sept routes, zéro violation — mais pas sur GitHub Pages, où le chemin de base et l'origine diffèrent. Une violation s'y traduirait par une carte vide, sans message visible. | Ouvrir le site déployé, console ouverte, sur `/enfant/:id` et `/reglages` ; guetter « Refused to… ». |
 | R6 | 3 | **Une arrivée après la sonnerie est affichée sans être signalée.** Pour un C2 déposé au Dillendapp le matin, aucune course n'arrive avant 07:55 : l'application montre 08:00, l'heure publiée, et la page « Limites » énonce le fait — mais la fiche de l'enfant ne le dit pas au moment où le parent la lit. | À trancher : soit c'est acceptable et la page « Limites » suffit, soit il faut une mention sur le trajet lui-même. Décision de conception, pas défaut. |
 
 ### Mise en service, non faite
@@ -855,6 +856,46 @@ sans école) dans `worker/src/rappels.test.js`, sur le modèle de `worker/src/pu
 ---
 
 ## Lot 11 — Sécurité et nettoyage des entrées
+
+> **Fait le 2026-08-08.** `src/lib/nettoyage.ts` livré et branché sur les deux entrées
+> exposées, CSP posée, CORS du Worker corrigé, `npm audit` en intégration continue.
+> 243 tests. Écarts et corrections :
+>
+> - **La CSP est engendrée à la construction**, dans `vite.config.ts`, et non écrite en
+>   dur dans `index.html` : elle doit contenir l'origine du Worker, connue seulement au
+>   build.
+> - **`frame-ancestors` a été volontairement omise.** La spécification l'ignore en
+>   balise `<meta>` — elle n'a d'effet qu'en en-tête HTTP, que GitHub Pages ne permet
+>   pas. L'écrire aurait donné une fausse impression de protection.
+> - **`style-src` autorise `'unsafe-inline'`.** Leaflet et le service worker injectent
+>   des styles ; une politique qui casse la carte protégerait surtout les parents de
+>   leur propre application. Les `style={{ … }}` des composants ayant disparu au lot 2,
+>   c'est la seule concession.
+> - Les caractères indésirables sont filtrés par propriétés Unicode (`\p{Cc}`,
+>   `\p{Cf}`) et non par une liste de points de code : cette liste aurait été écrite
+>   avec les caractères eux-mêmes, donc invisible dans l'éditeur comme dans une revue —
+>   précisément le défaut qu'ils servent à exploiter.
+> - `dateIsoValide` reconstruit la date et vérifie qu'elle se réécrit à l'identique :
+>   l'expression régulière seule laissait passer un 31 février.
+> - **Le CORS du Worker renvoyait l'origine de la requête telle quelle** sur `/abonner`
+>   et `/desabonner` : n'importe quel site pouvait faire désabonner un parent depuis son
+>   navigateur. Il compare désormais à `ORIGINES_AUTORISEES`.
+> - `chargerUrgences()` valide chaque perturbation séparément et **ignore les entrées
+>   invalides sans emporter les autres** : une faute de frappe dans le fichier ne doit
+>   pas priver les parents de toutes les annonces.
+> - `decoderFoyer()` refuse le lien **entier** quand le foyer n'a pas de coordonnée
+>   valable, mais se contente d'ignorer une adresse dérogatoire aberrante : sans
+>   domicile il n'y a aucun trajet à calculer, alors qu'un jour dérogatoire en moins
+>   laisse une configuration utilisable.
+> - Les deux points déjà traités ailleurs sont confirmés faits : le jeton *fine-grained*
+>   est documenté dans `ADMIN.md` (lot 8), et l'`aria-hidden` de `FicheImprimable` a été
+>   retiré (lot 7).
+>
+> **Réserve** : la CSP a été éprouvée sur le build local servi par `vite preview` —
+> carte OpenStreetMap, service worker, QR code et navigation sur sept routes, sans une
+> seule violation. Elle n'a **pas** été vérifiée sur GitHub Pages, où le chemin de base
+> et l'origine diffèrent. Une violation s'y traduirait par une carte vide ou un service
+> worker inerte, pas par un message visible.
 
 *Indépendant, mais à faire **après** le lot 8, dont il durcit les points d'entrée.*
 

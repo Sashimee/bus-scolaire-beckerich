@@ -45,12 +45,33 @@ function accepte(preference, charge) {
 }
 const DUREE_ETAT_S = 600
 
-const cors = (origine) => ({
-  'Access-Control-Allow-Origin': origine,
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400',
-})
+/**
+ * Origines déclarées, une fois pour toutes.
+ */
+const originesPermises = (env) =>
+  (env.ORIGINES_AUTORISEES ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+
+/**
+ * CORS.
+ *
+ * Renvoyait auparavant l'origine de la requête TELLE QUELLE, ce qui revenait à
+ * autoriser tout le monde sur `/abonner` et `/desabonner` : n'importe quel site
+ * pouvait faire désabonner un parent depuis son navigateur. On compare désormais à
+ * `ORIGINES_AUTORISEES`, la même liste que celle qui protège déjà la redirection OAuth.
+ */
+const cors = (origine, env) => {
+  const permises = originesPermises(env)
+  return {
+    'Access-Control-Allow-Origin': permises.includes(origine) ? origine : (permises[0] ?? 'null'),
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  }
+}
 
 /**
  * CORS de l'espace commune : l'origine n'est renvoyée que si elle figure dans
@@ -61,10 +82,7 @@ const cors = (origine) => ({
  * existantes. Les routes ajoutées ici ne doivent pas hériter du défaut.
  */
 const corsCommune = (origine, env) => {
-  const permises = (env.ORIGINES_AUTORISEES ?? '')
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean)
+  const permises = originesPermises(env)
   return {
     'Access-Control-Allow-Origin': permises.includes(origine) ? origine : permises[0] ?? 'null',
     'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
@@ -148,9 +166,36 @@ async function terminerOAuth(requete, env) {
   return Response.redirect(`${retour}#jeton=${encodeURIComponent(donnees.access_token)}`, 302)
 }
 
+/**
+ * Lit un corps JSON en refusant ce qui est trop gros ou mal typé.
+ *
+ * Sans plafond, un `POST` d'un mégaoctet sur `/abonner` consomme le budget processeur
+ * de l'invocation et fait tomber la requête sans trace. Et sans `try`, un corps qui
+ * n'est pas du JSON remonte en exception 500 plutôt qu'en refus explicite.
+ */
+async function corpsJson(requete, maxOctets = 8 * 1024) {
+  if (!(requete.headers.get('Content-Type') ?? '').includes('application/json')) {
+    throw new Error('type-attendu-json')
+  }
+  const texte = await requete.text()
+  if (texte.length > maxOctets) throw new Error('corps-trop-gros')
+  try {
+    return JSON.parse(texte)
+  } catch {
+    throw new Error('json-illisible')
+  }
+}
+
 async function abonner(requete, env, origine) {
-  const abonnement = await requete.json()
-  if (!abonnement?.endpoint) return json({ erreur: 'abonnement-invalide' }, 400, cors(origine))
+  let abonnement
+  try {
+    abonnement = await corpsJson(requete)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400, cors(origine, env))
+  }
+  if (!abonnement?.endpoint || typeof abonnement.endpoint !== 'string') {
+    return json({ erreur: 'abonnement-invalide' }, 400, cors(origine, env))
+  }
 
   const preference = PREFERENCES.includes(abonnement.preference)
     ? abonnement.preference
@@ -160,14 +205,21 @@ async function abonner(requete, env, origine) {
   // rechanger de préférence remplace simplement l'enregistrement.
   const cle = PREFIXE_ABONNEMENT + (await empreinte(abonnement.endpoint))
   await env.ABONNEMENTS.put(cle, JSON.stringify({ ...abonnement, preference }))
-  return json({ ok: true, preference }, 200, cors(origine))
+  return json({ ok: true, preference }, 200, cors(origine, env))
 }
 
 async function desabonner(requete, env, origine) {
-  const { endpoint } = await requete.json()
-  if (!endpoint) return json({ erreur: 'endpoint-manquant' }, 400, cors(origine))
+  let endpoint
+  try {
+    ;({ endpoint } = await corpsJson(requete))
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400, cors(origine, env))
+  }
+  if (!endpoint || typeof endpoint !== 'string') {
+    return json({ erreur: 'endpoint-manquant' }, 400, cors(origine, env))
+  }
   await env.ABONNEMENTS.delete(PREFIXE_ABONNEMENT + (await empreinte(endpoint)))
-  return json({ ok: true }, 200, cors(origine))
+  return json({ ok: true }, 200, cors(origine, env))
 }
 
 async function empreinte(texte) {
@@ -192,7 +244,12 @@ async function notifier(requete, env) {
     return json({ erreur: 'non-autorise' }, 401)
   }
 
-  const charge = await requete.json()
+  let charge
+  try {
+    charge = await corpsJson(requete, 16 * 1024)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400)
+  }
   if (!charge?.corps) return json({ erreur: 'corps-manquant' }, 400)
 
   const tailleLot = Number(env.TAILLE_LOT ?? 10)
@@ -281,8 +338,13 @@ async function notifierLot(requete, env) {
     return json({ erreur: 'non-autorise' }, 401)
   }
 
-  const { charge, noms } = await requete.json()
-  return json(await envoyerLot(charge, noms, env))
+  let corps
+  try {
+    corps = await corpsJson(requete, 64 * 1024)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400)
+  }
+  return json(await envoyerLot(corps.charge, corps.noms, env))
 }
 
 /**
@@ -497,7 +559,7 @@ export default {
     if (requete.method === 'OPTIONS') {
       const entetes = url.pathname.startsWith('/commune/')
         ? corsCommune(origine, env)
-        : cors(origine)
+        : cors(origine, env)
       return new Response(null, { status: 204, headers: entetes })
     }
 

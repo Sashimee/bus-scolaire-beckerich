@@ -15,6 +15,52 @@ const base = process.env.BASE_PATH ?? '/bus-scolaire-beckerich/'
 const version = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
 const dateBuild = new Date().toISOString()
 
+/**
+ * Politique de sécurité du contenu, posée en balise `<meta>`.
+ *
+ * GitHub Pages ne permet pas de définir d'en-tête HTTP : la balise est le seul moyen.
+ * Elle est engendrée ici et non écrite en dur dans `index.html`, parce qu'elle doit
+ * contenir l'origine du Worker, connue seulement à la construction.
+ *
+ * Deux directives manquent volontairement. `frame-ancestors` est **ignorée** en balise
+ * `<meta>` — la spécification l'exige en en-tête —, l'y écrire donnerait une fausse
+ * impression de protection. Et `style-src` autorise `'unsafe-inline'` : Leaflet et le
+ * service worker injectent des styles, et une politique qui casse la carte protégerait
+ * surtout les parents de leur propre application.
+ */
+function politiqueSecurite(urlWorker: string): string {
+  const worker = urlWorker.replace(/\/$/, '')
+  return [
+    "default-src 'self'",
+    "script-src 'self' https://gc.zgo.at",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https://*.tile.openstreetmap.org",
+    `connect-src 'self' https://gc.zgo.at${worker ? ` ${worker}` : ''}`,
+    "font-src 'self'",
+    "manifest-src 'self'",
+    "worker-src 'self'",
+    // Aucune raison d'incorporer quoi que ce soit, ni de laisser réécrire les liens
+    // relatifs, ni de poster un formulaire ailleurs que chez nous.
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ')
+}
+
+/** Insère la politique dans `index.html`, au plus près de l'ouverture du `<head>`. */
+function pluginCsp() {
+  return {
+    name: 'bus-csp',
+    transformIndexHtml(html: string) {
+      const csp = politiqueSecurite(process.env.VITE_URL_WORKER ?? '')
+      return html.replace(
+        '<head>',
+        `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />`,
+      )
+    },
+  }
+}
+
 /** Écrit version.json dans le build pour que l'app installée détecte les nouveaux déploiements. */
 function pluginVersion() {
   return {
@@ -36,6 +82,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    pluginCsp(),
     pluginVersion(),
     VitePWA({
       registerType: 'autoUpdate',

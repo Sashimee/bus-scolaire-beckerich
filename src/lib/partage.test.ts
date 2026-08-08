@@ -172,3 +172,65 @@ describe('lien et fragment', () => {
     expect(foyerDepuisUrl('')).toBeNull()
   })
 })
+
+describe('liens trafiqués', () => {
+  const encoder = (compact: unknown) =>
+    btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(compact))))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+
+  it('refuse un foyer dont les coordonnées sortent du pays', () => {
+    // 0,0 est au large de l'Afrique : l'arrêt « le plus proche » serait tiré au hasard.
+    expect(decoderFoyer(encoder([4, 'Test', 'Test', 0, 0, []]))).toBeNull()
+    expect(decoderFoyer(encoder([4, 'Test', 'Test', 48.85, 2.35, []]))).toBeNull()
+  })
+
+  it('refuse un foyer dont une coordonnée vaut NaN', () => {
+    // `JSON.stringify(NaN)` donne `null` : c'est exactement la valeur qui passait.
+    expect(decoderFoyer(encoder([4, 'Test', 'Test', null, 5.9, []]))).toBeNull()
+  })
+
+  it('refuse un lien qui prétend porter des milliers d’enfants', () => {
+    const enfants = Array.from({ length: 200 }, (_, i) => [`E${i}`, 1, 'mmmmm'])
+    expect(decoderFoyer(encoder([4, 'Test', 'Test', 49.74, 5.92, enfants]))).toBeNull()
+  })
+
+  it('tronque un prénom démesuré au lieu de l’importer tel quel', () => {
+    const relu = decoderFoyer(
+      encoder([4, 'Test', 'Test', 49.74, 5.92, [['x'.repeat(5000), 1, 'mmmmm']]]),
+    )!
+    expect(relu.enfants[0].prenom).toHaveLength(40)
+  })
+
+  it('retire les marques bidirectionnelles d’un prénom', () => {
+    const relu = decoderFoyer(
+      encoder([4, 'Test', 'Test', 49.74, 5.92, [['L‮éa', 1, 'mmmmm']]]),
+    )!
+    expect(relu.enfants[0].prenom).toBe('Léa')
+  })
+
+  it('ignore une adresse dérogatoire hors du pays sans perdre le reste', () => {
+    const adresses = [null, [null, ['Ailleurs', 'Loin', 0, 0]], null, null, null]
+    const relu = decoderFoyer(
+      encoder([4, 'Test', 'Test', 49.74, 5.92, [['Léa', 2, 'mmmmm', 'bbbbb', [], 0, [], adresses]]]),
+    )!
+    expect(relu.enfants[0].prenom).toBe('Léa')
+    expect(relu.enfants[0].adresses?.mardi).toBeUndefined()
+  })
+
+  it('remplace une heure de présence invalide par une absence', () => {
+    const relu = decoderFoyer(
+      encoder([
+        4,
+        'Test',
+        'Test',
+        49.74,
+        5.92,
+        [['Léa', 2, 'ddddd', 'bbbbb', ['pas une heure', '25:99', null, null, null]]],
+      ]),
+    )!
+    expect(relu.enfants[0].dillendappJusqua!.lundi).toBeNull()
+    expect(relu.enfants[0].dillendappJusqua!.mardi).toBeNull()
+  })
+})

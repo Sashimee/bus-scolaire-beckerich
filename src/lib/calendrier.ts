@@ -158,7 +158,15 @@ function premiereOccurrence(depuis: string, jours: Jour[]): Date {
 
 /** Échappe les caractères réservés du format iCalendar. */
 function echapper(texte: string): string {
-  return texte.replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n')
+  return (
+    texte
+      .replace(/([,;\\])/g, '\\$1')
+      // `\r` d'abord, seul ou suivi de `\n` : un prénom collé depuis Windows en porte
+      // un, et laissé tel quel il coupe la ligne au milieu d'un champ — le fichier
+      // devient illisible pour l'agenda, sans message d'erreur.
+      .replace(/\r\n?/g, '\\n')
+      .replace(/\n/g, '\\n')
+  )
 }
 
 /** Replie les lignes à 75 octets, comme l'exige la RFC 5545. */

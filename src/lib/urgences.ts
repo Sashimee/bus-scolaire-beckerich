@@ -8,6 +8,7 @@
  * l'urgence ne peut pas corrompre les horaires de référence.
  */
 import { isoDate } from './calendrier'
+import { coordValide, dateIsoValide, entierEntre, texteSur } from './nettoyage'
 import type { Trajet } from './types'
 
 export type TypePerturbation = 'annulation' | 'retard' | 'arret-deplace' | 'message'
@@ -84,6 +85,82 @@ export function correctionsActives(urgences: Urgences, date: Date): CorrectionAr
  * serait pire qu'inutile. Le service worker applique la même stratégie réseau d'abord,
  * avec repli sur la dernière version connue en cas de coupure.
  */
+const TYPES: TypePerturbation[] = ['annulation', 'retard', 'arret-deplace', 'message']
+const GRAVITES: Gravite[] = ['info', 'attention', 'alerte']
+const LANGUES = ['fr', 'de', 'lb', 'pt', 'en']
+const MESSAGE_MAX = 200
+const PERTURBATIONS_MAX = 50
+
+/**
+ * Relit une perturbation publiée, ou renvoie `null` si elle est inexploitable.
+ *
+ * Ce fichier est relu à CHAQUE ouverture de l'application, et il est écrit par le
+ * Worker, par `/admin`, et à la main dans le dépôt en cas de secours. Une entrée
+ * cassée par une faute de frappe ne doit pas emporter les autres avec elle : on
+ * l'ignore, et le reste s'affiche.
+ */
+function relirePerturbation(brut: unknown): Perturbation | null {
+  if (typeof brut !== 'object' || brut === null) return null
+  const p = brut as Record<string, unknown>
+
+  const id = texteSur(p.id, 64)
+  if (!id) return null
+  if (!TYPES.includes(p.type as TypePerturbation)) return null
+  if (!GRAVITES.includes(p.gravite as Gravite)) return null
+  if (!dateIsoValide(p.du) || !dateIsoValide(p.au) || p.au < p.du) return null
+
+  const messageBrut = p.message
+  if (typeof messageBrut !== 'object' || messageBrut === null) return null
+  const message: Record<string, string> = {}
+  for (const langue of LANGUES) {
+    const texte = texteSur((messageBrut as Record<string, unknown>)[langue], MESSAGE_MAX)
+    if (texte) message[langue] = texte
+  }
+  // Le français est la seule langue obligatoire : sans lui, rien à afficher.
+  if (!message.fr) return null
+
+  const minutes = p.minutes
+  if (minutes !== undefined && !entierEntre(minutes, 1, 120)) return null
+
+  const portee = (cle: string) => {
+    const v = texteSur(p[cle], 64)
+    return v ? { [cle]: v } : {}
+  }
+
+  return {
+    id,
+    du: p.du,
+    au: p.au,
+    type: p.type as TypePerturbation,
+    gravite: p.gravite as Gravite,
+    message: message as Perturbation['message'],
+    publieLe: texteSur(p.publieLe, 40),
+    publiePar: texteSur(p.publiePar, 80),
+    ...portee('ligne'),
+    ...portee('service'),
+    ...portee('arret'),
+    ...portee('arretRemplacement'),
+    ...(minutes !== undefined ? { minutes: minutes as number } : {}),
+    ...(entierEntre(p.rappels, 0, 3) ? { rappels: p.rappels as number } : {}),
+  }
+}
+
+/** Relit une correction d'arrêt, en refusant celles qui déplaceraient un arrêt hors du pays. */
+function relireCorrection(brut: unknown): CorrectionArret | null {
+  if (typeof brut !== 'object' || brut === null) return null
+  const c = brut as Record<string, unknown>
+  const arret = texteSur(c.arret, 64)
+  if (!arret || !coordValide(c.coord)) return null
+  return {
+    arret,
+    coord: c.coord,
+    publieLe: texteSur(c.publieLe, 40),
+    publiePar: texteSur(c.publiePar, 80),
+    ...(dateIsoValide(c.jusqua) ? { jusqua: c.jusqua } : {}),
+    ...(texteSur(c.note, 200) ? { note: texteSur(c.note, 200) } : {}),
+  }
+}
+
 export async function chargerUrgences(signal?: AbortSignal): Promise<Urgences | null> {
   try {
     const rep = await fetch(`${import.meta.env.BASE_URL}urgences.json`, {
@@ -91,9 +168,24 @@ export async function chargerUrgences(signal?: AbortSignal): Promise<Urgences | 
       signal,
     })
     if (!rep.ok) return null
-    const donnees = (await rep.json()) as Urgences
+    const donnees = (await rep.json()) as Record<string, unknown>
     if (!Array.isArray(donnees.perturbations)) return null
-    return donnees
+
+    // Chaque entrée est validée séparément : une seule mal formée ne doit pas priver
+    // les parents de toutes les autres.
+    const perturbations = donnees.perturbations
+      .slice(0, PERTURBATIONS_MAX)
+      .map(relirePerturbation)
+      .filter((p): p is Perturbation => p !== null)
+
+    const correctionsArrets = Array.isArray(donnees.correctionsArrets)
+      ? donnees.correctionsArrets
+          .slice(0, PERTURBATIONS_MAX)
+          .map(relireCorrection)
+          .filter((c): c is CorrectionArret => c !== null)
+      : []
+
+    return { ...(donnees as unknown as Urgences), perturbations, correctionsArrets }
   } catch {
     // Hors ligne : ce n'est pas une erreur, l'application reste utilisable.
     return null

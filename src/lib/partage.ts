@@ -8,6 +8,7 @@
  */
 import type { Adresse, AdresseJour, Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
+import { coordValide, heureValide, texteSur } from './nettoyage'
 
 /** 1 : sans l'usage du bus. 2 : avec. 3 : avec la présence au Dillendapp après la
  *  classe. 4 : avec l'inscription périscolaire, la présence avant la classe et les
@@ -15,6 +16,18 @@ import { JOURS } from './types'
 const VERSION = 4
 
 const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
+
+/**
+ * Bornes de ce qu'un lien peut porter.
+ *
+ * C'est l'entrée la plus exposée de l'application : n'importe qui peut faire ouvrir un
+ * lien. Un foyer de dix mille enfants, ou un prénom de cinq mille caractères, ne sont
+ * pas des configurations à importer — ce sont des tentatives de faire ramer l'appareil
+ * de quelqu'un.
+ */
+const ENFANTS_MAX = 10
+const PRENOM_MAX = 40
+const LIBELLE_MAX = 80
 
 const LETTRE_BUS: Record<UsageBus, string> = {
   'aller-retour': 'b',
@@ -68,8 +81,14 @@ function compacterAdresse(a: Adresse | null | undefined): AdresseCompacte | null
 function relireAdresse(c: AdresseCompacte | null | undefined): Adresse | null {
   if (!Array.isArray(c)) return null
   const [libelle, localite, lat, lon] = c
-  if (typeof lat !== 'number' || typeof lon !== 'number') return null
-  return { libelle: String(libelle ?? ''), localite: String(localite ?? ''), coord: [lat, lon] }
+  // `typeof === 'number'` laissait passer `NaN` : le foyer se retrouvait au large de
+  // l'Afrique, et l'arrêt « le plus proche » était tiré au hasard.
+  if (!coordValide([lat, lon])) return null
+  return {
+    libelle: texteSur(libelle, LIBELLE_MAX),
+    localite: texteSur(localite, LIBELLE_MAX),
+    coord: [lat, lon],
+  }
 }
 
 function compacterAdressesJour(
@@ -143,7 +162,11 @@ export function decoderFoyer(code: string): Foyer | null {
     if (!Array.isArray(brut) || brut[0] > VERSION || brut[0] < 1) return null
 
     const [, libelle, localite, lat, lon, enfantsBruts] = brut
-    if (typeof lat !== 'number' || typeof lon !== 'number') return null
+    // Le foyer sans adresse valable est refusé en bloc plutôt qu'importé à moitié :
+    // une configuration sans domicile ne calcule aucun trajet, et le parent croirait
+    // que l'application est en panne.
+    if (!coordValide([lat, lon])) return null
+    if (!Array.isArray(enfantsBruts) || enfantsBruts.length > ENFANTS_MAX) return null
 
     const enfants: Enfant[] = enfantsBruts.map(
       (
@@ -167,17 +190,20 @@ export function decoderFoyer(code: string): Foyer | null {
           JOURS.map((j, k) => [j, BUS_PAR_LETTRE[busBrut?.[k] ?? 'b'] ?? 'aller-retour']),
         ) as Record<Jour, UsageBus>
         // Les liens antérieurs à la version 3 ne portent pas la présence au Dillendapp.
+        // Une « heure » qui n'en est pas se lirait telle quelle dans la fiche et dans
+        // l'agenda : on la remplace par une absence, pas par une valeur inventée.
+        const heureOuRien = (v: unknown) => (heureValide(v) ? v : null)
         const dillendappJusqua = Object.fromEntries(
-          JOURS.map((j, k) => [j, dillendappBrut?.[k] ?? null]),
+          JOURS.map((j, k) => [j, heureOuRien(dillendappBrut?.[k])]),
         ) as Record<Jour, string | null>
         // Ni, avant la version 4, la présence du matin.
         const dillendappDepuis = Object.fromEntries(
-          JOURS.map((j, k) => [j, depuisBrut?.[k] ?? null]),
+          JOURS.map((j, k) => [j, heureOuRien(depuisBrut?.[k])]),
         ) as Record<Jour, string | null>
 
         return {
           id: `partage-${i}`,
-          prenom: String(prenom),
+          prenom: texteSur(prenom, PRENOM_MAX),
           cycle: CYCLES[iCycle] ?? 'c1',
           repas,
           bus,
@@ -192,8 +218,11 @@ export function decoderFoyer(code: string): Foyer | null {
       },
     )
 
+    const libelleFoyer = texteSur(libelle, LIBELLE_MAX)
     return {
-      adresse: libelle ? { libelle, localite, coord: [lat, lon] } : null,
+      adresse: libelleFoyer
+        ? { libelle: libelleFoyer, localite: texteSur(localite, LIBELLE_MAX), coord: [lat, lon] }
+        : null,
       enfants,
     }
   } catch {
