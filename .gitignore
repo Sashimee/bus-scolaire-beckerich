@@ -28,3 +28,6 @@ dist-ssr
 worker/.dev.vars
 .env
 .env.local
+
+# État local de `wrangler dev` : cache et KV de développement, propres à la machine.
+worker/.wrangler

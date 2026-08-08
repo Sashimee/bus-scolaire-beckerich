@@ -9,7 +9,7 @@
  * Il ne stocke aucune donnée personnelle : ni adresse, ni prénom, ni cycle. Seulement
  * des points de terminaison push, qui sont des identifiants d'appareil opaques.
  */
-import { ApplicationServerKeys, generatePushHTTPRequest } from 'webpush-webcrypto'
+import { base64urlEncode, genererRequetePush, importerClesVapid } from './push.js'
 
 const PREFIXE_ABONNEMENT = 'abonnement:'
 const PREFIXE_ETAT = 'oauth:'
@@ -173,8 +173,27 @@ async function notifier(requete, env) {
         },
         body: JSON.stringify({ charge, noms: lot }),
       })
-        .then((r) => r.json())
-        .catch(() => ({ envoyees: 0, purgees: 0, echecs: lot.length })),
+        .then(async (r) => {
+          // Si le lot a échoué avant de pouvoir répondre en JSON, la réponse est une page
+          // d'erreur : on garde son texte plutôt que de le jeter.
+          const texte = await r.text()
+          try {
+            return JSON.parse(texte)
+          } catch {
+            return {
+              envoyees: 0,
+              purgees: 0,
+              echecs: lot.length,
+              details: [{ service: 'lot', statut: r.status, motif: texte.slice(0, 200) }],
+            }
+          }
+        })
+        .catch((e) => ({
+          envoyees: 0,
+          purgees: 0,
+          echecs: lot.length,
+          details: [{ service: 'lot', statut: 0, motif: String(e).slice(0, 200) }],
+        })),
     ),
   )
 
@@ -183,8 +202,9 @@ async function notifier(requete, env) {
       envoyees: a.envoyees + (r.envoyees ?? 0),
       purgees: a.purgees + (r.purgees ?? 0),
       echecs: a.echecs + (r.echecs ?? 0),
+      details: [...a.details, ...(r.details ?? [])],
     }),
-    { envoyees: 0, purgees: 0, echecs: 0 },
+    { envoyees: 0, purgees: 0, echecs: 0, details: [] },
   )
 
   return json({ ...cumul, total: noms.length, lots: lots.length })
@@ -197,22 +217,38 @@ async function notifierLot(requete, env) {
   }
 
   const { charge, noms } = await requete.json()
-  const cles = await ApplicationServerKeys.fromJSON(JSON.parse(env.VAPID_JWK))
+  const cles = await importerClesVapid(env.VAPID_JWK)
 
   let envoyees = 0
   let purgees = 0
   let echecs = 0
+  // Le motif de chaque échec, remonté jusqu'à l'appelant. Sans cela, un envoi raté se
+  // résume à un compteur muet — et c'est précisément ce qui avait rendu la panne
+  // précédente si longue à diagnostiquer.
+  const details = []
 
   for (const nom of noms ?? []) {
     const brut = await env.ABONNEMENTS.get(nom)
     if (!brut) continue
 
+    let abonnement
     try {
-      const { headers, body, endpoint } = await generatePushHTTPRequest({
-        applicationServerKeys: cles,
-        payload: JSON.stringify(charge),
-        target: JSON.parse(brut),
-        adminContact: env.CONTACT_VAPID,
+      abonnement = JSON.parse(brut)
+      if (!abonnement?.endpoint || !abonnement?.keys) throw new Error('champs manquants')
+    } catch (e) {
+      // Un enregistrement illisible ne redeviendra jamais valide : là, purger a du sens.
+      await env.ABONNEMENTS.delete(nom)
+      purgees++
+      console.log(`abonnement illisible, purgé : ${nom} (${e})`)
+      continue
+    }
+
+    try {
+      const { headers, body, endpoint } = await genererRequetePush({
+        cles,
+        abonnement,
+        charge: JSON.stringify(charge),
+        contact: env.CONTACT_VAPID,
         ttl: 3600,
       })
 
@@ -226,16 +262,43 @@ async function notifierLot(requete, env) {
       } else if (reponse.ok) {
         envoyees++
       } else {
+        // Les services de push expliquent leur refus dans le corps : on le garde. Apple
+        // renvoie par exemple {"reason":"BadJwtToken"}.
+        const motif = (await reponse.text().catch(() => '')).slice(0, 200)
         echecs++
+        details.push({ service: new URL(endpoint).host, statut: reponse.status, motif })
+        console.log(`push refusé par ${new URL(endpoint).host} : ${reponse.status} ${motif}`)
       }
-    } catch {
-      // Un abonnement illisible ne doit pas empêcher les autres d'être servis.
-      await env.ABONNEMENTS.delete(nom)
-      purgees++
+    } catch (e) {
+      // Une panne de chiffrement ou de réseau est passagère : surtout ne pas supprimer un
+      // abonné valide à cause d'elle. On la compte en échec et on la journalise.
+      echecs++
+      details.push({ service: 'exception', statut: 0, motif: String(e).slice(0, 200) })
+      console.log(`échec d'envoi pour ${nom} : ${e}`)
     }
   }
 
-  return json({ envoyees, purgees, echecs })
+  return json({ envoyees, purgees, echecs, details })
+}
+
+/**
+ * État des notifications, pour `/sante`.
+ *
+ * On ne se contente pas de constater que le secret existe : on l'importe réellement et on
+ * en dérive la clé publique. C'est ce qui manquait — le secret était bien présent mais
+ * inutilisable, et `/sante` répondait pourtant `push: true`.
+ *
+ * La clé publique renvoyée n'est pas un secret : elle est déjà dans le JavaScript servi à
+ * tous. La publier ici permet de la comparer d'un coup d'œil à la variable `CLE_VAPID`.
+ */
+async function santePush(env) {
+  if (!env.VAPID_JWK) return { push: false, motifPush: 'secret VAPID_JWK absent' }
+  try {
+    const { clePublique } = await importerClesVapid(env.VAPID_JWK)
+    return { push: true, clePubliqueVapid: base64urlEncode(clePublique) }
+  } catch (e) {
+    return { push: false, motifPush: `VAPID_JWK illisible : ${String(e).slice(0, 200)}` }
+  }
 }
 
 export default {
@@ -247,31 +310,36 @@ export default {
       return new Response(null, { status: 204, headers: cors(origine) })
     }
 
+    // `return await` et non `return` : sans l'attente, la promesse s'échappe du `try` et
+    // le `catch` ci-dessous ne voit jamais rien. Cloudflare renvoyait alors sa page
+    // d'erreur HTML 1101 en lieu et place du JSON, ce qui rendait toute panne illisible
+    // depuis GitHub Actions.
     try {
       switch (`${requete.method} ${url.pathname}`) {
         case 'GET /sante':
           return json({
             ok: true,
             oauth: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
-            push: Boolean(env.VAPID_JWK),
+            ...(await santePush(env)),
             origines: env.ORIGINES_AUTORISEES ?? '',
           })
         case 'GET /auth/start':
-          return demarrerOAuth(requete, env)
+          return await demarrerOAuth(requete, env)
         case 'GET /auth/callback':
-          return terminerOAuth(requete, env)
+          return await terminerOAuth(requete, env)
         case 'POST /abonner':
-          return abonner(requete, env, origine)
+          return await abonner(requete, env, origine)
         case 'POST /desabonner':
-          return desabonner(requete, env, origine)
+          return await desabonner(requete, env, origine)
         case 'POST /notifier':
-          return notifier(requete, env)
+          return await notifier(requete, env)
         case 'POST /notifier-lot':
-          return notifierLot(requete, env)
+          return await notifierLot(requete, env)
         default:
           return json({ erreur: 'route-inconnue' }, 404)
       }
     } catch (e) {
+      console.log(`exception sur ${requete.method} ${url.pathname} : ${e?.stack ?? e}`)
       return json({ erreur: 'exception', detail: String(e) }, 500)
     }
   },

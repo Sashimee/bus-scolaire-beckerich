@@ -24,50 +24,77 @@ jobs:
         id: nouvelles
         run: |
           git show HEAD~1:public/urgences.json > /tmp/avant.json 2>/dev/null || echo '{"perturbations":[]}' > /tmp/avant.json
-          node --input-type=module <<'EOF' >> "$GITHUB_OUTPUT"
-          import { readFileSync } from 'node:fs'
+          node --input-type=module <<'EOF'
+          import { readFileSync, writeFileSync, appendFileSync } from 'node:fs'
 
           const lire = (c) => { try { return JSON.parse(readFileSync(c, 'utf8')).perturbations ?? [] } catch { return [] } }
           const avant = new Set(lire('/tmp/avant.json').map((p) => p.id))
           const apres = lire('public/urgences.json')
-          const nouvelles = apres.filter((p) => !avant.has(p.id))
 
           // On ne notifie que les ajouts. Un retrait de perturbation ne justifie pas
           // de réveiller tout le monde une seconde fois.
-          if (!nouvelles.length) {
-            console.log('aucune=true')
-          } else {
-            const p = nouvelles[0]
-            const titres = {
-              annulation: 'Bus annulé',
-              retard: 'Bus en retard',
-              'arret-deplace': 'Arrêt déplacé',
-              message: 'Information bus scolaire',
+          const nouvelles = apres.filter((p) => !avant.has(p.id))
+
+          const titres = {
+            annulation: 'Bus annulé',
+            retard: 'Bus en retard',
+            'arret-deplace': 'Arrêt déplacé',
+            message: 'Information bus scolaire',
+          }
+
+          // Toutes les nouvelles perturbations sont notifiées, pas seulement la première :
+          // publier une annulation et un retard d'un même geste en signalait un seul, et
+          // l'autre disparaissait sans que rien ne l'indique.
+          const charges = []
+          for (const p of nouvelles) {
+            const corps = p.message?.fr
+            if (!corps) {
+              // Sans texte, le Worker refuserait l'envoi : autant le dire ici.
+              console.log(`::warning::Perturbation ${p.id} sans message français, non notifiée.`)
+              continue
             }
-            const charge = {
+            charges.push({
               id: p.id,
               titre: titres[p.type] ?? 'Bus scolaire Beckerich',
-              corps: p.message.fr,
+              corps,
               gravite: p.gravite,
               url: './',
-            }
-            console.log('aucune=false')
-            console.log(`charge=${JSON.stringify(charge)}`)
+            })
           }
+
+          // Les charges transitent par un fichier, jamais par une sortie réinjectée dans
+          // le shell : un simple « l'arrêt » suffisait à casser la commande curl, et un
+          // message rédigé depuis /admin pouvait s'y faire interpréter.
+          writeFileSync('/tmp/charges.json', JSON.stringify(charges))
+          appendFileSync(process.env.GITHUB_OUTPUT, `nombre=${charges.length}\n`)
+          console.log(`${charges.length} perturbation(s) à notifier.`)
           EOF
 
-      - name: Envoyer la notification
-        if: steps.nouvelles.outputs.aucune == 'false'
+      - name: Envoyer les notifications
+        if: steps.nouvelles.outputs.nombre != '0'
+        env:
+          URL_WORKER: ${{ vars.URL_WORKER }}
+          SECRET_NOTIFICATION: ${{ secrets.SECRET_NOTIFICATION }}
         run: |
-          reponse=$(curl -sS -w '\n%{http_code}' -X POST "${{ vars.URL_WORKER }}/notifier" \
-            -H "Authorization: Bearer ${{ secrets.SECRET_NOTIFICATION }}" \
-            -H 'Content-Type: application/json' \
-            -d '${{ steps.nouvelles.outputs.charge }}')
-          corps=$(echo "$reponse" | head -n -1)
-          code=$(echo "$reponse" | tail -n1)
-          echo "Worker a répondu $code : $corps"
+          nombre=$(jq 'length' /tmp/charges.json)
+          echec=0
+          for i in $(seq 0 $((nombre - 1))); do
+            jq -c ".[$i]" /tmp/charges.json > /tmp/charge.json
+            identifiant=$(jq -r '.id' /tmp/charge.json)
+            # `|| reponse=…` : sans cela, une coupure réseau ferait échouer l'étape
+            # entière (les scripts tournent sous `bash -e`) et les perturbations
+            # suivantes ne seraient jamais envoyées. Code 000 = curl n'a pas abouti.
+            reponse=$(curl -sS -w '\n%{http_code}' -X POST "$URL_WORKER/notifier" \
+              -H "Authorization: Bearer $SECRET_NOTIFICATION" \
+              -H 'Content-Type: application/json' \
+              --data-binary @/tmp/charge.json) || reponse="$(printf 'curl a échoué\n000')"
+            corps=$(echo "$reponse" | sed '$d')
+            code=$(echo "$reponse" | tail -n1)
+            echo "[$((i + 1))/$nombre] $identifiant — Worker a répondu $code : $corps"
+            if [ "$code" != "200" ]; then echec=1; fi
+          done
           # Un échec d'envoi ne doit pas faire échouer le déploiement du site :
           # le bandeau dans l'application reste, lui, bien publié.
-          if [ "$code" != "200" ]; then
-            echo "::warning::L'envoi des notifications a échoué (HTTP $code). Le bandeau dans l'application reste actif."
+          if [ "$echec" = "1" ]; then
+            echo "::warning::L'envoi d'au moins une notification a échoué. Le détail figure ci-dessus, dans le champ « details » de la réponse. Le bandeau dans l'application reste actif."
           fi

@@ -133,10 +133,14 @@ plutôt que de servir une partie des familles seulement.
 
 ### « Sans maintenance » serait exagéré
 
-Ce n'est pas un service qu'on installe et qu'on oublie : la dépendance
-`webpush-webcrypto` et `wrangler` se mettent à jour, l'application OAuth GitHub et les
-clés VAPID peuvent devoir être renouvelées, et l'API de Cloudflare évolue. Compte une
-vérification par an, en même temps que la mise à jour du plan de bus.
+Ce n'est pas un service qu'on installe et qu'on oublie : `wrangler` se met à jour,
+l'application OAuth GitHub et les clés VAPID peuvent devoir être renouvelées, et l'API de
+Cloudflare évolue. Compte une vérification par an, en même temps que la mise à jour du
+plan de bus.
+
+Le chiffrement des notifications, lui, n'a plus de dépendance : il est écrit directement
+dans `worker/src/push.js`, aux normes RFC 8291 et RFC 8292, et verrouillé par le vecteur
+de test officiel dans `worker/src/push.test.js`.
 
 > Ces étapes demandent tes identifiants Cloudflare et GitHub : à toi de les faire.
 > Le code est écrit, mais **il n'a pas pu être testé de bout en bout** faute de compte.
@@ -168,12 +172,6 @@ export CLOUDFLARE_API_TOKEN='le-jeton'
 Le jeton reste dans ton terminal : il n'est ni affiché, ni écrit dans le dépôt.
 Ferme la session ou fais `unset CLOUDFLARE_API_TOKEN` quand tu as fini.
 
-**Si les notifications ne partent pas**, la cause la plus probable est une paire de
-clés VAPID désaccordée — la clé publique du site ne correspondant plus à la clé privée
-du Worker. `./reparer-vapid.sh` régénère la paire et la redépose des deux côtés, puis
-relance le déploiement. Les appareils déjà abonnés doivent alors réactiver les
-notifications.
-
 Il enchaîne tout — dépendances, connexion Cloudflare, création de l'espace de
 stockage, génération des clés, dépôt des quatre secrets, déploiement, déclaration des
 variables côté GitHub, puis vérification — en s'arrêtant aux deux seuls moments qui
@@ -186,6 +184,46 @@ Deux précautions y sont prises :
   au secret Cloudflare ;
 - **l'identifiant de compte n'est pas écrit dans le dépôt** : il est lu depuis
   `CLOUDFLARE_ACCOUNT_ID` ou demandé à l'exécution.
+
+### Si les notifications ne partent pas
+
+**Commence par lire ce que le Worker a répondu** — ne régénère surtout pas les clés
+d'emblée. Le workflow « Notifier les perturbations » journalise la réponse complète :
+
+```bash
+gh run list --workflow=notifier.yml --limit 1
+gh run view <identifiant> --log | grep 'Worker a répondu'
+```
+
+La réponse dit exactement ce qui s'est passé :
+
+| Réponse | Interprétation |
+| --- | --- |
+| `envoyees` > 0 | Les notifications sont parties. Si le téléphone ne sonne pas, le problème est côté appareil (autorisation refusée, mode concentration). |
+| `total: 0` | Aucun abonné enregistré. Il faut activer les notifications depuis le site, sur l'appareil. |
+| `echecs` > 0 | Le service de push a refusé l'envoi. **Le champ `details` donne le service, le code HTTP et le motif exact** — c'est lui qu'il faut lire. |
+
+Pour suivre un envoi en direct : `cd worker && npx wrangler tail`, puis publier la
+perturbation.
+
+Ce n'est **que si `details` montre un refus de signature** (`401`, `403`, ou un motif du
+genre `BadJwtToken`, `VapidPkHashMismatch`) que la paire VAPID est en cause : la clé
+publique du site ne correspond alors plus à la clé privée du Worker. `./reparer-vapid.sh`
+régénère la paire et la redépose des deux côtés, puis relance le déploiement. Les
+appareils déjà abonnés doivent ensuite réactiver les notifications — ne le lance donc
+pas sans raison.
+
+Une vérification rapide, avant tout soupçon sur les clés : la clé publique servie par le
+site doit être identique à la variable du dépôt.
+
+```bash
+gh variable list | grep CLE_VAPID
+curl -s https://sashimee.github.io/bus-scolaire-beckerich/ \
+  | grep -oE '/assets/index-[^"]+\.js' | head -1
+# puis chercher la clé (commence par « B », 87 caractères) dans ce fichier
+```
+
+Si les deux concordent, les clés ne sont pas le problème.
 
 > **Le sous-domaine workers.dev sera public.** L'URL du Worker est compilée dans le
 > JavaScript servi à tous les parents : elle apparaît donc en clair dans le code du

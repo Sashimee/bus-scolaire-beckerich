@@ -9,10 +9,12 @@
     "deploy": "wrangler deploy",
     "sante": "wrangler tail"
   },
-  "dependencies": {
-    "webpush-webcrypto": "^1.0.1"
-  },
   "devDependencies": {
-    "wrangler": "^3.90.0"
+    "wrangler": "^4.120.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "workerd@1.20260801.1": true
   }
 }
