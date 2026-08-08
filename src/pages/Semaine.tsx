@@ -51,6 +51,15 @@ export function Semaine() {
   // répété cinq fois, ce qui se lit comme une panne plutôt que comme une bonne nouvelle.
   const aPied = ctx.marcheDirecte
 
+  // Les jours où le parent dépose ou récupère lui-même l'enfant à la maison relais.
+  const presences = semaine
+    .map((j) => ({
+      jour: j.jour,
+      depose: j.depose?.heure ?? null,
+      recuperation: j.recuperation?.heure ?? null,
+    }))
+    .filter((p) => p.depose || p.recuperation)
+
   return (
     <>
       {/* Mise en page distincte, visible uniquement à l'impression. */}
@@ -99,6 +108,36 @@ export function Semaine() {
         </section>
       )}
 
+      {/*
+          Ce que le parent doit faire lui-même, d'un coup d'œil. Ces heures ne se
+          lisaient qu'en parcourant les cinq journées une à une : c'est précisément
+          l'information qu'on oublie, et elle demande d'être quelque part en voiture.
+      */}
+      {!aPied && presences.length > 0 && (
+        <section className="carte pile pile--serre">
+          <h3 className="titre-carte">{t('dillendapp.titre')}</h3>
+          <ul className="liste-nue pile pile--serre">
+            {presences.map(({ jour, depose, recuperation }) => (
+              <li key={jour} className="rangee rangee--espacee">
+                <span className="texte-fort">{t(`jours.${jour}`)}</span>
+                <span className="rangee">
+                  {depose && (
+                    <span className="etiquette">
+                      {t('dillendapp.aDeposer')} · {depose}
+                    </span>
+                  )}
+                  {recuperation && (
+                    <span className="etiquette">
+                      {t('dillendapp.aRecuperer')} · {recuperation}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {!aPied && JOURS.map((jour) => {
         const journee = semaine.find((j) => j.jour === jour)!
         return (
@@ -125,6 +164,15 @@ export function Semaine() {
           </section>
         )
       })}
+
+      {/* Là où le parent lit vraiment les heures. Une ligne discrète, mais elle doit
+          y être : l'application affiche des horaires, elle n'en garantit aucun. */}
+      {!aPied && (
+        <div className="encart encart--attention">
+          <div className="encart__titre">{t('plan.avertissementHoraires')}</div>
+          <p>{t('plan.avertissementHorairesDetail')}</p>
+        </div>
+      )}
 
       <section className="pile pile--serre sans-impression">
         <h3 className="titre-carte">{aPied ? t('impression.titre') : t('calendrier.titre')}</h3>

@@ -14,6 +14,12 @@ interface Props {
   etapes: Etape[]
   indice: number
   onIndice: (i: number) => void
+  /**
+   * Nombre total d'étapes possibles, quand certaines se dérobent selon les réponses.
+   * Sans lui, le total annoncé passe de 6 à 7 dès qu'une case est cochée : le repère
+   * bouge sous les pieds du parent au moment précis où il progresse.
+   */
+  total?: number
   /** Rendu à la dernière étape, à la place du bouton « Continuer ». */
   fin: ReactNode
 }
@@ -26,11 +32,13 @@ interface Props {
  * parent interrompu par un enfant retrouve exactement où il en était. C'est aussi ce
  * qui permet de revenir en arrière librement, sans perdre la suite.
  */
-export function Assistant({ etapes, indice, onIndice, fin }: Props) {
+export function Assistant({ etapes, indice, onIndice, total, fin }: Props) {
   const { t } = useT()
   const titre = useRef<HTMLHeadingElement>(null)
   const etape = etapes[indice]
   const derniere = indice === etapes.length - 1
+  const pas = Math.max(total ?? etapes.length, etapes.length)
+  const progression = t('assistant.progression', { etape: indice + 1, total: pas })
 
   // Au changement d'étape, le lecteur d'écran doit annoncer la nouvelle question, et
   // le clavier repartir du haut : sans cela, le focus reste sur « Continuer », qui a
@@ -44,12 +52,12 @@ export function Assistant({ etapes, indice, onIndice, fin }: Props) {
     <div className="pile pile--large">
       <header className="pile pile--serre">
         <p className="champ__aide" aria-hidden="true">
-          {t('assistant.progression', { etape: indice + 1, total: etapes.length })}
+          {progression}
         </p>
         <ol className="progression" aria-hidden="true">
-          {etapes.map((e, i) => (
+          {Array.from({ length: pas }, (_, i) => (
             <li
-              key={e.cle}
+              key={etapes[i]?.cle ?? `pas-${i}`}
               className={`progression__pas${i <= indice ? ' progression__pas--fait' : ''}`}
             />
           ))}
@@ -58,7 +66,7 @@ export function Assistant({ etapes, indice, onIndice, fin }: Props) {
           {t(`assistant.${etape.cle}`)}
         </h2>
         <p className="visuellement-cache" aria-live="polite">
-          {t('assistant.progression', { etape: indice + 1, total: etapes.length })}
+          {progression}
         </p>
       </header>
 

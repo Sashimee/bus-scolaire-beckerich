@@ -26,8 +26,15 @@ export const BOITE_LUXEMBOURG = {
   lonMax: 6.55,
 }
 
-const HEURE = /^([01]\d|2[0-3]):[0-5]\d$/
-const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/
+/**
+ * Une heure « HH:MM » sur 24 heures, et une date ISO.
+ *
+ * Exportées : la validation du plan officiel s'en sert aussi. Deux copies de la même
+ * expression finiraient par diverger, et l'une des deux laisserait passer ce que
+ * l'autre refuse.
+ */
+export const HEURE = /^([01]\d|2[0-3]):[0-5]\d$/
+export const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/
 
 /**
  * Caractères de contrôle (`Cc`) et de formatage (`Cf`).

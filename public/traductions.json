@@ -1,0 +1,5 @@
+{
+  "$commentaire": "Corrections de traduction, relues par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle. Ce fichier ne complète pas les dictionnaires de src/i18n/ — ceux-ci sont complets — il les recouvre. Une clé doit exister en français, avoir le même type et les mêmes marqueurs {…} que la référence française, sans quoi elle est ignorée à la lecture. Se modifie depuis /traductions ou /admin ; l'éditer à la main ici reste possible.",
+  "misAJour": null,
+  "langues": {}
+}

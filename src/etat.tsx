@@ -15,10 +15,37 @@ import {
   enregistrerFoyer,
   repasParDefaut,
 } from './lib/stockage'
-import { contexteEnfant, type ContexteEnfant } from './lib/plan'
+import { ajusterDillendapp, contexteEnfant, coursApresMidi, type ContexteEnfant } from './lib/plan'
 import { useUrgences } from './urgences-contexte'
-import type { Adresse, Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './lib/types'
+import type {
+  Adresse,
+  Cycle,
+  Enfant,
+  Foyer,
+  Jour,
+  RepasMidi,
+  SensAdresse,
+  UsageBus,
+} from './lib/types'
 import { JOURS } from './lib/types'
+
+/**
+ * Retire une adresse dérogatoire devenue contradictoire.
+ *
+ * Deux réglages ne doivent jamais se contredire dans le stockage : un enfant déposé au
+ * Dillendapp le lundi matin ne part de nulle part ailleurs ce matin-là. L'interface le
+ * cache déjà ; encore faut-il que la donnée disparaisse, sinon elle ressort au prochain
+ * décochage — ou pire, dans un lien de partage.
+ */
+function sansAdresse(e: Enfant, jour: Jour, sens: SensAdresse): Enfant {
+  const duJour = e.adresses?.[jour]
+  if (!duJour?.[sens]) return e
+  const restant = { ...duJour, [sens]: null }
+  const adresses = { ...e.adresses }
+  if (restant.matin || restant.midi || restant.soir) adresses[jour] = restant
+  else delete adresses[jour]
+  return { ...e, adresses }
+}
 
 export type Theme = 'auto' | 'clair' | 'sombre'
 
@@ -35,15 +62,13 @@ interface EtatFoyer {
   definirRepasSemaine: (id: string, repas: RepasMidi) => void
   definirBus: (id: string, jour: Jour, usage: UsageBus) => void
   definirBusSemaine: (id: string, usage: UsageBus) => void
-  definirPeriscolaire: (id: string, inscrit: boolean) => void
+  /** Inscription au repas de midi. Commande la grille des repas. */
+  definirPeriscolaireMidi: (id: string, inscrit: boolean) => void
+  /** Inscription avant la classe ou après l'école. Commande les grilles d'horaires. */
+  definirPeriscolaireHorsMidi: (id: string, inscrit: boolean) => void
   definirDillendappDepuis: (id: string, jour: Jour, heure: string | null) => void
   definirDillendappJusqua: (id: string, jour: Jour, heure: string | null) => void
-  definirAdresseJour: (
-    id: string,
-    jour: Jour,
-    sens: 'matin' | 'soir',
-    adresse: Adresse | null,
-  ) => void
+  definirAdresseJour: (id: string, jour: Jour, sens: SensAdresse, adresse: Adresse | null) => void
   supprimerEnfant: (id: string) => void
   remplacerFoyer: (f: Foyer) => void
   theme: Theme
@@ -121,7 +146,8 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
               cycle,
               repas: repasParDefaut(),
               bus: busParDefaut(),
-              periscolaire: false,
+              periscolaireMidi: false,
+              periscolaireHorsMidi: false,
               dillendappDepuis: dillendappParDefaut(),
               dillendappJusqua: dillendappParDefaut(),
               adresses: {},
@@ -131,18 +157,36 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
         return id
       },
 
-      modifierEnfant: (id, champs) => majEnfant(id, (e) => ({ ...e, ...champs })),
+      /**
+       * Un changement de cycle change le plan de bus de l'enfant, donc les heures de
+       * présence encore possibles au Dillendapp. Les laisser telles quelles décrirait
+       * un dépôt que plus aucune navette ne prolonge.
+       */
+      modifierEnfant: (id, champs) =>
+        majEnfant(id, (e) => {
+          const modifie = { ...e, ...champs }
+          if (!champs.cycle || champs.cycle === e.cycle || !foyer.adresse) return modifie
+          return ajusterDillendapp(modifie, foyer.adresse)
+        }),
 
       definirRepas: (id, jour, repas) =>
-        majEnfant(id, (e) => ({ ...e, repas: { ...e.repas, [jour]: repas } })),
+        majEnfant(id, (e) => {
+          const avecRepas = { ...e, repas: { ...e.repas, [jour]: repas } }
+          // Déjeuner au Dillendapp, c'est déjeuner au Dillendapp : l'adresse de midi
+          // n'a plus de destinataire.
+          return repas === 'dillendapp' ? sansAdresse(avecRepas, jour, 'midi') : avecRepas
+        }),
 
       definirRepasSemaine: (id, repas) =>
-        majEnfant(id, (e) => ({
-          ...e,
-          repas: Object.fromEntries(
-            Object.keys(e.repas).map((j) => [j, repas]),
-          ) as Record<Jour, RepasMidi>,
-        })),
+        majEnfant(id, (e) => {
+          const avecRepas = {
+            ...e,
+            repas: Object.fromEntries(JOURS.map((j) => [j, repas])) as Record<Jour, RepasMidi>,
+          }
+          return repas === 'dillendapp'
+            ? JOURS.reduce<Enfant>((acc, j) => sansAdresse(acc, j, 'midi'), avecRepas)
+            : avecRepas
+        }),
 
       definirBus: (id, jour, usage) =>
         majEnfant(id, (e) => ({
@@ -150,19 +194,64 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
           bus: { ...busParDefaut(), ...e.bus, [jour]: usage },
         })),
 
-      definirPeriscolaire: (id, inscrit) => majEnfant(id, (e) => ({ ...e, periscolaire: inscrit })),
+      /**
+       * Cocher l'inscription du midi bascule toute la semaine sur le Dillendapp : on
+       * ne s'inscrit pas au périscolaire pour n'y déjeuner aucun jour. Une grille déjà
+       * réglée jour par jour n'est en revanche jamais écrasée — décocher puis recocher
+       * ne doit pas détruire le travail du parent.
+       */
+      definirPeriscolaireMidi: (id, inscrit) =>
+        majEnfant(id, (e) => {
+          if (!inscrit) return { ...e, periscolaireMidi: false }
+          if (JOURS.some((j) => e.repas[j] === 'dillendapp')) return { ...e, periscolaireMidi: true }
+          const repas = Object.fromEntries(JOURS.map((j) => [j, 'dillendapp'])) as Record<
+            Jour,
+            RepasMidi
+          >
+          return JOURS.reduce<Enfant>((acc, j) => sansAdresse(acc, j, 'midi'), {
+            ...e,
+            periscolaireMidi: true,
+            repas,
+          })
+        }),
 
+      definirPeriscolaireHorsMidi: (id, inscrit) =>
+        majEnfant(id, (e) => ({ ...e, periscolaireHorsMidi: inscrit })),
+
+      /** Le parent dépose lui-même : il n'y a plus d'adresse de départ ce matin-là. */
       definirDillendappDepuis: (id, jour, heure) =>
-        majEnfant(id, (e) => ({
-          ...e,
-          dillendappDepuis: { ...dillendappParDefaut(), ...e.dillendappDepuis, [jour]: heure },
-        })),
+        majEnfant(id, (e) => {
+          const avecHeure = {
+            ...e,
+            dillendappDepuis: { ...dillendappParDefaut(), ...e.dillendappDepuis, [jour]: heure },
+          }
+          return heure ? sansAdresse(avecHeure, jour, 'matin') : avecHeure
+        }),
 
+      /**
+       * Le parent vient chercher l'enfant sur place : plus d'adresse de retour ce
+       * soir-là. Et les jours sans cours l'après-midi, y rester suppose d'y avoir
+       * déjeuné — la classe s'arrête à 11:45, il n'y a pas d'autre midi possible.
+       */
       definirDillendappJusqua: (id, jour, heure) =>
-        majEnfant(id, (e) => ({
-          ...e,
-          dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua, [jour]: heure },
-        })),
+        majEnfant(id, (e) => {
+          const avecHeure = {
+            ...e,
+            dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua, [jour]: heure },
+          }
+          if (!heure) return avecHeure
+          const sansRetour = sansAdresse(avecHeure, jour, 'soir')
+          if (coursApresMidi(jour)) return sansRetour
+          return sansAdresse(
+            {
+              ...sansRetour,
+              periscolaireMidi: true,
+              repas: { ...sansRetour.repas, [jour]: 'dillendapp' },
+            },
+            jour,
+            'midi',
+          )
+        }),
 
       /**
        * Pose ou retire une adresse dérogatoire. Un jour dont les deux sens reviennent
@@ -174,7 +263,7 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
         majEnfant(id, (e) => {
           const duJour = { ...e.adresses?.[jour], [sens]: adresse }
           const adresses = { ...e.adresses }
-          if (duJour.matin || duJour.soir) adresses[jour] = duJour
+          if (duJour.matin || duJour.midi || duJour.soir) adresses[jour] = duJour
           else delete adresses[jour]
           return { ...e, adresses }
         }),

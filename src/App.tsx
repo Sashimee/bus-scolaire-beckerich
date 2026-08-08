@@ -15,6 +15,8 @@ import { Agenda } from './pages/Agenda'
 import { Reglages } from './pages/Reglages'
 import { Admin } from './pages/Admin'
 import { Commune } from './pages/Commune'
+import { Traductions } from './pages/Traductions'
+import { Credits } from './pages/Credits'
 import { CommuneAlertes } from './pages/CommuneAlertes'
 import { CommuneHoraires } from './pages/CommuneHoraires'
 
@@ -47,10 +49,12 @@ export default function App() {
           <Route path="/plan" element={<PagePlan />} />
           <Route path="/limites" element={<Limites />} />
           <Route path="/independance" element={<Independance />} />
+          <Route path="/credits" element={<Credits />} />
           <Route path="/installer" element={<Installer />} />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/reglages" element={<Reglages />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/traductions" element={<Traductions />} />
           <Route path="/commune" element={<Commune />} />
           <Route path="/commune/alertes" element={<CommuneAlertes />} />
           <Route path="/commune/horaires" element={<CommuneHoraires />} />

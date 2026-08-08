@@ -6,6 +6,7 @@
  */
 import type { Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
+import { deduireInscriptions } from './plan'
 
 const CLE_FOYER = 'bus-beckerich.foyer'
 const CLE_LANGUE = 'bus-beckerich.langue'
@@ -60,19 +61,19 @@ export const chargerFoyer = (): Foyer => {
   return {
     ...f,
     enfants: (f.enfants ?? []).map((e) => {
-      const repas = { ...repasParDefaut(), ...e.repas }
-      return {
+      const complet = {
         ...e,
-        repas,
+        repas: { ...repasParDefaut(), ...e.repas },
         bus: { ...busParDefaut(), ...e.bus },
-        // L'inscription au périscolaire n'existait pas : la déduire des repas déjà
-        // saisis, sans quoi une famille inscrite verrait sa grille de midi disparaître
-        // à la mise à jour.
-        periscolaire: e.periscolaire ?? JOURS.some((j) => repas[j] === 'dillendapp'),
         dillendappDepuis: { ...dillendappParDefaut(), ...e.dillendappDepuis },
         dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua },
         adresses: e.adresses ?? {},
       }
+      // Les deux inscriptions n'ont pas toujours existé : les déduire de ce que le
+      // parent a réellement saisi, sans quoi une famille inscrite verrait sa grille de
+      // midi ou ses horaires disparaître à la mise à jour.
+      const { midi, horsMidi } = deduireInscriptions(complet)
+      return { ...complet, periscolaireMidi: midi, periscolaireHorsMidi: horsMidi }
     }),
   }
 }

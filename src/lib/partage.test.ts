@@ -12,12 +12,16 @@ const enfantComplet: Enfant = {
   cycle: 'c2',
   repas: { ...grille<RepasMidi>('maison'), lundi: 'dillendapp', jeudi: 'dillendapp' },
   bus: { ...grille<UsageBus>('aller-retour'), mercredi: 'aller' },
-  periscolaire: true,
+  periscolaireMidi: true,
+  periscolaireHorsMidi: true,
   dillendappDepuis: { ...grille<string | null>(null), lundi: '07:00' },
   dillendappJusqua: { ...grille<string | null>(null), lundi: '16:30' },
   adresses: {
     mardi: {
       soir: { libelle: 'Chez les grands-parents', localite: 'Hovelange', coord: [49.7228, 5.9049] },
+    },
+    mercredi: {
+      midi: { libelle: 'Chez la tante', localite: 'Elvange', coord: [49.7243, 5.9174] },
     },
     jeudi: {
       matin: { libelle: 'Chez la nounou', localite: 'Schweich', coord: [49.7209, 5.9214] },
@@ -30,7 +34,7 @@ const foyerComplet: Foyer = {
   enfants: [enfantComplet],
 }
 
-describe('encodage du foyer en version 4', () => {
+describe('encodage du foyer en version 5', () => {
   it('retrouve le foyer à l’identique après un aller-retour', () => {
     const relu = decoderFoyer(encoderFoyer(foyerComplet))!
     expect(relu.adresse).toEqual(foyerComplet.adresse)
@@ -41,9 +45,20 @@ describe('encodage du foyer en version 4', () => {
     expect(e.cycle).toBe('c2')
     expect(e.repas).toEqual(enfantComplet.repas)
     expect(e.bus).toEqual(enfantComplet.bus)
-    expect(e.periscolaire).toBe(true)
+    expect(e.periscolaireMidi).toBe(true)
+    expect(e.periscolaireHorsMidi).toBe(true)
     expect(e.dillendappDepuis).toEqual(enfantComplet.dillendappDepuis)
     expect(e.dillendappJusqua).toEqual(enfantComplet.dillendappJusqua)
+  })
+
+  it('distingue les deux inscriptions au lieu de n’en porter qu’une', () => {
+    const horsMidiSeul: Foyer = {
+      ...foyerComplet,
+      enfants: [{ ...enfantComplet, periscolaireMidi: false, periscolaireHorsMidi: true }],
+    }
+    const e = decoderFoyer(encoderFoyer(horsMidiSeul))!.enfants[0]
+    expect(e.periscolaireMidi).toBe(false)
+    expect(e.periscolaireHorsMidi).toBe(true)
   })
 
   it('conserve les adresses dérogatoires, jour par jour et sens par sens', () => {
@@ -53,6 +68,9 @@ describe('encodage du foyer en version 4', () => {
     expect(e.adresses?.mardi?.matin).toBeUndefined()
     expect(e.adresses?.jeudi?.matin?.localite).toBe('Schweich')
     expect(e.adresses?.jeudi?.soir).toBeUndefined()
+    // L'adresse du déjeuner est un sens à part entière, pas un repli sur celle du soir.
+    expect(e.adresses?.mercredi?.midi?.libelle).toBe('Chez la tante')
+    expect(e.adresses?.mercredi?.soir).toBeUndefined()
     // Un jour sans dérogation ne doit rien porter du tout.
     expect(e.adresses?.lundi).toBeUndefined()
   })
@@ -110,13 +128,17 @@ describe('lecture des liens de versions antérieures', () => {
     expect(e.dillendappJusqua).toEqual(grille<string | null>(null))
     expect(e.adresses).toEqual({})
     // L'inscription périscolaire n'existait pas : elle se déduit des repas, sans quoi
-    // la grille de midi du lien disparaîtrait à la lecture.
-    expect(e.periscolaire).toBe(true)
+    // la grille de midi du lien disparaîtrait à la lecture. Faute d'heure saisie, rien
+    // ne dit en revanche que l'enfant est au Dillendapp en dehors du midi.
+    expect(e.periscolaireMidi).toBe(true)
+    expect(e.periscolaireHorsMidi).toBe(false)
   })
 
   it("ne déduit pas d'inscription périscolaire pour un enfant qui rentre manger", () => {
     const v1 = encoderAncien([1, 'Test', 'Test', 49.74, 5.92, [['Tom', 1, 'mmmmm']]])
-    expect(decoderFoyer(v1)!.enfants[0].periscolaire).toBe(false)
+    const e = decoderFoyer(v1)!.enfants[0]
+    expect(e.periscolaireMidi).toBe(false)
+    expect(e.periscolaireHorsMidi).toBe(false)
   })
 
   it('lit un lien de version 3, sans présence du matin ni adresses par jour', () => {
@@ -139,6 +161,33 @@ describe('lecture des liens de versions antérieures', () => {
     expect(e.dillendappJusqua!.lundi).toBe('16:30')
     expect(e.dillendappDepuis).toEqual(grille<string | null>(null))
     expect(e.adresses).toEqual({})
+  })
+
+  it('lit les adresses d’un lien de version 4 comme des paires matin/soir', () => {
+    // La version 4 encodait `[matin, soir]`. Lire son second élément comme un midi
+    // ramènerait l'enfant chez la nounou à l'heure du déjeuner au lieu du soir.
+    const v4 = encoderAncien([
+      4,
+      'Test',
+      'Test',
+      49.74,
+      5.92,
+      [
+        [
+          'Tom',
+          2,
+          'mmmmm',
+          'bbbbb',
+          [null, null, null, null, null],
+          0,
+          [null, null, null, null, null],
+          [null, [null, ['Chez la nounou', 'Schweich', 49.7209, 5.9214]], null, null, null],
+        ],
+      ],
+    ])
+    const e = decoderFoyer(v4)!.enfants[0]
+    expect(e.adresses?.mardi?.soir?.libelle).toBe('Chez la nounou')
+    expect(e.adresses?.mardi?.midi).toBeUndefined()
   })
 
   it('refuse un lien annonçant une version plus récente que celle qu’il sait lire', () => {

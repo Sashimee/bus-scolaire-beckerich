@@ -1,0 +1,21 @@
+{
+  "$commentaire": "Personnes créditées pour leur travail sur l'application. N'y inscrire que des noms dont l'accord est acquis : c'est la seule donnée personnelle que ce projet publie. Un `lien` n'est rendu cliquable que s'il commence par http:// ou https://. Se modifie depuis /admin, onglet Crédits.",
+
+  "developpement": [
+    {
+      "nom": "Alex Baskewitsch",
+      "role": "Conception et développement, à titre privé",
+      "lien": "https://github.com/Sashimee/bus-scolaire-beckerich"
+    }
+  ],
+
+  "traductions": {
+    "fr": [],
+    "de": [],
+    "lb": [],
+    "pt": [],
+    "en": []
+  },
+
+  "remerciements": []
+}

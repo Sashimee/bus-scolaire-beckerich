@@ -47,7 +47,7 @@
     "midi": "Wou ësst et mëttes?",
     "periscolaire": "Zu wéi engen Zäiten ass et am Dillendapp?",
     "recapitulatif": "Dat ass seng Woch",
-    "terminer": "Seng Fiche kucken",
+    "terminer": "Fäerdeg",
     "reglageFin": "Alles op enger Säit astellen",
     "reprendre": "Schrëtt fir Schrëtt astellen",
     "situation": "Wat ass geschitt?",
@@ -70,14 +70,23 @@
     "choisirArret": "Den Arrêt uginn",
     "arretLabel": "Benotzten Arrêt",
     "arretPlaceholder": "En Arrêt wielen",
-    "arretAide": "Adress baussent der Gemeng: gitt den Arrêt un, wou d'Kand op- oder ofklëmmt. D'Zäit ze Fouss kann dann net geschat ginn."
+    "arretAide": "Adress baussent der Gemeng: gitt den Arrêt un, wou d'Kand op- oder ofklëmmt. D'Zäit ze Fouss kann dann net geschat ginn.",
+    "partageeFratrie": "Dat ass d’Adress vum Stot: se hei z’änneren géif se och fir Är aner Kanner änneren.",
+    "modifierPourTous": "Adress vum Stot änneren"
   },
   "adresseJour": {
     "titre": "Besonnesch Adressen",
-    "aide": "Standardméisseg fiert d'Kand vun Ärem Wunnsëtz fort a kënnt do zréck. Gitt hei d'Deeg un, wou dat net de Fall ass — bei de Grousselteren, bei der Nounou. Moies an owes ginn getrennt agestallt.",
+    "aide": "Standardméisseg fiert d’Kand vun Ärem Wunnsëtz fort a kënnt do zréck. Gitt hei d’Deeg un, wou dat net de Fall ass — bei de Grousselteren, bei der Nounou. All Moment vum Dag gëtt getrennt agestallt.",
     "domicile": "Doheem",
     "matin": "Fiert moies fort vun",
-    "soir": "Kënnt owes zréck op"
+    "soir": "Kënnt owes zréck op",
+    "midi": "Ësst mëttes bei",
+    "joursDerogatoires": "{nombre} Dag/Deeg anescht",
+    "auDillendapp": {
+      "matin": "Dee Moie an den Dillendapp bruecht: et fiert vu kenger anerer Adress fort.",
+      "midi": "Ësst deen Dag am Dillendapp.",
+      "soir": "Deen Owend am Dillendapp ofzehuelen: de Bus bréngt et néierens anescht hin."
+    }
   },
   "enfant": {
     "prenom": "Virnumm",
@@ -106,9 +115,9 @@
     "maisonCourt": "Doheem",
     "dillendapp": "Ësst am Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Mëttegiessen, ganz Woch",
+    "touteLaSemaine": "Ganz Woch astellen",
     "sansCoursApresMidi": "Kee Cours nomëttes",
-    "sansPeriscolaire": "Dëst Kand ësst all Dag doheem. Kräizt hei ënnen d'Umeldung an der Betreiung un, wann et heiansdo am Dillendapp ësst."
+    "sansPeriscolaire": "Dëst Kand ësst all Dag doheem. Kräizt « Ësst mëttes am Dillendapp » un, wann et do heiansdo säi Mëttegiessen hëlt."
   },
   "dillendapp": {
     "titre": "Präsenz am Dillendapp",
@@ -116,19 +125,27 @@
     "repartEnBus": "Fiert mam Bus",
     "aRecuperer": "Am Dillendapp ofzehuelen",
     "recuperation": "Um {heure} am Dillendapp ofzehuelen.",
-    "aide": "Wann Dir eng Auerzäit uginn, bleift d'Kand nom Cours an der Maison Relais: den Owesbus setzt et do of, amplaz et heem ze bréngen.",
     "depuis": "Kënnt un ab",
     "aDeposer": "An den Dillendapp bréngen",
     "depose": "Um {heure} an den Dillendapp bréngen.",
-    "aideDepuis": "Wann Dir eng Auerzäit uginn, bréngt Dir d'Kand virun der Klass selwer an d'Maison Relais: dee Moie fiert kee Bus bei Iech fort.",
-    "inscription": "An der Betreiung ugemellt (Dillendapp)",
-    "inscriptionAide": "Ofkräizen, wann d'Kand ni higeet: déi ganz Dillendapp-Mechanik verschwënnt dann aus den Astellungen an aus senger Fiche."
+    "inscriptionMidi": "Ësst mëttes am Dillendapp",
+    "inscriptionMidiAide": "Ukräizen, wann d’Kand do säi Mëttegiessen hëlt, och wann et nëmmen een Dag d’Woch ass.",
+    "inscriptionHorsMidi": "Am Dillendapp virun der Klass oder no der Schoul",
+    "inscriptionHorsMidiAide": "Ukräizen, wann Dir et moies dohinner bréngt, oder wann Dir et owes do sichen kommt. Dat gëtt onofhängeg vum Mëttegiessen agestallt.",
+    "blocMatin": "Moies, virun der Klass",
+    "blocMatinAide": "Dir bréngt d’Kand selwer an d’Maison Relais: déi Moiessen fiert kee Bus bei Iech fort. Duerno bréngt de Bus et an d’Klass.",
+    "blocSoir": "Owes, no der Schoul",
+    "blocSoirAide": "D’Kand bleift nom Cours an der Maison Relais: de Bus setzt et do of, amplaz et heem ze bréngen, an Dir kommt et do sichen.",
+    "deposeCase": "Ech bréngen et deen Dag",
+    "recupereCase": "Ech kommen et deen Dag sichen",
+    "bornes": "Tëscht {min} an {max}, jee no Bus vu sengem Cycle",
+    "midiObligatoire": "Deen Dag ass kee Cours nomëttes: am Dillendapp ze bleiwen heescht, do ze iessen. D’Mëttegiessen gouf deementspriechend agestallt."
   },
   "bus": {
     "titre": "Bus",
     "aide": "Wann Dir Äert Kand un e puer Deeg selwer bréngt oder ofhëlt, gitt et hei un: d'App weist dann nëmmen d'Fahrten, déi et wierklech hëlt.",
     "pourJour": "Busnotzung {jour}",
-    "touteLaSemaine": "Bus, ganz Woch",
+    "touteLaSemaine": "Ganz Woch astellen",
     "aller-retour": "Hin an zréck",
     "aller": "Nëmmen hin",
     "retour": "Nëmmen zréck",
@@ -181,7 +198,8 @@
   },
   "trajetAdresse": {
     "matin": "Offaart vun enger anerer Adress",
-    "soir": "Retour op eng aner Adress"
+    "soir": "Retour op eng aner Adress",
+    "midi": "Mëttegiessen op enger anerer Adress"
   },
   "manquants": {
     "titre": "Net vum Plang ofgedeckt",
@@ -349,7 +367,9 @@
     "circule": "Fiert",
     "reserve": "Linn reservéiert",
     "horairesEcole": "Schoulziichten",
-    "horairesEcoleDetail": "Cours vun {matinDebut} bis {matinFin} vu méindes bis freides, a vun {apresMidiDebut} bis {apresMidiFin} méindes, mëttwochs a freides."
+    "horairesEcoleDetail": "Cours vun {matinDebut} bis {matinFin} vu méindes bis freides, a vun {apresMidiDebut} bis {apresMidiFin} méindes, mëttwochs a freides.",
+    "avertissementHoraires": "Indikativ Zäiten",
+    "avertissementHorairesDetail": "D'Auerzäite si just indikativ a kënne liicht variéieren no de Verkéiersbedéngungen. Mir recommandéieren, 5 Minutte virun der virgesinner Zäit op der Arrêt ze sinn. Bei aussergewéinlechen Ännerungen (schlecht Wieder, Aarbechten asw.) ginn d'Eltere per E-Mail oder iwwer d'Schoul informéiert."
   },
   "validite": {
     "couverte": "Plang gëlteg fir {annees}",
@@ -376,7 +396,9 @@
     "adressesTitre": "Adresse pro Dag funktionéieren nëmmen an der Gemeng",
     "adressesCorps": "Dir kënnt fir e bestëmmten Dag eng aner Ufanks- oder Ukunftsadress wéi Äre Wunnsëtz uginn. D'Adressiche kennt awer nëmmen d'Gemeng Biekerech: fir e Plaz baussent der Gemeng gitt direkt den Arrêt un, deen Dir benotzt, amplaz d'Säit roden ze loossen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
-    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Eenzeg Ausnam: wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparatkennung fir d'Dauer vum Abonnement op engem Server gespäichert, a beim Ausschalten erëm geläscht."
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Eenzeg Ausnam: wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparatkennung fir d'Dauer vum Abonnement op engem Server gespäichert, a beim Ausschalten erëm geläscht.",
+    "notificationsTitre": "Notifikatiounen",
+    "notificationsCorps": "Si mellen eng Annulatioun oder e Retard, mä näischt garantéiert, datt se ukommen: Telefon aus, Net stéieren, Panne beim Push-Déngscht. Eng Web-Applikatioun kann sech och net selwer als prioritär deklaréieren. D'Schoul an d'Gemeng bleiwen den offiziellen Informatiounswee; dës Applikatioun ersetzt se net."
   },
   "independance": {
     "titre": "Onofhängeg Säit",
@@ -494,7 +516,30 @@
       "urgences": "Eng Meldung pro Ausfall oder schwéier Stéierung, ouni Widderhuelung.",
       "urgences-rappels": "Wéi uewen, plus eng Erënnerung moies, wann d'Stéierung undauert. Dat recommandéiert Astellung.",
       "tout": "Och einfach Informatiounen. De Banner an der App weist se beim Opmaachen souwisou."
-    }
+    },
+    "priorite": "Fir se net ze verpassen",
+    "prioriteAide": "Eng Web-Notifikatioun kënnt un wéi all aner: Äert Telefon entscheet, ob se opfält. E puer Astellungen änneren do vill.",
+    "iosEtapes": [
+      "D'Applikatioun muss um Startbildschierm installéiert sinn: soss stellt iOS keng Web-Notifikatioun zou.",
+      "Astellungen → Matdeelungen → Bus scolaire Beckerich.",
+      "Aktivéiert « Dauerhaft Banner » an d'Téin.",
+      "Huelt d'Applikatioun aus der « Resumé » eraus: se bündelt Matdeelungen zu fixen Zäiten, an d'Annulatioun géif nom Bus ukommen.",
+      "Setzt d'Applikatioun an engem Fokus-Modus op d'Ausnahmen."
+    ],
+    "androidEtapes": [
+      "Erlaabt d'Notifikatioune vum Site, wann de Browser dono freet.",
+      "Astellungen → Applikatiounen → Äre Browser → Notifikatiounen: kuckt no, datt de Site erlaabt ass.",
+      "Huelt de Browser aus der Batterie-Optiméierung, soss kënnen Envoie stonnelaang waarden.",
+      "Setzt de Browser bei « Net stéieren » op d'Ausnahmen."
+    ],
+    "ordinateurEtapes": [
+      "Erlaabt d'Notifikatioune vum Site, wann de Browser dono freet.",
+      "Loosst de Browser op: zou kritt en näischt.",
+      "Kuckt no, datt de System net am Fokus- oder Presentatiounsmodus ass."
+    ],
+    "pasUneGarantie": "Dat ass keng Garantie",
+    "pasUneGarantieDetail": "Eng Web-Applikatioun kann sech net selwer als prioritär deklaréieren: den « zäitkritesche » Niveau vun iOS ass native Apps virbehalen. An eng Notifikatioun kann ausbleiwen — Telefon aus, Net stéieren, Panne beim Push-Déngscht.",
+    "ecoleReste": "D'Schoul an d'Gemeng bleiwen den offiziellen Informatiounswee. Dës Applikatioun ersetzt se net an entbënnt keen dovun, d'Eltere ze informéieren."
   },
   "admin": {
     "titre": "Administratioun",
@@ -549,7 +594,12 @@
       "conflit": "Een huet d'Datei an der Tëschenzäit geännert. Luet d'Säit nei a probéiert nach eng Kéier.",
       "lecture-impossible": "D'Stéierungsdatei konnt op GitHub net gelies ginn.",
       "publication-impossible": "D'Publikatioun huet net geklappt."
-    }
+    },
+    "ongletPerturbations": "Stéierungen",
+    "ongletArrets": "Arrêten",
+    "ongletPlan": "Plang",
+    "ongletTraductions": "Texter",
+    "ongletCredits": "Merci"
   },
   "commune": {
     "titre": "Gemengebereich",
@@ -687,5 +737,58 @@
     "moinsQuAvant": "Den neie Plang huet manner Fahrten wéi den aktuellen. Kuckt no, ob en net onvollstänneg ass.",
     "publier": "Neie Plang publizéieren",
     "filet": "No der Publikatioun lafen d'Tester virum Deployment. Wa se feelschloen, bleift d'Säit op der viregter Versioun."
+  },
+  "traductions": {
+    "titre": "Texter korrigéieren",
+    "aide": "All Korrektur iwwerdeckt de kompiléierten Text, ouni en ze ersetzen: si gëllt vum nächsten Opmaachen un, ouni de Site nei ze bauen. De franséischen Text bleift als Referenz ze gesinn.",
+    "langue": "Sprooch fir ze korrigéieren",
+    "langueAide": "Franséisch ass d'Referenz: se ze korrigéieren ännert och de Réckfall vun den anere Sproochen.",
+    "recherche": "No engem Schlëssel oder Text sichen",
+    "recherchePlaceholder": "dillendapp, Arrêt, Agenda…",
+    "compte": "{affichees} vun {total} Texter",
+    "corrigee": "korrigéiert",
+    "etape": "Schrëtt {numero}",
+    "revenir": "Zréck zum Originaltext",
+    "enAttente": "{nombre} Korrektur(en) nach net publizéiert.",
+    "bloquantes": "Virum Publizéieren ze fléissen",
+    "publier": "Korrekture publizéieren",
+    "publiee": "Korrekture publizéiert. Si erschéngen beim nächsten Opmaache vun der Applikatioun.",
+    "refus": {
+      "langue-inconnue": "Dës Sprooch gëtt et an der Applikatioun net.",
+      "cle-inconnue": "Dëse Text gëtt et op Franséisch net: korrigéiere kann een nëmme wat scho do ass.",
+      "type-different": "Den Originaltext huet net dës Form: eng Lëscht ersetzt kee Saz, an ëmgekéiert.",
+      "longueur-liste": "Et brauch genee esou vill Schrëtt wéi am Originaltext.",
+      "trop-long": "Text ze laang: héchstens 400 Zeechen.",
+      "vide": "E eidelen Text géif de Saz um Ecran läschen. Benotzt « Zréck zum Originaltext ».",
+      "marqueurs": "D'Marqueuren tëscht Klameren, wéi {heure}, musse genee déi selwecht si wéi am franséischen Text. Si gi beim Uweise duerch e richtege Wäert ersat."
+    },
+    "connexion": "Iwwersetzungsberäich",
+    "connexionAide": "Gitt de Code an, deen Dir kritt hutt fir d'Texter ze korrigéieren. En dréit nëmmen d'Iwwersetzungen op."
+  },
+  "credits": {
+    "titre": "Merci",
+    "intro": "Dës Applikatioun ass vun engem Elterendeel a senger Fräizäit gemaach, an iwwersat mat der Hëllef vu Leit, déi näischt dru verdéngen. Hei sinn si.",
+    "developpement": "Entwécklung",
+    "developpementAide": "Konzept, Code an Donnéeë vun der Applikatioun.",
+    "traductions": "Iwwersetzungen",
+    "traductionsAide": "Nolauschteren a Korrektur vun den Texter, Sprooch fir Sprooch.",
+    "remerciements": "Merci un",
+    "remerciementsAide": "All déi, deenen hir Réckmeldungen d'Applikatioun virubruecht hunn.",
+    "accord": "Hei stinn nëmmen Nimm, fir déi d'Zoustëmmung gefrot gouf. Wien vun dëser Säit erof wëll, schreift einfach.",
+    "nom": "Numm",
+    "role": "Roll",
+    "motif": "Firwat",
+    "lien": "Link (fakultativ)",
+    "lienIgnore": "Dëse Link gëtt net klickbar: nëmmen Adresse mat http:// oder https:// ginn ugewisen.",
+    "ajouter": "Persoun derbäisetzen",
+    "retirer": "Ewechhuelen",
+    "monter": "Erop",
+    "descendre": "Erof",
+    "aucun": "Nach keen.",
+    "sansNom": "{nombre} Andrag/Anträg ouni Numm: si ginn net publizéiert.",
+    "publier": "Merci publizéieren",
+    "publiee": "Publizéiert. Erschéngt nom Neibau, an enger bis zwou Minutten.",
+    "editeurAide": "Dës Säit gehéiert zum Site: se ze publizéiere léist en Neibau aus, am Géigesaz zu den Textkorrekturen.",
+    "lienDepuisReglages": "Wien huet dës Applikatioun gemaach?"
   }
 }

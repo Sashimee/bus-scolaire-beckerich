@@ -42,7 +42,7 @@ function cleEnOctets(base64url: string): Uint8Array<ArrayBuffer> {
  * à rattraper. Le parent lit d'abord à quoi il s'engage, puis clique.
  */
 export function Notifications() {
-  const { t } = useT()
+  const { t, tListe } = useT()
   const [etat, setEtat] = useState<Etat>('proposable')
   const [occupe, setOccupe] = useState(false)
   const [preference, setPreference] = useState<Preference>(preferenceInitiale)
@@ -141,6 +141,9 @@ export function Notifications() {
 
   const estIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const installee = window.matchMedia('(display-mode: standalone)').matches
+  // La marche à suivre n'est pas la même selon le système ; montrer les trois à la
+  // fois, c'est n'en faire lire aucune.
+  const plateforme = estIOS ? 'ios' : /Android/.test(navigator.userAgent) ? 'android' : 'ordinateur'
 
   return (
     <section className="carte pile pile--serre">
@@ -162,6 +165,24 @@ export function Notifications() {
       {etat === 'active' ? (
         <>
           <p>✓ {t('notifications.activees')}</p>
+
+          {/*
+              Accorder la permission ne suffit pas : le système décide seul de la
+              discrétion d'une notification web, et personne ne va chercher ces
+              réglages de lui-même. On les donne donc ici, au moment où l'on vient
+              d'activer — et pour la plateforme qu'on a sous les yeux.
+          */}
+          <details className="repli" open>
+            <summary>{t('notifications.priorite')}</summary>
+            <div className="pile pile--serre">
+              <p className="champ__aide">{t('notifications.prioriteAide')}</p>
+              <ol className="liste-puces">
+                {tListe(`notifications.${plateforme}Etapes`).map((etape) => (
+                  <li key={etape}>{etape}</li>
+                ))}
+              </ol>
+            </div>
+          </details>
 
           <div className="champ">
             <label htmlFor="preference-notifications">{t('notifications.recevoir')}</label>
@@ -196,6 +217,17 @@ export function Notifications() {
           </button>
         )
       )}
+
+      {/*
+          Permanent et non repliable, quel que soit l'état : c'est la seule chose que
+          l'application doive absolument dire sur ses notifications. Les cacher derrière
+          un repli reviendrait à laisser croire à une promesse qu'elle ne tient pas.
+      */}
+      <div className="encart encart--attention">
+        <div className="encart__titre">{t('notifications.pasUneGarantie')}</div>
+        <p>{t('notifications.pasUneGarantieDetail')}</p>
+        <p className="texte-fort">{t('notifications.ecoleReste')}</p>
+      </div>
 
       <p className="champ__aide">{t('notifications.confidentialite')}</p>
     </section>

@@ -19,8 +19,8 @@ import type {
   JourneeEnfant,
   Ligne,
   Periode,
-  RepasMidi,
   Reserve,
+  SensAdresse,
   Service,
   Trajet,
   TypeTrajet,
@@ -35,6 +35,33 @@ export function enMinutes(heure: string | null): number | null {
   if (!heure) return null
   const [h, m] = heure.split(':').map(Number)
   return h * 60 + m
+}
+
+/** L'inverse : 445 → « 07:25 ». Borné à la journée, sans débordement. */
+export function enHeure(minutes: number): string {
+  const borne = Math.max(0, Math.min(24 * 60 - 1, Math.round(minutes)))
+  return `${String(Math.floor(borne / 60)).padStart(2, '0')}:${String(borne % 60).padStart(2, '0')}`
+}
+
+/**
+ * Les deux inscriptions au périscolaire, déduites quand elles ne sont pas enregistrées.
+ *
+ * Une seule case commandait autrefois le repas et la présence. Les configurations
+ * enregistrées avant la séparation, et les liens de partage antérieurs, ne portent que
+ * cette case — voire rien du tout. On retombe alors sur ce que le parent a réellement
+ * saisi, faute de quoi une famille inscrite verrait sa configuration s'évaporer à la
+ * mise à jour.
+ */
+export function deduireInscriptions(enfant: Enfant): { midi: boolean; horsMidi: boolean } {
+  const heuresSaisies = JOURS.some(
+    (j) => enfant.dillendappDepuis?.[j] || enfant.dillendappJusqua?.[j],
+  )
+  const repasAuDillendapp = JOURS.some((j) => enfant.repas[j] === 'dillendapp')
+  return {
+    midi: enfant.periscolaireMidi ?? enfant.periscolaire ?? repasAuDillendapp,
+    horsMidi:
+      enfant.periscolaireHorsMidi ?? ((enfant.periscolaire ?? repasAuDillendapp) && heuresSaisies),
+  }
 }
 
 /**
@@ -52,12 +79,18 @@ export function arretsEquivalents(id: string): string[] {
 /**
  * Une réservation est-elle satisfaite ? Sert aussi bien pour une ligne entière que
  * pour un arrêt particulier d'une course.
+ *
+ * `inscritDillendapp` dit que l'enfant fréquente la maison relais ce jour-là, à quelque
+ * moment que ce soit. Ce n'est pas la même chose que « déjeune au Dillendapp » : depuis
+ * que la présence du matin et celle du soir sont indépendantes du repas, un enfant peut
+ * rentrer manger chez lui et rejoindre la maison relais après la classe. Les dessertes
+ * réservées aux inscrits doivent lui rester ouvertes.
  */
 function reserveSatisfaite(
   r: Reserve | undefined,
   enfant: Enfant,
   villageDomicile: string,
-  repas: RepasMidi,
+  inscritDillendapp: boolean,
 ): boolean {
   if (!r) return true
 
@@ -67,7 +100,7 @@ function reserveSatisfaite(
   if (r.villagesAussiAdmis?.some((v) => v.toLowerCase() === village)) return true
 
   if (r.cycles && !r.cycles.includes(enfant.cycle)) return false
-  if (r.conditionDillendapp && repas !== 'dillendapp') return false
+  if (r.conditionDillendapp && !inscritDillendapp) return false
   return true
 }
 
@@ -117,7 +150,10 @@ interface RechercheOptions {
   directions: Direction[]
   enfant: Enfant
   villageDomicile: string
-  repas: RepasMidi
+  /** L'enfant fréquente-t-il la maison relais ce jour-là, à un moment quelconque ? */
+  inscritDillendapp: boolean
+  /** Ne retenir que les courses qui partent à cette heure ou après. */
+  apres?: string | null
 }
 
 /** Toutes les liaisons possibles pour un déplacement donné, triées par heure de départ. */
@@ -128,11 +164,13 @@ function liaisons(o: RechercheOptions): Liaison[] {
   // propre est satisfaite : le plan liste par exemple Huttange sur l'Aller 2 sans le
   // desservir, et n'ouvre le départ de 07:25 sur l'Aller 1 qu'aux cycles 3.
   const utilisable = (a: ArretDesservi) =>
-    a.desservi !== false && reserveSatisfaite(a.reserve, o.enfant, o.villageDomicile, o.repas)
+    a.desservi !== false &&
+    reserveSatisfaite(a.reserve, o.enfant, o.villageDomicile, o.inscritDillendapp)
 
   for (const ligne of plan.lignes) {
     if (!o.directions.includes(ligne.direction)) continue
-    if (!reserveSatisfaite(ligne.reserve, o.enfant, o.villageDomicile, o.repas)) continue
+    if (!reserveSatisfaite(ligne.reserve, o.enfant, o.villageDomicile, o.inscritDillendapp))
+      continue
 
     for (const service of ligne.services) {
       if (!service.jours.includes(o.jour)) continue
@@ -153,9 +191,21 @@ function liaisons(o: RechercheOptions): Liaison[] {
     }
   }
 
+  // Une course déjà partie quand l'enfant arrive ne lui sert à rien. Les heures non
+  // publiées échappent au filtre : on ne peut rien en dire, et les écarter reviendrait
+  // à affirmer que la course ne convient pas.
+  const seuil = enMinutes(o.apres ?? null)
+  const retenues =
+    seuil === null
+      ? trouvees
+      : trouvees.filter((l) => {
+          const h = enMinutes(l.depart.heure)
+          return h === null || h >= seuil
+        })
+
   // Tri par heure de départ. Les courses sans heure publiée passent en dernier :
   // elles sont utilisables mais moins informatives pour le parent.
-  return trouvees.sort((x, y) => {
+  return retenues.sort((x, y) => {
     const hx = enMinutes(x.depart.heure)
     const hy = enMinutes(y.depart.heure)
     if (hx === null) return 1
@@ -184,9 +234,12 @@ export function arretsProches(coord: Coord): ArretProche[] {
 /** De quel côté du trajet on cherche l'arrêt : celui du départ, ou celui du retour. */
 export type SensArret = 'depart' | 'arrivee'
 
-/** Les arrêts d'un jour, de part et d'autre de la journée de classe. */
+/** Les arrêts d'un jour : au départ, à la coupure de midi, et au retour du soir. */
 export interface ArretsDuJour {
   matin: ArretProche | null
+  /** Où l'enfant déjeune quand il ne rentre pas chez lui. Ne sert que les jours où il
+   *  y a cours l'après-midi : sinon le retour de midi est le retour de la journée. */
+  midi: ArretProche | null
   soir: ArretProche | null
 }
 
@@ -239,7 +292,7 @@ export function arretUtile(coord: Coord, enfant: Enfant, sens: SensArret): Arret
           directions: sens === 'depart' ? ['vers-ecole'] : ['vers-domicile'],
           enfant,
           villageDomicile: p.arret.village,
-          repas: enfant.repas[jour],
+          inscritDillendapp: enfant.repas[jour] === 'dillendapp',
         }).length > 0,
     )
     if (utile) return p
@@ -275,6 +328,9 @@ export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant
       jour,
       {
         matin: arretDuSens(enfant.adresses?.[jour]?.matin, 'depart', domicileMatin),
+        // Le midi retombe sur le DOMICILE, pas sur l'adresse du soir : « revient le
+        // soir chez la nounou » ne dit rien de l'endroit où l'enfant déjeune.
+        midi: arretDuSens(enfant.adresses?.[jour]?.midi, 'arrivee', domicileSoir),
         soir: arretDuSens(enfant.adresses?.[jour]?.soir, 'arrivee', domicileSoir),
       },
     ]),
@@ -308,12 +364,11 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const { enfant, arretEcole } = ctx
   const apresMidi = coursApresMidi(jour)
 
-  // Sans inscription au périscolaire, toute la mécanique Dillendapp disparaît : c'est
-  // le cas de la majorité des familles. Le réglage est absent des configurations
-  // antérieures ; on le déduit alors des repas déjà saisis, faute de quoi une famille
-  // inscrite verrait sa configuration s'évaporer à la mise à jour.
-  const periscolaire = enfant.periscolaire ?? JOURS.some((j) => enfant.repas[j] === 'dillendapp')
-  const repas = periscolaire ? enfant.repas[jour] : 'maison'
+  // Deux inscriptions distinctes : déjeuner au Dillendapp, et y être avant ou après la
+  // classe. Sans elles, toute la mécanique disparaît — c'est le cas de la majorité des
+  // familles. Elles sont absentes des configurations antérieures, d'où la déduction.
+  const { midi: periscolaireMidi, horsMidi: periscolaireHorsMidi } = deduireInscriptions(enfant)
+  const repas = periscolaireMidi ? enfant.repas[jour] : 'maison'
 
   // Une famille peut n'utiliser le bus qu'à moitié : déposer l'enfant en voiture le
   // matin et le laisser rentrer en bus, ou l'inverse. On ne propose alors que les
@@ -325,18 +380,27 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
 
   // Présence à la maison relais AVANT la classe : c'est le parent qui dépose, donc
   // aucun bus depuis le domicile ce matin-là.
-  const debutDillendapp = periscolaire ? (enfant.dillendappDepuis?.[jour] ?? null) : null
+  const debutDillendapp = periscolaireHorsMidi ? (enfant.dillendappDepuis?.[jour] ?? null) : null
 
   // Heure de fin de présence à la maison relais. Elle change la destination du soir :
   // l'enfant retourne bien en classe l'après-midi — l'école est obligatoire — mais le
   // bus du soir le dépose au Dillendapp au lieu de le ramener chez lui.
-  const finDillendapp = repas === 'dillendapp' ? (enfant.dillendappJusqua?.[jour] ?? null) : null
+  //
+  // Les jours SANS cours l'après-midi, y rester suppose d'y avoir déjeuné : la classe
+  // s'arrête à 11:45 et il n'y a pas d'autre midi possible. Les autres jours, l'enfant
+  // peut très bien déjeuner ailleurs puis rejoindre la maison relais après la classe.
+  const finDillendapp =
+    periscolaireHorsMidi && (apresMidi || repas === 'dillendapp')
+      ? (enfant.dillendappJusqua?.[jour] ?? null)
+      : null
 
-  // Les deux bouts de la journée peuvent être des adresses différentes.
+  // Les trois moments de la journée peuvent être des adresses différentes.
   const arretsJour = ctx.arretsParJour[jour]
   const departDuJour = arretsJour.matin ? [arretsJour.matin.arret.id] : []
+  const midiDuJour = arretsJour.midi ? [arretsJour.midi.arret.id] : []
   const arriveeDuJour = arretsJour.soir ? [arretsJour.soir.arret.id] : []
   const derogationMatin = enfant.adresses?.[jour]?.matin ? ('matin' as const) : undefined
+  const derogationMidi = enfant.adresses?.[jour]?.midi ? ('midi' as const) : undefined
   const derogationSoir = enfant.adresses?.[jour]?.soir ? ('soir' as const) : undefined
 
   const ecole = arretsEquivalents(arretEcole.id)
@@ -355,15 +419,21 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     jour,
     enfant,
     villageDomicile: arretsJour.matin?.arret.village ?? ctx.arretDomicile.village,
-    repas,
+    // Une desserte réservée aux inscrits reste ouverte à l'enfant qui n'est au
+    // Dillendapp qu'en dehors du midi : c'est la même inscription.
+    inscritDillendapp:
+      repas === 'dillendapp' || debutDillendapp !== null || finDillendapp !== null,
   }
 
   const ajouter = (
     type: TypeTrajet,
-    o: Omit<RechercheOptions, 'jour' | 'enfant' | 'villageDomicile' | 'repas'> & {
+    o: Omit<
+      RechercheOptions,
+      'jour' | 'enfant' | 'villageDomicile' | 'inscritDillendapp'
+    > & {
       /** Force la visibilité côté parent quand le trajet ne touche pas son arrêt. */
       concerneParent?: boolean
-      derogation?: 'matin' | 'soir'
+      derogation?: SensAdresse
     },
   ) => {
     const trouvees = liaisons({ ...base, ...o })
@@ -403,6 +473,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
         periodes: ['matin'],
         directions: ['vers-ecole'],
         concerneParent: false,
+        // Une course partie avant l'arrivée de l'enfant ne le conduit nulle part :
+        // déposé à 07:45, il prend le passage de 07:52, pas celui de 07:38.
+        apres: debutDillendapp,
       })
     }
   } else if (prendAller) {
@@ -416,25 +489,29 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   }
 
   if (repas === 'maison') {
-    // 2. Retour à la maison pour déjeuner.
+    // 2. Retour pour déjeuner — chez soi, ou chez qui héberge le repas ce jour-là.
+    //    Les jours sans cours l'après-midi, ce retour est celui de la journée : c'est
+    //    alors l'adresse du soir qui vaut, et l'adresse de midi n'est pas proposée.
+    const versLeRepas = apresMidi ? midiDuJour : arriveeDuJour
+    const derogationRepas = apresMidi ? derogationMidi : derogationSoir
     if (prendRetour) {
       ajouter('retour-midi', {
         depuis: ecole,
-        vers: arriveeDuJour,
+        vers: versLeRepas,
         periodes: ['midi'],
         directions: ['vers-domicile'],
-        derogation: derogationSoir,
+        derogation: derogationRepas,
       })
     }
     // 3. Retour en classe, uniquement les jours où il y a cours l'après-midi. On
-    //    repart d'où l'enfant a déjeuné, donc de l'adresse du retour de midi.
+    //    repart d'où l'enfant a déjeuné.
     if (apresMidi && prendAller) {
       ajouter('aller-apres-midi', {
-        depuis: arriveeDuJour,
+        depuis: versLeRepas,
         vers: ecole,
         periodes: ['apres-midi'],
         directions: ['vers-ecole'],
-        derogation: derogationSoir,
+        derogation: derogationRepas,
       })
     }
   } else {
@@ -488,6 +565,12 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     manquants.push('retour-soir')
   }
 
+  // Le plan fait arriver les bus de c1 et c2 quelques minutes après l'heure de classe
+  // affichée (07:58 à Oberpallen, 08:00 à Noerdange, pour une sonnerie à 07:55). Ce
+  // n'est pas un écart à signaler : c'est un transport scolaire, et l'école intègre
+  // ces quelques minutes. Le signaler chaque jour à presque toutes les familles de ces
+  // deux cycles ferait du bruit, pas de l'information.
+
   trajets.sort((a, b) => {
     const ha = enMinutes(a.depart.heure)
     const hb = enMinutes(b.depart.heure)
@@ -509,6 +592,142 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     // le rappelle au lieu de l'alerter.
     ...(finDillendapp ? { recuperation: { lieu: 'dillendapp' as const, heure: finDillendapp } } : {}),
   }
+}
+
+/** Les heures saisissables pour un moment de présence, et celle proposée par défaut. */
+export interface BorneHeure {
+  min: string
+  max: string
+  defaut: string
+}
+
+/** Ce qu'un parent peut déclarer comme présence au Dillendapp, un jour donné. */
+export interface BornesDillendapp {
+  /** Arrivée avant la classe. `null` si aucune présence n'est possible ce matin-là. */
+  depuis: BorneHeure | null
+  /** Départ après la classe. `null` si l'enfant ne peut pas y être ce jour-là. */
+  jusqua: BorneHeure | null
+}
+
+/**
+ * Les bornes d'une présence déclarée au Dillendapp, cycle par cycle et jour par jour.
+ *
+ * Une heure saisie hors de ces bornes décrit une présence qui n'existe pas : la maison
+ * relais est fermée, ou le dernier bus qui conduit l'enfant en classe est déjà parti.
+ * Le plafond du matin se lit donc dans le plan de bus du cycle, pas dans une constante :
+ * un enfant de Noerdange et un enfant de Beckerich n'ont pas la même dernière minute
+ * utile, et le changement de cycle doit tout recalculer.
+ */
+export function bornesDillendapp(ctx: ContexteEnfant, jour: Jour): BornesDillendapp {
+  const { ouverture, fermeture, margeAvantBusMinutes } = maisonRelais.horaires
+  const apresMidi = coursApresMidi(jour)
+
+  const ecole = arretsEquivalents(ctx.arretEcole.id)
+  const dillendapp = arretsEquivalents(maisonRelais.arret)
+  // Maison relais au pied de l'école : aucune navette à attraper, c'est la sonnerie
+  // qui fait la limite.
+  const auPiedDeLEcole = dillendapp.includes(ctx.arretEcole.id)
+
+  const base = {
+    jour,
+    enfant: ctx.enfant,
+    villageDomicile: ctx.arretDomicile.village,
+    inscritDillendapp: true,
+  }
+
+  // Matin : la dernière course qui part encore du Dillendapp vers l'école, moins la
+  // marge de sécurité. Sans navette, le début des cours joue le même rôle.
+  const matinales = auPiedDeLEcole
+    ? []
+    : liaisons({
+        ...base,
+        depuis: dillendapp,
+        vers: ecole,
+        periodes: ['matin'],
+        directions: ['vers-ecole'],
+      })
+  const dernierDepart = matinales.reduce<number | null>((tard, l) => {
+    const h = enMinutes(l.depart.heure)
+    return h !== null && (tard === null || h > tard) ? h : tard
+  }, null)
+
+  const ouvre = enMinutes(ouverture) ?? 0
+  const limiteMatin = (dernierDepart ?? enMinutes(plan.horairesEcole.matin.debut) ?? 0) -
+    margeAvantBusMinutes
+  // Une heure d'arrivée reste une heure d'arrivée : au-delà d'une heure après
+  // l'ouverture, ce n'est plus un accueil du matin.
+  const maxMatin = Math.min(limiteMatin, ouvre + 60)
+
+  // Soir : l'enfant ne peut pas être récupéré avant d'être arrivé. C'est la course
+  // qu'il prend réellement — la première du tri, comme dans `trajetsDuJour`.
+  const versLaMaisonRelais = auPiedDeLEcole
+    ? []
+    : liaisons({
+        ...base,
+        depuis: ecole,
+        vers: dillendapp,
+        periodes: [apresMidi ? 'soir' : 'midi'],
+        directions: ['vers-domicile', 'vers-dillendapp'],
+      })
+  const finDesCours = apresMidi ? plan.horairesEcole.apresMidi.fin : plan.horairesEcole.matin.fin
+  const arriveeSurPlace =
+    enMinutes(versLaMaisonRelais[0]?.arrivee.heure ?? null) ?? enMinutes(finDesCours) ?? 0
+  const ferme = enMinutes(fermeture) ?? 24 * 60 - 1
+
+  return {
+    depuis:
+      maxMatin > ouvre
+        ? { min: ouverture, max: enHeure(maxMatin), defaut: ouverture }
+        : null,
+    jusqua:
+      ferme > arriveeSurPlace
+        ? {
+            min: enHeure(arriveeSurPlace),
+            max: fermeture,
+            // Le parent qui vient chercher son enfant vient le plus souvent aussitôt
+            // possible ; c'est aussi la seule heure dont on sait qu'elle est valable.
+            defaut: enHeure(arriveeSurPlace),
+          }
+        : null,
+  }
+}
+
+/**
+ * Ramène les heures Dillendapp déjà saisies dans les bornes du cycle courant.
+ *
+ * Appelée au changement de cycle : un enfant qui passe de Noerdange à Beckerich n'a plus
+ * la même dernière navette du matin, et une heure devenue impossible doit être corrigée
+ * plutôt que laissée à décrire un dépôt que personne n'assurera.
+ */
+export function ajusterDillendapp(enfant: Enfant, adresse: Adresse): Enfant {
+  const ctx = contexteEnfant(enfant, adresse)
+  if (!ctx) return enfant
+
+  let modifie = false
+  const depuis = { ...enfant.dillendappDepuis } as Record<Jour, string | null>
+  const jusqua = { ...enfant.dillendappJusqua } as Record<Jour, string | null>
+
+  const ecreter = (heure: string | null | undefined, borne: BorneHeure | null): string | null => {
+    if (!heure) return null
+    if (!borne) return null
+    const h = enMinutes(heure)
+    const min = enMinutes(borne.min)
+    const max = enMinutes(borne.max)
+    if (h === null || min === null || max === null) return heure
+    return enHeure(Math.min(Math.max(h, min), max))
+  }
+
+  for (const jour of JOURS) {
+    const bornes = bornesDillendapp(ctx, jour)
+    const d = ecreter(enfant.dillendappDepuis?.[jour], bornes.depuis)
+    const j = ecreter(enfant.dillendappJusqua?.[jour], bornes.jusqua)
+    if (d !== (enfant.dillendappDepuis?.[jour] ?? null)) modifie = true
+    if (j !== (enfant.dillendappJusqua?.[jour] ?? null)) modifie = true
+    depuis[jour] = d
+    jusqua[jour] = j
+  }
+
+  return modifie ? { ...enfant, dillendappDepuis: depuis, dillendappJusqua: jusqua } : enfant
 }
 
 /** La semaine complète d'un enfant. */

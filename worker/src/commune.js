@@ -14,14 +14,33 @@
  *    d'un `curl` pour parler à cette route.
  */
 import { validerPlan } from '../../src/lib/validation.ts'
+// Mêmes règles que le navigateur, importées et non réécrites : une seconde
+// implémentation aurait divergé au premier ajustement.
+import { relireSurcouche } from '../../src/lib/traductions.ts'
 import { ecrireFichier, lireFichier } from './github.js'
 
 const PREFIXE_AGENT = 'agent:'
+const PREFIXE_TRADUCTEUR = 'traducteur:'
 const PREFIXE_JOURNAL = 'journal:'
 const PREFIXE_DEBIT = 'debit:'
 
+/**
+ * Les deux espaces, et le préfixe KV où vivent leurs codes.
+ *
+ * Deux barrières indépendantes séparent un agent communal d'un traducteur, pour que la
+ * séparation ne tienne pas à une seule ligne :
+ *  — le préfixe : un code de traduction n'existe littéralement pas sous `agent:`, donc
+ *    la connexion à l'espace commune ne peut pas le trouver ;
+ *  — le rôle inscrit dans le jeton signé, revérifié à chaque route.
+ */
+const ROLES = {
+  commune: PREFIXE_AGENT,
+  traductions: PREFIXE_TRADUCTEUR,
+}
+
 const CHEMIN_URGENCES = 'public/urgences.json'
 const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
+const CHEMIN_TRADUCTIONS = 'public/traductions.json'
 
 const DUREE_SESSION_S = 8 * 3600
 /** Un code de huit caractères se force en quelques heures sans cette limite. */
@@ -229,14 +248,23 @@ async function corpsJson(requete, maxOctets) {
   }
 }
 
-/** L'agent porteur d'une session valide, ou `null`. */
-export async function agentDeLaRequete(requete, env) {
+/**
+ * L'agent porteur d'une session valide POUR CE RÔLE, ou `null`.
+ *
+ * Le rôle est vérifié ici et non chez l'appelant : un jeton de l'espace commune
+ * présenté à `/traductions/` doit être refusé même si la route oublie de le tester.
+ */
+export async function agentDeLaRequete(requete, env, role) {
   const entete = requete.headers.get('Authorization') ?? ''
   if (!entete.startsWith('Bearer ')) return null
-  return verifierJeton(entete.slice(7), env.SECRET_SESSION)
+  const charge = await verifierJeton(entete.slice(7), env.SECRET_SESSION)
+  if (!charge) return null
+  // Les jetons émis avant l'ouverture de l'espace traduction ne portaient pas de rôle :
+  // ce sont des jetons de commune, et rien d'autre.
+  return (charge.role ?? 'commune') === role ? charge : null
 }
 
-async function connexion(requete, env, entetesCors) {
+async function connexion(requete, env, entetesCors, role) {
   const ip = requete.headers.get('CF-Connecting-IP') ?? 'inconnue'
   if (await debitDepasse(env, ip)) {
     return json(
@@ -251,10 +279,12 @@ async function connexion(requete, env, entetesCors) {
     return json({ erreur: 'code-inconnu' }, 401, entetesCors)
   }
 
-  const cle = PREFIXE_AGENT + (await empreinte(code.trim().toLowerCase()))
+  const prefixe = ROLES[role]
+  const cle = prefixe + (await empreinte(code.trim().toLowerCase()))
   const brut = await env.ABONNEMENTS.get(cle)
   // Le `get` par clé est déjà une comparaison d'empreintes : la comparaison à temps
   // constant ci-dessous couvre le cas où l'enregistrement porterait sa propre copie.
+  // Et comme le préfixe dépend du rôle, un code de l'autre espace n'existe pas ici.
   if (!brut) return json({ erreur: 'code-inconnu' }, 401, entetesCors)
 
   let agent
@@ -263,7 +293,7 @@ async function connexion(requete, env, entetesCors) {
   } catch {
     return json({ erreur: 'code-inconnu' }, 401, entetesCors)
   }
-  if (agent.empreinte && !egalConstant(agent.empreinte, cle.slice(PREFIXE_AGENT.length))) {
+  if (agent.empreinte && !egalConstant(agent.empreinte, cle.slice(prefixe.length))) {
     return json({ erreur: 'code-inconnu' }, 401, entetesCors)
   }
 
@@ -272,10 +302,14 @@ async function connexion(requete, env, entetesCors) {
 
   const expire = Math.floor(Date.now() / 1000) + DUREE_SESSION_S
   const jeton = await signerJeton(
-    { nom: agent.nom, service: agent.service ?? '', expire },
+    { nom: agent.nom, service: agent.service ?? '', role, expire },
     env.SECRET_SESSION,
   )
-  return json({ jeton, nom: agent.nom, service: agent.service ?? '', expire }, 200, entetesCors)
+  return json(
+    { jeton, nom: agent.nom, service: agent.service ?? '', role, expire },
+    200,
+    entetesCors,
+  )
 }
 
 /** Relit les urgences, applique une transformation, republie. */
@@ -390,6 +424,73 @@ async function journal(env, entetesCors) {
 }
 
 /**
+ * Publication des corrections de traduction.
+ *
+ * On revalide entrée par entrée avec la MÊME règle que le navigateur, importée de
+ * `src/lib/traductions.ts` : une seconde implémentation aurait divergé, et il suffit
+ * d'un `curl` pour parler à cette route. Une entrée refusée est écartée, les autres
+ * passent — le fichier publié ne contient donc jamais que du recevable.
+ */
+async function publierTraductions(requete, env, agent, entetesCors) {
+  const charge = await corpsJson(requete, TAILLE_CORPS_MAX)
+  const propre = relireSurcouche(charge?.surcouche)
+
+  const { sha } = await lireFichier(env, CHEMIN_TRADUCTIONS)
+  const langues = Object.keys(propre)
+  const nouveau = {
+    $commentaire:
+      "Corrections de traduction, relues par l'application À CHAQUE OUVERTURE, sans " +
+      'reconstruction du bundle. Publié depuis /traductions ou /admin.',
+    misAJour: new Date().toISOString(),
+    langues: propre,
+  }
+
+  await ecrireFichier(
+    env,
+    CHEMIN_TRADUCTIONS,
+    JSON.stringify(nouveau, null, 2) + '\n',
+    sha,
+    `Traductions (${langues.join(', ') || 'aucune'}) — publié par ${agent.nom}${
+      agent.service ? ` (${agent.service})` : ''
+    }`,
+  )
+  await journaliser(env, agent, 'traductions', langues.join(', '))
+
+  const retenues = langues.reduce((n, l) => n + Object.keys(propre[l]).length, 0)
+  return json({ ok: true, retenues }, 200, entetesCors)
+}
+
+/**
+ * Routeur de l'espace traduction. Même mécanique que la commune — code personnel,
+ * jeton signé, publication au nom de l'agent — mais un préfixe KV et un rôle qui lui
+ * sont propres : un code de l'un n'ouvre rien de l'autre.
+ */
+export async function routerTraductions(requete, env, url, entetesCors) {
+  if (!url.pathname.startsWith('/traductions/')) return null
+
+  if (!env.SECRET_SESSION) {
+    return json({ erreur: 'espace-commune-non-configure' }, 503, entetesCors)
+  }
+
+  const cle = `${requete.method} ${url.pathname}`
+
+  // Même limitation de débit que la commune : sans elle, l'espace le plus récent
+  // deviendrait la porte d'entrée de tous les autres.
+  if (cle === 'POST /traductions/connexion') {
+    return connexion(requete, env, entetesCors, 'traductions')
+  }
+
+  const agent = await agentDeLaRequete(requete, env, 'traductions')
+  if (!agent) return json({ erreur: 'session-expiree' }, 401, entetesCors)
+
+  if (cle === 'POST /traductions/publier') {
+    return publierTraductions(requete, env, agent, entetesCors)
+  }
+
+  return json({ erreur: 'route-inconnue' }, 404, entetesCors)
+}
+
+/**
  * Routeur de l'espace commune. Renvoie `null` si le chemin ne le concerne pas, pour
  * que `index.js` poursuive avec ses propres routes.
  */
@@ -402,10 +503,10 @@ export async function routerCommune(requete, env, url, entetesCors) {
 
   const cle = `${requete.method} ${url.pathname}`
 
-  if (cle === 'POST /commune/connexion') return connexion(requete, env, entetesCors)
+  if (cle === 'POST /commune/connexion') return connexion(requete, env, entetesCors, 'commune')
 
-  // Tout le reste exige une session valide.
-  const agent = await agentDeLaRequete(requete, env)
+  // Tout le reste exige une session valide DE CET ESPACE.
+  const agent = await agentDeLaRequete(requete, env, 'commune')
   if (!agent) return json({ erreur: 'session-expiree' }, 401, entetesCors)
 
   if (cle === 'GET /commune/journal') return journal(env, entetesCors)

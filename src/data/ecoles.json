@@ -79,6 +79,17 @@
     "localite": "Beckerich",
     "coord": [49.731842, 5.882778],
     "precision": "verifiee",
-    "arret": "beckerich-dillendapp"
+    "arret": "beckerich-dillendapp",
+
+    "horaires": {
+      "$commentaire": "Amplitude d'accueil de la maison relais. Elle borne les heures qu'un parent peut saisir : une arrivée avant l'ouverture ou une récupération après la fermeture décrirait une présence qui n'existe pas. La borne haute du matin est resserrée par le plan de bus, cycle par cycle, à `margeAvantBusMinutes` près.",
+      "ouverture": "07:00",
+      "fermeture": "18:30",
+      "margeAvantBusMinutes": 5,
+      "source": {
+        "dateReleve": "2026-08-08",
+        "note": "Amplitude annoncée par la maison relais. À revérifier à chaque rentrée."
+      }
+    }
   }
 }

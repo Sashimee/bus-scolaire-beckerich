@@ -10,6 +10,7 @@ export function Limites() {
     'marche',
     'arrets',
     'tempsReel',
+    'notifications',
     'plan',
     'incertitudes',
     'dillendapp',
@@ -23,6 +24,13 @@ export function Limites() {
         <h2>{t('limites.titre')}</h2>
         <p>{t('limites.intro')}</p>
       </header>
+
+      {/* En tête des limites, parce que c'est la première : un horaire n'est pas une
+          promesse, et c'est la commune qui le dit. */}
+      <div className="encart encart--attention">
+        <div className="encart__titre">{t('plan.avertissementHoraires')}</div>
+        <p>{t('plan.avertissementHorairesDetail')}</p>
+      </div>
 
       {sections.map((cle) => (
         <section className="carte pile pile--serre" key={cle}>

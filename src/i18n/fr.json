@@ -47,7 +47,7 @@
     "midi": "Où déjeune-t-il ?",
     "periscolaire": "À quelles heures est-il au Dillendapp ?",
     "recapitulatif": "Voici sa semaine",
-    "terminer": "Voir sa fiche",
+    "terminer": "Terminé",
     "reglageFin": "Tout régler d'un seul écran",
     "reprendre": "Configurer pas à pas",
     "situation": "Que se passe-t-il ?",
@@ -70,14 +70,23 @@
     "choisirArret": "Indiquer l'arrêt utilisé",
     "arretLabel": "Arrêt utilisé",
     "arretPlaceholder": "Choisir un arrêt",
-    "arretAide": "Adresse hors commune : indiquez l'arrêt où l'enfant monte ou descend. Le temps de marche ne pourra pas être estimé."
+    "arretAide": "Adresse hors commune : indiquez l'arrêt où l'enfant monte ou descend. Le temps de marche ne pourra pas être estimé.",
+    "partageeFratrie": "C'est l'adresse du foyer : la changer ici la changerait aussi pour vos autres enfants.",
+    "modifierPourTous": "Modifier l'adresse du foyer"
   },
   "adresseJour": {
     "titre": "Adresses particulières",
-    "aide": "Par défaut, l'enfant part de votre domicile et y revient. Indiquez ici les jours où ce n'est pas le cas — chez les grands-parents, chez la nounou. Le matin et le soir se règlent séparément.",
+    "aide": "Par défaut, l'enfant part de votre domicile et y revient. Indiquez ici les jours où ce n'est pas le cas — chez les grands-parents, chez la nounou. Chaque moment de la journée se règle séparément.",
     "domicile": "Domicile",
     "matin": "Part le matin de",
-    "soir": "Revient le soir à"
+    "soir": "Revient le soir à",
+    "midi": "Déjeune à",
+    "joursDerogatoires": "{nombre} jour(s) à part",
+    "auDillendapp": {
+      "matin": "Déposé au Dillendapp ce matin-là : il ne part d'aucune autre adresse.",
+      "midi": "Déjeune au Dillendapp ce jour-là.",
+      "soir": "À récupérer au Dillendapp ce soir-là : le bus ne le ramène nulle part ailleurs."
+    }
   },
   "enfant": {
     "prenom": "Prénom",
@@ -106,9 +115,9 @@
     "maisonCourt": "Maison",
     "dillendapp": "Mange au Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Repas, toute la semaine",
+    "touteLaSemaine": "Régler toute la semaine",
     "sansCoursApresMidi": "Pas de cours l'après-midi",
-    "sansPeriscolaire": "Cet enfant rentre manger tous les jours. Cochez l'inscription au périscolaire ci-dessous s'il déjeune parfois au Dillendapp."
+    "sansPeriscolaire": "Cet enfant rentre manger tous les jours. Cochez « Déjeune au Dillendapp » s'il y prend parfois son repas de midi."
   },
   "dillendapp": {
     "titre": "Présence au Dillendapp",
@@ -116,19 +125,27 @@
     "repartEnBus": "Repart en bus",
     "aRecuperer": "À récupérer au Dillendapp",
     "recuperation": "À récupérer au Dillendapp à {heure}.",
-    "aide": "Si vous indiquez une heure, l'enfant reste à la maison relais après la classe : le bus du soir l'y dépose au lieu de le ramener chez vous.",
     "depuis": "Arrive à partir de",
     "aDeposer": "À déposer au Dillendapp",
     "depose": "À déposer au Dillendapp à {heure}.",
-    "aideDepuis": "Si vous indiquez une heure, c'est vous qui déposez l'enfant à la maison relais avant la classe : aucun bus ne part de chez vous ce matin-là.",
-    "inscription": "Inscrit au périscolaire (Dillendapp)",
-    "inscriptionAide": "Décochez si l'enfant n'y va jamais : toute la mécanique Dillendapp disparaît alors des réglages et de sa fiche."
+    "inscriptionMidi": "Déjeune au Dillendapp",
+    "inscriptionMidiAide": "Cochez si l'enfant y prend son repas de midi, ne serait-ce qu'un jour par semaine.",
+    "inscriptionHorsMidi": "Au Dillendapp avant la classe ou après l'école",
+    "inscriptionHorsMidiAide": "Cochez si vous l'y déposez le matin, ou si vous venez l'y chercher en fin de journée. Cela se règle indépendamment du repas de midi.",
+    "blocMatin": "Le matin, avant la classe",
+    "blocMatinAide": "C'est vous qui déposez l'enfant à la maison relais : aucun bus ne part de chez vous ces matins-là. C'est ensuite le bus qui le conduit en classe.",
+    "blocSoir": "Le soir, après l'école",
+    "blocSoirAide": "L'enfant reste à la maison relais après la classe : le bus l'y dépose au lieu de le ramener chez vous, et c'est vous qui venez l'y chercher.",
+    "deposeCase": "Je le dépose ce jour-là",
+    "recupereCase": "Je viens le chercher ce jour-là",
+    "bornes": "Entre {min} et {max}, selon le bus de son cycle",
+    "midiObligatoire": "Ce jour-là, il n'y a pas cours l'après-midi : rester au Dillendapp suppose d'y déjeuner. Le repas de midi a été réglé en conséquence."
   },
   "bus": {
     "titre": "Bus",
     "aide": "Si vous déposez ou récupérez votre enfant vous-même certains jours, indiquez-le : l'application n'affichera que les trajets qu'il emprunte réellement.",
     "pourJour": "Usage du bus le {jour}",
-    "touteLaSemaine": "Bus, toute la semaine",
+    "touteLaSemaine": "Régler toute la semaine",
     "aller-retour": "Aller et retour",
     "aller": "Aller seulement",
     "retour": "Retour seulement",
@@ -181,7 +198,8 @@
   },
   "trajetAdresse": {
     "matin": "Départ d'une autre adresse",
-    "soir": "Retour à une autre adresse"
+    "soir": "Retour à une autre adresse",
+    "midi": "Déjeuner à une autre adresse"
   },
   "manquants": {
     "titre": "Non couvert par le plan",
@@ -349,7 +367,9 @@
     "circule": "Circule",
     "reserve": "Ligne réservée",
     "horairesEcole": "Horaires de l'école",
-    "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi."
+    "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi.",
+    "avertissementHoraires": "Horaires indicatifs",
+    "avertissementHorairesDetail": "Les horaires sont donnés à titre indicatif et peuvent varier légèrement en fonction des conditions de circulation. Nous vous recommandons d'être à l'arrêt 5 minutes avant l'heure prévue. En cas de modification exceptionnelle des horaires (intempéries, travaux, etc.), les parents sont informés par email ou via l'école."
   },
   "validite": {
     "couverte": "Plan valable pour {annees}",
@@ -376,7 +396,9 @@
     "adressesTitre": "Les adresses par jour ne fonctionnent que dans la commune",
     "adressesCorps": "Vous pouvez indiquer, pour un jour donné, une adresse de départ ou d'arrivée différente de votre domicile. La recherche d'adresse ne connaît toutefois que la commune de Beckerich : pour un lieu situé en dehors, indiquez directement l'arrêt utilisé, plutôt que de laisser le site deviner.",
     "donneesTitre": "Vos données restent chez vous",
-    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Les analytics Goat Counter sont activés via le script installé. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez."
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Les analytics Goat Counter sont activés via le script installé. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez.",
+    "notificationsTitre": "Notifications",
+    "notificationsCorps": "Elles préviennent d'une annulation ou d'un retard, mais rien ne garantit qu'elles arrivent : téléphone éteint, mode Ne pas déranger, service de notification en panne. Une application web ne peut pas non plus se déclarer prioritaire d'elle-même. L'école et la commune restent la voie d'information officielle ; cette application ne les remplace pas."
   },
   "independance": {
     "titre": "Site indépendant",
@@ -494,7 +516,30 @@
       "urgences": "Une notification par annulation ou perturbation grave, sans répétition.",
       "urgences-rappels": "Comme ci-dessus, plus un rappel le matin si la perturbation dure. C'est le réglage conseillé.",
       "tout": "Y compris les simples informations. Le bandeau dans l'application les montre déjà à l'ouverture."
-    }
+    },
+    "priorite": "Pour ne pas les rater",
+    "prioriteAide": "Une notification web arrive comme n'importe quelle autre : c'est votre téléphone qui décide de la faire remarquer ou non. Quelques réglages y changent beaucoup.",
+    "iosEtapes": [
+      "L'application doit être installée sur l'écran d'accueil : sans cela, iOS ne délivre aucune notification web.",
+      "Réglages → Notifications → Bus scolaire Beckerich.",
+      "Activez « Bannières persistantes » et les sons.",
+      "Retirez l'application du « Résumé programmé » : il regroupe les notifications à heure fixe, et ferait arriver l'annulation après le bus.",
+      "Dans un mode de concentration, ajoutez l'application aux exceptions."
+    ],
+    "androidEtapes": [
+      "Autorisez les notifications du site quand le navigateur le demande.",
+      "Paramètres → Applications → votre navigateur → Notifications : vérifiez que le site est autorisé.",
+      "Retirez le navigateur de l'optimisation de batterie, sinon les envois peuvent attendre plusieurs heures.",
+      "Dans « Ne pas déranger », ajoutez le navigateur aux exceptions."
+    ],
+    "ordinateurEtapes": [
+      "Autorisez les notifications du site quand le navigateur le demande.",
+      "Laissez le navigateur ouvert : fermé, il ne reçoit rien.",
+      "Vérifiez que le système n'est pas en mode concentration ou présentation."
+    ],
+    "pasUneGarantie": "Ce n'est pas une garantie",
+    "pasUneGarantieDetail": "Une application web ne peut pas se déclarer prioritaire d'elle-même : le niveau « temps réel » d'iOS est réservé aux applications natives. Et une notification peut ne jamais arriver — téléphone éteint, mode Ne pas déranger, service de notification en panne.",
+    "ecoleReste": "L'école et la commune restent la voie d'information officielle. Cette application ne les remplace pas et ne dispense personne de prévenir les parents."
   },
   "admin": {
     "titre": "Administration",
@@ -549,7 +594,12 @@
       "conflit": "Quelqu'un a modifié le fichier entre-temps. Rechargez la page et recommencez.",
       "lecture-impossible": "Impossible de lire le fichier des urgences sur GitHub.",
       "publication-impossible": "La publication a échoué."
-    }
+    },
+    "ongletPerturbations": "Perturbations",
+    "ongletArrets": "Arrêts",
+    "ongletPlan": "Plan",
+    "ongletTraductions": "Textes",
+    "ongletCredits": "Crédits"
   },
   "commune": {
     "titre": "Espace commune",
@@ -687,5 +737,58 @@
     "moinsQuAvant": "Le nouveau plan contient moins de courses que l'actuel. Vérifiez qu'il n'est pas incomplet.",
     "publier": "Publier le nouveau plan",
     "filet": "Après publication, les tests s'exécutent avant le déploiement. S'ils échouent, le site reste sur la version précédente."
+  },
+  "traductions": {
+    "titre": "Corriger les textes",
+    "aide": "Chaque correction recouvre le texte compilé sans le remplacer : elle s'applique dès l'ouverture suivante, sans reconstruction du site. Le texte français reste affiché en référence.",
+    "langue": "Langue à corriger",
+    "langueAide": "Le français sert de référence : le corriger change aussi le repli des autres langues.",
+    "recherche": "Chercher une clé ou un texte",
+    "recherchePlaceholder": "dillendapp, arrêt, agenda…",
+    "compte": "{affichees} textes sur {total}",
+    "corrigee": "corrigée",
+    "etape": "Étape {numero}",
+    "revenir": "Revenir au texte d'origine",
+    "enAttente": "{nombre} correction(s) en attente de publication.",
+    "bloquantes": "À corriger avant de publier",
+    "publier": "Publier les corrections",
+    "publiee": "Corrections publiées. Elles seront visibles à la prochaine ouverture de l'application.",
+    "refus": {
+      "langue-inconnue": "Cette langue n'existe pas dans l'application.",
+      "cle-inconnue": "Ce texte n'existe pas en français : on ne peut corriger que ce qui est déjà là.",
+      "type-different": "Le texte d'origine n'a pas cette forme : une liste ne remplace pas une phrase, ni l'inverse.",
+      "longueur-liste": "Il faut exactement autant d'étapes que dans le texte d'origine.",
+      "trop-long": "Texte trop long : 400 caractères au maximum.",
+      "vide": "Un texte vide effacerait la phrase à l'écran. Utilisez « Revenir au texte d'origine ».",
+      "marqueurs": "Les repères entre accolades, comme {heure}, doivent être exactement les mêmes que dans le texte français. Ils sont remplacés par une vraie valeur à l'affichage."
+    },
+    "connexion": "Espace traduction",
+    "connexionAide": "Entrez le code qui vous a été remis pour corriger les textes de l'application. Il ne donne accès qu'aux traductions."
+  },
+  "credits": {
+    "titre": "Crédits",
+    "intro": "Cette application est faite par un parent, sur son temps libre, et traduite avec l'aide de personnes qui n'y gagnent rien. Les voici.",
+    "developpement": "Développement",
+    "developpementAide": "Conception, code et données de l'application.",
+    "traductions": "Traductions",
+    "traductionsAide": "Relecture et correction des textes, langue par langue.",
+    "remerciements": "Remerciements",
+    "remerciementsAide": "Celles et ceux dont les retours ont fait avancer l'application.",
+    "accord": "Seuls figurent ici des noms dont l'accord a été demandé. Pour être retiré de cette page, il suffit d'écrire.",
+    "nom": "Nom",
+    "role": "Rôle",
+    "motif": "Pour quoi",
+    "lien": "Lien (facultatif)",
+    "lienIgnore": "Ce lien ne sera pas rendu cliquable : seules les adresses commençant par http:// ou https:// le sont.",
+    "ajouter": "Ajouter une personne",
+    "retirer": "Retirer",
+    "monter": "Monter",
+    "descendre": "Descendre",
+    "aucun": "Personne pour l'instant.",
+    "sansNom": "{nombre} entrée(s) sans nom : elles ne seront pas publiées.",
+    "publier": "Publier les crédits",
+    "publiee": "Crédits publiés. Ils apparaîtront après le redéploiement, dans une à deux minutes.",
+    "editeurAide": "Ces crédits font partie du site : leur publication déclenche une reconstruction, contrairement aux corrections de texte.",
+    "lienDepuisReglages": "Qui a fait cette application ?"
   }
 }

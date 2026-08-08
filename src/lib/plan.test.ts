@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { arretEcoleDuCycle, plan, siteDuCycle } from './donnees'
-import { contexteEnfant, coursApresMidi, trajetsDuJour } from './plan'
+import {
+  ajusterDillendapp,
+  bornesDillendapp,
+  contexteEnfant,
+  coursApresMidi,
+  deduireInscriptions,
+  trajetsDuJour,
+} from './plan'
 import { distanceMarche, tempsMarche } from './distance'
-import type { Adresse, Cycle, Enfant, Jour, RepasMidi, TypeTrajet } from './types'
+import type { Adresse, Cycle, Enfant, Jour, RepasMidi, SensAdresse, TypeTrajet } from './types'
 import { JOURS } from './types'
 
 /** Fabrique un enfant dont le repas de midi est le même tous les jours. */
@@ -311,12 +318,24 @@ describe('absence de retour les mardi et jeudi', () => {
   it("n'inquiète pas un enfant qui rentre manger le mardi", () => {
     const ctx = contexteEnfant(enfant('c2', 'maison'), HOVELANGE)
     const mardi = trajetsDuJour(ctx!, 'mardi')
-    expect(mardi.incertitudes).toHaveLength(0)
     expect(mardi.manquants).toHaveLength(0)
   })
 
   it("ne déclare plus aucune incertitude dans le plan", () => {
     expect(plan.incertitudes).toHaveLength(0)
+  })
+})
+
+describe('arrivée quelques minutes après l’heure de classe affichée', () => {
+  it('ne la signale pas : c’est un transport scolaire, la marge est intégrée', () => {
+    // Le plan fait arriver un C2 d'Hovelange à Noerdange à 08:00 alors qu'il annonce
+    // la classe à 07:55 — c'est le cas de presque tous les arrêts en c1 et c2.
+    // L'école tient compte de ces quelques minutes ; en faire une alerte quotidienne
+    // pour deux cycles entiers ne renseignerait personne.
+    const ctx = contexteEnfant(enfant('c2', 'maison'), HOVELANGE)
+    const lundi = trajetsDuJour(ctx!, 'lundi')
+    expect(lundi.trajets.find((t) => t.type === 'aller-matin')!.arrivee.heure).toBe('08:00')
+    expect(lundi.incertitudes).toHaveLength(0)
   })
 })
 
@@ -384,8 +403,8 @@ describe('domicile mitoyen de l’école', () => {
 })
 
 describe('adresses dérogatoires par jour', () => {
-  /** Un enfant qui part ou rentre ailleurs que chez lui, un jour donné. */
-  const avecAdresse = (jour: Jour, sens: 'matin' | 'soir', a: Adresse, cycle: Cycle = 'c2') => {
+  /** Un enfant qui part, déjeune ou rentre ailleurs que chez lui, un jour donné. */
+  const avecAdresse = (jour: Jour, sens: SensAdresse, a: Adresse, cycle: Cycle = 'c2') => {
     const e = enfant(cycle, 'maison')
     e.adresses = { [jour]: { [sens]: a } }
     return contexteEnfant(e, HOVELANGE)
@@ -427,12 +446,38 @@ describe('adresses dérogatoires par jour', () => {
   })
 
   it('repart l’après-midi de là où l’enfant a déjeuné', () => {
-    // L'enfant rentre manger chez ses grands-parents : c'est de chez eux qu'il
-    // reprend le bus, pas de chez lui.
+    // L'enfant déjeune chez ses grands-parents : c'est de chez eux qu'il reprend le
+    // bus, pas de chez lui.
+    const ctx = avecAdresse('lundi', 'midi', SCHWEICH)
+    const lundi = trajetsDuJour(ctx!, 'lundi')
+    const retourMidi = lundi.trajets.find((t) => t.type === 'retour-midi')!
+    const apresMidi = lundi.trajets.find((t) => t.type === 'aller-apres-midi')!
+    expect(retourMidi.arrivee.arret.village).toBe('Schweich')
+    expect(retourMidi.adresseDerogatoire).toBe('midi')
+    expect(apresMidi.depart.arret.village).toBe('Schweich')
+    expect(apresMidi.adresseDerogatoire).toBe('midi')
+  })
+
+  it('ne détourne pas le repas de midi quand seul le retour du soir change', () => {
+    // « Revient le soir chez la nounou » ne dit rien de l'endroit où l'enfant déjeune :
+    // un jour avec cours l'après-midi, il rentre manger chez lui comme d'habitude.
     const ctx = avecAdresse('lundi', 'soir', SCHWEICH)
     const lundi = trajetsDuJour(ctx!, 'lundi')
-    const apresMidi = lundi.trajets.find((t) => t.type === 'aller-apres-midi')!
-    expect(apresMidi.depart.arret.village).toBe('Schweich')
+    expect(lundi.trajets.find((t) => t.type === 'retour-midi')!.arrivee.arret.id).toBe(
+      ctx!.arretDomicile.id,
+    )
+    expect(lundi.trajets.find((t) => t.type === 'retour-soir')!.arrivee.arret.village).toBe(
+      'Schweich',
+    )
+  })
+
+  it('fait du retour de midi le retour de la journée quand il n’y a pas cours l’après-midi', () => {
+    // Le mardi, l'enfant ne repart pas en classe : le retour de midi le ramène là où il
+    // passe sa soirée. L'adresse de midi n'aurait aucun sens ce jour-là.
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    const mardi = trajetsDuJour(ctx!, 'mardi').trajets.find((t) => t.type === 'retour-midi')!
+    expect(mardi.arrivee.arret.village).toBe('Schweich')
+    expect(mardi.adresseDerogatoire).toBe('soir')
   })
 
   it('laisse la fiche annoncer le domicile comme arrêt de référence', () => {
@@ -562,5 +607,141 @@ describe('présence au Dillendapp avant la classe', () => {
     const ctx = contexteEnfant(e, HOVELANGE)
     expect(types(ctx, 'lundi')).toContain('aller-matin')
     expect(trajetsDuJour(ctx!, 'lundi').depose).toBeUndefined()
+  })
+
+  it('ne fait pas monter l’enfant dans une course déjà partie', () => {
+    // Déposé à 07:45, un C2 ne peut plus prendre l'Aller 2 de 07:34 : il lui reste
+    // l'Aller 3 de 07:52. Retenir la première course du plan lui ferait manquer sa
+    // classe en lui montrant un bus qu'il n'a pas pu attraper.
+    const navette = trajetsDuJour(avecDebut('lundi', '07:45')!, 'lundi').trajets.find(
+      (t) => t.type === 'navette-dillendapp-matin',
+    )!
+    expect(navette.depart.heure).toBe('07:52')
+  })
+})
+
+describe('deux inscriptions au Dillendapp plutôt qu’une', () => {
+  /** Un enfant inscrit hors midi seulement, avec une heure de récupération. */
+  const horsMidiSeul = (jour: Jour, heure: string) => {
+    const e = enfant('c2', 'maison')
+    e.periscolaireMidi = false
+    e.periscolaireHorsMidi = true
+    e.dillendappJusqua = Object.fromEntries(
+      JOURS.map((j) => [j, j === jour ? heure : null]),
+    ) as Record<Jour, string | null>
+    return contexteEnfant(e, HOVELANGE)
+  }
+
+  it('laisse un enfant déjeuner chez lui et rester au Dillendapp après la classe', () => {
+    // Le lundi il y a cours l'après-midi : rentrer manger n'empêche pas d'être à la
+    // maison relais le soir. Les deux réglages sont indépendants.
+    const journee = trajetsDuJour(horsMidiSeul('lundi', '17:00')!, 'lundi')
+    expect(journee.trajets.map((t) => t.type)).toContain('retour-soir-dillendapp')
+    expect(journee.recuperation).toEqual({ lieu: 'dillendapp', heure: '17:00' })
+  })
+
+  it('refuse ce montage les jours sans cours l’après-midi', () => {
+    // Le mardi, la classe s'arrête à 11:45 : rester à la maison relais l'après-midi
+    // suppose forcément d'y avoir déjeuné. L'interface force alors le repas ; le
+    // moteur, lui, ne doit rien inventer.
+    const journee = trajetsDuJour(horsMidiSeul('mardi', '17:00')!, 'mardi')
+    expect(journee.recuperation).toBeUndefined()
+    expect(journee.trajets.map((t) => t.type)).not.toContain('retour-soir-dillendapp')
+  })
+
+  it('déduit les deux inscriptions d’une configuration antérieure à leur séparation', () => {
+    const e = enfant('c2', 'dillendapp')
+    e.periscolaire = true
+    expect(deduireInscriptions(e)).toEqual({ midi: true, horsMidi: false })
+
+    e.dillendappJusqua = Object.fromEntries(JOURS.map((j) => [j, '17:00'])) as Record<
+      Jour,
+      string | null
+    >
+    expect(deduireInscriptions(e)).toEqual({ midi: true, horsMidi: true })
+  })
+
+  it('déduit l’inscription du midi des repas quand rien n’est enregistré', () => {
+    const e = enfant('c2', 'dillendapp')
+    delete e.periscolaire
+    expect(deduireInscriptions(e)).toEqual({ midi: true, horsMidi: false })
+  })
+})
+
+describe('bornes des heures de présence au Dillendapp', () => {
+  const bornes = (cycle: Cycle, jour: Jour) =>
+    bornesDillendapp(contexteEnfant(enfant(cycle, 'dillendapp'), HOVELANGE)!, jour)
+
+  it('arrête le matin au dernier bus utile du cycle, marge comprise', () => {
+    // L'Aller 3 passe au Dillendapp à 07:38 puis 07:52 ; au-delà de 07:47, un C2 n'a
+    // plus de course pour rejoindre Noerdange. La marge de 5 min évite de proposer au
+    // parent de déposer son enfant à la minute où le bus part.
+    expect(bornes('c2', 'lundi').depuis).toEqual({
+      min: '07:00',
+      max: '07:47',
+      defaut: '07:00',
+    })
+  })
+
+  it('se rabat sur le début des cours quand la maison relais est au pied de l’école', () => {
+    // Un C4 va à pied du Dillendapp à sa classe : il n'y a pas de bus à attraper,
+    // c'est la sonnerie de 07:55 qui fait la limite.
+    expect(bornes('c4', 'lundi').depuis!.max).toBe('07:50')
+  })
+
+  it('change de borne quand l’enfant change de cycle', () => {
+    // C'est tout l'intérêt de les calculer : un C3 doit être déposé bien plus tôt.
+    expect(bornes('c3', 'lundi').depuis!.max).toBe('07:29')
+    expect(bornes('c1', 'lundi').depuis!.max).toBe('07:45')
+  })
+
+  it('ne laisse pas récupérer l’enfant avant qu’il soit arrivé', () => {
+    // Le soir, c'est l'heure d'arrivée du bus au Dillendapp qui fait le plancher.
+    const lundi = bornes('c2', 'lundi').jusqua!
+    expect(lundi.min).toBe('16:31')
+    expect(lundi.defaut).toBe('16:31')
+    expect(lundi.max).toBe('18:30')
+  })
+
+  it('place ce plancher à la navette de midi les jours sans cours l’après-midi', () => {
+    expect(bornes('c2', 'mardi').jusqua!.min).toBe('12:31')
+    // Sans navette, c'est la fin des cours.
+    expect(bornes('c4', 'mardi').jusqua!.min).toBe('11:45')
+  })
+})
+
+describe('ajustement des heures au changement de cycle', () => {
+  const avecHeures = (cycle: Cycle, depuis: string, jusqua: string): Enfant => {
+    const e = enfant(cycle, 'dillendapp')
+    e.periscolaireMidi = true
+    e.periscolaireHorsMidi = true
+    e.dillendappDepuis = Object.fromEntries(JOURS.map((j) => [j, depuis])) as Record<
+      Jour,
+      string | null
+    >
+    e.dillendappJusqua = Object.fromEntries(JOURS.map((j) => [j, jusqua])) as Record<
+      Jour,
+      string | null
+    >
+    return e
+  }
+
+  it('écrête une heure devenue impossible dans le nouveau cycle', () => {
+    // 07:47 convenait à un C2 ; passé en C3, l'enfant n'a plus de bus après 07:29.
+    const passeEnC3 = { ...avecHeures('c2', '07:47', '17:00'), cycle: 'c3' as Cycle }
+    const ajuste = ajusterDillendapp(passeEnC3, HOVELANGE)
+    expect(ajuste.dillendappDepuis!.lundi).toBe('07:29')
+    // Une heure déjà valable ne bouge pas.
+    expect(ajuste.dillendappJusqua!.lundi).toBe('17:00')
+  })
+
+  it('remonte une récupération trop précoce au moment où l’enfant arrive', () => {
+    const passeEnC2 = { ...avecHeures('c4', '07:10', '15:50'), cycle: 'c2' as Cycle }
+    expect(ajusterDillendapp(passeEnC2, HOVELANGE).dillendappJusqua!.lundi).toBe('16:31')
+  })
+
+  it('rend l’enfant inchangé quand tout tient déjà dans les bornes', () => {
+    const e = avecHeures('c2', '07:10', '17:00')
+    expect(ajusterDillendapp(e, HOVELANGE)).toBe(e)
   })
 })

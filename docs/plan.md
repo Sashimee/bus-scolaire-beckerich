@@ -15,9 +15,9 @@ et **administrable par un agent communal non informaticien**, sans renoncer aux 
 principes du projet : aucune donnée personnelle ne quitte l'appareil, et l'application dit
 ce qu'elle ne sait pas plutôt que de deviner.
 
-Le travail est découpé en **13 lots indépendants**, lançables un par un. Chaque lot est
-autonome : il compile, passe les tests et peut être déployé seul. Les dépendances entre
-lots sont indiquées explicitement.
+Le travail est découpé en lots indépendants, lançables un par un — 13 à l'origine,
+17 depuis les retours d'usage. Chaque lot est autonome : il compile, passe les tests et
+peut être déployé seul. Les dépendances entre lots sont indiquées explicitement.
 
 ### Décisions déjà prises
 
@@ -52,7 +52,12 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R13 | 6 | **Trois vérifications successives n'avaient pas montré que la boîte d'installation ne s'ouvrait jamais**, parce qu'elles simulaient `beforeinstallprompt` APRÈS le montage de React — exactement le cas qui fonctionnait. Rappel de méthode : un événement simulé ne prouve rien sur le moment où le vrai arrive. | Corrigé. Ligne gardée comme trace. |
 | R14 | — | **Les champs d'heure débordaient sur iPhone**, signalé en usage réel : Safari leur donne une largeur intrinsèque large et une hauteur gonflée. Corrigé (`appearance: none`, `min-inline-size: 0`, hauteur fixe) et mesuré à 390 px sous Chrome — **mais pas sur un iPhone réel**, que je n'ai pas. | Rouvrir `/configurer` sur l'iPhone, déplier un enfant inscrit au périscolaire, vérifier que les deux champs tiennent dans la carte. |
 | R15 | — | **La vignette de partage n'a pas été soumise aux validateurs.** Les métadonnées Open Graph sont posées et l'image existe, mais aucun aperçu réel n'a été obtenu depuis WhatsApp, Facebook ou LinkedIn. | Coller le lien dans une conversation WhatsApp, ou passer par le débogueur de partage de chaque plateforme. |
-| R6 | 3 | **Une arrivée après la sonnerie est affichée sans être signalée.** Pour un C2 déposé au Dillendapp le matin, aucune course n'arrive avant 07:55 : l'application montre 08:00, l'heure publiée, et la page « Limites » énonce le fait — mais la fiche de l'enfant ne le dit pas au moment où le parent la lit. | À trancher : soit c'est acceptable et la page « Limites » suffit, soit il faut une mention sur le trajet lui-même. Décision de conception, pas défaut. |
+| R16 | 14 | **Les bornes `min`/`max` des champs d'heure n'ont pas été vues sur Safari iOS.** Elles sont posées et mesurées à 390 px sous Chrome, mais Safari applique sa propre roue de sélection : rien ne dit qu'il la borne comme Chrome. | Ouvrir l'étape des horaires sur l'iPhone et vérifier qu'on ne peut pas descendre sous 07:00 ni dépasser la borne du cycle. |
+| R17 | 15 | **L'espace `/traductions` n'a jamais parlé à un vrai Worker.** La séparation des rôles est couverte par quatre tests contre un KV en mémoire ; la connexion par code, la publication sur GitHub et la relecture de la surcouche déployée ne l'ont pas été. | Même manœuvre que R3, avec `./creer-agent.sh "Nom" "" traductions`, puis corriger une clé allemande et vérifier qu'elle change sans reconstruction. |
+| R18 | 15 | **Les onglets d'`/admin` n'ont pas été vus connecté.** Le composant est couvert par huit tests (clavier, URL, ARIA) mais `/admin` exige un jeton GitHub, que le poste de développement n'a pas. | Se connecter sur `/admin` et parcourir les cinq onglets, dont ceux des textes et des crédits. |
+| R19 | 17 | **L'effet de l'en-tête `Urgency` n'est pas constatable ici.** Il ne se voit que sur un vrai téléphone en économie de batterie. La marche à suivre par plateforme n'a pas été vue à l'écran non plus : la section entière disparaît sans clé VAPID, absente en développement. | À rattacher à R7. Activer les notifications sur un appareil réel, vérifier que la marche à suivre iOS s'affiche, puis publier une alerte. |
+| R20 | 17 | **Aucune notification d'essai.** C'est le seul moyen pour un parent de vérifier son propre réglage après avoir suivi la marche à suivre. Écarté du périmètre : il faut une route Worker authentifiée par l'abonnement lui-même. | Piste, pas défaut. À reprendre si les réglages système se révèlent difficiles à suivre. |
+| ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
 ### Mise en service, non faite
 
@@ -1046,6 +1051,172 @@ des liens malformés), puis vérification manuelle qu'un lien de partage trafiqu
 - Nouvelle variable de build `VITE_ID_CLIENT_GOOGLE`, sur le modèle de `VITE_URL_WORKER` :
   vide, la fonctionnalité disparaît de l'interface et l'ICS reste seul, exactement comme
   `notificationsConfigurees()` le fait déjà.
+
+---
+
+## Lot 14 — Reprise de l'assistant et de la présence au Dillendapp
+
+> **Fait le 2026-08-08.** Signalé en usage réel sur iPhone. Livré : bornes d'heures
+> calculées par cycle depuis le plan de bus, deux inscriptions au Dillendapp au lieu
+> d'une, adresse de midi, raccourcis « toute la semaine » remontés en tête, horaires en
+> deux blocs d'une colonne, adresse du foyer verrouillée dès le deuxième enfant, actions
+> retirées de l'assistant. Écarts :
+>
+> - **Le retour de midi ne suit plus l'adresse du soir.** Une famille qui déclarait
+>   seulement « revient le soir chez la nounou » voyait aussi son retour de midi partir
+>   là-bas. Désormais le midi revient au domicile sauf adresse de midi explicite. C'est
+>   la lecture fidèle du libellé, mais cela change le calcul de configurations
+>   existantes. Couvert par deux tests.
+> - **Défaut trouvé en route et corrigé** : un enfant déposé au Dillendapp à 07:45 se
+>   voyait proposer la navette de 07:38, déjà partie. `liaisons()` accepte désormais un
+>   seuil `apres`.
+> - **La case unique est conservée en lecture** (`Enfant.periscolaire`, marquée
+>   `@deprecated`) : les configurations enregistrées et les liens de partage antérieurs
+>   la portent, et `deduireInscriptions()` en tire les deux nouvelles.
+> - **L'étape 5 disparaît toujours** quand la case hors-midi est décochée, mais le total
+>   annoncé reste 7 : le repère ne bouge plus sous les pieds du parent.
+> - **Idée B abandonnée** après mesure, voir R6 rayée.
+>
+> Vérifié : 312 tests (dont 9 nouveaux sur les bornes, 4 sur les deux inscriptions,
+> 3 sur l'adresse de midi, 9 de composant sur l'assistant — les premiers du dépôt) ;
+> mesures DOM à 390 px sur les cinq étapes touchées ; lien de partage v4 relu.
+>
+> **Réserves** : R16.
+
+*Dépend des lots 3, 4 et 5.*
+
+Sept points relevés après usage : raccourcis hebdomadaires sous les grilles, deux
+explications d'horaires empilées et illisibles sur iPhone, heures non bornées, adresses
+dérogatoires en contradiction avec la présence au Dillendapp, actions dupliquées en fin
+d'assistant, adresse du foyer modifiable depuis l'assistant de n'importe quel enfant, et
+un modèle d'adresses qui ignore le déjeuner ailleurs qu'à la maison.
+
+### 14.1 Amplitude d'accueil — `src/data/ecoles.json`, `src/lib/types.ts`
+
+`maisonRelais.horaires` : ouverture, fermeture, marge avant bus. Les bornes ne sont pas
+des constantes du code.
+
+### 14.2 Bornes par cycle — `src/lib/plan.ts`
+
+`bornesDillendapp(ctx, jour)` lit le dernier départ Dillendapp → école du cycle et en
+retranche la marge ; à défaut de navette, le début des cours. Le soir, l'arrivée du bus
+fait le plancher. `ajusterDillendapp()` écrête au changement de cycle.
+
+### 14.3 Deux inscriptions — `src/lib/types.ts`, `src/lib/plan.ts`
+
+`periscolaireMidi` et `periscolaireHorsMidi`. `RechercheOptions.repas` devient
+`inscritDillendapp` : une desserte réservée aux inscrits reste ouverte à l'enfant qui
+n'est là qu'en dehors du midi.
+
+### 14.4 Adresse de midi — `src/lib/types.ts`, `src/lib/plan.ts`
+
+`AdresseJour.midi`, `ArretsDuJour.midi`. Proposée seulement les jours avec cours
+l'après-midi où l'enfant ne déjeune pas au Dillendapp.
+
+### 14.5 Migrations — `src/lib/stockage.ts`, `src/lib/partage.ts`
+
+Lien de partage en version 5 : second drapeau d'inscription, adresses en triplets
+`[matin, midi, soir]`. Les versions 1 à 4 restent lisibles.
+
+### 14.6 à 14.8 Écrans et invariants
+
+Assistant, grilles, et `etat.tsx` où se ferment les contradictions : une heure de dépose
+efface l'adresse du matin, une récupération un mardi force le repas au Dillendapp.
+
+### 14.9 à 14.13 Ménage et couverture
+
+Regex `HEURE` factorisée, récapitulatif Dillendapp sur la fiche, compteur au repli des
+adresses, et `src/pages/AssistantEnfant.test.tsx`.
+
+---
+
+## Lot 15 — Traductions modifiables sans reconstruction
+
+> **Fait le 2026-08-08.** Livré : `public/traductions.json` en surcouche relue à chaque
+> ouverture, éditeur commun à `/admin` et au nouvel espace `/traductions`, rôle distinct
+> côté Worker, et `/admin` passé en onglets. Écarts :
+>
+> - **`chargerTraductions` vit dans `src/i18n/surcouche.ts`**, pas dans
+>   `src/lib/traductions.ts` : ce dernier est importé par le Worker, qui n'a ni `fetch`
+>   vers le site ni `import.meta.env`.
+> - **Deux barrières, pas une** entre les espaces : préfixe KV (`agent:` contre
+>   `traducteur:`) et rôle inscrit dans le jeton signé. Un jeton d'avant les rôles est lu
+>   comme un jeton de commune, pour ne pas déconnecter une session en cours.
+> - **Scintillement assumé** : le premier rendu utilise les dictionnaires du bundle, qui
+>   sont complets ; la surcouche ne fait que corriger.
+> - **`/traductions` ne touche pas aux crédits.** Un traducteur ne s'ajoute pas lui-même.
+>
+> Vérifié : 15 tests sur les règles de la surcouche, 8 sur les onglets, 4 sur la
+> séparation des rôles ; `globIgnores` et `runtimeCaching` posés — le build reste à
+> 18 entrées préchargées, donc la surcouche n'est pas figée.
+>
+> **Réserves** : R17, R18.
+
+*Dépend du lot 8 pour le Worker, du lot 11 pour la validation des entrées.*
+
+Corriger une tournure allemande demandait un commit et un redéploiement, donc l'auteur.
+
+### 15.1 Surcouche — `public/traductions.json`, `src/lib/traductions.ts`
+
+Clés pointées et plates. Une correction doit viser une clé qui existe en français, du
+même type, avec exactement les mêmes marqueurs `{…}`. Une entrée refusée est ignorée,
+les autres s'appliquent.
+
+### 15.2 à 15.5 Éditeur, rôle et hôtes
+
+`EditeurTraductions` avec le français en référence et le motif de refus affiché à la
+saisie ; `routerTraductions` côté Worker ; `Onglets` générique, l'onglet actif dans la
+query string.
+
+---
+
+## Lot 16 — Crédits et remerciements
+
+> **Fait le 2026-08-08.** Livré : `src/data/credits.json`, page `/credits` liée depuis
+> les réglages, éditeur en cinquième onglet d'`/admin`. Écarts :
+>
+> - **Fichier du bundle, pas surcouche** : une page de crédits doit s'afficher hors
+>   ligne, et elle change quelques fois par an. Sa publication déclenche donc une
+>   reconstruction, ce que l'éditeur annonce.
+> - **Un `lien` n'est rendu cliquable que s'il est en `http(s)`.** C'est le seul endroit
+>   du projet où du texte saisi dans une page web devient une URL sur une page publique.
+> - **Une langue sans traducteur déclaré n'affiche pas de bloc vide** : cela se lirait
+>   comme un oubli plutôt que comme une absence.
+>
+> Vérifié : 9 tests, dont le refus d'un `javascript:` ; page mesurée à 390 px.
+
+*Dépend du lot 15 pour les onglets d'`/admin`.*
+
+Trois sections : développement, traductions par langue, remerciements. Le fichier porte
+des noms de tiers : seuls ceux dont l'accord est acquis y figurent, et la page le dit.
+
+---
+
+## Lot 17 — Notifications prioritaires, et ce qu'elles ne remplacent pas
+
+> **Fait le 2026-08-08.** Livré : en-tête `Urgency` de la RFC 8030, TTL calculé sur la
+> fenêtre de pertinence, vibration sur les alertes, marche à suivre par plateforme après
+> activation, et encart d'honnêteté permanent. Écarts :
+>
+> - **Rien sur WhatsApp.** Envoyer un message supposerait de confier le numéro de chaque
+>   parent à un serveur et à Meta : cela romprait le principe n° 1. Décision de l'auteur.
+> - **Aucune application web ne peut se déclarer prioritaire d'elle-même** : le niveau
+>   « temps réel » d'iOS est réservé aux applications natives, et le canal Android
+>   appartient au navigateur. Tout ce qui pouvait l'être l'est au niveau du transport ;
+>   le reste est écrit noir sur blanc à l'écran.
+> - **Notification d'essai écartée** du périmètre, voir R20.
+> - Ajouté au passage, hors plan initial : l'avertissement du site officiel sur les
+>   horaires indicatifs, repris mot pour mot sur `/plan`, `/limites` et la fiche enfant.
+>
+> Vérifié : 61 tests du Worker, dont deux nouveaux sur `Urgency`.
+>
+> **Réserves** : R19, R20.
+
+*Indépendant des lots 14 à 16.*
+
+Un bus annulé est une information dont dix minutes de retard changent la valeur. La
+requête push ne portait aucun en-tête d'urgence, et rien n'expliquait au parent comment
+faire sortir ces notifications du lot sur son téléphone.
 
 ---
 

@@ -10,7 +10,7 @@
  * des points de terminaison push, qui sont des identifiants d'appareil opaques.
  */
 import { base64urlEncode, genererRequetePush, importerClesVapid } from './push.js'
-import { routerCommune } from './commune.js'
+import { routerCommune, routerTraductions } from './commune.js'
 import { rappelsDus } from './rappels.js'
 import { etatDuJour } from '../../src/lib/calendrier.ts'
 import { plan } from '../../src/lib/donnees.ts'
@@ -347,6 +347,26 @@ async function notifierLot(requete, env) {
   return json(await envoyerLot(corps.charge, corps.noms, env))
 }
 
+/** Une minute avant minuit, une annulation du matin n'a plus rien à dire. */
+const DUREE_MIN_S = 5 * 60
+const DUREE_MAX_S = 6 * 3600
+
+/**
+ * Combien de temps le service de push doit retenir la notification si l'appareil est
+ * éteint.
+ *
+ * Une annonce de bus annulé n'a d'intérêt que jusqu'à la fin de la journée d'école :
+ * la délivrer le lendemain matin ferait courir un parent pour un bus qui roule. On
+ * borne donc à la fin du jour concerné, sans jamais dépasser six heures — au-delà,
+ * personne n'agira plus dessus.
+ */
+function dureeDeVie(charge) {
+  const fin = Date.parse(`${charge?.au ?? ''}T18:30:00Z`)
+  if (Number.isNaN(fin)) return 3600
+  const restant = Math.floor((fin - Date.now()) / 1000)
+  return Math.max(DUREE_MIN_S, Math.min(restant, DUREE_MAX_S))
+}
+
 /**
  * Le travail proprement dit, séparé du transport pour que `notifier` puisse l'appeler
  * directement quand il n'y a qu'un seul lot — sans sous-requête, donc sans dépendre du
@@ -389,7 +409,8 @@ async function envoyerLot(charge, noms, env) {
         abonnement,
         charge: JSON.stringify(charge),
         contact: env.CONTACT_VAPID,
-        ttl: 3600,
+        ttl: dureeDeVie(charge),
+        urgence: charge.gravite === 'alerte' ? 'high' : 'normal',
       })
 
       const reponse = await fetch(endpoint, { method: 'POST', headers, body })
@@ -557,9 +578,11 @@ export default {
     const origine = requete.headers.get('Origin') ?? '*'
 
     if (requete.method === 'OPTIONS') {
-      const entetes = url.pathname.startsWith('/commune/')
-        ? corsCommune(origine, env)
-        : cors(origine, env)
+      // Les deux espaces à code personnel envoient un en-tête `Authorization` : sans
+      // ce préflight-là, le navigateur refuse la requête avant même de l'émettre.
+      const aJeton =
+        url.pathname.startsWith('/commune/') || url.pathname.startsWith('/traductions/')
+      const entetes = aJeton ? corsCommune(origine, env) : cors(origine, env)
       return new Response(null, { status: 204, headers: entetes })
     }
 
@@ -570,6 +593,10 @@ export default {
     try {
       const commune = await routerCommune(requete, env, url, corsCommune(origine, env))
       if (commune) return commune
+
+      // Même mécanique, code d'accès distinct : voir `commune.js`.
+      const traductions = await routerTraductions(requete, env, url, corsCommune(origine, env))
+      if (traductions) return traductions
 
       switch (`${requete.method} ${url.pathname}`) {
         case 'GET /sante':

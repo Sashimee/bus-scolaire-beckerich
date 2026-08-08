@@ -239,11 +239,37 @@ describe('genererRequetePush', () => {
     expect(requete.headers['Content-Encoding']).toBe('aes128gcm')
     expect(requete.headers.Authorization).toMatch(/^vapid t=[\w-]+\.[\w-]+\.[\w-]+, k=B[\w-]+$/)
     expect(requete.headers.TTL).toBe('3600')
+    // Sans en-tête d'urgence, le service de push traite l'envoi comme une notification
+    // ordinaire et peut le retenir quand le téléphone économise sa batterie.
+    expect(requete.headers.Urgency).toBe('normal')
 
     // Les en-têtes du brouillon draft-04 : c'est leur présence qui faisait rejeter
     // chaque envoi par Apple. Ils ne doivent jamais réapparaître.
     expect(requete.headers.Encryption).toBeUndefined()
     expect(requete.headers['Crypto-Key']).toBeUndefined()
     expect(requete.headers.Authorization).not.toMatch(/^WebPush /)
+  })
+
+  it('marque une alerte comme prioritaire au transport', async () => {
+    const paire = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+      'sign',
+      'verify',
+    ])
+    const jwkPrivee = await crypto.subtle.exportKey('jwk', paire.privateKey)
+    const jwkPublique = await crypto.subtle.exportKey('jwk', paire.publicKey)
+    const cles = await importerClesVapid({ ...jwkPrivee, x: jwkPublique.x, y: jwkPublique.y })
+    const requete = await genererRequetePush({
+      cles,
+      abonnement: {
+        endpoint: 'https://web.push.apple.com/abc123',
+        keys: { p256dh: VECTEUR.uaPublique, auth: VECTEUR.auth },
+      },
+      charge: JSON.stringify({ titre: 'Bus annulé' }),
+      contact: 'mailto:a@b.org',
+      ttl: 900,
+      urgence: 'high',
+    })
+    expect(requete.headers.Urgency).toBe('high')
+    expect(requete.headers.TTL).toBe('900')
   })
 })
