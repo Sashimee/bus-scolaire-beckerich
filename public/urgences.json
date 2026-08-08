@@ -3,18 +3,6 @@
   "version": 1,
   "misAJour": "2026-08-08T00:45:38.198Z",
   "perturbations": [
-    {
-      "id": "2026-08-08-jfu2p",
-      "du": "2026-08-08",
-      "au": "2026-08-08",
-      "type": "annulation",
-      "message": {
-        "fr": "Coucou"
-      },
-      "publieLe": "2026-08-08T00:45:33.417Z",
-      "publiePar": "Alex",
-      "gravite": "alerte"
-    }
   ],
   "correctionsArrets": []
 }
