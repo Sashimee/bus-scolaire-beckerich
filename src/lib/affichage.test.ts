@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { alignerServices, distanceLisible } from './affichage'
+import { alignerServices, destinationTrajet, distanceLisible, sensTrajet } from './affichage'
 import { plan } from './donnees'
+import type { TypeTrajet } from './types'
 
 const ligne = (id: string) => plan.lignes.find((l) => l.id === id)!
 
@@ -45,6 +46,35 @@ describe('alignement des tableaux du plan officiel', () => {
     expect(reference.filter((a) => a.arret === 'beckerich-dillendapp')).toHaveLength(2)
     const heures = colonnes[0].cases.map((c) => c?.heure)
     expect(heures).toEqual(['07:30', '07:32', '07:34', '07:38', '07:45', '07:52', '07:55', '07:58'])
+  })
+})
+
+describe('sens et destination d’un trajet', () => {
+  // Liste exhaustive : un huitième type de trajet ajouté sans être classé ici fera
+  // échouer ce test plutôt que de s'afficher au hasard.
+  const attendu: Record<TypeTrajet, ['aller' | 'retour', 'ecole' | 'maison' | 'dillendapp']> = {
+    'aller-matin': ['aller', 'ecole'],
+    'aller-apres-midi': ['aller', 'ecole'],
+    'navette-dillendapp-retour': ['aller', 'ecole'],
+    'retour-midi': ['retour', 'maison'],
+    'retour-soir': ['retour', 'maison'],
+    'retour-soir-dillendapp': ['retour', 'dillendapp'],
+    'navette-dillendapp-midi': ['retour', 'dillendapp'],
+  }
+
+  for (const [type, [sens, destination]] of Object.entries(attendu) as [
+    TypeTrajet,
+    ['aller' | 'retour', 'ecole' | 'maison' | 'dillendapp'],
+  ][]) {
+    it(`classe ${type}`, () => {
+      expect(sensTrajet(type)).toBe(sens)
+      expect(destinationTrajet(type)).toBe(destination)
+    })
+  }
+
+  it('couvre tous les types de trajet du domaine', () => {
+    // Le nombre est écrit en clair : ajouter un type sans le classer casse le test.
+    expect(Object.keys(attendu)).toHaveLength(7)
   })
 })
 

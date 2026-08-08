@@ -1,13 +1,50 @@
 import { useT } from '../i18n'
-import { nomArret } from '../lib/affichage'
+import { nomArret, sensTrajet } from '../lib/affichage'
 import { incertitude } from '../lib/donnees'
 import {
+  heureArriveeEffective,
   heureEffective,
   messagePerturbation,
   perturbationsDuTrajet,
   type Perturbation,
 } from '../lib/urgences'
 import type { JourneeEnfant, Trajet } from '../lib/types'
+
+/**
+ * Une heure de trajet, telle qu'elle doit se lire une fois les urgences appliquées :
+ * barrée si le bus est annulé, barrée puis corrigée s'il est retardé.
+ */
+function HeureTrajet({
+  heure,
+  effective,
+  annule,
+  libelle,
+}: {
+  heure: string | null
+  effective: string | null
+  annule: boolean
+  libelle: string
+}) {
+  const { t } = useT()
+  const decale = !annule && effective !== null && effective !== heure
+
+  return (
+    <>
+      <span className="visuellement-cache">
+        {heure ? `${libelle} ` : `${libelle} ${t('trajets.heureNonPubliee')}`}
+      </span>
+      {annule ? (
+        <s aria-label={t('urgences.annule')}>{heure ?? '—'}</s>
+      ) : decale ? (
+        <>
+          <s>{heure}</s> {effective}
+        </>
+      ) : (
+        (heure ?? '—')
+      )}
+    </>
+  )
+}
 
 /** Une ligne de trajet : heure, intitulé, arrêts, ligne et notes éventuelles. */
 export function LigneTrajet({
@@ -23,26 +60,32 @@ export function LigneTrajet({
   const concernees = perturbationsDuTrajet(perturbations, trajet)
   const annule = concernees.some((p) => p.type === 'annulation')
   const nouvelleHeure = heureEffective(trajet, concernees)
-  const decale = !annule && nouvelleHeure !== null && nouvelleHeure !== trajet.depart.heure
+  const nouvelleArrivee = heureArriveeEffective(trajet, concernees)
+
+  // Sur un retour, c'est l'heure d'arrivée que le parent doit voir en premier : c'est
+  // elle qui lui dit quand être à l'arrêt.
+  const retour = sensTrajet(trajet.type) === 'retour'
+  const classeDepart = retour ? 'trajet__heure--secondaire' : 'trajet__heure--principale'
+  const classeArrivee = retour ? 'trajet__heure--principale' : 'trajet__heure--secondaire'
+
+  // L'étiquette « horaire modifié » suit l'heure mise en avant, pas systématiquement
+  // celle du départ.
+  const heureEnAvant = retour ? trajet.arrivee.heure : trajet.depart.heure
+  const effectiveEnAvant = retour ? nouvelleArrivee : nouvelleHeure
+  const decale = !annule && effectiveEnAvant !== null && effectiveEnAvant !== heureEnAvant
 
   return (
     <div className={`trajet${interne ? ' trajet--interne' : ''}`}>
-      <span className="trajet__heure">
-        {annule ? (
-          <s aria-label={t('urgences.annule')}>{trajet.depart.heure ?? '—'}</s>
-        ) : decale ? (
-          <>
-            <s>{trajet.depart.heure}</s> {nouvelleHeure}
-          </>
-        ) : (
-          (trajet.depart.heure ?? '—')
-        )}
-        <span className="visuellement-cache">
-          {trajet.depart.heure ? '' : t('trajets.heureNonPubliee')}
-        </span>
+      <span className={`trajet__heure ${classeDepart}`}>
+        <HeureTrajet
+          heure={trajet.depart.heure}
+          effective={nouvelleHeure}
+          annule={annule}
+          libelle={t('trajets.depart')}
+        />
       </span>
 
-      <div>
+      <div className="trajet__corps">
         <div className="trajet__titre">
           {t(`trajets.${trajet.type}`)}
           {annule && (
@@ -58,6 +101,16 @@ export function LigneTrajet({
         </div>
       </div>
 
+      <span className={`trajet__heure ${classeArrivee}`}>
+        <span aria-hidden="true">→ </span>
+        <HeureTrajet
+          heure={trajet.arrivee.heure}
+          effective={nouvelleArrivee}
+          annule={annule}
+          libelle={t('trajets.arrivee')}
+        />
+      </span>
+
       {concernees.map((p) => (
         <p key={p.id} className="trajet__detail" style={{ color: 'var(--orange)' }}>
           {messagePerturbation(p, langue)}
@@ -65,8 +118,7 @@ export function LigneTrajet({
       ))}
 
       <div className="trajet__detail">
-        {nomArret(trajet.depart.arret, t)} → {nomArret(trajet.arrivee.arret, t)}
-        {trajet.arrivee.heure && ` · ${trajet.arrivee.heure}`}{' '}
+        {nomArret(trajet.depart.arret, t)} → {nomArret(trajet.arrivee.arret, t)}{' '}
         <span className="etiquette etiquette--ligne">{trajet.ligne.nom}</span>
       </div>
 

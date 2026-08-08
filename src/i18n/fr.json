@@ -71,7 +71,7 @@
     "maisonCourt": "Maison",
     "dillendapp": "Mange au Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Repas, toute la semaine :",
+    "touteLaSemaine": "Repas, toute la semaine",
     "sansCoursApresMidi": "Pas de cours l'après-midi"
   },
   "dillendapp": {
@@ -86,7 +86,7 @@
     "titre": "Bus",
     "aide": "Si vous déposez ou récupérez votre enfant vous-même certains jours, indiquez-le : l'application n'affichera que les trajets qu'il emprunte réellement.",
     "pourJour": "Usage du bus le {jour}",
-    "touteLaSemaine": "Bus, toute la semaine :",
+    "touteLaSemaine": "Bus, toute la semaine",
     "aller-retour": "Aller et retour",
     "aller": "Aller seulement",
     "retour": "Retour seulement",
@@ -126,6 +126,8 @@
     "depuis": "de {arret}",
     "vers": "vers {arret}",
     "a": "à {heure}",
+    "depart": "Départ",
+    "arrivee": "Arrivée",
     "heureNonPubliee": "horaire non publié",
     "ligne": "Ligne",
     "alternative": "Aussi possible : {ligne} à {heure}",
@@ -322,6 +324,7 @@
   },
   "maj": {
     "disponible": "Une nouvelle version est disponible.",
+    "miseAJour": "Nouvelle version — mise à jour…",
     "recharger": "Recharger",
     "version": "Version {version}",
     "horsLigne": "Hors ligne — les horaires restent consultables."

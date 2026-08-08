@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useT } from '../i18n'
 import { ResumePerturbation } from '../composants/BandeauUrgences'
 import { useUrgences } from '../urgences-contexte'
+import { useBlocageRechargement } from '../rechargement-contexte'
 import { arrets, plan } from '../lib/donnees'
 import { nomArret } from '../lib/affichage'
 import { isoDate } from '../lib/calendrier'
@@ -60,6 +61,10 @@ export function Admin() {
   const [remplacement, setRemplacement] = useState('')
   const [message, setMessage] = useState('')
   const [gravite, setGravite] = useState<Gravite>('alerte')
+
+  // Un rechargement automatique en plein milieu d'une saisie effacerait le texte de
+  // l'annonce, au pire moment : celui où quelqu'un cherche à publier une urgence.
+  useBlocageRechargement(message.trim().length > 0, 'brouillon-admin')
 
   // Récupère le jeton renvoyé par le Worker après la connexion GitHub.
   useEffect(() => {

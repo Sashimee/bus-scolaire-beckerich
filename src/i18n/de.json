@@ -71,7 +71,7 @@
     "maisonCourt": "Zuhause",
     "dillendapp": "Isst im Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Mittagessen, ganze Woche:",
+    "touteLaSemaine": "Mittagessen, ganze Woche",
     "sansCoursApresMidi": "Kein Nachmittagsunterricht"
   },
   "dillendapp": {
@@ -86,7 +86,7 @@
     "titre": "Bus",
     "aide": "Wenn Sie Ihr Kind an manchen Tagen selbst bringen oder abholen, geben Sie es hier an: die App zeigt dann nur die Fahrten, die es wirklich nimmt.",
     "pourJour": "Busnutzung am {jour}",
-    "touteLaSemaine": "Bus, ganze Woche:",
+    "touteLaSemaine": "Bus, ganze Woche",
     "aller-retour": "Hin und zurück",
     "aller": "Nur Hinfahrt",
     "retour": "Nur Rückfahrt",
@@ -126,6 +126,8 @@
     "depuis": "ab {arret}",
     "vers": "nach {arret}",
     "a": "um {heure}",
+    "depart": "Abfahrt",
+    "arrivee": "Ankunft",
     "heureNonPubliee": "Uhrzeit nicht veröffentlicht",
     "ligne": "Linie",
     "alternative": "Ebenfalls möglich: {ligne} um {heure}",
@@ -322,6 +324,7 @@
   },
   "maj": {
     "disponible": "Eine neue Version ist verfügbar.",
+    "miseAJour": "Neue Version — wird aktualisiert…",
     "recharger": "Neu laden",
     "version": "Version {version}",
     "horsLigne": "Offline — die Fahrzeiten bleiben abrufbar."

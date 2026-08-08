@@ -1,24 +1,19 @@
 import { useT } from '../i18n'
-import { nomArret } from '../lib/affichage'
+import { destinationTrajet, nomArret } from '../lib/affichage'
 import { siteDuCycle, plan } from '../lib/donnees'
 import { semaineEnfant, type ContexteEnfant } from '../lib/plan'
 import { JOURS } from '../lib/types'
-import type { Trajet } from '../lib/types'
+import type { TypeTrajet } from '../lib/types'
 
-/** Direction résumée d'un trajet, pour tenir dans une cellule de tableau. */
-function sens(trajet: Trajet, t: ReturnType<typeof useT>['t']): string {
-  switch (trajet.type) {
-    case 'aller-matin':
-    case 'aller-apres-midi':
-    case 'navette-dillendapp-retour':
-      return t('impression.versEcole')
-    case 'retour-midi':
-    case 'retour-soir':
-      return t('impression.versMaison')
-    case 'navette-dillendapp-midi':
-    case 'retour-soir-dillendapp':
-      return t('impression.versDillendapp')
-  }
+/** Clés d'affichage de la destination, pour tenir dans une cellule de tableau. */
+const LIBELLE_DESTINATION = {
+  ecole: 'impression.versEcole',
+  maison: 'impression.versMaison',
+  dillendapp: 'impression.versDillendapp',
+} as const
+
+function libelleDestination(type: TypeTrajet): string {
+  return LIBELLE_DESTINATION[destinationTrajet(type)]
 }
 
 /**
@@ -86,7 +81,7 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
                     <ul className="fiche__trajets">
                       {utiles.map((trajet, i) => (
                         <li key={`${trajet.type}-${i}`}>
-                          <b>{trajet.depart.heure ?? '—'}</b> {sens(trajet, t)}
+                          <b>{trajet.depart.heure ?? '—'}</b> {t(libelleDestination(trajet.type))}
                           <span className="fiche__ligne"> {trajet.ligne.nom}</span>
                         </li>
                       ))}

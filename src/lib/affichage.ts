@@ -6,7 +6,34 @@
  */
 import type { Traduction } from '../i18n'
 import { arret as trouverArret, plan } from './donnees'
-import type { Arret, ArretDesservi, Ligne, Service } from './types'
+import type { Arret, ArretDesservi, Ligne, Service, TypeTrajet } from './types'
+
+/** Vers quoi va ce trajet. */
+export function destinationTrajet(type: TypeTrajet): 'ecole' | 'maison' | 'dillendapp' {
+  switch (type) {
+    case 'aller-matin':
+    case 'aller-apres-midi':
+    case 'navette-dillendapp-retour':
+      return 'ecole'
+    case 'retour-midi':
+    case 'retour-soir':
+      return 'maison'
+    case 'navette-dillendapp-midi':
+    case 'retour-soir-dillendapp':
+      return 'dillendapp'
+  }
+}
+
+/**
+ * Le sens d'un trajet, qui décide de l'heure à mettre en avant.
+ *
+ * Sur un aller, le parent doit savoir quand partir de l'arrêt : c'est l'heure de départ
+ * qui compte. Sur un retour, il doit savoir quand aller chercher l'enfant : c'est
+ * l'heure d'arrivée.
+ */
+export function sensTrajet(type: TypeTrajet): 'aller' | 'retour' {
+  return destinationTrajet(type) === 'ecole' ? 'aller' : 'retour'
+}
 
 /**
  * Aligne les services d'une ligne sur une même colonne d'arrêts, pour l'affichage

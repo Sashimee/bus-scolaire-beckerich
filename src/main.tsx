@@ -5,6 +5,7 @@ import App from './App'
 import { FournisseurTraduction } from './i18n'
 import { FournisseurFoyer } from './etat'
 import { FournisseurUrgences } from './urgences-contexte'
+import { FournisseurRechargement } from './rechargement-contexte'
 import './index.css'
 
 // GitHub Pages sert `404.html` pour toute route inconnue. Celui-ci mémorise le chemin
@@ -25,11 +26,13 @@ createRoot(document.getElementById('root')!).render(
         servi sous n'importe quel chemin sans modification du code. */}
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <FournisseurTraduction>
-        <FournisseurUrgences>
-          <FournisseurFoyer>
-            <App />
-          </FournisseurFoyer>
-        </FournisseurUrgences>
+        <FournisseurRechargement>
+          <FournisseurUrgences>
+            <FournisseurFoyer>
+              <App />
+            </FournisseurFoyer>
+          </FournisseurUrgences>
+        </FournisseurRechargement>
       </FournisseurTraduction>
     </BrowserRouter>
   </StrictMode>,

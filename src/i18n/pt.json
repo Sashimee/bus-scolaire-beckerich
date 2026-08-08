@@ -71,7 +71,7 @@
     "maisonCourt": "Casa",
     "dillendapp": "Almoça no Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Almoço, toda a semana:",
+    "touteLaSemaine": "Almoço, toda a semana",
     "sansCoursApresMidi": "Sem aulas à tarde"
   },
   "dillendapp": {
@@ -86,7 +86,7 @@
     "titre": "Autocarro",
     "aide": "Se em alguns dias leva ou vai buscar o seu filho, indique-o: a aplicação mostrará apenas as deslocações que ele faz realmente.",
     "pourJour": "Utilização do autocarro à {jour}",
-    "touteLaSemaine": "Autocarro, toda a semana:",
+    "touteLaSemaine": "Autocarro, toda a semana",
     "aller-retour": "Ida e volta",
     "aller": "Apenas ida",
     "retour": "Apenas volta",
@@ -126,6 +126,8 @@
     "depuis": "de {arret}",
     "vers": "para {arret}",
     "a": "às {heure}",
+    "depart": "Partida",
+    "arrivee": "Chegada",
     "heureNonPubliee": "horário não publicado",
     "ligne": "Linha",
     "alternative": "Também possível: {ligne} às {heure}",
@@ -322,6 +324,7 @@
   },
   "maj": {
     "disponible": "Está disponível uma nova versão.",
+    "miseAJour": "Nova versão — a atualizar…",
     "recharger": "Recarregar",
     "version": "Versão {version}",
     "horsLigne": "Sem rede — os horários continuam consultáveis."

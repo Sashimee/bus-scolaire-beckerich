@@ -4,6 +4,7 @@ import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import { useFoyer, type Theme } from '../etat'
 import { lienPartage } from '../lib/partage'
 import { toutEffacer } from '../lib/stockage'
+import { siteDuCycle } from '../lib/donnees'
 import { sourceAdresses } from '../lib/adresses'
 import { Notifications } from '../composants/Notifications'
 
@@ -70,9 +71,30 @@ export function Reglages() {
 
       <section className="carte pile pile--serre">
         <h3 style={{ fontSize: '1rem' }}>{t('onboarding.etapeEnfants')}</h3>
-        <p className="champ__aide">
-          {foyer.adresse?.libelle ?? '—'} · {foyer.enfants.length}
-        </p>
+        <p className="champ__aide">{foyer.adresse?.libelle ?? '—'}</p>
+
+        {/* Un compte d'enfants ne dit rien : le parent vient ici pour reconnaître le
+            sien et corriger son cycle ou son école. */}
+        {foyer.enfants.length === 0 ? (
+          <p className="champ__aide">{t('enfant.aucun')}</p>
+        ) : (
+          <ul className="liste-nue pile pile--serre">
+            {foyer.enfants.map((enfant) => (
+              <li className="rangee rangee--espacee" key={enfant.id}>
+                <span>
+                  <strong>{enfant.prenom}</strong>{' '}
+                  <span className="champ__aide">
+                    {t(`cycles.${enfant.cycle}`)} · {siteDuCycle(enfant.cycle).nom}
+                  </span>
+                </span>
+                <Link to={`/enfant/${enfant.id}`} className="bouton bouton--discret">
+                  {t('enfant.voirSemaine')}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+
         <Link to="/configurer" className="bouton">
           {t('commun.modifier')}
         </Link>

@@ -138,17 +138,41 @@ export function decalerHeure(heure: string, minutes: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
 }
 
+/** Le retard total annoncé par un ensemble de perturbations, en minutes. */
+function retardCumule(perturbations: Perturbation[]): number {
+  return perturbations
+    .filter((p) => p.type === 'retard' && typeof p.minutes === 'number')
+    .reduce((somme, p) => somme + (p.minutes ?? 0), 0)
+}
+
+/** L'heure décalée du retard annoncé, ou `null` si le trajet est annulé. */
+function heureDecalee(heure: string | null, perturbations: Perturbation[]): string | null {
+  if (perturbations.some((p) => p.type === 'annulation')) return null
+  if (!heure) return null
+  const retard = retardCumule(perturbations)
+  return retard ? decalerHeure(heure, retard) : heure
+}
+
 /**
  * L'heure de départ à afficher pour un trajet, une fois les retards appliqués.
  * Renvoie `null` si le trajet est annulé.
  */
 export function heureEffective(trajet: Trajet, perturbations: Perturbation[]): string | null {
-  if (perturbations.some((p) => p.type === 'annulation')) return null
-  const retard = perturbations
-    .filter((p) => p.type === 'retard' && typeof p.minutes === 'number')
-    .reduce((somme, p) => somme + (p.minutes ?? 0), 0)
-  if (!trajet.depart.heure) return null
-  return retard ? decalerHeure(trajet.depart.heure, retard) : trajet.depart.heure
+  return heureDecalee(trajet.depart.heure, perturbations)
+}
+
+/**
+ * L'heure d'arrivée à afficher, une fois les retards appliqués.
+ *
+ * Le même retard s'applique aux deux bouts : un bus parti en retard arrive en retard.
+ * L'hypothèse inverse — un bus qui rattraperait son retard en route — ferait attendre
+ * un parent à l'arrêt sur une heure que rien ne garantit.
+ */
+export function heureArriveeEffective(
+  trajet: Trajet,
+  perturbations: Perturbation[],
+): string | null {
+  return heureDecalee(trajet.arrivee.heure, perturbations)
 }
 
 /** Le message d'une perturbation dans la langue demandée, avec repli sur le français. */

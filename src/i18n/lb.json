@@ -71,7 +71,7 @@
     "maisonCourt": "Doheem",
     "dillendapp": "Ësst am Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Mëttegiessen, ganz Woch:",
+    "touteLaSemaine": "Mëttegiessen, ganz Woch",
     "sansCoursApresMidi": "Kee Cours nomëttes"
   },
   "dillendapp": {
@@ -86,7 +86,7 @@
     "titre": "Bus",
     "aide": "Wann Dir Äert Kand un e puer Deeg selwer bréngt oder ofhëlt, gitt et hei un: d'App weist dann nëmmen d'Fahrten, déi et wierklech hëlt.",
     "pourJour": "Busnotzung {jour}",
-    "touteLaSemaine": "Bus, ganz Woch:",
+    "touteLaSemaine": "Bus, ganz Woch",
     "aller-retour": "Hin an zréck",
     "aller": "Nëmmen hin",
     "retour": "Nëmmen zréck",
@@ -126,6 +126,8 @@
     "depuis": "vun {arret}",
     "vers": "op {arret}",
     "a": "um {heure}",
+    "depart": "Offahrt",
+    "arrivee": "Ukunft",
     "heureNonPubliee": "Auerzäit net publizéiert",
     "ligne": "Linn",
     "alternative": "Och méiglech: {ligne} um {heure}",
@@ -322,6 +324,7 @@
   },
   "maj": {
     "disponible": "Eng nei Versioun ass verfügbar.",
+    "miseAJour": "Nei Versioun — gëtt aktualiséiert…",
     "recharger": "Nei lueden",
     "version": "Versioun {version}",
     "horsLigne": "Offline — d'Ziichte bleiwen ofrufbar."

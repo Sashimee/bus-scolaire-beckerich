@@ -71,7 +71,7 @@
     "maisonCourt": "Home",
     "dillendapp": "Eats at the Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Lunch, whole week:",
+    "touteLaSemaine": "Lunch, whole week",
     "sansCoursApresMidi": "No afternoon classes"
   },
   "dillendapp": {
@@ -86,7 +86,7 @@
     "titre": "Bus",
     "aide": "If you drop off or pick up your child yourself on some days, say so here: the app will then only show the journeys they actually take.",
     "pourJour": "Bus use on {jour}",
-    "touteLaSemaine": "Bus, whole week:",
+    "touteLaSemaine": "Bus, whole week",
     "aller-retour": "There and back",
     "aller": "Outward only",
     "retour": "Return only",
@@ -126,6 +126,8 @@
     "depuis": "from {arret}",
     "vers": "to {arret}",
     "a": "at {heure}",
+    "depart": "Departure",
+    "arrivee": "Arrival",
     "heureNonPubliee": "time not published",
     "ligne": "Line",
     "alternative": "Also possible: {ligne} at {heure}",
@@ -322,6 +324,7 @@
   },
   "maj": {
     "disponible": "A new version is available.",
+    "miseAJour": "New version — updating…",
     "recharger": "Reload",
     "version": "Version {version}",
     "horsLigne": "Offline — the timetables remain available."

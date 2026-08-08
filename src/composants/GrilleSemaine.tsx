@@ -116,40 +116,34 @@ export function GrilleSemaine({
 
       <p className="champ__aide">{t('bus.aide')}</p>
 
-      <div className="rangee">
-        <span className="champ__aide">{t('repas.touteLaSemaine')} :</span>
-        {(['maison', 'dillendapp'] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            className="bouton bouton--discret"
-            onClick={() => onRepasSemaine(option)}
-          >
-            {t(`repas.${option}Court`)}
-          </button>
-        ))}
-      </div>
-
-      <div className="rangee">
-        <label className="champ__aide" htmlFor={`${enfant.id}-bus-semaine`}>
-          {t('bus.touteLaSemaine')}
-        </label>
-        <select
-          id={`${enfant.id}-bus-semaine`}
-          defaultValue=""
-          onChange={(e) => {
-            if (e.target.value) onBusSemaine(e.target.value as UsageBus)
-            e.target.value = ''
-          }}
-        >
-          <option value="">…</option>
-          {USAGES_BUS.map((u) => (
-            <option key={u} value={u}>
-              {t(`bus.${u}`)}
-            </option>
+      {/* Raccourcis : le libellé occupe sa propre ligne, sinon il pousse les boutons
+          hors de l'écran sur un téléphone. Ce sont des actions et non un état — pas
+          d'`aria-pressed`, la grille au-dessus reste la source de vérité. */}
+      <fieldset className="fieldset-nu">
+        <legend className="legende" id={`${enfant.id}-repas-semaine`}>
+          {t('repas.touteLaSemaine')}
+        </legend>
+        <div className="segments" role="group" aria-labelledby={`${enfant.id}-repas-semaine`}>
+          {(['maison', 'dillendapp'] as const).map((option) => (
+            <button key={option} type="button" onClick={() => onRepasSemaine(option)}>
+              {t(`repas.${option}Court`)}
+            </button>
           ))}
-        </select>
-      </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="fieldset-nu">
+        <legend className="legende" id={`${enfant.id}-bus-semaine`}>
+          {t('bus.touteLaSemaine')}
+        </legend>
+        <div className="segments" role="group" aria-labelledby={`${enfant.id}-bus-semaine`}>
+          {USAGES_BUS.map((u) => (
+            <button key={u} type="button" onClick={() => onBusSemaine(u)}>
+              {t(`bus.${u}Court`)}
+            </button>
+          ))}
+        </div>
+      </fieldset>
     </div>
   )
 }

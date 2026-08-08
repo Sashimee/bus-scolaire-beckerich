@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   decalerHeure,
   graviteMax,
+  heureArriveeEffective,
   heureEffective,
   messagePerturbation,
   perturbationsDuJour,
@@ -132,6 +133,39 @@ describe('effet sur les horaires', () => {
   it('ne déborde pas de la journée', () => {
     expect(decalerHeure('23:55', 30)).toBe('23:59')
     expect(decalerHeure('00:05', -30)).toBe('00:00')
+  })
+})
+
+describe('effet sur l’heure d’arrivée', () => {
+  it("décale l'arrivée du même retard que le départ", () => {
+    // Un bus parti en retard arrive en retard : supposer qu'il rattrape ferait
+    // attendre un parent à l'arrêt sur une heure que rien ne garantit.
+    expect(allerLundi.arrivee.heure).toBe('08:00')
+    expect(heureArriveeEffective(allerLundi, [perturbation({ type: 'retard', minutes: 15 })])).toBe(
+      '08:15',
+    )
+  })
+
+  it('cumule plusieurs retards', () => {
+    const retarde = heureArriveeEffective(allerLundi, [
+      perturbation({ id: 'a', type: 'retard', minutes: 10 }),
+      perturbation({ id: 'b', type: 'retard', minutes: 5 }),
+    ])
+    expect(retarde).toBe('08:15')
+  })
+
+  it("n'annonce aucune arrivée pour un trajet annulé", () => {
+    expect(heureArriveeEffective(allerLundi, [perturbation({ type: 'annulation' })])).toBeNull()
+  })
+
+  it("laisse l'heure intacte pour un simple message", () => {
+    expect(heureArriveeEffective(allerLundi, [perturbation({ type: 'message' })])).toBe('08:00')
+  })
+
+  it("reste nulle quand le plan ne publie pas l'heure d'arrivée", () => {
+    const sansArrivee = { ...allerLundi, arrivee: { ...allerLundi.arrivee, heure: null } }
+    expect(heureArriveeEffective(sansArrivee, [])).toBeNull()
+    expect(heureArriveeEffective(sansArrivee, [perturbation({ type: 'retard', minutes: 5 })])).toBeNull()
   })
 })
 
