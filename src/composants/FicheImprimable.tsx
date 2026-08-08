@@ -29,7 +29,10 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
   const semaine = semaineEnfant(ctx)
 
   return (
-    <article className="fiche" aria-hidden="true">
+    /* Pas d'`aria-hidden` : `.fiche` est déjà en `display: none` hors impression, donc
+       absente de l'arbre d'accessibilité. L'y ajouter privait en revanche de tout
+       contenu qui imprime en PDF pour le relire ensuite. */
+    <article className="fiche">
       <header className="fiche__entete">
         <h1 className="fiche__nom">{enfant.prenom}</h1>
         <p className="fiche__site">

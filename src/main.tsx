@@ -6,6 +6,7 @@ import { FournisseurTraduction } from './i18n'
 import { FournisseurFoyer } from './etat'
 import { FournisseurUrgences } from './urgences-contexte'
 import { FournisseurRechargement } from './rechargement-contexte'
+import { FournisseurInstallation } from './installation-contexte'
 import './index.css'
 
 // GitHub Pages sert `404.html` pour toute route inconnue. Celui-ci mémorise le chemin
@@ -29,7 +30,9 @@ createRoot(document.getElementById('root')!).render(
         <FournisseurRechargement>
           <FournisseurUrgences>
             <FournisseurFoyer>
-              <App />
+              <FournisseurInstallation>
+                <App />
+              </FournisseurInstallation>
             </FournisseurFoyer>
           </FournisseurUrgences>
         </FournisseurRechargement>

@@ -10,6 +10,7 @@
  * des points de terminaison push, qui sont des identifiants d'appareil opaques.
  */
 import { base64urlEncode, genererRequetePush, importerClesVapid } from './push.js'
+import { routerCommune } from './commune.js'
 
 const PREFIXE_ABONNEMENT = 'abonnement:'
 const PREFIXE_ETAT = 'oauth:'
@@ -21,6 +22,28 @@ const cors = (origine) => ({
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Max-Age': '86400',
 })
+
+/**
+ * CORS de l'espace commune : l'origine n'est renvoyée que si elle figure dans
+ * `ORIGINES_AUTORISEES`.
+ *
+ * `cors()` ci-dessus renvoie l'origine de la requête telle quelle, ce qui autorise de
+ * fait tout le monde — c'est un point relevé pour le lot 11, qui reprendra les routes
+ * existantes. Les routes ajoutées ici ne doivent pas hériter du défaut.
+ */
+const corsCommune = (origine, env) => {
+  const permises = (env.ORIGINES_AUTORISEES ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+  return {
+    'Access-Control-Allow-Origin': permises.includes(origine) ? origine : permises[0] ?? 'null',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  }
+}
 
 const json = (donnees, statut = 200, entetes = {}) =>
   new Response(JSON.stringify(donnees), {
@@ -324,7 +347,10 @@ export default {
     const origine = requete.headers.get('Origin') ?? '*'
 
     if (requete.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: cors(origine) })
+      const entetes = url.pathname.startsWith('/commune/')
+        ? corsCommune(origine, env)
+        : cors(origine)
+      return new Response(null, { status: 204, headers: entetes })
     }
 
     // `return await` et non `return` : sans l'attente, la promesse s'échappe du `try` et
@@ -332,12 +358,16 @@ export default {
     // d'erreur HTML 1101 en lieu et place du JSON, ce qui rendait toute panne illisible
     // depuis GitHub Actions.
     try {
+      const commune = await routerCommune(requete, env, url, corsCommune(origine, env))
+      if (commune) return commune
+
       switch (`${requete.method} ${url.pathname}`) {
         case 'GET /sante':
           return json({
             ok: true,
             oauth: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
             ...(await santePush(env)),
+            commune: Boolean(env.SECRET_SESSION && env.GITHUB_PAT),
             origines: env.ORIGINES_AUTORISEES ?? '',
           })
         case 'GET /auth/start':

@@ -70,10 +70,57 @@ Pour l'utiliser, il faut se connecter, de l'une des deux façons :
 Plus la portée est précise, moins on alarme de parents inutilement. Une perturbation
 sans `ligne` ni `arret` s'affiche chez **tout le monde**.
 
-### Donner accès à la commune
+### Donner accès à un agent communal
 
-Inviter le compte GitHub concerné en **Write** sur le dépôt
-(`Settings → Collaborators`). Rien d'autre à faire : la page `/admin` le reconnaîtra.
+**C'est la voie normale depuis l'espace commune.** L'agent n'a besoin d'aucun compte
+GitHub, ne voit aucun JSON, et ne détient aucun jeton : il se connecte avec un code
+personnel sur `/commune`, et c'est le Worker qui publie en son nom.
+
+Prérequis, une seule fois :
+
+```bash
+cd worker
+npx wrangler secret put SECRET_SESSION   # une longue chaîne au hasard, à ne pas réutiliser
+npx wrangler secret put GITHUB_PAT       # voir ci-dessous
+npx wrangler deploy
+```
+
+Le `GITHUB_PAT` est un jeton **fine-grained** (`Settings → Developer settings → Personal
+access tokens → Fine-grained tokens`), limité à **ce seul dépôt**, avec la permission
+`Contents: Read and write` et rien d'autre. C'est lui qui écrit ; il ne quitte jamais
+le Worker.
+
+Puis, pour chaque agent :
+
+```bash
+./creer-agent.sh "Marie Weber" "service technique"
+```
+
+Le script engendre un code au format `xxxx-xxxx`, en stocke **l'empreinte SHA-256** dans
+le KV et affiche le code **une seule fois**. Il n'est récupérable nulle part ensuite :
+en cas de perte, on en crée un autre et on retire l'ancien. Transmettez-le de vive voix
+ou par un canal distinct de celui du lien.
+
+Le Worker limite les tentatives à **5 par quart d'heure et par adresse IP**, sans quoi
+un code de huit caractères se forcerait en quelques heures. Chaque publication est
+inscrite au journal, consultable sur `/commune` : qui a publié quoi, et quand.
+
+Pour retirer un accès, la commande est affichée à la création. On peut aussi lister les
+agents :
+
+```bash
+npx wrangler kv key list --binding ABONNEMENTS --remote --prefix "agent:"
+```
+
+### Donner accès au mainteneur (`/admin`)
+
+La page `/admin` reste réservée au mainteneur, avec les outils avancés : correction
+d'arrêts sur carte, édition du plan complet. Inviter le compte GitHub concerné en
+**Write** sur le dépôt (`Settings → Collaborators`) ; la page le reconnaîtra.
+
+Préférez cependant un jeton **fine-grained** saisi à la main dans le champ prévu par
+`/admin` : la connexion OAuth demande la portée `repo`, très large, que GitHub n'offre
+pas plus étroite en OAuth classique.
 
 ---
 

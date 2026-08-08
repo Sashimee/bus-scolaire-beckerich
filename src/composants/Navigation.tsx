@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useT } from '../i18n'
+import { useInstallation } from '../installation-contexte'
 
 /**
  * Navigation principale.
@@ -43,6 +44,19 @@ const ENTREES: Entree[] = [
   },
 ]
 
+/**
+ * L'installation, ajoutée en dernière entrée tant qu'elle n'est pas faite.
+ *
+ * Elle disparaît une fois l'application installée : garder une entrée permanente vers
+ * une action déjà accomplie occuperait un cinquième de la barre pour rien.
+ */
+const ENTREE_INSTALLER: Entree = {
+  vers: '/installer',
+  // Libellé court : « Installer l'application » déborderait d'une case de barre basse.
+  cle: 'installerCourt',
+  trace: 'M12 4v10M8 11l4 4 4-4M5 17v2a1 1 0 001 1h12a1 1 0 001-1v-2',
+}
+
 function Icone({ trace }: { trace: string }) {
   return (
     <svg className="nav-basse__icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -69,10 +83,12 @@ export function NavigationHaute() {
 /** Variante basse, fixée au bord de l'écran, sur téléphone. */
 export function NavigationBasse() {
   const { t } = useT()
+  const { installee } = useInstallation()
+  const entrees = installee ? ENTREES : [...ENTREES, ENTREE_INSTALLER]
 
   return (
     <nav className="nav-basse" aria-label={t('nav.principale')}>
-      {ENTREES.map((e) => (
+      {entrees.map((e) => (
         <NavLink key={e.vers} to={e.vers} end={e.exact} className="nav-basse__lien">
           <Icone trace={e.trace} />
           <span>{t(`nav.${e.cle}`)}</span>

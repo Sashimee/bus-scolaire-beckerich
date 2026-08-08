@@ -15,6 +15,7 @@
     "limites": "Grenzen der Website",
     "independance": "Unabhängige Website",
     "installer": "App installieren",
+    "installerCourt": "Installieren",
     "menu": "Menü",
     "retour": "Zurück",
     "principale": "Hauptnavigation"
@@ -261,7 +262,10 @@
     "versMaison": "→ nach Hause",
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Blatt erstellt am {date}",
-    "aPied": "Zu Fuß"
+    "aPied": "Zu Fuß",
+    "famille": "Ganze Familie drucken",
+    "familleTitre": "Schulbus — die Woche",
+    "familleAide": "Eine einzige A4-Seite: die fünf Tage als Zeilen, ein Kind pro Spalte."
   },
   "carte": {
     "titre": "Fußweg",
@@ -363,7 +367,23 @@
     "firefox": "Firefox",
     "firefoxNote": "Firefox am Computer kann keine Web-Apps installieren. Setzen Sie die Website stattdessen auf Ihre Lesezeichen. Unter Android bietet Firefox im Menü „Zum Startbildschirm hinzufügen“ an.",
     "boutonInstaller": "Jetzt installieren",
-    "dejaInstallee": "Die App ist auf diesem Gerät bereits installiert."
+    "dejaInstallee": "Die App ist auf diesem Gerät bereits installiert.",
+    "inviteTitre": "Auf dem Startbildschirm installieren?",
+    "inviteCorps": "Die App öffnet sich dann wie jede andere, direkt vom Startbildschirm aus.",
+    "voirProcedure": "Anleitung ansehen",
+    "plusTard": "Später",
+    "pourquoiTitre": "Was sich dadurch ändert",
+    "atoutHorsLigne": "Die Fahrzeiten bleiben ohne Netz abrufbar, an der Haltestelle wie im Zug.",
+    "atoutNotifications": "Störungsmeldungen werden möglich — auf dem iPhone unerlässlich, da sie anders gar nicht existieren.",
+    "atoutPleinEcran": "Keine Adressleiste mehr: der ganze Bildschirm zeigt Fahrzeiten.",
+    "atoutPoids": "Die Installation lädt nichts zusätzlich herunter: die bereits gespeicherte Seite bekommt nur ein Symbol.",
+    "demoEcranAccueil": "Zum Startbildschirm",
+    "demoCopier": "Kopieren",
+    "demoMarquePage": "Lesezeichen",
+    "demoNouvelOnglet": "Neuer Tab",
+    "demoInstaller": "App installieren",
+    "demoParametres": "Einstellungen",
+    "demoValider": "Installieren"
   },
   "maj": {
     "disponible": "Eine neue Version ist verfügbar.",

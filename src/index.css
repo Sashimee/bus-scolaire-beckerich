@@ -954,6 +954,34 @@
     background: var(--danger-fond);
   }
 
+  /*
+   * --- Boîte de dialogue --------------------------------------------------------
+   * Le `<dialog>` natif apporte le piège à focus, la fermeture par Échap et le fond
+   * inerte. Il ne reste qu'à l'habiller — et à le décoller du bas sur téléphone, où
+   * la navigation basse occupe déjà le bord.
+   */
+  .dialogue {
+    inline-size: min(28rem, calc(100vw - 2 * var(--espace-4)));
+    padding: var(--espace-5);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-l);
+    background: var(--surface);
+    color: var(--encre);
+    box-shadow: var(--ombre-3);
+    margin-block-end: calc(var(--cible) + var(--espace-5) + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 48rem) {
+    .dialogue {
+      margin-block-end: auto;
+    }
+  }
+
+  .dialogue::backdrop {
+    background: rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(2px);
+  }
+
   /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
     background: var(--surface-haute);
@@ -1025,6 +1053,213 @@
     border-radius: var(--rayon-s);
     overflow: hidden;
     border: var(--trait) solid var(--bord);
+  }
+
+  /*
+   * --- Démonstrations d'installation --------------------------------------------
+   *
+   * Chaque suite d'images dure 6 s et se termine sur l'état informatif : panneau
+   * ouvert, bonne ligne en surbrillance. C'est ce qui rend `prefers-reduced-motion`
+   * gratuit — la règle globale de la couche `base` ramène la durée à presque zéro et
+   * l'itération à une, et `forwards` fige alors l'image sur cette dernière étape, qui
+   * explique à elle seule la manœuvre.
+   */
+  .demo {
+    inline-size: 100%;
+    max-inline-size: 15rem;
+    block-size: auto;
+    margin-inline: auto;
+  }
+
+  .demo__appareil {
+    fill: var(--fond-creux);
+    stroke: var(--bord);
+    stroke-width: 2;
+  }
+
+  .demo__contenu,
+  .demo__barre {
+    fill: var(--surface);
+    stroke: var(--bord);
+    stroke-width: 1;
+  }
+
+  /*
+   * 8 px dans le repère du SVG, pas à l'écran : les démonstrations sont mises à
+   * l'échelle par `viewBox`, et « Installer l'application » doit tenir dans son
+   * panneau dans les cinq langues.
+   */
+  .demo__texte {
+    fill: var(--encre);
+    font-family: system-ui, sans-serif;
+    font-size: 8px;
+  }
+
+  .demo__texte--titre {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .demo__texte--url {
+    fill: var(--encre-douce);
+    font-size: 8px;
+  }
+
+  .demo__texte--bouton {
+    fill: var(--encre-sur-accent);
+    font-weight: 700;
+  }
+
+  .demo__points circle {
+    fill: var(--encre-douce);
+  }
+
+  .demo__icone-partage rect,
+  .demo__icone-installer rect {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .demo__icone-partage path,
+  .demo__icone-installer path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .demo__panneau > rect:first-child {
+    fill: var(--surface-haute);
+    stroke: var(--bord);
+    stroke-width: 1;
+  }
+
+  .demo__surbrillance {
+    fill: var(--accent);
+  }
+
+  /* La ligne mise en avant s'écrit sur l'accent : sans ça, elle devient illisible. */
+  .demo__surbrillance + .demo__texte {
+    fill: var(--encre-sur-accent);
+    font-weight: 700;
+  }
+
+  .demo__pointeur {
+    fill: color-mix(in oklab, var(--accent) 55%, transparent);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    animation: 6s ease-in-out infinite forwards;
+  }
+
+  .demo__panneau {
+    animation: 6s ease-in-out infinite forwards demo-panneau;
+    transform-origin: center;
+  }
+
+  /* Le panneau reste invisible tant que le pointeur n'a pas atteint sa cible. */
+  @keyframes demo-panneau {
+    0%,
+    30% {
+      opacity: 0;
+    }
+    45%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .demo__panneau--bas {
+    animation-name: demo-panneau, demo-monte;
+  }
+  .demo__panneau--haut,
+  .demo__panneau--boite {
+    animation-name: demo-panneau, demo-descend;
+  }
+
+  @keyframes demo-monte {
+    0%,
+    30% {
+      transform: translateY(40px);
+    }
+    45%,
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes demo-descend {
+    0%,
+    30% {
+      transform: translateY(-16px);
+    }
+    45%,
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* Le pointeur part du centre, rejoint la commande, puis la ligne à choisir. */
+  .demo--ios .demo__pointeur {
+    animation-name: demo-pointeur-ios;
+  }
+  @keyframes demo-pointeur-ios {
+    0% {
+      transform: translate(80px, 130px);
+      opacity: 0;
+    }
+    10%,
+    30% {
+      transform: translate(51px, 233px);
+      opacity: 1;
+    }
+    55%,
+    100% {
+      transform: translate(60px, 176px);
+      opacity: 1;
+    }
+  }
+
+  .demo--android .demo__pointeur,
+  .demo--firefox .demo__pointeur {
+    animation-name: demo-pointeur-android;
+  }
+  @keyframes demo-pointeur-android {
+    0% {
+      transform: translate(80px, 140px);
+      opacity: 0;
+    }
+    10%,
+    30% {
+      transform: translate(140px, 25px);
+      opacity: 1;
+    }
+    55%,
+    100% {
+      transform: translate(75px, 84px);
+      opacity: 1;
+    }
+  }
+
+  .demo--bureau .demo__pointeur {
+    animation-name: demo-pointeur-bureau;
+  }
+  @keyframes demo-pointeur-bureau {
+    0% {
+      transform: translate(110px, 90px);
+      opacity: 0;
+    }
+    10%,
+    30% {
+      transform: translate(193px, 25px);
+      opacity: 1;
+    }
+    55%,
+    100% {
+      transform: translate(150px, 75px);
+      opacity: 1;
+    }
   }
 
   /* --- Repli (`<details>`) ------------------------------------------------------ */
@@ -1247,6 +1482,72 @@
 
     .fiche__pied p {
       margin: 0 0 1mm;
+    }
+
+    /*
+     * — Fiche de tout le foyer ————————————————————————————————
+     * Un tableau, les cinq jours en lignes, un enfant par colonne. La contrainte est
+     * la largeur : (186 mm − 22 mm pour la colonne des jours) / N. À cinq enfants,
+     * 33 mm par colonne, ce qui suffit tout juste à « 07:25 → 07:45 » sur deux lignes.
+     * Au-delà, `FicheFoyer` pagine par groupes de quatre — d'où l'absence de bascule
+     * en paysage, qui n'aurait plus rien à corriger.
+     */
+    .fiche-foyer + .fiche-foyer {
+      break-before: page;
+    }
+
+    .fiche-foyer__tableau {
+      table-layout: fixed;
+    }
+
+    .fiche-foyer__tableau tbody th,
+    .fiche-foyer__tableau tbody td:first-of-type {
+      inline-size: 22mm;
+    }
+
+    .fiche-foyer__prenom {
+      display: block;
+      font-size: 11pt;
+    }
+
+    .fiche-foyer__tableau thead th {
+      text-transform: none;
+      letter-spacing: 0;
+      vertical-align: top;
+    }
+
+    /* Une journée ne doit jamais être coupée entre deux pages. */
+    .fiche-foyer__tableau tr {
+      break-inside: avoid;
+    }
+
+    /* Les trajets s'empilent : en ligne, deux heures et un nom de ligne ne tiennent pas. */
+    .fiche__trajets--colonne {
+      display: block;
+    }
+
+    .fiche__trajets--colonne li + li {
+      margin-block-start: 1mm;
+    }
+
+    .fiche__trajets--colonne .fiche__ligne {
+      display: block;
+    }
+
+    /*
+     * Le corps de texte suit le nombre d'enfants de la page. En attribut de données
+     * plutôt qu'en variable posée par un `style={{ … }}` : un composant ne porte que
+     * des classes, et cinq cas se listent plus vite qu'ils ne se calculent.
+     */
+    .fiche-foyer[data-enfants='4'] {
+      font-size: 9.5pt;
+    }
+    .fiche-foyer[data-enfants='5'] {
+      font-size: 9pt;
+    }
+    .fiche-foyer[data-enfants='4'] .fiche-foyer__prenom,
+    .fiche-foyer[data-enfants='5'] .fiche-foyer__prenom {
+      font-size: 10pt;
     }
   }
 }

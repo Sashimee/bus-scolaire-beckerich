@@ -7,12 +7,15 @@ import { toutEffacer } from '../lib/stockage'
 import { siteDuCycle } from '../lib/donnees'
 import { sourceAdresses } from '../lib/adresses'
 import { Notifications } from '../composants/Notifications'
+import { FicheFoyer } from '../composants/FicheFoyer'
+import { useInstallation } from '../installation-contexte'
 
 const THEMES: Theme[] = ['auto', 'clair', 'sombre']
 
 export function Reglages() {
   const { t, langue, changerLangue } = useT()
-  const { foyer, configure, theme, definirTheme } = useFoyer()
+  const { foyer, contextes, configure, theme, definirTheme } = useFoyer()
+  const { installee } = useInstallation()
   const [copie, setCopie] = useState(false)
   const [montrerQr, setMontrerQr] = useState(false)
   const [qr, setQr] = useState<string | null>(null)
@@ -33,8 +36,15 @@ export function Reglages() {
     }
   }, [montrerQr, lien])
 
+  const calcules = foyer.enfants
+    .map((e) => contextes.get(e.id))
+    .filter((c) => c !== null && c !== undefined)
+
   return (
-    <div className="pile pile--large">
+    <>
+      <FicheFoyer contextes={calcules} />
+
+      <div className="pile pile--large ecran-seulement">
       <h2>{t('reglages.titre')}</h2>
 
       <section className="carte pile pile--serre">
@@ -98,6 +108,15 @@ export function Reglages() {
         <Link to="/configurer" className="bouton">
           {t('commun.modifier')}
         </Link>
+
+        {calcules.length > 0 && (
+          <>
+            <button type="button" className="bouton" onClick={() => window.print()}>
+              {t('impression.famille')}
+            </button>
+            <p className="champ__aide">{t('impression.familleAide')}</p>
+          </>
+        )}
       </section>
 
       {configure && (
@@ -130,6 +149,18 @@ export function Reglages() {
         </section>
       )}
 
+      {/* Entrée permanente tant que l'application n'est pas installée : c'est le
+          réglage qui débloque les notifications sur iPhone. */}
+      {!installee && (
+        <section className="carte pile pile--serre">
+          <h3 className="titre-carte">{t('installer.titre')}</h3>
+          <p className="champ__aide">{t('installer.atoutNotifications')}</p>
+          <Link to="/installer" className="bouton bouton--primaire">
+            {t('nav.installer')}
+          </Link>
+        </section>
+      )}
+
       <Notifications />
 
       <section className="carte pile pile--serre">
@@ -150,6 +181,7 @@ export function Reglages() {
           {t('reglages.effacer')}
         </button>
       </section>
-    </div>
+      </div>
+    </>
   )
 }

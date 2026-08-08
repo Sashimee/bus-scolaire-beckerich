@@ -15,6 +15,7 @@
     "limites": "Grenze vun der Säit",
     "independance": "Onofhängeg Säit",
     "installer": "App installéieren",
+    "installerCourt": "Installéieren",
     "menu": "Menü",
     "retour": "Zréck",
     "principale": "Haaptnavigatioun"
@@ -261,7 +262,10 @@
     "versMaison": "→ heem",
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Blat erstallt den {date}",
-    "aPied": "Zu Fouss"
+    "aPied": "Zu Fouss",
+    "famille": "Ganz Famill drécken",
+    "familleTitre": "Schoulbus — d'Woch",
+    "familleAide": "Eng eenzeg A4-Säit: déi fënnef Deeg als Zeilen, ee Kand pro Kolonn."
   },
   "carte": {
     "titre": "Wee zu Fouss",
@@ -363,7 +367,23 @@
     "firefox": "Firefox",
     "firefoxNote": "De Firefox um Computer kann keng Web-Apps installéieren. Setzt d'Säit amplaz op Är Lieszeechen. Um Android bitt de Firefox am Menü „Op den Startbildschierm setzen“ un.",
     "boutonInstaller": "Elo installéieren",
-    "dejaInstallee": "D'App ass op dësem Apparat scho installéiert."
+    "dejaInstallee": "D'App ass op dësem Apparat scho installéiert.",
+    "inviteTitre": "Um Startbildschierm installéieren?",
+    "inviteCorps": "D'App geet dann op wéi all aner, direkt vum Startbildschierm aus.",
+    "voirProcedure": "Uleedung kucken",
+    "plusTard": "Méi spéit",
+    "pourquoiTitre": "Wat dat ännert",
+    "atoutHorsLigne": "D'Auerzäite bleiwen ouni Netz consultéierbar, um Arrêt wéi am Zuch.",
+    "atoutNotifications": "Meldunge bei Stéierunge ginn méiglech — um iPhone onerlässlech, well se soss guer net existéieren.",
+    "atoutPleinEcran": "Keng Adressleescht méi: de ganze Bildschierm weist Auerzäiten.",
+    "atoutPoids": "D'Installatioun lued näischt zousätzlech erof: déi scho gespäichert Säit kritt just eng Ikon.",
+    "demoEcranAccueil": "Op de Startbildschierm",
+    "demoCopier": "Kopéieren",
+    "demoMarquePage": "Lieszeechen",
+    "demoNouvelOnglet": "Neien Tab",
+    "demoInstaller": "App installéieren",
+    "demoParametres": "Astellungen",
+    "demoValider": "Installéieren"
   },
   "maj": {
     "disponible": "Eng nei Versioun ass verfügbar.",

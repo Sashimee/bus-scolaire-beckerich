@@ -455,6 +455,30 @@ dupliquée, aucun état de brouillon parallèle.
 
 ## Lot 6 — Installation de l'application (PWA)
 
+> **Fait le 2026-08-08.** Les deux parties sont livrées. Écarts et ajouts :
+>
+> - `src/installation-contexte.tsx` capte `beforeinstallprompt` au niveau de
+>   l'application et expose `invite`, `installee`, `estIOS`, `proposable`,
+>   `installer()`, `reporter()` et `noterFicheVue()`.
+> - La boîte s'ouvre après **2 visites ou 1 fiche enfant consultée**, jamais avant que
+>   le foyer soit configuré, et un refus vaut **30 jours**. Les cinq conditions ont été
+>   éprouvées une à une dans le navigateur.
+> - Quatre démonstrations SVG écrites à la main dans
+>   `src/composants/installation/Demonstrations.tsx`. L'animation est portée par la CSS
+>   et non par SMIL : c'est ce qui rend `prefers-reduced-motion` gratuit, la règle
+>   globale de la couche `base` ramenant la durée à presque zéro et `forwards` figeant
+>   l'image sur la dernière étape — qui est justement l'étape informative.
+> - **Défaut trouvé et corrigé** : « Plus tard » fermait la boîte sans mémoriser le
+>   refus, qui serait donc revenu à chaque ouverture. Deux causes successives — un
+>   `onClose` que React ne relayait pas, puis un effet aux dépendances stables qui ne se
+>   rejouait jamais pour trouver la boîte, absente au premier rendu. La boîte est
+>   désormais pilotée par l'état, plus par un `close()` impératif.
+> - **Défaut trouvé et corrigé** : « Installer l'application » débordait de son panneau
+>   dans deux démonstrations. Les quatre démonstrations sont maintenant mesurées dans
+>   les cinq langues.
+> - L'entrée permanente de la barre basse porte un libellé court : « Installer
+>   l'application » ne tient pas dans une case.
+
 *Dépend du lot 2.*
 
 ### 6.1 Invitation active
@@ -491,6 +515,25 @@ Remplacer les listes d'étapes textuelles par des **démonstrations animées par
 ---
 
 ## Lot 7 — Impression : tous les enfants sur une feuille A4
+
+> **Fait le 2026-08-08.** `src/composants/FicheFoyer.tsx` livré, avec le bouton sur
+> l'accueil et sur `/reglages`. Écarts :
+>
+> - **La bascule en paysage au-delà de 5 enfants n'a pas été faite, volontairement** :
+>   elle contredit la règle de pagination par groupes de 4 énoncée juste au-dessus.
+>   Une page ne portant jamais plus de 4 colonnes au-delà de 5 enfants, le paysage
+>   n'aurait plus rien à corriger — c'était une règle morte.
+> - Le corps de texte suit `data-enfants` plutôt qu'une variable CSS posée en ligne :
+>   un composant ne porte que des classes, et cinq cas se listent plus vite qu'ils ne
+>   se calculent.
+> - `FicheImprimable` perd son `aria-hidden="true"`, comme le demandait le §11.3 : la
+>   fiche est déjà en `display: none` hors impression, donc absente de l'arbre
+>   d'accessibilité, et l'attribut privait de tout contenu qui imprime en PDF pour le
+>   relire ensuite.
+> - Vérifié par la structure du DOM — 5 enfants sur une page de 6 colonnes, 7 enfants
+>   sur deux pages de 4 et 3. **L'aperçu papier lui-même n'a pas pu être contrôlé** :
+>   ce navigateur n'expose pas l'émulation du média `print`, et ouvrir la boîte
+>   d'impression bloquerait la session.
 
 *Dépend du lot 2.*
 
@@ -537,6 +580,24 @@ théorique — mais il doit produire deux pages propres, pas une bouillie.
 ---
 
 ## Lot 8 — Espace commune (partie Worker)
+
+> **Fait le 2026-08-08.** `worker/src/commune.js` livré avec ses quatre routes, plus
+> `worker/creer-agent.sh` et la section d'ADMIN.md. 28 tests. Écarts et ajouts :
+>
+> - `validerPlan()` est bien **importé** depuis `src/lib/validation.ts` par le Worker,
+>   comme demandé : vérifié par `wrangler deploy --dry-run`, esbuild résout le
+>   TypeScript et les imports JSON sans configuration.
+> - En revanche, `src/lib/github.ts` **n'a pas pu être partagé** : il importe
+>   `src/config.ts`, qui lit `import.meta.env` et n'existe donc pas hors de Vite.
+>   `worker/src/github.js` reprend le strict nécessaire, avec le dépôt en variable
+>   d'environnement plutôt qu'en constante compilée.
+> - Le CORS des routes `/commune/*` vérifie l'origine contre `ORIGINES_AUTORISEES`.
+>   Les routes existantes gardent leur `cors()` permissif : leur reprise est
+>   explicitement au lot 11, et les mélanger aurait brouillé les deux lots.
+> - `publiePar` est toujours pris dans la session, jamais dans la charge : un client
+>   ne choisit pas la signature de sa publication.
+> - Le script engendre le code en base 32 sans caractères ambigus (ni 0/O, ni 1/l/I) :
+>   un code se dicte au téléphone.
 
 *Indépendant des lots 1 à 7. Peut être lancé en parallèle.*
 

@@ -15,6 +15,7 @@
     "limites": "Limits of this site",
     "independance": "Independent site",
     "installer": "Install the app",
+    "installerCourt": "Install",
     "menu": "Menu",
     "retour": "Back",
     "principale": "Main navigation"
@@ -261,7 +262,10 @@
     "versMaison": "→ home",
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Sheet generated on {date}",
-    "aPied": "On foot"
+    "aPied": "On foot",
+    "famille": "Print the whole family",
+    "familleTitre": "School bus — the week",
+    "familleAide": "A single A4 page: the five days as rows, one child per column."
   },
   "carte": {
     "titre": "Walking route",
@@ -363,7 +367,23 @@
     "firefox": "Firefox",
     "firefoxNote": "Firefox on desktop cannot install web apps. Bookmark the site instead. On Android, Firefox offers \"Add to Home screen\" in its menu.",
     "boutonInstaller": "Install now",
-    "dejaInstallee": "The app is already installed on this device."
+    "dejaInstallee": "The app is already installed on this device.",
+    "inviteTitre": "Install on your home screen?",
+    "inviteCorps": "The app then opens like any other, straight from your home screen.",
+    "voirProcedure": "See how",
+    "plusTard": "Later",
+    "pourquoiTitre": "What it changes",
+    "atoutHorsLigne": "Timetables stay available with no network, at the bus stop as on the train.",
+    "atoutNotifications": "Disruption notifications become possible — essential on iPhone, where they do not exist otherwise.",
+    "atoutPleinEcran": "No more address bar: the whole screen shows timetables.",
+    "atoutPoids": "Installing downloads nothing extra: the site already in memory simply gets an icon.",
+    "demoEcranAccueil": "Add to Home Screen",
+    "demoCopier": "Copy",
+    "demoMarquePage": "Bookmark",
+    "demoNouvelOnglet": "New tab",
+    "demoInstaller": "Install app",
+    "demoParametres": "Settings",
+    "demoValider": "Install"
   },
   "maj": {
     "disponible": "A new version is available.",

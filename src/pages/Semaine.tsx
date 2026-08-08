@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useFoyer } from '../etat'
+import { useInstallation } from '../installation-contexte'
 import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { FicheImprimable } from '../composants/FicheImprimable'
@@ -19,6 +21,13 @@ export function Semaine() {
   const { id } = useParams()
   const { foyer, contextes } = useFoyer()
   const { urgences } = useUrgences()
+  const { noterFicheVue } = useInstallation()
+
+  // Consulter la semaine d'un enfant, c'est se servir de l'application pour de bon :
+  // c'est à partir de là qu'une invitation à l'installer a du sens.
+  useEffect(() => {
+    noterFicheVue()
+  }, [noterFicheVue])
   // Les perturbations portent une date ; la fiche raisonne en jours de semaine.
   // On rattache donc chaque jour à sa date réelle dans la semaine en cours.
   const dates = datesDeLaSemaine()

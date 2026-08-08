@@ -1,69 +1,57 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useT } from '../i18n'
+import { estAppareilIOS, useInstallation } from '../installation-contexte'
+import { DEMONSTRATIONS } from '../composants/installation/Demonstrations'
 
-type Plateforme = 'ios' | 'android' | 'bureau' | 'firefox'
+type Plateforme = keyof typeof DEMONSTRATIONS
 
 /** Devine la plateforme pour mettre en avant la bonne procédure, sans masquer les autres. */
 function detecter(): Plateforme {
   const ua = navigator.userAgent
-  // iPadOS se déclare comme un Mac depuis iOS 13 : le test tactile lève l'ambiguïté.
-  const estIOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
-  if (estIOS) return 'ios'
+  if (estAppareilIOS()) return 'ios'
   if (/Android/.test(ua)) return 'android'
   if (/Firefox\//.test(ua)) return 'firefox'
   return 'bureau'
 }
 
-interface EvenementInstallation extends Event {
-  prompt: () => Promise<void>
-}
+const PLATEFORMES: Plateforme[] = ['ios', 'android', 'bureau', 'firefox']
 
-export function Installer() {
+/**
+ * Un bloc de procédure : la démonstration animée, puis les étapes en toutes lettres.
+ *
+ * L'animation ne remplace pas le texte, elle le double. Un parent qui n'a pas
+ * l'application sous les yeux au même moment doit pouvoir suivre la liste seule, et
+ * un lecteur d'écran n'a que celle-ci.
+ */
+function Procedure({ cle, principal }: { cle: Plateforme; principal: boolean }) {
   const { t, tListe } = useT()
-  const [plateforme] = useState(detecter)
-  const [invite, setInvite] = useState<EvenementInstallation | null>(null)
-  const [installee, setInstallee] = useState(
-    () => window.matchMedia('(display-mode: standalone)').matches,
-  )
+  const Demonstration = DEMONSTRATIONS[cle]
+  const etapes = cle === 'firefox' ? [] : tListe(`installer.${cle}Etapes`)
+  const note =
+    cle === 'ios' ? t('installer.iosNote') : cle === 'firefox' ? t('installer.firefoxNote') : null
 
-  useEffect(() => {
-    // Chrome et Edge proposent une installation programmatique ; Safari non.
-    const capturer = (e: Event) => {
-      e.preventDefault()
-      setInvite(e as EvenementInstallation)
-    }
-    const installe = () => setInstallee(true)
-    window.addEventListener('beforeinstallprompt', capturer)
-    window.addEventListener('appinstalled', installe)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', capturer)
-      window.removeEventListener('appinstalled', installe)
-    }
-  }, [])
-
-  const procedures: { cle: Plateforme; etapes: string[]; note?: string }[] = [
-    { cle: 'ios', etapes: tListe('installer.iosEtapes'), note: t('installer.iosNote') },
-    { cle: 'android', etapes: tListe('installer.androidEtapes') },
-    { cle: 'bureau', etapes: tListe('installer.bureauEtapes') },
-    { cle: 'firefox', etapes: [], note: t('installer.firefoxNote') },
-  ]
-
-  const misEnAvant = procedures.find((p) => p.cle === plateforme)!
-  const autres = procedures.filter((p) => p.cle !== plateforme)
-
-  const bloc = (p: (typeof procedures)[number], principal: boolean) => (
-    <section className={principal ? 'carte carte--accent pile pile--serre' : 'pile pile--serre'} key={p.cle}>
-      <h3 className="titre-carte">{t(`installer.${p.cle}`)}</h3>
-      {p.etapes.length > 0 && (
+  return (
+    <div className={principal ? 'carte carte--accent pile' : 'pile'}>
+      <h3 className="titre-carte">{t(`installer.${cle}`)}</h3>
+      <Demonstration />
+      {etapes.length > 0 && (
         <ol className="pile pile--serre liste-puces">
-          {p.etapes.map((etape) => (
+          {etapes.map((etape) => (
             <li key={etape}>{etape}</li>
           ))}
         </ol>
       )}
-      {p.note && <p className="champ__aide">{p.note}</p>}
-    </section>
+      {note && <p className="champ__aide">{note}</p>}
+    </div>
   )
+}
+
+export function Installer() {
+  const { t } = useT()
+  const [plateforme] = useState(detecter)
+  const { invite, installee, installer } = useInstallation()
+
+  const autres = PLATEFORMES.filter((p) => p !== plateforme)
 
   return (
     <div className="pile pile--large">
@@ -72,30 +60,39 @@ export function Installer() {
         <p>{t('installer.intro')}</p>
       </header>
 
+      {/* Ce que l'installation apporte concrètement, avant la manière de s'y prendre :
+          c'est la seule question que le parent se pose vraiment. */}
+      <section className="carte pile pile--serre">
+        <h3 className="titre-carte">{t('installer.pourquoiTitre')}</h3>
+        <ul className="liste-puces pile pile--serre">
+          <li>{t('installer.atoutHorsLigne')}</li>
+          <li>{t('installer.atoutNotifications')}</li>
+          <li>{t('installer.atoutPleinEcran')}</li>
+        </ul>
+        <p className="champ__aide">{t('installer.atoutPoids')}</p>
+      </section>
+
       {installee && <div className="encart encart--info">{t('installer.dejaInstallee')}</div>}
 
       {invite && !installee && (
-        <button
-          type="button"
-          className="bouton bouton--primaire"
-          onClick={async () => {
-            await invite.prompt()
-            setInvite(null)
-          }}
-        >
+        <button type="button" className="bouton bouton--primaire" onClick={() => void installer()}>
           {t('installer.boutonInstaller')}
         </button>
       )}
 
-      <div className="pile">
+      <section className="pile pile--serre">
         <span className="etiquette">{t('installer.detecte')}</span>
-        {bloc(misEnAvant, true)}
-      </div>
+        <Procedure cle={plateforme} principal />
+      </section>
 
-      <div className="pile">
-        <span className="etiquette">{t('installer.autres')}</span>
-        {autres.map((p) => bloc(p, false))}
-      </div>
+      <details className="repli carte">
+        <summary>{t('installer.autres')}</summary>
+        <div className="pile pile--large">
+          {autres.map((p) => (
+            <Procedure key={p} cle={p} principal={false} />
+          ))}
+        </div>
+      </details>
     </div>
   )
 }

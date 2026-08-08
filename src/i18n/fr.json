@@ -15,6 +15,7 @@
     "limites": "Limites du site",
     "independance": "Site indépendant",
     "installer": "Installer l'application",
+    "installerCourt": "Installer",
     "menu": "Menu",
     "retour": "Retour",
     "principale": "Navigation principale"
@@ -261,7 +262,10 @@
     "versMaison": "→ maison",
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Fiche générée le {date}",
-    "aPied": "À pied"
+    "aPied": "À pied",
+    "famille": "Imprimer toute la famille",
+    "familleTitre": "Bus scolaire — la semaine",
+    "familleAide": "Une seule page A4 : les cinq jours en lignes, un enfant par colonne."
   },
   "carte": {
     "titre": "Trajet à pied",
@@ -363,7 +367,23 @@
     "firefox": "Firefox",
     "firefoxNote": "Firefox pour ordinateur ne permet pas d'installer les applications web. Ajoutez plutôt le site à vos marque-pages. Sur Android, Firefox propose « Ajouter à l'écran d'accueil » dans son menu.",
     "boutonInstaller": "Installer maintenant",
-    "dejaInstallee": "L'application est déjà installée sur cet appareil."
+    "dejaInstallee": "L'application est déjà installée sur cet appareil.",
+    "inviteTitre": "Installer sur votre écran d'accueil ?",
+    "inviteCorps": "L'application s'ouvre alors comme n'importe quelle autre, depuis votre écran d'accueil.",
+    "voirProcedure": "Voir comment faire",
+    "plusTard": "Plus tard",
+    "pourquoiTitre": "Ce que ça change",
+    "atoutHorsLigne": "Les horaires restent consultables sans réseau, à l'arrêt de bus comme dans le train.",
+    "atoutNotifications": "Les notifications de perturbation deviennent possibles — indispensables sur iPhone, où elles n'existent pas autrement.",
+    "atoutPleinEcran": "Plus de barre d'adresse : l'écran entier sert aux horaires.",
+    "atoutPoids": "L'installation ne télécharge rien de plus : c'est le site déjà en mémoire qui reçoit une icône.",
+    "demoEcranAccueil": "Sur l'écran d'accueil",
+    "demoCopier": "Copier",
+    "demoMarquePage": "Marque-page",
+    "demoNouvelOnglet": "Nouvel onglet",
+    "demoInstaller": "Installer l'application",
+    "demoParametres": "Paramètres",
+    "demoValider": "Installer"
   },
   "maj": {
     "disponible": "Une nouvelle version est disponible.",

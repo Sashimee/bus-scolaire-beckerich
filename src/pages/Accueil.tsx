@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
+import { FicheFoyer } from '../composants/FicheFoyer'
 import { useFoyer } from '../etat'
 import { etatDuJour, jourDeSemaine } from '../lib/calendrier'
 import { enMinutes, trajetsDuJour } from '../lib/plan'
@@ -109,8 +110,15 @@ export function Accueil() {
     )
   }
 
+  // Les enfants dont l'arrêt n'a pas pu être calculé n'ont rien à imprimer.
+  const calcules = foyer.enfants.map((e) => contextes.get(e.id)).filter((c) => c !== null && c !== undefined)
+
   return (
-    <div className="pile pile--large">
+    <>
+      {/* Mise en page papier, visible uniquement à l'impression. */}
+      <FicheFoyer contextes={calcules} />
+
+      <div className="pile pile--large ecran-seulement">
       <section className="pile">
         <h2>{t('aujourdhui.titre')}</h2>
 
@@ -153,7 +161,17 @@ export function Accueil() {
               </article>
             ) : null
           })}
+
+        {calcules.length > 1 && (
+          <section className="pile pile--serre sans-impression">
+            <button type="button" className="bouton" onClick={() => window.print()}>
+              {t('impression.famille')}
+            </button>
+            <p className="champ__aide">{t('impression.familleAide')}</p>
+          </section>
+        )}
       </section>
-    </div>
+      </div>
+    </>
   )
 }

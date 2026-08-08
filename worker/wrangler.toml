@@ -31,8 +31,20 @@ CONTACT_VAPID = "mailto:alex.baskewitsch@gmail.com"
 # regardant `npx wrangler tail`. Voir ADMIN.md.
 TAILLE_LOT = "10"
 
+# Dépôt visé par les publications de l'espace commune. En variable plutôt qu'en
+# constante compilée : le même Worker peut ainsi viser un dépôt de test.
+DEPOT_PROPRIETAIRE = "Sashimee"
+DEPOT_NOM = "bus-scolaire-beckerich"
+DEPOT_BRANCHE = "main"
+
 # Secrets à définir séparément, jamais dans ce fichier :
 #   npx wrangler secret put GITHUB_CLIENT_ID
 #   npx wrangler secret put GITHUB_CLIENT_SECRET
 #   npx wrangler secret put VAPID_JWK
 #   npx wrangler secret put SECRET_NOTIFICATION
+
+# Espace commune. Sans SECRET_SESSION, les routes /commune/* répondent 503 et le
+# reste du Worker fonctionne normalement.
+#   npx wrangler secret put GITHUB_PAT      # jeton *fine-grained*, contenu en
+#                                           # écriture, CE dépôt uniquement
+#   npx wrangler secret put SECRET_SESSION  # clé de signature des jetons de session

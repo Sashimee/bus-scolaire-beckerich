@@ -2,6 +2,7 @@ import { Link, Route, Routes } from 'react-router-dom'
 import { useT } from './i18n'
 import { plan } from './lib/donnees'
 import { PileBandeaux } from './composants/Bandeaux'
+import { InvitationInstallation } from './composants/InvitationInstallation'
 import { NavigationBasse, NavigationHaute } from './composants/Navigation'
 import { Accueil } from './pages/Accueil'
 import { Configurer } from './pages/Configurer'
@@ -64,6 +65,7 @@ export default function App() {
       </main>
 
       <NavigationBasse />
+      <InvitationInstallation />
     </>
   )
 }

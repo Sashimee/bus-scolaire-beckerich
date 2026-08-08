@@ -15,6 +15,7 @@
     "limites": "Limites do site",
     "independance": "Site independente",
     "installer": "Instalar a aplicação",
+    "installerCourt": "Instalar",
     "menu": "Menu",
     "retour": "Voltar",
     "principale": "Navegação principal"
@@ -261,7 +262,10 @@
     "versMaison": "→ casa",
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Folha gerada em {date}",
-    "aPied": "A pé"
+    "aPied": "A pé",
+    "famille": "Imprimir toda a família",
+    "familleTitre": "Autocarro escolar — a semana",
+    "familleAide": "Uma única página A4: os cinco dias em linhas, uma criança por coluna."
   },
   "carte": {
     "titre": "Percurso a pé",
@@ -363,7 +367,23 @@
     "firefox": "Firefox",
     "firefoxNote": "O Firefox para computador não permite instalar aplicações web. Adicione antes o site aos seus marcadores. No Android, o Firefox oferece «Adicionar ao ecrã principal» no seu menu.",
     "boutonInstaller": "Instalar agora",
-    "dejaInstallee": "A aplicação já está instalada neste dispositivo."
+    "dejaInstallee": "A aplicação já está instalada neste dispositivo.",
+    "inviteTitre": "Instalar no seu ecrã principal?",
+    "inviteCorps": "A aplicação abre então como qualquer outra, a partir do seu ecrã principal.",
+    "voirProcedure": "Ver como fazer",
+    "plusTard": "Mais tarde",
+    "pourquoiTitre": "O que isso muda",
+    "atoutHorsLigne": "Os horários continuam consultáveis sem rede, na paragem como no comboio.",
+    "atoutNotifications": "As notificações de perturbação tornam-se possíveis — indispensáveis no iPhone, onde de outro modo não existem.",
+    "atoutPleinEcran": "Sem barra de endereço: todo o ecrã serve para os horários.",
+    "atoutPoids": "A instalação não descarrega nada de novo: é o site já em memória que recebe um ícone.",
+    "demoEcranAccueil": "Para o ecrã principal",
+    "demoCopier": "Copiar",
+    "demoMarquePage": "Marcador",
+    "demoNouvelOnglet": "Novo separador",
+    "demoInstaller": "Instalar a aplicação",
+    "demoParametres": "Definições",
+    "demoValider": "Instalar"
   },
   "maj": {
     "disponible": "Está disponível uma nova versão.",
