@@ -30,6 +30,42 @@ lots sont indiquées explicitement.
 
 ---
 
+## Réserves ouvertes
+
+Ce que les lots livrés **n'ont pas pu vérifier**, et comment le lever. Cette liste est
+tenue à jour à chaque lot : une réserve énoncée et non inscrite ici est une réserve
+perdue. Elle se raye quand la vérification a été faite, pas avant.
+
+| # | Lot | Réserve | Comment la lever |
+| --- | --- | --- | --- |
+| R1 | 2, 7 | **L'aperçu papier n'a jamais été regardé.** Le navigateur employé n'expose pas l'émulation du média `print`, et ouvrir la boîte d'impression bloquerait la session. Seule la structure du DOM a été vérifiée : 5 enfants sur une page de 6 colonnes, 7 enfants sur deux pages de 4 et 3. | `Cmd+P` sur `/enfant/:id` puis sur `/reglages`, avec 1, 3, 5 puis 7 enfants. |
+| R2 | 6 | **L'installation réelle n'a pas été essayée.** Les cinq conditions d'affichage de la boîte ont été éprouvées avec un `beforeinstallprompt` simulé : Chrome ne l'émet qu'en production, avec service worker. Ni `appinstalled`, ni le geste iOS n'ont été exercés. | Après déploiement : ouvrir le site sur un Android et sur un iPhone, vérifier que la boîte apparaît à la deuxième visite et que l'installation aboutit. |
+| R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
+| R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
+| R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
+| R6 | 3 | **Une arrivée après la sonnerie est affichée sans être signalée.** Pour un C2 déposé au Dillendapp le matin, aucune course n'arrive avant 07:55 : l'application montre 08:00, l'heure publiée, et la page « Limites » énonce le fait — mais la fiche de l'enfant ne le dit pas au moment où le parent la lit. | À trancher : soit c'est acceptable et la page « Limites » suffit, soit il faut une mention sur le trajet lui-même. Décision de conception, pas défaut. |
+
+### Mise en service, non faite
+
+L'espace commune est écrit mais **pas activé**. Tant que `SECRET_SESSION` est absent,
+les routes `/commune/*` répondent 503 et `/commune` affiche « non activé » — ce qui est
+le comportement voulu, mais signifie que les lots 8 et 9 ne rendent aucun service pour
+l'instant.
+
+```bash
+cd worker
+npx wrangler secret put SECRET_SESSION   # longue chaîne au hasard, non réutilisée
+npx wrangler secret put GITHUB_PAT       # jeton fine-grained, Contents: RW, CE dépôt seul
+npx wrangler deploy
+./creer-agent.sh "Prénom Nom" "service"
+curl https://<worker>/sante              # doit renvoyer "commune": true
+```
+
+Il faut aussi que `VITE_URL_WORKER` soit défini à la construction, sans quoi l'espace
+commune reste invisible côté navigateur.
+
+---
+
 ## Lot 0 — Amorçage : `CLAUDE.md` et `docs/plan.md`
 
 Aucun `CLAUDE.md` n'existe à la racine aujourd'hui.
@@ -153,6 +189,12 @@ que les heures d'arrivée des retours sont l'élément le plus gros de la carte.
 > - Vérification automatisée plutôt qu'à l'œil : 9 routes × 3 largeurs × 2 thèmes = 54
 >   combinaisons, mesurées dans des iframes de largeur fixe. Aucun débordement
 >   horizontal, aucune cible interactive sous 44 px.
+>
+> **Réserve** : la couche `impression` n'a pas été contrôlée visuellement. Le navigateur
+> employé n'expose pas l'émulation du média `print`, et ouvrir la boîte d'impression
+> bloquerait la session. `FicheImprimable.tsx` n'est pas touché et les variables de la
+> couche ont été recroisées une à une (aucune utilisée sans être définie), mais
+> l'aperçu papier reste à confirmer d'un `Cmd+P`.
 
 **Fondation de toute la refonte. À faire avant les lots 3 à 8**, qui construisent des
 écrans avec les nouvelles primitives.
@@ -478,6 +520,12 @@ dupliquée, aucun état de brouillon parallèle.
 >   les cinq langues.
 > - L'entrée permanente de la barre basse porte un libellé court : « Installer
 >   l'application » ne tient pas dans une case.
+>
+> **Réserve** : les cinq conditions d'affichage ont été éprouvées avec un
+> `beforeinstallprompt` **simulé** — Chrome ne l'émet qu'en production, avec service
+> worker. La logique de déclenchement est donc vérifiée, mais ni l'installation réelle,
+> ni le comportement de `appinstalled`, ni le geste iOS ne l'ont été. À reprendre sur un
+> appareil réel après le prochain déploiement.
 
 *Dépend du lot 2.*
 
@@ -598,6 +646,13 @@ théorique — mais il doit produire deux pages propres, pas une bouillie.
 >   ne choisit pas la signature de sa publication.
 > - Le script engendre le code en base 32 sans caractères ambigus (ni 0/O, ni 1/l/I) :
 >   un code se dicte au téléphone.
+>
+> **Réserves** : rien n'a tourné contre Cloudflare ni GitHub. Les 29 tests s'appuient sur
+> un KV en mémoire, `worker/src/github.js` n'a jamais émis d'appel réel, et
+> `creer-agent.sh` n'a été vérifié que par `bash -n`, jamais exécuté. Par ailleurs, la
+> limitation de débit repose sur la cohérence **différée** de KV : en cas de requêtes
+> concurrentes, quelques tentatives de plus passeront — sans commune mesure avec les
+> milliers qu'exigerait une force brute, mais le comportement n'est pas strict.
 
 *Indépendant des lots 1 à 7. Peut être lancé en parallèle.*
 

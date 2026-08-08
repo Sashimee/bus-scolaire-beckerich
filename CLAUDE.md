@@ -60,6 +60,12 @@ npm run build        # build de production dans dist/
 - **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les 13 lots d'évolution en
   cours (refonte UI, adresses par jour, espace commune, sécurité, agenda…), avec leurs
   dépendances et leur ordre d'exécution. **À consulter avant d'entamer une évolution.**
+
+  À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
+  « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une
+  réserve dite de vive voix et non écrite est une réserve perdue — elle réapparaît en
+  panne trois mois plus tard. Y noter aussi les écarts assumés par rapport au texte du
+  lot, et pourquoi.
 - [DONNEES.md](DONNEES.md) — mettre à jour horaires, arrêts, cycles et vacances.
 - [ADMIN.md](ADMIN.md) — publier une urgence, activer les notifications push.
 - [README.md](README.md) — présentation publique et sources des données.
