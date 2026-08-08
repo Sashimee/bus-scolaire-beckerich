@@ -162,6 +162,14 @@ async function notifier(requete, env) {
     )
   }
 
+  // Un seul lot — le cas courant tant que la commune compte quelques dizaines d'abonnés —
+  // n'a rien à gagner à sortir sur le réseau : on l'envoie dans cette invocation-ci. Le
+  // budget processeur est le même, et ça épargne l'aller-retour public.
+  if (lots.length <= 1) {
+    const resultat = await envoyerLot(charge, lots[0] ?? [], env)
+    return json({ ...resultat, total: noms.length, lots: lots.length })
+  }
+
   const origine = new URL(requete.url).origin
   const resultats = await Promise.all(
     lots.map((lot) =>
@@ -210,13 +218,22 @@ async function notifier(requete, env) {
   return json({ ...cumul, total: noms.length, lots: lots.length })
 }
 
-/** Envoie un lot d'abonnements. Une invocation, donc un budget processeur propre. */
+/** Point d'entrée HTTP d'un lot : une invocation, donc un budget processeur propre. */
 async function notifierLot(requete, env) {
   if (requete.headers.get('Authorization') !== `Bearer ${env.SECRET_NOTIFICATION}`) {
     return json({ erreur: 'non-autorise' }, 401)
   }
 
   const { charge, noms } = await requete.json()
+  return json(await envoyerLot(charge, noms, env))
+}
+
+/**
+ * Le travail proprement dit, séparé du transport pour que `notifier` puisse l'appeler
+ * directement quand il n'y a qu'un seul lot — sans sous-requête, donc sans dépendre du
+ * détour par la porte d'entrée publique.
+ */
+async function envoyerLot(charge, noms, env) {
   const cles = await importerClesVapid(env.VAPID_JWK)
 
   let envoyees = 0
@@ -278,7 +295,7 @@ async function notifierLot(requete, env) {
     }
   }
 
-  return json({ envoyees, purgees, echecs, details })
+  return { envoyees, purgees, echecs, details }
 }
 
 /**

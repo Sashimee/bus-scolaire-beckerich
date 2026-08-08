@@ -1,7 +1,13 @@
 name = "bus-beckerich"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
-compatibility_flags = ["nodejs_compat"]
+# `global_fetch_strictly_public` : sans lui, la sous-requête de `/notifier` vers
+# `/notifier-lot` est refusée par Cloudflare avec « error code: 1042 » — un Worker n'a
+# pas le droit d'appeler un Worker de la même zone. Le drapeau fait ressortir l'appel
+# par la porte d'entrée publique, ce qui le fait revenir comme une invocation neuve,
+# avec son propre budget processeur : exactement ce que le découpage en lots cherche.
+# `wrangler dev` en local autorise cet appel, lui : la panne ne se voit qu'en production.
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
 # Stockage des abonnements push et des états OAuth temporaires.
 # Créer l'espace avant le premier déploiement :

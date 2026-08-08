@@ -202,9 +202,15 @@ La réponse dit exactement ce qui s'est passé :
 | `envoyees` > 0 | Les notifications sont parties. Si le téléphone ne sonne pas, le problème est côté appareil (autorisation refusée, mode concentration). |
 | `total: 0` | Aucun abonné enregistré. Il faut activer les notifications depuis le site, sur l'appareil. |
 | `echecs` > 0 | Le service de push a refusé l'envoi. **Le champ `details` donne le service, le code HTTP et le motif exact** — c'est lui qu'il faut lire. |
+| `details` mentionne `error code: 1042` | Cloudflare a refusé la sous-requête de `/notifier` vers `/notifier-lot` : un Worker n'a pas le droit d'appeler un Worker de la même zone. Le drapeau `global_fetch_strictly_public` de `wrangler.toml` lève l'interdiction ; vérifie qu'il est bien présent et que le Worker a été redéployé depuis. |
 
 Pour suivre un envoi en direct : `cd worker && npx wrangler tail`, puis publier la
 perturbation.
+
+> Attention : `npx wrangler dev` autorise cet appel d'un Worker à lui-même, alors que la
+> production le refuse. Un envoi qui marche en local peut donc échouer une fois déployé —
+> c'est exactement ainsi que le défaut 1042 est passé inaperçu. Le seul essai qui tranche
+> est une perturbation réellement publiée.
 
 Ce n'est **que si `details` montre un refus de signature** (`401`, `403`, ou un motif du
 genre `BadJwtToken`, `VapidPkHashMismatch`) que la paire VAPID est en cause : la clé
