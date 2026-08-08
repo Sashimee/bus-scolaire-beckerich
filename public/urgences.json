@@ -1,7 +1,7 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-08T00:10:04.151Z",
+  "misAJour": "2026-08-08T00:10:07.475Z",
   "perturbations": [
     {
       "id": "2026-08-08-glhhi",
@@ -62,18 +62,6 @@
         "fr": "Third push test V3"
       },
       "publieLe": "2026-08-07T23:11:12Z",
-      "publiePar": "ci-test",
-      "gravite": "info"
-    },
-    {
-      "id": "ci-test-v4-1786145363",
-      "du": "2026-08-08",
-      "au": "2026-08-08",
-      "type": "message",
-      "message": {
-        "fr": "Fourth push test V4 after wrangler login"
-      },
-      "publieLe": "2026-08-07T23:29:23Z",
       "publiePar": "ci-test",
       "gravite": "info"
     },
