@@ -55,8 +55,23 @@ export function Configurer() {
 
         {foyer.enfants.length === 0 && <p className="champ__aide">{t('enfant.aucun')}</p>}
 
+        {/*
+            Un enfant replié par défaut. Trois enfants dépliés donnaient une page de
+            plusieurs écrans où il fallait faire défiler longtemps pour trouver le bon,
+            et rien ne distinguait la fin d'une fiche du début de la suivante.
+        */}
         {foyer.enfants.map((enfant) => (
-          <article className="carte pile" key={enfant.id}>
+          <details className="carte repli repli--enfant" key={enfant.id}>
+            <summary>
+              <span className="repli__resume">
+                <span className="texte-fort">{enfant.prenom || t('enfant.sansPrenom')}</span>
+                <span className="champ__aide">
+                  {t(`cycles.${enfant.cycle}`)} · {siteDuCycle(enfant.cycle).nom}
+                </span>
+              </span>
+            </summary>
+
+            <div className="pile">
             <div className="rangee rangee--espacee">
               <div className="champ champ--flexible">
                 <label htmlFor={`prenom-${enfant.id}`}>{t('enfant.prenom')}</label>
@@ -121,8 +136,12 @@ export function Configurer() {
               >
                 {t('enfant.supprimer')}
               </button>
+              <Link to={`/enfant/${enfant.id}/assistant`} className="bouton bouton--discret">
+                {t('assistant.reprendre')}
+              </Link>
             </div>
-          </article>
+            </div>
+          </details>
         ))}
 
         <form className="carte pile pile--serre" onSubmit={soumettre}>

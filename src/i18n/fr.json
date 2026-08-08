@@ -54,7 +54,8 @@
     "portee": "Qui est concerné ?",
     "quand": "Quand ?",
     "message": "Que dire aux parents ?",
-    "apercu": "Vérifiez avant de publier"
+    "apercu": "Vérifiez avant de publier",
+    "adresses": "Part-il toujours de chez vous ?"
   },
   "adresse": {
     "label": "Adresse du domicile",
@@ -95,7 +96,8 @@
     "voirSemaine": "Voir la semaine",
     "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel.",
     "aPied": "Pas de bus : l’école est juste à côté",
-    "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même."
+    "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même.",
+    "sansPrenom": "Enfant sans prénom"
   },
   "repas": {
     "titre": "Repas de midi",
@@ -432,7 +434,10 @@
     "demoNouvelOnglet": "Nouvel onglet",
     "demoInstaller": "Installer l'application",
     "demoParametres": "Paramètres",
-    "demoValider": "Installer"
+    "demoValider": "Installer",
+    "conditionNotifications": "Sans installation, pas de notifications",
+    "conditionNotificationsIOS": "Sur iPhone et iPad, Safari n'autorise les notifications que depuis l'écran d'accueil. Sans installer l'application, vous ne serez jamais prévenu d'une annulation de bus.",
+    "conditionNotificationsAutre": "Une fois installée, l'application peut vous prévenir d'une annulation ou d'un retard, même fermée. C'est la seule façon d'être averti sans ouvrir le site."
   },
   "maj": {
     "disponible": "Une nouvelle version est disponible.",

@@ -54,7 +54,8 @@
     "portee": "Who is affected?",
     "quand": "When?",
     "message": "What should parents know?",
-    "apercu": "Check before publishing"
+    "apercu": "Check before publishing",
+    "adresses": "Do they always leave from your home?"
   },
   "adresse": {
     "label": "Home address",
@@ -95,7 +96,8 @@
     "voirSemaine": "View the week",
     "aucunArret": "From your address, no stop serves this child's school. Please check the official plan.",
     "aPied": "No bus: the school is right next door",
-    "aPiedDetail": "Your address is about {minutes} min on foot from {site}. No bus journey is planned for {prenom}: the nearest stop is the school’s own."
+    "aPiedDetail": "Your address is about {minutes} min on foot from {site}. No bus journey is planned for {prenom}: the nearest stop is the school’s own.",
+    "sansPrenom": "Child with no first name"
   },
   "repas": {
     "titre": "Lunch",
@@ -432,7 +434,10 @@
     "demoNouvelOnglet": "New tab",
     "demoInstaller": "Install app",
     "demoParametres": "Settings",
-    "demoValider": "Install"
+    "demoValider": "Install",
+    "conditionNotifications": "No installation, no notifications",
+    "conditionNotificationsIOS": "On iPhone and iPad, Safari only allows notifications from the home screen. Without installing the app you will never be told about a cancelled bus.",
+    "conditionNotificationsAutre": "Once installed, the app can warn you of a cancellation or a delay, even when closed. It is the only way to be told without opening the site."
   },
   "maj": {
     "disponible": "A new version is available.",

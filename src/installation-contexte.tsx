@@ -26,6 +26,30 @@ interface EvenementInstallation extends Event {
   prompt: () => Promise<void>
 }
 
+/**
+ * Capture de `beforeinstallprompt`, AU CHARGEMENT DU MODULE.
+ *
+ * Chrome émet cet événement très tôt, souvent avant que React ait monté quoi que ce
+ * soit. Un écouteur posé dans un `useEffect` arrive après la bataille : l'invitation
+ * était perdue à chaque fois, et la boîte de dialogue ne s'affichait donc jamais — ce
+ * que trois vérifications avec un événement simulé n'avaient pas pu montrer.
+ *
+ * Ce module étant importé par `main.tsx` avant le premier rendu, l'écouteur est en
+ * place dès l'analyse du bundle. L'événement est mis de côté, et un événement maison
+ * réveille le fournisseur s'il est déjà monté.
+ */
+let inviteEnAttente: EvenementInstallation | null = null
+export const EVENEMENT_INVITE = 'bus-beckerich.invite-installation'
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Sans `preventDefault`, Chrome affiche sa propre barre au moment qui l'arrange.
+    e.preventDefault()
+    inviteEnAttente = e as EvenementInstallation
+    window.dispatchEvent(new Event(EVENEMENT_INVITE))
+  })
+}
+
 interface EtatInstallation {
   /** Le navigateur propose une installation programmatique (Chrome, Edge). */
   invite: boolean
@@ -79,7 +103,8 @@ export function estAppareilIOS(): boolean {
 }
 
 export function FournisseurInstallation({ children }: { children: ReactNode }) {
-  const [invite, setInvite] = useState<EvenementInstallation | null>(null)
+  // L'invitation a pu arriver avant ce rendu : on part de ce qui a déjà été capté.
+  const [invite, setInvite] = useState<EvenementInstallation | null>(() => inviteEnAttente)
   const [installee, setInstallee] = useState(estInstallee)
   const [reportee, setReportee] = useState(reportRecent)
   const [ficheVue, setFicheVue] = useState(() => lireNombre(CLE_FICHE_VUE) > 0)
@@ -90,19 +115,17 @@ export function FournisseurInstallation({ children }: { children: ReactNode }) {
   })
 
   useEffect(() => {
-    const capturer = (e: Event) => {
-      // Sans `preventDefault`, Chrome affiche sa propre barre au moment qui l'arrange.
-      e.preventDefault()
-      setInvite(e as EvenementInstallation)
-    }
+    // L'écouteur natif vit au niveau du module ; ici on ne fait qu'écouter son relais.
+    const reveiller = () => setInvite(inviteEnAttente)
     const installe = () => {
       setInstallee(true)
+      inviteEnAttente = null
       setInvite(null)
     }
-    window.addEventListener('beforeinstallprompt', capturer)
+    window.addEventListener(EVENEMENT_INVITE, reveiller)
     window.addEventListener('appinstalled', installe)
     return () => {
-      window.removeEventListener('beforeinstallprompt', capturer)
+      window.removeEventListener(EVENEMENT_INVITE, reveiller)
       window.removeEventListener('appinstalled', installe)
     }
   }, [])
@@ -111,6 +134,7 @@ export function FournisseurInstallation({ children }: { children: ReactNode }) {
     if (!invite) return
     await invite.prompt()
     // L'invitation n'est utilisable qu'une fois, quelle que soit la réponse.
+    inviteEnAttente = null
     setInvite(null)
   }, [invite])
 

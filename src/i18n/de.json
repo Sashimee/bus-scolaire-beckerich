@@ -54,7 +54,8 @@
     "portee": "Wer ist betroffen?",
     "quand": "Wann?",
     "message": "Was sollen die Eltern erfahren?",
-    "apercu": "Vor dem Veröffentlichen prüfen"
+    "apercu": "Vor dem Veröffentlichen prüfen",
+    "adresses": "Fährt es immer von zu Hause los?"
   },
   "adresse": {
     "label": "Wohnadresse",
@@ -95,7 +96,8 @@
     "voirSemaine": "Woche ansehen",
     "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan.",
     "aPied": "Kein Bus: die Schule liegt gleich nebenan",
-    "aPiedDetail": "Ihre Adresse liegt etwa {minutes} Min. zu Fuß von {site} entfernt. Für {prenom} ist keine Busfahrt vorgesehen: die nächste Haltestelle ist die der Schule selbst."
+    "aPiedDetail": "Ihre Adresse liegt etwa {minutes} Min. zu Fuß von {site} entfernt. Für {prenom} ist keine Busfahrt vorgesehen: die nächste Haltestelle ist die der Schule selbst.",
+    "sansPrenom": "Kind ohne Vornamen"
   },
   "repas": {
     "titre": "Mittagessen",
@@ -432,7 +434,10 @@
     "demoNouvelOnglet": "Neuer Tab",
     "demoInstaller": "App installieren",
     "demoParametres": "Einstellungen",
-    "demoValider": "Installieren"
+    "demoValider": "Installieren",
+    "conditionNotifications": "Ohne Installation keine Benachrichtigungen",
+    "conditionNotificationsIOS": "Auf iPhone und iPad erlaubt Safari Benachrichtigungen nur vom Startbildschirm aus. Ohne Installation werden Sie nie über einen Busausfall informiert.",
+    "conditionNotificationsAutre": "Einmal installiert, kann die App Sie über Ausfälle oder Verspätungen informieren, auch wenn sie geschlossen ist. Nur so erfahren Sie es, ohne die Website zu öffnen."
   },
   "maj": {
     "disponible": "Eine neue Version ist verfügbar.",

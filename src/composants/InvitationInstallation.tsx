@@ -61,9 +61,19 @@ export function InvitationInstallation() {
         </h2>
         <p>{t('installer.inviteCorps')}</p>
 
+        {/*
+            La condition sur les notifications est mise en avant, pas noyée dans la
+            liste : sur iPhone, c'est un fait technique — Safari ne les autorise QUE
+            depuis l'écran d'accueil — et beaucoup de parents activaient les
+            notifications sans jamais rien recevoir.
+        */}
+        <div className="encart encart--info">
+          <div className="encart__titre">{t('installer.conditionNotifications')}</div>
+          {estIOS ? t('installer.conditionNotificationsIOS') : t('installer.conditionNotificationsAutre')}
+        </div>
+
         <ul className="liste-puces pile pile--serre">
           <li>{t('installer.atoutHorsLigne')}</li>
-          <li>{t('installer.atoutNotifications')}</li>
           <li>{t('installer.atoutPleinEcran')}</li>
         </ul>
 

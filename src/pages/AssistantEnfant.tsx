@@ -9,6 +9,7 @@ import { ChampAdresse } from '../composants/ChampAdresse'
 import {
   CasePeriscolaire,
   HorairesPeriscolaire,
+  SectionAdresses,
   SectionBus,
   SectionRepas,
   estPeriscolaire,
@@ -49,6 +50,7 @@ export function AssistantEnfant() {
     definirPeriscolaire,
     definirDillendappDepuis,
     definirDillendappJusqua,
+    definirAdresseJour,
   } = useFoyer()
   const [indice, setIndice] = useState(0)
 
@@ -198,7 +200,24 @@ export function AssistantEnfant() {
         ]
       : []),
 
-    // 6. Le résultat. La seule étape qui ne demande rien : elle rend compte, trajets
+    // 6. Les adresses particulières. La question se pose pour bien des familles — un
+    //    mardi chez les grands-parents, un jeudi chez la nounou — et l'assistant est le
+    //    seul endroit où on la POSE ; ailleurs, il faut penser à aller la chercher.
+    {
+      cle: 'adresses',
+      contenu: (
+        <div className="carte">
+          <SectionAdresses
+            enfant={enfant}
+            onAdresseJour={(jour, sens, adresse) =>
+              definirAdresseJour(enfant.id, jour, sens, adresse)
+            }
+          />
+        </div>
+      ),
+    },
+
+    // 7. Le résultat. La seule étape qui ne demande rien : elle rend compte, trajets
     //    manquants compris, puis propose d'emporter la fiche.
     {
       cle: 'recapitulatif',

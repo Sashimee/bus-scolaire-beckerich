@@ -961,6 +961,12 @@
    * la navigation basse occupe déjà le bord.
    */
   .dialogue {
+    /*
+     * `margin: auto` rétablit le centrage que le navigateur applique par défaut à un
+     * `<dialog>` modal : le `* { margin: 0 }` de la couche `reset` l'écrasait, et la
+     * boîte se collait dans le coin supérieur gauche.
+     */
+    margin: auto;
     inline-size: min(28rem, calc(100vw - 2 * var(--espace-4)));
     padding: var(--espace-5);
     border: var(--trait) solid var(--bord);
@@ -1341,6 +1347,14 @@
   }
 
   /* --- Repli (`<details>`) ------------------------------------------------------ */
+  /*
+   * Repli (`<details>`).
+   *
+   * `display: flex` sur un `summary` supprime le triangle natif dans Chrome : le bloc
+   * n'avait plus AUCUN signe qu'on pouvait le déplier, et personne ne l'ouvrait. On
+   * dessine donc le chevron, qui pivote à l'ouverture — et on le pose en `::before`
+   * pour qu'il reste aligné quel que soit le libellé.
+   */
   .repli > summary {
     cursor: pointer;
     min-block-size: var(--cible);
@@ -1349,10 +1363,94 @@
     gap: var(--espace-2);
     font-weight: 600;
     font-size: var(--texte-m);
+    color: var(--accent);
+    list-style: none;
+  }
+
+  /* Safari passe par ce pseudo-élément, que `list-style: none` ne suffit pas à ôter. */
+  .repli > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /*
+   * Le chevron est dessiné dans une pastille : seul, un trait de 8 px passait
+   * inaperçu, et personne ne dépliait. La pastille donne au résumé l'aspect d'une
+   * ligne sur laquelle on appuie.
+   */
+  .repli > summary::before {
+    content: '';
+    flex: 0 0 auto;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 999px;
+    background: var(--surface-haute);
+    border: var(--trait) solid var(--bord);
+    /* Le chevron proprement dit, tracé au centre de la pastille. */
+    background-image: linear-gradient(currentColor, currentColor),
+      linear-gradient(currentColor, currentColor);
+    background-size:
+      0.5rem 2px,
+      2px 0.5rem;
+    background-position:
+      center center,
+      center center;
+    background-repeat: no-repeat;
+    transition: rotate 0.15s ease;
+  }
+
+  /* Fermé : un « + ». Ouvert : un « − ». Deux signes que tout le monde lit. */
+  .repli[open] > summary::before {
+    background-size:
+      0.5rem 2px,
+      0 0;
+  }
+
+  .repli > summary:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .repli > summary.champ__aide {
     font-weight: 400;
+  }
+
+  /* Le contenu déplié se décolle de son résumé. */
+  .repli[open] > summary {
+    margin-block-end: var(--espace-3);
+  }
+
+  /* Le résumé d'un enfant : prénom lisible, cycle et école en dessous. */
+  .repli__resume {
+    display: grid;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+
+  /* Un enfant : la ligne entière est une cible, avec un fond au survol. */
+  .repli--enfant > summary {
+    color: var(--encre);
+    font-size: var(--texte-l);
+    padding: var(--espace-2);
+    margin: calc(-1 * var(--espace-2));
+    border-radius: var(--rayon-s);
+    transition: background 0.15s ease;
+  }
+
+  .repli--enfant > summary:hover {
+    background: var(--surface-haute);
+    text-decoration: none;
+  }
+
+  .repli--enfant > summary::before {
+    color: var(--accent);
+    align-self: center;
+  }
+
+  .repli--enfant[open] > summary {
+    margin-block-end: var(--espace-2);
+    border-block-end: var(--trait) solid var(--bord);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
   }
 }
 

@@ -54,7 +54,8 @@
     "portee": "Quem é afetado?",
     "quand": "Quando?",
     "message": "O que dizer aos pais?",
-    "apercu": "Verifique antes de publicar"
+    "apercu": "Verifique antes de publicar",
+    "adresses": "Parte sempre de sua casa?"
   },
   "adresse": {
     "label": "Morada de residência",
@@ -95,7 +96,8 @@
     "voirSemaine": "Ver a semana",
     "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial.",
     "aPied": "Sem autocarro: a escola fica mesmo ao lado",
-    "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola."
+    "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola.",
+    "sansPrenom": "Criança sem nome"
   },
   "repas": {
     "titre": "Almoço",
@@ -432,7 +434,10 @@
     "demoNouvelOnglet": "Novo separador",
     "demoInstaller": "Instalar a aplicação",
     "demoParametres": "Definições",
-    "demoValider": "Instalar"
+    "demoValider": "Instalar",
+    "conditionNotifications": "Sem instalação, não há notificações",
+    "conditionNotificationsIOS": "No iPhone e no iPad, o Safari só permite notificações a partir do ecrã principal. Sem instalar a aplicação, nunca será avisado de um cancelamento de autocarro.",
+    "conditionNotificationsAutre": "Uma vez instalada, a aplicação pode avisá-lo de um cancelamento ou de um atraso, mesmo fechada. É a única forma de ser avisado sem abrir o site."
   },
   "maj": {
     "disponible": "Está disponível uma nova versão.",

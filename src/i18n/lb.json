@@ -54,7 +54,8 @@
     "portee": "Wie ass betraff?",
     "quand": "Wéini?",
     "message": "Wat solle d'Elteren erfueren?",
-    "apercu": "Virum Publizéiere nokucken"
+    "apercu": "Virum Publizéiere nokucken",
+    "adresses": "Fiert et ëmmer vun doheem fort?"
   },
   "adresse": {
     "label": "Wunnadress",
@@ -95,7 +96,8 @@
     "voirSemaine": "D'Woch kucken",
     "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no.",
     "aPied": "Kee Bus: d’Schoul ass direkt niewendrun",
-    "aPiedDetail": "Är Adress ass ongeféier {minutes} Min. zu Fouss vu(n) {site} ewech. Fir {prenom} ass keng Busfaart virgesinn: déi nooste Statioun ass déi vun der Schoul selwer."
+    "aPiedDetail": "Är Adress ass ongeféier {minutes} Min. zu Fouss vu(n) {site} ewech. Fir {prenom} ass keng Busfaart virgesinn: déi nooste Statioun ass déi vun der Schoul selwer.",
+    "sansPrenom": "Kand ouni Virnumm"
   },
   "repas": {
     "titre": "Mëttegiessen",
@@ -432,7 +434,10 @@
     "demoNouvelOnglet": "Neien Tab",
     "demoInstaller": "App installéieren",
     "demoParametres": "Astellungen",
-    "demoValider": "Installéieren"
+    "demoValider": "Installéieren",
+    "conditionNotifications": "Ouni Installatioun keng Meldungen",
+    "conditionNotificationsIOS": "Um iPhone an iPad erlaabt Safari Meldunge nëmme vum Startbildschierm aus. Ouni d'App z'installéieren, gitt Dir ni iwwer en Busausfall informéiert.",
+    "conditionNotificationsAutre": "Eemol installéiert, kann d'App Iech iwwer en Ausfall oder eng Verspéidung informéieren, och wa se zou ass. Dat ass déi eenzeg Manéier, et zu gewuer ze ginn, ouni d'Säit opzemaachen."
   },
   "maj": {
     "disponible": "Eng nei Versioun ass verfügbar.",
