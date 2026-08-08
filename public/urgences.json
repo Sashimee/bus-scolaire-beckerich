@@ -1,7 +1,7 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-08T00:09:25.007Z",
+  "misAJour": "2026-08-08T00:10:01.321Z",
   "perturbations": [
     {
       "id": "2026-08-08-glhhi",
@@ -86,18 +86,6 @@
         "fr": "Fifth push test V5 after fresh deploy"
       },
       "publieLe": "2026-08-07T23:30:43Z",
-      "publiePar": "ci-test",
-      "gravite": "info"
-    },
-    {
-      "id": "ci-test-v6-1786146169",
-      "du": "2026-08-08",
-      "au": "2026-08-08",
-      "type": "message",
-      "message": {
-        "fr": "Sixth push test V6 after worker deploy"
-      },
-      "publieLe": "2026-08-07T23:42:49Z",
       "publiePar": "ci-test",
       "gravite": "info"
     },
