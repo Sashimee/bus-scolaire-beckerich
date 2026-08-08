@@ -1,8 +1,32 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-08T00:28:30.679Z",
+  "misAJour": "2026-08-08T00:44:00Z",
   "perturbations": [
+    {
+      "id": "essai-1042-a",
+      "du": "2026-08-08",
+      "au": "2026-08-08",
+      "type": "message",
+      "message": {
+        "fr": "Essai n°1 : l'arrêt de l'école n'est pas desservi"
+      },
+      "publieLe": "2026-08-08T00:44:00Z",
+      "publiePar": "essai",
+      "gravite": "info"
+    },
+    {
+      "id": "essai-1042-b",
+      "du": "2026-08-08",
+      "au": "2026-08-08",
+      "type": "message",
+      "message": {
+        "fr": "Essai n°2 : deux d'un coup, avec « guillemets »"
+      },
+      "publieLe": "2026-08-08T00:44:01Z",
+      "publiePar": "essai",
+      "gravite": "info"
+    },
     {
       "id": "2026-08-08-0uqdw",
       "du": "2026-08-08",
