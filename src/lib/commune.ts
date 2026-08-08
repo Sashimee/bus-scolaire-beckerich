@@ -86,11 +86,39 @@ export type MotifCommune =
   | 'code-inconnu'
   | 'trop-de-tentatives'
   | 'session-expiree'
+  /** Le Worker tourne, mais ses secrets ne sont pas posés : l'espace n'existe pas encore. */
+  | 'non-activee'
   | 'charge-invalide'
   | 'plan-invalide'
   | 'conflit'
   | 'reseau'
   | 'inconnu'
+
+/**
+ * Suffixe i18n d'un motif, sous `commune.erreur.`.
+ *
+ * Les deux écrans de connexion enchaînaient trois ternaires imbriqués pour retomber sur
+ * « inconnu » : ajouter un motif obligeait à les corriger tous les deux, et l'un des
+ * deux finissait par être oublié.
+ */
+export function cleErreur(motif: MotifCommune): string {
+  switch (motif) {
+    case 'code-inconnu':
+      return 'codeInconnu'
+    case 'trop-de-tentatives':
+      return 'tropDeTentatives'
+    case 'session-expiree':
+      return 'sessionExpiree'
+    case 'non-activee':
+      return 'nonActivee'
+    case 'conflit':
+      return 'conflit'
+    case 'reseau':
+      return 'reseau'
+    default:
+      return 'inconnu'
+  }
+}
 
 export class ErreurCommune extends Error {
   motif: MotifCommune
@@ -129,6 +157,9 @@ async function appeler<T>(
   if (motif === 'code-inconnu') throw new ErreurCommune('code-inconnu')
   if (motif === 'trop-de-tentatives') throw new ErreurCommune('trop-de-tentatives', donnees.minutes)
   if (motif === 'session-expiree') throw new ErreurCommune('session-expiree')
+  // Sans `SECRET_SESSION`, le Worker répond 503 à tout l'espace. Le dire franchement
+  // vaut mieux qu'une « erreur inconnue » devant laquelle personne ne sait quoi faire.
+  if (motif === 'espace-commune-non-configure') throw new ErreurCommune('non-activee')
   if (motif === 'charge-invalide') throw new ErreurCommune('charge-invalide', donnees.motifs)
   if (motif === 'plan-invalide') throw new ErreurCommune('plan-invalide', donnees.problemes)
   if (reponse.status === 409) throw new ErreurCommune('conflit')

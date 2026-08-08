@@ -539,7 +539,13 @@
     ],
     "pasUneGarantie": "Ce n'est pas une garantie",
     "pasUneGarantieDetail": "Une application web ne peut pas se déclarer prioritaire d'elle-même : le niveau « temps réel » d'iOS est réservé aux applications natives. Et une notification peut ne jamais arriver — téléphone éteint, mode Ne pas déranger, service de notification en panne.",
-    "ecoleReste": "L'école et la commune restent la voie d'information officielle. Cette application ne les remplace pas et ne dispense personne de prévenir les parents."
+    "ecoleReste": "L'école et la commune restent la voie d'information officielle. Cette application ne les remplace pas et ne dispense personne de prévenir les parents.",
+    "essai": "Envoyer une notification d'essai",
+    "essaiTitre": "Essai — Bus scolaire",
+    "essaiCorps": "Si vous lisez ceci, vos notifications fonctionnent.",
+    "essaiEnvoye": "Envoyée. Elle devrait arriver dans quelques secondes — si elle n'apparaît pas, reprenez la marche à suivre ci-dessus.",
+    "essaiTropFrequent": "Un essai par minute suffit. Réessayez dans un instant.",
+    "essaiEchec": "L'essai n'est pas parti. Désactivez puis réactivez les notifications, et réessayez."
   },
   "admin": {
     "titre": "Administration",
@@ -686,7 +692,8 @@
       "sessionExpiree": "Votre session a expiré. Reconnectez-vous avec votre code.",
       "conflit": "Quelqu'un a publié entre-temps. Rechargez la page et recommencez.",
       "reseau": "Impossible de joindre le serveur. Vérifiez votre connexion.",
-      "inconnu": "La publication a échoué. Réessayez dans un instant."
+      "inconnu": "La publication a échoué. Réessayez dans un instant.",
+      "nonActivee": "Cet espace n'est pas encore activé sur le serveur. Prévenez la personne qui gère l'application : il lui manque une clé de configuration."
     },
     "rappels": "Répéter la notification",
     "rappelsAide": "Un rappel n'est envoyé qu'aux créneaux utiles du jour concerné — avant 7 h 40 le matin, avant 15 h l'après-midi — et jamais un jour sans école.",
@@ -695,6 +702,16 @@
       "1": "Un rappel",
       "2": "Deux rappels",
       "3": "Trois rappels (conseillé)"
+    },
+    "journal": "Journal des publications",
+    "journalAide": "Qui a publié quoi, et quand. Conservé 90 jours, puis effacé automatiquement.",
+    "journalVide": "Rien de publié pour l'instant.",
+    "journalEchec": "Le journal n'a pas pu être lu. Réessayez en repliant puis rouvrant.",
+    "journalAction": {
+      "publication": "Publication",
+      "retrait": "Retrait",
+      "horaires": "Horaires",
+      "traductions": "Textes"
     }
   },
   "adminArrets": {

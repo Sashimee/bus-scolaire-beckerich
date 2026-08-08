@@ -5,10 +5,62 @@ import {
   ErreurCommune,
   chargerSession,
   communeConfiguree,
+  cleErreur,
+  lireJournal,
   oublierSession,
   seConnecter,
+  type EntreeJournal,
   type MotifCommune,
+  type SessionCommune,
 } from '../lib/commune'
+
+/**
+ * Le journal des publications.
+ *
+ * Le Worker inscrit chaque publication et chaque retrait depuis le lot 8, mais rien ne
+ * les affichait : un journal que personne ne peut lire ne rend de comptes à personne.
+ * Il est replié — on ne le consulte qu'en cas de doute — et se charge à l'ouverture,
+ * pour ne pas coûter un aller-retour à chaque connexion.
+ */
+function Journal({ session }: { session: SessionCommune }) {
+  const { t } = useT()
+  const [entrees, setEntrees] = useState<EntreeJournal[] | null>(null)
+  const [echec, setEchec] = useState(false)
+
+  const charger = async () => {
+    setEchec(false)
+    try {
+      setEntrees(await lireJournal(session))
+    } catch {
+      setEchec(true)
+    }
+  }
+
+  return (
+    <details className="repli carte" onToggle={(e) => e.currentTarget.open && !entrees && charger()}>
+      <summary>{t('commune.journal')}</summary>
+      <div className="pile pile--serre">
+        <p className="champ__aide">{t('commune.journalAide')}</p>
+
+        {echec && <div className="encart encart--attention">{t('commune.journalEchec')}</div>}
+        {!echec && entrees === null && <p className="champ__aide">{t('commun.chargement')}</p>}
+        {entrees?.length === 0 && <p className="champ__aide">{t('commune.journalVide')}</p>}
+
+        {entrees?.map((e) => (
+          <div className="pile pile--serre" key={`${e.quand}-${e.detail}`}>
+            <span className="rangee">
+              <span className="etiquette">{t(`commune.journalAction.${e.action}`)}</span>
+              <span className="texte-fort">{e.qui}</span>
+            </span>
+            <p className="champ__aide">
+              {new Date(e.quand).toLocaleString()} · {e.detail}
+            </p>
+          </div>
+        ))}
+      </div>
+    </details>
+  )
+}
 
 /**
  * Connexion de l'espace commune.
@@ -77,6 +129,8 @@ export function Commune() {
           <p className="champ__aide">{t('commune.allerHorairesAide')}</p>
         </section>
 
+        <Journal session={session} />
+
         <button
           type="button"
           className="bouton bouton--discret"
@@ -121,9 +175,7 @@ export function Commune() {
 
         {motif && (
           <div className="encart encart--alerte" role="alert">
-            {motif === 'trop-de-tentatives'
-              ? t('commune.erreur.tropDeTentatives', { minutes })
-              : t(`commune.erreur.${motif === 'code-inconnu' ? 'codeInconnu' : motif === 'reseau' ? 'reseau' : 'inconnu'}`)}
+            {t(`commune.erreur.${cleErreur(motif)}`, { minutes })}
           </div>
         )}
 

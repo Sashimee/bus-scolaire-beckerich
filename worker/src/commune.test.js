@@ -3,6 +3,7 @@ import {
   agentDeLaRequete,
   egalConstant,
   empreinte,
+  perturbationPropre,
   routerCommune,
   routerTraductions,
   signerJeton,
@@ -308,6 +309,33 @@ describe('validation des perturbations', () => {
     // « information » n'existe pas côté application : l'accepter publierait une
     // perturbation que personne ne verrait.
     expect(validerPerturbation({ ...valide, type: 'information' })).toContain('type')
+  })
+
+  it('borne le nombre de rappels', () => {
+    // Chaque rappel est un envoi répété à toutes les familles abonnées. Non borné, le
+    // champ ferait du Worker un outil de harcèlement involontaire.
+    expect(validerPerturbation({ ...valide, rappels: 2 })).toEqual([])
+    expect(validerPerturbation({ ...valide, rappels: 0 })).toEqual([])
+    expect(validerPerturbation({ ...valide, rappels: 4 })).toContain('rappels')
+    expect(validerPerturbation({ ...valide, rappels: -1 })).toContain('rappels')
+    expect(validerPerturbation({ ...valide, rappels: 1.5 })).toContain('rappels')
+    expect(validerPerturbation({ ...valide, rappels: '3' })).toContain('rappels')
+  })
+
+  it('n’emporte que les champs connus dans le fichier publié', () => {
+    // Le contenu était recopié tel quel : un `curl` pouvait glisser n'importe quel
+    // champ dans un fichier public du dépôt. L'application l'aurait ignoré à la
+    // lecture, mais il aurait bel et bien été publié.
+    const propre = perturbationPropre({
+      ...valide,
+      rappels: 2,
+      publiePar: 'Pirate',
+      script: '<script>',
+      nImporteQuoi: { profond: [1, 2, 3] },
+    })
+    expect(Object.keys(propre).sort()).toEqual(
+      ['au', 'du', 'gravite', 'id', 'message', 'rappels', 'type'].sort(),
+    )
   })
 
   it('refuse un type ou une gravité inventés', () => {

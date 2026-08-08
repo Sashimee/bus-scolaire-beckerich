@@ -539,7 +539,13 @@
     ],
     "pasUneGarantie": "Não é uma garantia",
     "pasUneGarantieDetail": "Uma aplicação web não pode declarar-se prioritária por si própria: o nível «tempo real» do iOS está reservado às aplicações nativas. E uma notificação pode nunca chegar — telemóvel desligado, Não incomodar, avaria do serviço de notificações.",
-    "ecoleReste": "A escola e o município continuam a ser a via oficial de informação. Esta aplicação não os substitui nem dispensa ninguém de avisar os pais."
+    "ecoleReste": "A escola e o município continuam a ser a via oficial de informação. Esta aplicação não os substitui nem dispensa ninguém de avisar os pais.",
+    "essai": "Enviar uma notificação de teste",
+    "essaiTitre": "Teste — Autocarro escolar",
+    "essaiCorps": "Se está a ler isto, as suas notificações funcionam.",
+    "essaiEnvoye": "Enviada. Deve chegar em alguns segundos — se não aparecer, refaça os passos acima.",
+    "essaiTropFrequent": "Um teste por minuto é suficiente. Tente daqui a pouco.",
+    "essaiEchec": "O teste não partiu. Desative e reative as notificações, e tente de novo."
   },
   "admin": {
     "titre": "Administração",
@@ -686,7 +692,8 @@
       "sessionExpiree": "A sua sessão expirou. Volte a iniciar sessão com o seu código.",
       "conflit": "Alguém publicou entretanto. Recarregue a página e recomece.",
       "reseau": "Não foi possível contactar o servidor. Verifique a sua ligação.",
-      "inconnu": "A publicação falhou. Tente novamente daqui a instantes."
+      "inconnu": "A publicação falhou. Tente novamente daqui a instantes.",
+      "nonActivee": "Este espaço ainda não está ativado no servidor. Avise a pessoa que gere a aplicação: falta-lhe uma chave de configuração."
     },
     "rappels": "Repetir a notificação",
     "rappelsAide": "Um lembrete só é enviado nos horários úteis do dia em causa — antes das 7h40 de manhã, antes das 15h à tarde — e nunca num dia sem aulas.",
@@ -695,6 +702,16 @@
       "1": "Um lembrete",
       "2": "Dois lembretes",
       "3": "Três lembretes (aconselhado)"
+    },
+    "journal": "Registo das publicações",
+    "journalAide": "Quem publicou o quê, e quando. Guardado 90 dias, depois apagado automaticamente.",
+    "journalVide": "Nada publicado por enquanto.",
+    "journalEchec": "Não foi possível ler o registo. Feche e volte a abrir.",
+    "journalAction": {
+      "publication": "Publicação",
+      "retrait": "Retirada",
+      "horaires": "Horários",
+      "traductions": "Textos"
     }
   },
   "adminArrets": {

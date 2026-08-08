@@ -4,6 +4,7 @@ import { EditeurTraductions } from '../composants/EditeurTraductions'
 import {
   ErreurCommune,
   chargerSession,
+  cleErreur,
   communeConfiguree,
   oublierSession,
   publierTraductions,
@@ -110,13 +111,7 @@ export function Traductions() {
 
         {motif && (
           <div className="encart encart--alerte" role="alert">
-            {motif === 'trop-de-tentatives'
-              ? t('commune.erreur.tropDeTentatives', { minutes })
-              : t(
-                  `commune.erreur.${
-                    motif === 'code-inconnu' ? 'codeInconnu' : motif === 'reseau' ? 'reseau' : 'inconnu'
-                  }`,
-                )}
+            {t(`commune.erreur.${cleErreur(motif)}`, { minutes })}
           </div>
         )}
 

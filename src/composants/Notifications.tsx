@@ -46,6 +46,7 @@ export function Notifications() {
   const [etat, setEtat] = useState<Etat>('proposable')
   const [occupe, setOccupe] = useState(false)
   const [preference, setPreference] = useState<Preference>(preferenceInitiale)
+  const [essai, setEssai] = useState<'envoye' | 'trop-frequent' | 'echec' | null>(null)
 
   useEffect(() => {
     if (!notificationsConfigurees()) return setEtat('non-configure')
@@ -82,6 +83,43 @@ export function Notifications() {
       setEtat('active')
     } catch {
       setEtat('erreur')
+    } finally {
+      setOccupe(false)
+    }
+  }
+
+  /**
+   * Demande au Worker de renvoyer une notification à cet appareil-ci.
+   *
+   * Le endpoint sert d'authentification : lui seul le connaît, et la seule chose qu'il
+   * obtient est de se faire vibrer lui-même.
+   */
+  async function envoyerEssai() {
+    setOccupe(true)
+    setEssai(null)
+    try {
+      const sw = await navigator.serviceWorker.ready
+      const abonnement = await sw.pushManager.getSubscription()
+      if (!abonnement) return setEssai('echec')
+
+      const rep = await fetch(`${URL_WORKER}/essai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          endpoint: abonnement.endpoint,
+          titre: t('notifications.essaiTitre'),
+          message: t('notifications.essaiCorps'),
+        }),
+      })
+      if (rep.status === 429) return setEssai('trop-frequent')
+      if (!rep.ok) return setEssai('echec')
+
+      // Le Worker répond 200 même quand le service de push a refusé : c'est le
+      // compteur qui dit si quelque chose est réellement parti.
+      const { envoyees } = (await rep.json()) as { envoyees?: number }
+      setEssai(envoyees ? 'envoye' : 'echec')
+    } catch {
+      setEssai('echec')
     } finally {
       setOccupe(false)
     }
@@ -198,6 +236,24 @@ export function Notifications() {
               ))}
             </select>
             <p className="champ__aide">{t(`notifications.preferenceAide.${preference}`)}</p>
+          </div>
+
+          {/*
+              Sans cet essai, un parent ne découvrirait un réglage mal posé qu'un matin
+              de bus annulé — au pire moment. C'est la seule vérification qu'il puisse
+              faire lui-même.
+          */}
+          <div className="pile pile--serre">
+            <button type="button" className="bouton" disabled={occupe} onClick={envoyerEssai}>
+              {t('notifications.essai')}
+            </button>
+            {essai === 'envoye' && <p className="champ__aide">✓ {t('notifications.essaiEnvoye')}</p>}
+            {essai === 'trop-frequent' && (
+              <p className="champ__aide">{t('notifications.essaiTropFrequent')}</p>
+            )}
+            {essai === 'echec' && (
+              <div className="encart encart--attention">{t('notifications.essaiEchec')}</div>
+            )}
           </div>
 
           <button type="button" className="bouton" disabled={occupe} onClick={desactiver}>
