@@ -8,14 +8,20 @@ import { nomArret } from '../lib/affichage'
 import { isoDate } from '../lib/calendrier'
 import {
   lireUrgencesDepot,
+  publierCreditsGithub,
+  publierSurcoucheGithub,
   publierUrgences,
   verifierAcces,
   type Identite,
 } from '../lib/github'
 import { nouvelIdentifiant, type Gravite, type Perturbation, type TypePerturbation } from '../lib/urgences'
 import { URL_WORKER, connexionGithubConfiguree, lienEditeurGithub } from '../config'
+import { credits } from '../lib/credits'
 import { AdminArrets } from '../composants/AdminArrets'
 import { AdminPlan } from '../composants/AdminPlan'
+import { EditeurCredits } from '../composants/EditeurCredits'
+import { EditeurTraductions } from '../composants/EditeurTraductions'
+import { Onglets } from '../composants/Onglets'
 
 const CLE_JETON = 'bus-beckerich.jeton-github'
 const TYPES: TypePerturbation[] = ['annulation', 'retard', 'arret-deplace', 'message']
@@ -39,7 +45,7 @@ const ecrireJeton = (j: string | null) => {
 }
 
 export function Admin() {
-  const { t, langue } = useT()
+  const { t, langue, surcouche } = useT()
   const { urgences, rafraichir } = useUrgences()
 
   const [jeton, setJeton] = useState<string | null>(lireJeton)
@@ -233,34 +239,14 @@ export function Admin() {
     )
   }
 
-  // — Connecté avec droit d'écriture ——————————————————————————————
-  return (
-    <div className="pile pile--large">
-      <header className="rangee rangee--espacee">
-        <h2>{t('admin.titre')}</h2>
-        <span className="rangee">
-          <span className="etiquette">{identite.login}</span>
-          <button
-            type="button"
-            className="bouton bouton--discret"
-            onClick={() => {
-              ecrireJeton(null)
-              setJeton(null)
-            }}
-          >
-            {t('admin.deconnexion')}
-          </button>
-        </span>
-      </header>
-
-      <div className="encart encart--attention">
-        <div className="encart__titre">{t('admin.responsabilite')}</div>
-        {t('admin.responsabiliteDetail')}
-      </div>
-
-      {publiee && <div className="encart encart--info">{t('admin.publiee')}</div>}
-      {erreur && <div className="encart encart--alerte">{t(`admin.erreur.${erreur}`)}</div>}
-
+  /**
+   * Le formulaire de perturbation et la liste des perturbations en cours.
+   *
+   * Extrait en constante pour tenir dans un onglet : c'est le même JSX qu'avant,
+   * simplement déplacé.
+   */
+  const perturbations = (
+    <div className="pile">
       <section className="carte pile pile--serre">
         <h3 className="titre-carte">{t('admin.nouvelle')}</h3>
 
@@ -442,14 +428,88 @@ export function Admin() {
           </div>
         ))}
       </section>
+    </div>
+  )
 
-      <hr className="separateur" />
+  // — Connecté avec droit d'écriture ——————————————————————————————
+  return (
+    <div className="pile pile--large">
+      <header className="rangee rangee--espacee">
+        <h2>{t('admin.titre')}</h2>
+        <span className="rangee">
+          <span className="etiquette">{identite.login}</span>
+          <button
+            type="button"
+            className="bouton bouton--discret"
+            onClick={() => {
+              ecrireJeton(null)
+              setJeton(null)
+            }}
+          >
+            {t('admin.deconnexion')}
+          </button>
+        </span>
+      </header>
 
-      <AdminArrets jeton={jeton!} auteur={identite.nom ?? identite.login} onErreur={setErreur} />
+      <div className="encart encart--attention">
+        <div className="encart__titre">{t('admin.responsabilite')}</div>
+        {t('admin.responsabiliteDetail')}
+      </div>
 
-      <hr className="separateur" />
+      {publiee && <div className="encart encart--info">{t('admin.publiee')}</div>}
+      {erreur && <div className="encart encart--alerte">{t(`admin.erreur.${erreur}`)}</div>}
 
-      <AdminPlan jeton={jeton!} onErreur={setErreur} />
+
+      {/*
+          Quatre domaines sans rapport les uns avec les autres, empilés sur une seule
+          page, faisaient plusieurs écrans de défilement où l'on ne retrouvait rien.
+          L'onglet actif vit dans l'URL : un rechargement ne renvoie pas au premier.
+      */}
+      <Onglets
+        onglets={[
+          {
+            cle: 'perturbations',
+            libelle: t('admin.ongletPerturbations'),
+            contenu: perturbations,
+          },
+          {
+            cle: 'arrets',
+            libelle: t('admin.ongletArrets'),
+            contenu: (
+              <AdminArrets
+                jeton={jeton!}
+                auteur={identite.nom ?? identite.login}
+                onErreur={setErreur}
+              />
+            ),
+          },
+          {
+            cle: 'plan',
+            libelle: t('admin.ongletPlan'),
+            contenu: <AdminPlan jeton={jeton!} onErreur={setErreur} />,
+          },
+          {
+            cle: 'traductions',
+            libelle: t('admin.ongletTraductions'),
+            contenu: (
+              <EditeurTraductions
+                surcouche={surcouche}
+                publier={(suite) => publierSurcoucheGithub(jeton!, suite)}
+              />
+            ),
+          },
+          {
+            cle: 'credits',
+            libelle: t('admin.ongletCredits'),
+            contenu: (
+              <EditeurCredits
+                credits={credits}
+                publier={(suite) => publierCreditsGithub(jeton!, suite)}
+              />
+            ),
+          },
+        ]}
+      />
 
       <a className="bouton bouton--discret" href={lienEditeurGithub()} target="_blank" rel="noopener noreferrer">
         {t('admin.editerSurGithub')}

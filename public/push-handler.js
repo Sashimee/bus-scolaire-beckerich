@@ -15,6 +15,7 @@ self.addEventListener('push', (evenement) => {
   }
 
   const titre = donnees.titre || 'Bus scolaire Beckerich'
+  const alerte = donnees.gravite === 'alerte'
   const options = {
     body: donnees.corps || '',
     icon: donnees.icone || './icones/icone-192.png',
@@ -22,7 +23,12 @@ self.addEventListener('push', (evenement) => {
     // Un identifiant stable évite d'empiler dix fois la même annulation.
     tag: donnees.id || 'urgence',
     renotify: true,
-    requireInteraction: donnees.gravite === 'alerte',
+    requireInteraction: alerte,
+    // Perceptible là où la bannière ne l'est pas — téléphone dans une poche, sonnerie
+    // coupée. C'est, avec `Urgency` côté transport, tout ce qu'une application web
+    // peut faire d'elle-même : le reste relève des réglages du système.
+    ...(alerte ? { vibrate: [200, 100, 200] } : {}),
+    silent: false,
     data: { url: donnees.url || './' },
   }
 

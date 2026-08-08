@@ -47,7 +47,7 @@
     "midi": "Where do they have lunch?",
     "periscolaire": "What times are they at the Dillendapp?",
     "recapitulatif": "Here is their week",
-    "terminer": "See their sheet",
+    "terminer": "Done",
     "reglageFin": "Set everything on one screen",
     "reprendre": "Set up step by step",
     "situation": "What happened?",
@@ -70,14 +70,23 @@
     "choisirArret": "Name the stop used",
     "arretLabel": "Stop used",
     "arretPlaceholder": "Choose a stop",
-    "arretAide": "Address outside the municipality: name the stop where the child gets on or off. Walking time cannot then be estimated."
+    "arretAide": "Address outside the municipality: name the stop where the child gets on or off. Walking time cannot then be estimated.",
+    "partageeFratrie": "This is the household address: changing it here would change it for your other children too.",
+    "modifierPourTous": "Change the household address"
   },
   "adresseJour": {
     "titre": "Special addresses",
-    "aide": "By default the child leaves from your home and returns to it. Set here the days when that is not the case — at the grandparents', at the childminder's. Morning and evening are set separately.",
+    "aide": "By default the child leaves from your home and returns there. List here the days when that is not the case — at their grandparents’, at the childminder’s. Each moment of the day is set separately.",
     "domicile": "Home",
     "matin": "Leaves in the morning from",
-    "soir": "Returns in the evening to"
+    "soir": "Returns in the evening to",
+    "midi": "Has lunch at",
+    "joursDerogatoires": "{nombre} day(s) apart",
+    "auDillendapp": {
+      "matin": "Dropped off at the Dillendapp that morning: they do not leave from any other address.",
+      "midi": "Has lunch at the Dillendapp that day.",
+      "soir": "To be collected at the Dillendapp that evening: the bus takes them nowhere else."
+    }
   },
   "enfant": {
     "prenom": "First name",
@@ -106,9 +115,9 @@
     "maisonCourt": "Home",
     "dillendapp": "Eats at the Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Lunch, whole week",
+    "touteLaSemaine": "Set the whole week",
     "sansCoursApresMidi": "No afternoon classes",
-    "sansPeriscolaire": "This child comes home for lunch every day. Tick the after-school registration below if they sometimes eat at the Dillendapp."
+    "sansPeriscolaire": "This child comes home for lunch every day. Tick “Has lunch at the Dillendapp” if they sometimes eat there."
   },
   "dillendapp": {
     "titre": "Time at the Dillendapp",
@@ -116,19 +125,27 @@
     "repartEnBus": "Takes the bus home",
     "aRecuperer": "To collect from the Dillendapp",
     "recuperation": "To collect from the Dillendapp at {heure}.",
-    "aide": "If you give a time, the child stays at the maison relais after class: the evening bus drops them there instead of taking them home.",
     "depuis": "Arrives from",
     "aDeposer": "To drop off at the Dillendapp",
     "depose": "To drop off at the Dillendapp at {heure}.",
-    "aideDepuis": "If you set a time, you drop the child off at the after-school centre yourself before class: no bus leaves from your home that morning.",
-    "inscription": "Registered for after-school care (Dillendapp)",
-    "inscriptionAide": "Untick if the child never goes: the whole Dillendapp mechanism then disappears from the settings and from their sheet."
+    "inscriptionMidi": "Has lunch at the Dillendapp",
+    "inscriptionMidiAide": "Tick this if the child eats lunch there, even just one day a week.",
+    "inscriptionHorsMidi": "At the Dillendapp before class or after school",
+    "inscriptionHorsMidiAide": "Tick this if you drop them off in the morning, or pick them up at the end of the day. This is set independently of lunch.",
+    "blocMatin": "In the morning, before class",
+    "blocMatinAide": "You drop the child off at the after-school centre yourself: no bus leaves from your home on those mornings. The bus then takes them to class.",
+    "blocSoir": "In the evening, after school",
+    "blocSoirAide": "The child stays at the after-school centre after class: the bus drops them there instead of bringing them home, and you collect them there.",
+    "deposeCase": "I drop them off that day",
+    "recupereCase": "I collect them that day",
+    "bornes": "Between {min} and {max}, depending on their cycle’s bus",
+    "midiObligatoire": "There are no afternoon classes that day: staying at the Dillendapp means having lunch there. Lunch has been set accordingly."
   },
   "bus": {
     "titre": "Bus",
     "aide": "If you drop off or pick up your child yourself on some days, say so here: the app will then only show the journeys they actually take.",
     "pourJour": "Bus use on {jour}",
-    "touteLaSemaine": "Bus, whole week",
+    "touteLaSemaine": "Set the whole week",
     "aller-retour": "There and back",
     "aller": "Outward only",
     "retour": "Return only",
@@ -181,7 +198,8 @@
   },
   "trajetAdresse": {
     "matin": "Departure from another address",
-    "soir": "Return to another address"
+    "soir": "Return to another address",
+    "midi": "Lunch at another address"
   },
   "manquants": {
     "titre": "Not covered by the plan",
@@ -349,7 +367,9 @@
     "circule": "Runs",
     "reserve": "Restricted line",
     "horairesEcole": "School hours",
-    "horairesEcoleDetail": "Classes from {matinDebut} to {matinFin} Monday to Friday, and from {apresMidiDebut} to {apresMidiFin} on Mondays, Wednesdays and Fridays."
+    "horairesEcoleDetail": "Classes from {matinDebut} to {matinFin} Monday to Friday, and from {apresMidiDebut} to {apresMidiFin} on Mondays, Wednesdays and Fridays.",
+    "avertissementHoraires": "Times are indicative",
+    "avertissementHorairesDetail": "Times are indicative and may vary slightly depending on traffic conditions. We recommend being at the stop 5 minutes before the scheduled time. Should times change exceptionally (bad weather, roadworks, etc.), parents are informed by email or through the school."
   },
   "validite": {
     "couverte": "Plan valid for {annees}",
@@ -376,7 +396,9 @@
     "adressesTitre": "Per-day addresses only work inside the municipality",
     "adressesCorps": "For a given day you can set a departure or arrival address other than your home. The address search, however, only knows the municipality of Beckerich: for a place outside it, name the stop used directly rather than letting the site guess.",
     "donneesTitre": "Your data stays with you",
-    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. Goat Counter analytics are enabled via the installed script. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off."
+    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. Goat Counter analytics are enabled via the installed script. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off.",
+    "notificationsTitre": "Notifications",
+    "notificationsCorps": "They warn of a cancellation or a delay, but nothing guarantees they arrive: phone off, Do Not Disturb, push service outage. Nor can a web app mark itself as priority. The school and the municipality remain the official channel; this app does not replace them."
   },
   "independance": {
     "titre": "Independent site",
@@ -494,7 +516,30 @@
       "urgences": "One notification per cancellation or serious disruption, with no repeat.",
       "urgences-rappels": "As above, plus a reminder in the morning if the disruption lasts. This is the recommended setting.",
       "tout": "Including plain information. The banner in the app already shows those when you open it."
-    }
+    },
+    "priorite": "So you don't miss them",
+    "prioriteAide": "A web notification arrives like any other: it is your phone that decides whether it stands out. A few settings make a large difference.",
+    "iosEtapes": [
+      "The app must be installed on the home screen: without that, iOS delivers no web notifications at all.",
+      "Settings → Notifications → Bus scolaire Beckerich.",
+      "Turn on “Persistent banners” and sounds.",
+      "Remove the app from the “Scheduled Summary”: it bundles notifications at fixed times, and would deliver the cancellation after the bus.",
+      "In any Focus mode, add the app to the exceptions."
+    ],
+    "androidEtapes": [
+      "Allow the site's notifications when the browser asks.",
+      "Settings → Apps → your browser → Notifications: check the site is allowed.",
+      "Remove the browser from battery optimisation, or messages may wait for hours.",
+      "Under “Do not disturb”, add the browser to the exceptions."
+    ],
+    "ordinateurEtapes": [
+      "Allow the site's notifications when the browser asks.",
+      "Leave the browser open: closed, it receives nothing.",
+      "Check the system is not in focus or presentation mode."
+    ],
+    "pasUneGarantie": "This is not a guarantee",
+    "pasUneGarantieDetail": "A web app cannot mark itself as priority: the iOS “time sensitive” level is reserved for native apps. And a notification may never arrive — phone off, Do Not Disturb, push service outage.",
+    "ecoleReste": "The school and the municipality remain the official channel. This app does not replace them, and relieves nobody of informing parents."
   },
   "admin": {
     "titre": "Administration",
@@ -549,7 +594,12 @@
       "conflit": "Someone changed the file in the meantime. Reload the page and try again.",
       "lecture-impossible": "Could not read the disruptions file on GitHub.",
       "publication-impossible": "Publishing failed."
-    }
+    },
+    "ongletPerturbations": "Disruptions",
+    "ongletArrets": "Stops",
+    "ongletPlan": "Timetable",
+    "ongletTraductions": "Wording",
+    "ongletCredits": "Credits"
   },
   "commune": {
     "titre": "Municipality area",
@@ -687,5 +737,58 @@
     "moinsQuAvant": "The new plan has fewer runs than the current one. Check that it is not incomplete.",
     "publier": "Publish the new plan",
     "filet": "After publishing, the tests run before deployment. If they fail, the site stays on the previous version."
+  },
+  "traductions": {
+    "titre": "Correct the wording",
+    "aide": "Each correction overlays the compiled text without replacing it: it applies from the next opening, with no site rebuild. The French text stays visible for reference.",
+    "langue": "Language to correct",
+    "langueAide": "French is the reference: correcting it also changes the fallback for the other languages.",
+    "recherche": "Search a key or a text",
+    "recherchePlaceholder": "dillendapp, stop, calendar…",
+    "compte": "{affichees} of {total} texts",
+    "corrigee": "corrected",
+    "etape": "Step {numero}",
+    "revenir": "Back to the original wording",
+    "enAttente": "{nombre} correction(s) awaiting publication.",
+    "bloquantes": "To fix before publishing",
+    "publier": "Publish the corrections",
+    "publiee": "Corrections published. They will show the next time the app is opened.",
+    "refus": {
+      "langue-inconnue": "That language does not exist in the app.",
+      "cle-inconnue": "That text does not exist in French: only what is already there can be corrected.",
+      "type-different": "The original does not have that shape: a list does not replace a sentence, nor the other way round.",
+      "longueur-liste": "Exactly as many steps as the original are needed.",
+      "trop-long": "Text too long: 400 characters at most.",
+      "vide": "An empty text would wipe the sentence off the screen. Use “Back to the original wording”.",
+      "marqueurs": "The placeholders in braces, such as {heure}, must match the French text exactly. They are replaced by a real value when displayed."
+    },
+    "connexion": "Translation space",
+    "connexionAide": "Enter the code you were given to correct the app's wording. It grants access to translations only."
+  },
+  "credits": {
+    "titre": "Credits",
+    "intro": "This app was built by a parent in their spare time, and translated with the help of people who gain nothing from it. Here they are.",
+    "developpement": "Development",
+    "developpementAide": "Design, code and data of the app.",
+    "traductions": "Translations",
+    "traductionsAide": "Reviewing and correcting the wording, language by language.",
+    "remerciements": "Thanks to",
+    "remerciementsAide": "Everyone whose feedback moved the app forward.",
+    "accord": "Only names whose consent was asked for appear here. To be removed from this page, just write.",
+    "nom": "Name",
+    "role": "Role",
+    "motif": "What for",
+    "lien": "Link (optional)",
+    "lienIgnore": "This link will not be clickable: only addresses starting with http:// or https:// are rendered.",
+    "ajouter": "Add a person",
+    "retirer": "Remove",
+    "monter": "Move up",
+    "descendre": "Move down",
+    "aucun": "Nobody yet.",
+    "sansNom": "{nombre} entry/entries without a name: they will not be published.",
+    "publier": "Publish the credits",
+    "publiee": "Credits published. They will appear after the rebuild, in a minute or two.",
+    "editeurAide": "These credits are part of the site: publishing them triggers a rebuild, unlike wording corrections.",
+    "lienDepuisReglages": "Who made this app?"
   }
 }

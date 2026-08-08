@@ -47,7 +47,7 @@
     "midi": "Wo isst es zu Mittag?",
     "periscolaire": "Zu welchen Zeiten ist es im Dillendapp?",
     "recapitulatif": "Das ist seine Woche",
-    "terminer": "Übersicht ansehen",
+    "terminer": "Fertig",
     "reglageFin": "Alles auf einer Seite einstellen",
     "reprendre": "Schritt für Schritt einrichten",
     "situation": "Was ist passiert?",
@@ -70,14 +70,23 @@
     "choisirArret": "Genutzte Haltestelle angeben",
     "arretLabel": "Genutzte Haltestelle",
     "arretPlaceholder": "Haltestelle wählen",
-    "arretAide": "Adresse außerhalb der Gemeinde: geben Sie die Haltestelle an, an der das Kind ein- oder aussteigt. Die Gehzeit kann dann nicht geschätzt werden."
+    "arretAide": "Adresse außerhalb der Gemeinde: geben Sie die Haltestelle an, an der das Kind ein- oder aussteigt. Die Gehzeit kann dann nicht geschätzt werden.",
+    "partageeFratrie": "Das ist die Adresse des Haushalts: sie hier zu ändern würde sie auch für Ihre anderen Kinder ändern.",
+    "modifierPourTous": "Adresse des Haushalts ändern"
   },
   "adresseJour": {
     "titre": "Besondere Adressen",
-    "aide": "Standardmäßig fährt das Kind von Ihrem Wohnsitz los und kehrt dorthin zurück. Tragen Sie hier die Tage ein, an denen das nicht so ist — bei den Großeltern, bei der Tagesmutter. Morgens und abends werden getrennt eingestellt.",
+    "aide": "Standardmäßig fährt das Kind von Ihrem Wohnsitz los und kehrt dorthin zurück. Tragen Sie hier die Tage ein, an denen das nicht so ist — bei den Großeltern, bei der Tagesmutter. Jeder Moment des Tages wird getrennt eingestellt.",
     "domicile": "Wohnsitz",
     "matin": "Fährt morgens los von",
-    "soir": "Kehrt abends zurück nach"
+    "soir": "Kehrt abends zurück nach",
+    "midi": "Isst zu Mittag bei",
+    "joursDerogatoires": "{nombre} abweichende(r) Tag(e)",
+    "auDillendapp": {
+      "matin": "An diesem Morgen zum Dillendapp gebracht: es fährt von keiner anderen Adresse los.",
+      "midi": "Isst an diesem Tag im Dillendapp zu Mittag.",
+      "soir": "An diesem Abend im Dillendapp abzuholen: der Bus bringt es nirgendwo anders hin."
+    }
   },
   "enfant": {
     "prenom": "Vorname",
@@ -106,9 +115,9 @@
     "maisonCourt": "Zuhause",
     "dillendapp": "Isst im Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Mittagessen, ganze Woche",
+    "touteLaSemaine": "Ganze Woche einstellen",
     "sansCoursApresMidi": "Kein Nachmittagsunterricht",
-    "sansPeriscolaire": "Dieses Kind isst jeden Tag zu Hause. Kreuzen Sie unten die Anmeldung zur Betreuung an, wenn es manchmal im Dillendapp isst."
+    "sansPeriscolaire": "Dieses Kind isst jeden Tag zu Hause. Kreuzen Sie „Isst mittags im Dillendapp“ an, wenn es dort manchmal zu Mittag isst."
   },
   "dillendapp": {
     "titre": "Anwesenheit im Dillendapp",
@@ -116,19 +125,27 @@
     "repartEnBus": "Fährt mit dem Bus",
     "aRecuperer": "Im Dillendapp abzuholen",
     "recuperation": "Um {heure} im Dillendapp abzuholen.",
-    "aide": "Wenn Sie eine Uhrzeit angeben, bleibt das Kind nach dem Unterricht in der Maison Relais: der Abendbus setzt es dort ab, statt es nach Hause zu bringen.",
     "depuis": "Kommt an ab",
     "aDeposer": "Zum Dillendapp bringen",
     "depose": "Um {heure} zum Dillendapp bringen.",
-    "aideDepuis": "Wenn Sie eine Uhrzeit angeben, bringen Sie das Kind vor dem Unterricht selbst zur Maison Relais: an diesem Morgen fährt kein Bus bei Ihnen ab.",
-    "inscription": "Zur Betreuung angemeldet (Dillendapp)",
-    "inscriptionAide": "Abwählen, wenn das Kind nie hingeht: die gesamte Dillendapp-Logik verschwindet dann aus den Einstellungen und aus seiner Übersicht."
+    "inscriptionMidi": "Isst mittags im Dillendapp",
+    "inscriptionMidiAide": "Ankreuzen, wenn das Kind dort zu Mittag isst, sei es auch nur an einem Tag pro Woche.",
+    "inscriptionHorsMidi": "Im Dillendapp vor dem Unterricht oder nach der Schule",
+    "inscriptionHorsMidiAide": "Ankreuzen, wenn Sie es morgens dorthin bringen oder abends dort abholen. Das wird unabhängig vom Mittagessen eingestellt.",
+    "blocMatin": "Morgens, vor dem Unterricht",
+    "blocMatinAide": "Sie bringen das Kind selbst zur Maison Relais: an diesen Morgen fährt kein Bus bei Ihnen ab. Danach bringt der Bus es zum Unterricht.",
+    "blocSoir": "Abends, nach der Schule",
+    "blocSoirAide": "Das Kind bleibt nach dem Unterricht in der Maison Relais: der Bus setzt es dort ab, statt es nach Hause zu bringen, und Sie holen es dort ab.",
+    "deposeCase": "Ich bringe es an diesem Tag",
+    "recupereCase": "Ich hole es an diesem Tag ab",
+    "bornes": "Zwischen {min} und {max}, je nach Bus seines Zyklus",
+    "midiObligatoire": "An diesem Tag gibt es keinen Nachmittagsunterricht: im Dillendapp zu bleiben setzt voraus, dort zu essen. Das Mittagessen wurde entsprechend eingestellt."
   },
   "bus": {
     "titre": "Bus",
     "aide": "Wenn Sie Ihr Kind an manchen Tagen selbst bringen oder abholen, geben Sie es hier an: die App zeigt dann nur die Fahrten, die es wirklich nimmt.",
     "pourJour": "Busnutzung am {jour}",
-    "touteLaSemaine": "Bus, ganze Woche",
+    "touteLaSemaine": "Ganze Woche einstellen",
     "aller-retour": "Hin und zurück",
     "aller": "Nur Hinfahrt",
     "retour": "Nur Rückfahrt",
@@ -181,7 +198,8 @@
   },
   "trajetAdresse": {
     "matin": "Abfahrt von einer anderen Adresse",
-    "soir": "Rückkehr zu einer anderen Adresse"
+    "soir": "Rückkehr zu einer anderen Adresse",
+    "midi": "Mittagessen an einer anderen Adresse"
   },
   "manquants": {
     "titre": "Vom Plan nicht abgedeckt",
@@ -349,7 +367,9 @@
     "circule": "Verkehrt",
     "reserve": "Linie vorbehalten",
     "horairesEcole": "Schulzeiten",
-    "horairesEcoleDetail": "Unterricht von {matinDebut} bis {matinFin} von Montag bis Freitag, sowie von {apresMidiDebut} bis {apresMidiFin} montags, mittwochs und freitags."
+    "horairesEcoleDetail": "Unterricht von {matinDebut} bis {matinFin} von Montag bis Freitag, sowie von {apresMidiDebut} bis {apresMidiFin} montags, mittwochs und freitags.",
+    "avertissementHoraires": "Richtwerte",
+    "avertissementHorairesDetail": "Die Fahrzeiten sind Richtwerte und können je nach Verkehrslage leicht abweichen. Wir empfehlen, 5 Minuten vor der angegebenen Zeit an der Haltestelle zu sein. Bei außerplanmäßigen Änderungen (Unwetter, Bauarbeiten usw.) werden die Eltern per E-Mail oder über die Schule informiert."
   },
   "validite": {
     "couverte": "Plan gültig für {annees}",
@@ -376,7 +396,9 @@
     "adressesTitre": "Adressen pro Tag funktionieren nur innerhalb der Gemeinde",
     "adressesCorps": "Sie können für einen bestimmten Tag eine andere Start- oder Zieladresse als Ihren Wohnsitz angeben. Die Adresssuche kennt jedoch nur die Gemeinde Beckerich: Für einen Ort außerhalb geben Sie bitte direkt die genutzte Haltestelle an, statt die Website raten zu lassen.",
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
-    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Goat Counter Analysen werden über das installierte Skript aktiviert. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht."
+    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Goat Counter Analysen werden über das installierte Skript aktiviert. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht.",
+    "notificationsTitre": "Benachrichtigungen",
+    "notificationsCorps": "Sie melden eine Absage oder Verspätung, aber nichts garantiert, dass sie ankommen: Telefon aus, Nicht stören, Ausfall des Push-Dienstes. Eine Webanwendung kann sich auch nicht selbst als vorrangig einstufen. Schule und Gemeinde bleiben der offizielle Informationsweg; diese Anwendung ersetzt sie nicht."
   },
   "independance": {
     "titre": "Unabhängige Website",
@@ -494,7 +516,30 @@
       "urgences": "Eine Benachrichtigung pro Ausfall oder schwerer Störung, ohne Wiederholung.",
       "urgences-rappels": "Wie oben, plus eine Erinnerung am Morgen, wenn die Störung anhält. Empfohlene Einstellung.",
       "tout": "Auch einfache Informationen. Das Banner in der App zeigt sie beim Öffnen ohnehin an."
-    }
+    },
+    "priorite": "Damit Sie sie nicht verpassen",
+    "prioriteAide": "Eine Web-Benachrichtigung kommt an wie jede andere: Ihr Telefon entscheidet, ob sie auffällt. Ein paar Einstellungen ändern daran viel.",
+    "iosEtapes": [
+      "Die Anwendung muss auf dem Startbildschirm installiert sein: sonst stellt iOS keine Web-Benachrichtigung zu.",
+      "Einstellungen → Mitteilungen → Bus scolaire Beckerich.",
+      "Aktivieren Sie „Dauerhafte Banner“ und die Töne.",
+      "Nehmen Sie die Anwendung aus der „Zusammenfassung“ heraus: sie bündelt Mitteilungen zu festen Zeiten und ließe die Absage nach dem Bus eintreffen.",
+      "Fügen Sie die Anwendung in einem Fokus-Modus zu den Ausnahmen hinzu."
+    ],
+    "androidEtapes": [
+      "Erlauben Sie die Benachrichtigungen der Website, wenn der Browser danach fragt.",
+      "Einstellungen → Apps → Ihr Browser → Benachrichtigungen: prüfen Sie, dass die Website erlaubt ist.",
+      "Nehmen Sie den Browser aus der Akku-Optimierung, sonst können Sendungen stundenlang warten.",
+      "Fügen Sie den Browser unter „Bitte nicht stören“ zu den Ausnahmen hinzu."
+    ],
+    "ordinateurEtapes": [
+      "Erlauben Sie die Benachrichtigungen der Website, wenn der Browser danach fragt.",
+      "Lassen Sie den Browser geöffnet: geschlossen empfängt er nichts.",
+      "Prüfen Sie, dass das System nicht im Fokus- oder Präsentationsmodus ist."
+    ],
+    "pasUneGarantie": "Das ist keine Garantie",
+    "pasUneGarantieDetail": "Eine Webanwendung kann sich nicht selbst als vorrangig einstufen: die Stufe „zeitkritisch“ von iOS ist nativen Apps vorbehalten. Und eine Benachrichtigung kann ausbleiben — Telefon aus, Nicht stören, Ausfall des Push-Dienstes.",
+    "ecoleReste": "Schule und Gemeinde bleiben der offizielle Informationsweg. Diese Anwendung ersetzt sie nicht und entbindet niemanden davon, die Eltern zu benachrichtigen."
   },
   "admin": {
     "titre": "Verwaltung",
@@ -549,7 +594,12 @@
       "conflit": "Jemand hat die Datei zwischenzeitlich geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
       "lecture-impossible": "Die Störungsdatei konnte auf GitHub nicht gelesen werden.",
       "publication-impossible": "Die Veröffentlichung ist fehlgeschlagen."
-    }
+    },
+    "ongletPerturbations": "Störungen",
+    "ongletArrets": "Haltestellen",
+    "ongletPlan": "Fahrplan",
+    "ongletTraductions": "Texte",
+    "ongletCredits": "Danksagung"
   },
   "commune": {
     "titre": "Gemeindebereich",
@@ -687,5 +737,58 @@
     "moinsQuAvant": "Der neue Plan enthält weniger Fahrten als der aktuelle. Prüfen Sie, ob er vollständig ist.",
     "publier": "Neuen Plan veröffentlichen",
     "filet": "Nach der Veröffentlichung laufen die Tests vor dem Deployment. Schlagen sie fehl, bleibt die Website auf der vorherigen Version."
+  },
+  "traductions": {
+    "titre": "Texte korrigieren",
+    "aide": "Jede Korrektur überlagert den kompilierten Text, ohne ihn zu ersetzen: sie gilt ab dem nächsten Öffnen, ohne Neuerstellung der Website. Der französische Text bleibt als Referenz sichtbar.",
+    "langue": "Zu korrigierende Sprache",
+    "langueAide": "Französisch ist die Referenz: es zu korrigieren ändert auch den Rückfall der anderen Sprachen.",
+    "recherche": "Schlüssel oder Text suchen",
+    "recherchePlaceholder": "dillendapp, Haltestelle, Kalender…",
+    "compte": "{affichees} von {total} Texten",
+    "corrigee": "korrigiert",
+    "etape": "Schritt {numero}",
+    "revenir": "Zum Originaltext zurückkehren",
+    "enAttente": "{nombre} Korrektur(en) noch nicht veröffentlicht.",
+    "bloquantes": "Vor der Veröffentlichung zu beheben",
+    "publier": "Korrekturen veröffentlichen",
+    "publiee": "Korrekturen veröffentlicht. Sie erscheinen beim nächsten Öffnen der Anwendung.",
+    "refus": {
+      "langue-inconnue": "Diese Sprache gibt es in der Anwendung nicht.",
+      "cle-inconnue": "Diesen Text gibt es auf Französisch nicht: korrigieren lässt sich nur, was bereits vorhanden ist.",
+      "type-different": "Der Originaltext hat nicht diese Form: eine Liste ersetzt keinen Satz und umgekehrt.",
+      "longueur-liste": "Es braucht genau so viele Schritte wie im Originaltext.",
+      "trop-long": "Text zu lang: höchstens 400 Zeichen.",
+      "vide": "Ein leerer Text würde den Satz auf dem Bildschirm löschen. Nutzen Sie „Zum Originaltext zurückkehren“.",
+      "marqueurs": "Die Platzhalter in geschweiften Klammern, etwa {heure}, müssen genau denen des französischen Textes entsprechen. Sie werden bei der Anzeige durch einen echten Wert ersetzt."
+    },
+    "connexion": "Übersetzungsbereich",
+    "connexionAide": "Geben Sie den Code ein, den Sie zum Korrigieren der Texte erhalten haben. Er gibt ausschließlich Zugang zu den Übersetzungen."
+  },
+  "credits": {
+    "titre": "Danksagung",
+    "intro": "Diese Anwendung wurde von einem Elternteil in der Freizeit erstellt und mit Hilfe von Menschen übersetzt, die nichts daran verdienen. Hier sind sie.",
+    "developpement": "Entwicklung",
+    "developpementAide": "Konzept, Code und Daten der Anwendung.",
+    "traductions": "Übersetzungen",
+    "traductionsAide": "Durchsicht und Korrektur der Texte, Sprache für Sprache.",
+    "remerciements": "Dank",
+    "remerciementsAide": "Alle, deren Rückmeldungen die Anwendung vorangebracht haben.",
+    "accord": "Hier stehen nur Namen, für die eine Zustimmung eingeholt wurde. Wer von dieser Seite verschwinden möchte, schreibt einfach eine Nachricht.",
+    "nom": "Name",
+    "role": "Rolle",
+    "motif": "Wofür",
+    "lien": "Link (optional)",
+    "lienIgnore": "Dieser Link wird nicht anklickbar sein: nur Adressen mit http:// oder https:// werden dargestellt.",
+    "ajouter": "Person hinzufügen",
+    "retirer": "Entfernen",
+    "monter": "Nach oben",
+    "descendre": "Nach unten",
+    "aucun": "Noch niemand.",
+    "sansNom": "{nombre} Eintrag/Einträge ohne Namen: sie werden nicht veröffentlicht.",
+    "publier": "Danksagung veröffentlichen",
+    "publiee": "Veröffentlicht. Erscheint nach der Neuerstellung, in ein bis zwei Minuten.",
+    "editeurAide": "Diese Danksagung gehört zur Website: ihre Veröffentlichung löst eine Neuerstellung aus, anders als Textkorrekturen.",
+    "lienDepuisReglages": "Wer hat diese Anwendung gemacht?"
   }
 }

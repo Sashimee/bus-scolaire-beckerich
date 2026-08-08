@@ -10,9 +10,22 @@
  * poste partagé — c'est la même politique que le jeton GitHub de `/admin`.
  */
 import { URL_WORKER } from '../config'
+import type { Surcouche } from './traductions'
 import type { Perturbation } from './urgences'
 
-const CLE_SESSION = 'bus-beckerich.session-commune'
+/**
+ * Les deux espaces à code personnel, et la clé de session qui va avec.
+ *
+ * Deux clés distinctes, et non une seule portant un rôle : ouvrir les deux espaces
+ * dans le même onglet doit rester possible, et surtout, se déconnecter de l'un ne doit
+ * pas emporter l'autre.
+ */
+export type RoleCommune = 'commune' | 'traductions'
+
+const CLES_SESSION: Record<RoleCommune, string> = {
+  commune: 'bus-beckerich.session-commune',
+  traductions: 'bus-beckerich.session-traductions',
+}
 
 export interface SessionCommune {
   jeton: string
@@ -33,9 +46,9 @@ export interface EntreeJournal {
 /** L'espace commune n'existe que si un Worker est configuré à la construction. */
 export const communeConfiguree = (): boolean => Boolean(URL_WORKER)
 
-export function chargerSession(): SessionCommune | null {
+export function chargerSession(role: RoleCommune = 'commune'): SessionCommune | null {
   try {
-    const brut = sessionStorage.getItem(CLE_SESSION)
+    const brut = sessionStorage.getItem(CLES_SESSION[role])
     if (!brut) return null
     const s = JSON.parse(brut) as SessionCommune
     // Une session expirée vaut une absence de session : mieux vaut redemander le code
@@ -47,17 +60,17 @@ export function chargerSession(): SessionCommune | null {
   }
 }
 
-const enregistrerSession = (s: SessionCommune) => {
+const enregistrerSession = (role: RoleCommune, s: SessionCommune) => {
   try {
-    sessionStorage.setItem(CLE_SESSION, JSON.stringify(s))
+    sessionStorage.setItem(CLES_SESSION[role], JSON.stringify(s))
   } catch {
     /* stockage indisponible : la session vaudra pour cette page seulement */
   }
 }
 
-export function oublierSession(): void {
+export function oublierSession(role: RoleCommune = 'commune'): void {
   try {
-    sessionStorage.removeItem(CLE_SESSION)
+    sessionStorage.removeItem(CLES_SESSION[role])
   } catch {
     /* rien à faire : il n'y avait rien à oublier */
   }
@@ -122,12 +135,21 @@ async function appeler<T>(
   throw new ErreurCommune('inconnu', motif)
 }
 
-export async function seConnecter(code: string): Promise<SessionCommune> {
-  const s = await appeler<SessionCommune>('/commune/connexion', {
+/**
+ * Échange un code contre un jeton de session, pour l'espace demandé.
+ *
+ * Un code de l'autre espace est refusé côté Worker : il n'y existe littéralement pas,
+ * les deux vivant sous des préfixes distincts.
+ */
+export async function seConnecter(
+  code: string,
+  role: RoleCommune = 'commune',
+): Promise<SessionCommune> {
+  const s = await appeler<SessionCommune>(`/${role}/connexion`, {
     methode: 'POST',
     corps: { code },
   })
-  enregistrerSession(s)
+  enregistrerSession(role, s)
   return s
 }
 
@@ -157,6 +179,18 @@ export async function publierPlan(
   await appeler('/commune/horaires', {
     methode: 'POST',
     corps: { plan, resume },
+    jeton: session.jeton,
+  })
+}
+
+/** Publie la surcouche de traduction complète. Le Worker revalide entrée par entrée. */
+export async function publierTraductions(
+  session: SessionCommune,
+  surcouche: Surcouche,
+): Promise<void> {
+  await appeler('/traductions/publier', {
+    methode: 'POST',
+    corps: { surcouche },
     jeton: session.jeton,
   })
 }

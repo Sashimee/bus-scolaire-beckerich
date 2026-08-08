@@ -11,6 +11,9 @@
  * site reste sur sa version précédente plutôt que de partir cassé.
  */
 import { arrets, cycles } from './donnees'
+// Mêmes expressions que la relecture des entrées : deux copies finiraient par
+// diverger, et l'une laisserait passer ce que l'autre refuse.
+import { DATE_ISO, HEURE } from './nettoyage'
 import { JOURS } from './types'
 import type { Jour } from './types'
 
@@ -25,8 +28,6 @@ export interface Probleme {
 
 const PERIODES = ['matin', 'midi', 'apres-midi', 'soir']
 const DIRECTIONS = ['vers-ecole', 'vers-domicile', 'vers-dillendapp']
-const HEURE = /^([01]\d|2[0-3]):[0-5]\d$/
-const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/
 
 const estObjet = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)

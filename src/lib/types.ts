@@ -152,6 +152,25 @@ export interface CycleScolaire {
   arretEcole: string
 }
 
+/**
+ * Amplitude d'accueil de la maison relais.
+ *
+ * Elle borne ce qu'un parent peut saisir : hors de ces heures, la présence déclarée
+ * décrirait un accueil qui n'existe pas. `margeAvantBusMinutes` est la sécurité
+ * retranchée à l'heure du dernier bus utilisable — on ne demande à personne de déposer
+ * son enfant à la minute où le bus part.
+ */
+export interface HorairesMaisonRelais {
+  ouverture: string
+  fermeture: string
+  margeAvantBusMinutes: number
+}
+
+export interface MaisonRelais extends SiteScolaire {
+  arret: string
+  horaires: HorairesMaisonRelais
+}
+
 export interface Adresse {
   libelle: string
   localite: string
@@ -169,9 +188,24 @@ export interface Adresse {
 export interface AdresseJour {
   /** D'où l'enfant part ce matin-là. */
   matin?: Adresse | null
+  /**
+   * Où il déjeune ce jour-là, quand ce n'est ni chez lui ni au Dillendapp — chez une
+   * tante, chez ses grands-parents. Le bus l'y dépose à midi et l'y reprend pour
+   * l'après-midi.
+   *
+   * Ne vaut que les jours où il y a cours l'après-midi : les autres, le retour de midi
+   * est le retour de la journée, et c'est `soir` qui décrit la destination.
+   */
+  midi?: Adresse | null
   /** Où il est ramené ce soir-là. */
   soir?: Adresse | null
 }
+
+/** Les trois moments de la journée auxquels une adresse peut déroger au domicile. */
+export type SensAdresse = 'matin' | 'midi' | 'soir'
+
+/** Dans l'ordre chronologique, pour l'affichage comme pour l'encodage des liens. */
+export const SENS_ADRESSE: readonly SensAdresse[] = ['matin', 'midi', 'soir'] as const
 
 /** Un enfant tel que le parent le décrit. */
 export interface Enfant {
@@ -188,12 +222,23 @@ export interface Enfant {
    */
   adresses?: Partial<Record<Jour, AdresseJour>>
   /**
-   * L'enfant est inscrit au périscolaire (Dillendapp / SEA).
+   * L'enfant déjeune au Dillendapp, au moins un jour. Commande la grille des repas.
    *
-   * `false` masque toute la mécanique Dillendapp — repas comme présence — ce qui est
-   * le cas de la majorité des familles. Absent sur les données antérieures au
-   * réglage : on le déduit alors des repas déjà saisis, pour ne pas faire disparaître
-   * la configuration des familles concernées.
+   * Absent sur les données antérieures au réglage : voir `deduireInscriptions`.
+   */
+  periscolaireMidi?: boolean
+  /**
+   * L'enfant est au Dillendapp avant la classe ou après l'école. Commande les grilles
+   * d'horaires.
+   *
+   * Distinct du midi, parce que les deux se décident séparément : un enfant peut
+   * rentrer déjeuner chez lui et rejoindre la maison relais après la classe.
+   */
+  periscolaireHorsMidi?: boolean
+  /**
+   * @deprecated Une seule case commandait le repas ET la présence. Remplacée par
+   * `periscolaireMidi` et `periscolaireHorsMidi` ; encore lue à la migration des
+   * configurations enregistrées et des liens de partage antérieurs.
    */
   periscolaire?: boolean
   /**
@@ -265,7 +310,7 @@ export interface Trajet {
    * dérogatoire de ce jour-là. Sans cette mention, un arrêt inhabituel se lit comme
    * une erreur de l'application plutôt que comme le réglage du parent.
    */
-  adresseDerogatoire?: 'matin' | 'soir'
+  adresseDerogatoire?: SensAdresse
   /** Autres lignes qui assurent le même déplacement ce jour-là. */
   alternatives: { ligne: Ligne; heureDepart: string | null }[]
 }

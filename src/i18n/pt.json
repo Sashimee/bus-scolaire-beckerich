@@ -47,7 +47,7 @@
     "midi": "Onde almoça?",
     "periscolaire": "A que horas está no Dillendapp?",
     "recapitulatif": "Eis a sua semana",
-    "terminer": "Ver a sua ficha",
+    "terminer": "Terminado",
     "reglageFin": "Definir tudo num só ecrã",
     "reprendre": "Configurar passo a passo",
     "situation": "O que aconteceu?",
@@ -70,14 +70,23 @@
     "choisirArret": "Indicar a paragem utilizada",
     "arretLabel": "Paragem utilizada",
     "arretPlaceholder": "Escolher uma paragem",
-    "arretAide": "Endereço fora da comuna: indique a paragem onde a criança entra ou sai. O tempo a pé não poderá ser estimado."
+    "arretAide": "Endereço fora da comuna: indique a paragem onde a criança entra ou sai. O tempo a pé não poderá ser estimado.",
+    "partageeFratrie": "É a morada do agregado: alterá-la aqui alterá-la-ia também para os seus outros filhos.",
+    "modifierPourTous": "Alterar a morada do agregado"
   },
   "adresseJour": {
     "titre": "Endereços especiais",
-    "aide": "Por defeito, a criança parte da sua morada e regressa a ela. Indique aqui os dias em que não é o caso — em casa dos avós, da ama. A manhã e a tarde definem-se separadamente.",
+    "aide": "Por defeito, a criança parte da sua casa e regressa a ela. Indique aqui os dias em que não é o caso — em casa dos avós, da ama. Cada momento do dia configura-se separadamente.",
     "domicile": "Morada",
     "matin": "Parte de manhã de",
-    "soir": "Regressa à noite a"
+    "soir": "Regressa à noite a",
+    "midi": "Almoça em",
+    "joursDerogatoires": "{nombre} dia(s) à parte",
+    "auDillendapp": {
+      "matin": "Levada ao Dillendapp nessa manhã: não parte de mais nenhuma morada.",
+      "midi": "Almoça no Dillendapp nesse dia.",
+      "soir": "A ir buscar ao Dillendapp nesse fim de dia: o autocarro não a leva a mais lado nenhum."
+    }
   },
   "enfant": {
     "prenom": "Nome próprio",
@@ -106,9 +115,9 @@
     "maisonCourt": "Casa",
     "dillendapp": "Almoça no Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Almoço, toda a semana",
+    "touteLaSemaine": "Configurar toda a semana",
     "sansCoursApresMidi": "Sem aulas à tarde",
-    "sansPeriscolaire": "Esta criança vem almoçar a casa todos os dias. Assinale abaixo a inscrição no acolhimento se ela almoçar por vezes no Dillendapp."
+    "sansPeriscolaire": "Esta criança vem almoçar a casa todos os dias. Assinale «Almoça no Dillendapp» se por vezes aí faz a refeição do meio-dia."
   },
   "dillendapp": {
     "titre": "Presença no Dillendapp",
@@ -116,19 +125,27 @@
     "repartEnBus": "Regressa de autocarro",
     "aRecuperer": "A ir buscar ao Dillendapp",
     "recuperation": "A ir buscar ao Dillendapp às {heure}.",
-    "aide": "Se indicar uma hora, a criança fica na maison relais depois das aulas: o autocarro do fim do dia deixa-a lá em vez de a levar a casa.",
     "depuis": "Chega a partir das",
     "aDeposer": "A levar ao Dillendapp",
     "depose": "A levar ao Dillendapp às {heure}.",
-    "aideDepuis": "Se indicar uma hora, é você que leva a criança à casa de acolhimento antes das aulas: nenhum autocarro parte de sua casa nessa manhã.",
-    "inscription": "Inscrita no acolhimento (Dillendapp)",
-    "inscriptionAide": "Desmarque se a criança nunca lá vai: toda a mecânica do Dillendapp desaparece então das definições e da sua ficha."
+    "inscriptionMidi": "Almoça no Dillendapp",
+    "inscriptionMidiAide": "Assinale se a criança aí faz a refeição do meio-dia, nem que seja um dia por semana.",
+    "inscriptionHorsMidi": "No Dillendapp antes das aulas ou depois da escola",
+    "inscriptionHorsMidiAide": "Assinale se a leva lá de manhã, ou se a vai buscar ao fim do dia. Configura-se independentemente do almoço.",
+    "blocMatin": "De manhã, antes das aulas",
+    "blocMatinAide": "É você que leva a criança à casa de acolhimento: nenhum autocarro parte de sua casa nessas manhãs. Depois é o autocarro que a leva às aulas.",
+    "blocSoir": "Ao fim do dia, depois da escola",
+    "blocSoirAide": "A criança fica na casa de acolhimento depois das aulas: o autocarro deixa-a lá em vez de a levar a casa, e é você que a vai buscar.",
+    "deposeCase": "Levo-a nesse dia",
+    "recupereCase": "Vou buscá-la nesse dia",
+    "bornes": "Entre {min} e {max}, conforme o autocarro do seu ciclo",
+    "midiObligatoire": "Nesse dia não há aulas à tarde: ficar no Dillendapp implica almoçar lá. O almoço foi configurado em conformidade."
   },
   "bus": {
     "titre": "Autocarro",
     "aide": "Se em alguns dias leva ou vai buscar o seu filho, indique-o: a aplicação mostrará apenas as deslocações que ele faz realmente.",
     "pourJour": "Utilização do autocarro à {jour}",
-    "touteLaSemaine": "Autocarro, toda a semana",
+    "touteLaSemaine": "Configurar toda a semana",
     "aller-retour": "Ida e volta",
     "aller": "Apenas ida",
     "retour": "Apenas volta",
@@ -181,7 +198,8 @@
   },
   "trajetAdresse": {
     "matin": "Partida de outro endereço",
-    "soir": "Regresso a outro endereço"
+    "soir": "Regresso a outro endereço",
+    "midi": "Almoço noutra morada"
   },
   "manquants": {
     "titre": "Não coberto pelo plano",
@@ -349,7 +367,9 @@
     "circule": "Circula",
     "reserve": "Linha reservada",
     "horairesEcole": "Horário da escola",
-    "horairesEcoleDetail": "Aulas das {matinDebut} às {matinFin} de segunda a sexta-feira, e das {apresMidiDebut} às {apresMidiFin} às segundas, quartas e sextas-feiras."
+    "horairesEcoleDetail": "Aulas das {matinDebut} às {matinFin} de segunda a sexta-feira, e das {apresMidiDebut} às {apresMidiFin} às segundas, quartas e sextas-feiras.",
+    "avertissementHoraires": "Horários indicativos",
+    "avertissementHorairesDetail": "Os horários são indicativos e podem variar ligeiramente consoante as condições de trânsito. Recomendamos estar na paragem 5 minutos antes da hora prevista. Em caso de alteração excecional dos horários (mau tempo, obras, etc.), os pais são informados por email ou através da escola."
   },
   "validite": {
     "couverte": "Plano válido para {annees}",
@@ -376,7 +396,9 @@
     "adressesTitre": "Os endereços por dia só funcionam dentro da comuna",
     "adressesCorps": "Pode indicar, para um determinado dia, um endereço de partida ou de chegada diferente da sua morada. A pesquisa de endereços conhece, no entanto, apenas a comuna de Beckerich: para um local fora dela, indique diretamente a paragem utilizada, em vez de deixar o site adivinhar.",
     "donneesTitre": "Os seus dados ficam consigo",
-    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. As análises Goat Counter são ativadas via o script instalado. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar."
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. As análises Goat Counter são ativadas via o script instalado. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar.",
+    "notificationsTitre": "Notificações",
+    "notificationsCorps": "Avisam de um cancelamento ou de um atraso, mas nada garante que cheguem: telemóvel desligado, Não incomodar, avaria do serviço de notificações. Uma aplicação web também não pode declarar-se prioritária por si própria. A escola e o município continuam a ser a via oficial de informação; esta aplicação não os substitui."
   },
   "independance": {
     "titre": "Site independente",
@@ -494,7 +516,30 @@
       "urgences": "Uma notificação por cancelamento ou perturbação grave, sem repetição.",
       "urgences-rappels": "Como acima, mais um lembrete de manhã se a perturbação se mantiver. É a definição aconselhada.",
       "tout": "Incluindo as simples informações. O aviso na aplicação já as mostra na abertura."
-    }
+    },
+    "priorite": "Para não as perder",
+    "prioriteAide": "Uma notificação web chega como qualquer outra: é o seu telemóvel que decide se a faz notar. Algumas definições mudam muito nisso.",
+    "iosEtapes": [
+      "A aplicação tem de estar instalada no ecrã principal: sem isso, o iOS não entrega notificações web.",
+      "Definições → Notificações → Bus scolaire Beckerich.",
+      "Ative «Faixas persistentes» e os sons.",
+      "Retire a aplicação do «Resumo programado»: agrupa notificações a horas fixas e faria chegar o cancelamento depois do autocarro.",
+      "Num modo de concentração, adicione a aplicação às exceções."
+    ],
+    "androidEtapes": [
+      "Autorize as notificações do site quando o navegador o pedir.",
+      "Definições → Aplicações → o seu navegador → Notificações: confirme que o site está autorizado.",
+      "Retire o navegador da otimização de bateria, senão os envios podem esperar horas.",
+      "Em «Não incomodar», adicione o navegador às exceções."
+    ],
+    "ordinateurEtapes": [
+      "Autorize as notificações do site quando o navegador o pedir.",
+      "Deixe o navegador aberto: fechado, não recebe nada.",
+      "Verifique que o sistema não está em modo de concentração ou apresentação."
+    ],
+    "pasUneGarantie": "Não é uma garantia",
+    "pasUneGarantieDetail": "Uma aplicação web não pode declarar-se prioritária por si própria: o nível «tempo real» do iOS está reservado às aplicações nativas. E uma notificação pode nunca chegar — telemóvel desligado, Não incomodar, avaria do serviço de notificações.",
+    "ecoleReste": "A escola e o município continuam a ser a via oficial de informação. Esta aplicação não os substitui nem dispensa ninguém de avisar os pais."
   },
   "admin": {
     "titre": "Administração",
@@ -549,7 +594,12 @@
       "conflit": "Alguém alterou o ficheiro entretanto. Recarregue a página e tente novamente.",
       "lecture-impossible": "Não foi possível ler o ficheiro das perturbações no GitHub.",
       "publication-impossible": "A publicação falhou."
-    }
+    },
+    "ongletPerturbations": "Perturbações",
+    "ongletArrets": "Paragens",
+    "ongletPlan": "Plano",
+    "ongletTraductions": "Textos",
+    "ongletCredits": "Créditos"
   },
   "commune": {
     "titre": "Área da comuna",
@@ -687,5 +737,58 @@
     "moinsQuAvant": "O novo plano tem menos circulações do que o atual. Verifique se não está incompleto.",
     "publier": "Publicar o novo plano",
     "filet": "Após a publicação, os testes correm antes da implantação. Se falharem, o site fica na versão anterior."
+  },
+  "traductions": {
+    "titre": "Corrigir os textos",
+    "aide": "Cada correção sobrepõe-se ao texto compilado sem o substituir: aplica-se a partir da abertura seguinte, sem reconstruir o site. O texto francês continua visível como referência.",
+    "langue": "Idioma a corrigir",
+    "langueAide": "O francês serve de referência: corrigi-lo altera também o recurso das outras línguas.",
+    "recherche": "Procurar uma chave ou um texto",
+    "recherchePlaceholder": "dillendapp, paragem, agenda…",
+    "compte": "{affichees} de {total} textos",
+    "corrigee": "corrigida",
+    "etape": "Passo {numero}",
+    "revenir": "Voltar ao texto de origem",
+    "enAttente": "{nombre} correção(ões) por publicar.",
+    "bloquantes": "A corrigir antes de publicar",
+    "publier": "Publicar as correções",
+    "publiee": "Correções publicadas. Ficarão visíveis na próxima abertura da aplicação.",
+    "refus": {
+      "langue-inconnue": "Este idioma não existe na aplicação.",
+      "cle-inconnue": "Este texto não existe em francês: só se pode corrigir o que já lá está.",
+      "type-different": "O texto de origem não tem esta forma: uma lista não substitui uma frase, nem o contrário.",
+      "longueur-liste": "São precisos exatamente tantos passos como no texto de origem.",
+      "trop-long": "Texto demasiado longo: 400 caracteres no máximo.",
+      "vide": "Um texto vazio apagaria a frase no ecrã. Use «Voltar ao texto de origem».",
+      "marqueurs": "Os marcadores entre chavetas, como {heure}, têm de ser exatamente os mesmos do texto francês. São substituídos por um valor real na apresentação."
+    },
+    "connexion": "Espaço de tradução",
+    "connexionAide": "Introduza o código que lhe foi entregue para corrigir os textos da aplicação. Dá acesso apenas às traduções."
+  },
+  "credits": {
+    "titre": "Créditos",
+    "intro": "Esta aplicação foi feita por um pai, no seu tempo livre, e traduzida com a ajuda de pessoas que nada ganham com isso. Aqui estão elas.",
+    "developpement": "Desenvolvimento",
+    "developpementAide": "Conceção, código e dados da aplicação.",
+    "traductions": "Traduções",
+    "traductionsAide": "Revisão e correção dos textos, língua a língua.",
+    "remerciements": "Agradecimentos",
+    "remerciementsAide": "Todos aqueles cujos comentários fizeram avançar a aplicação.",
+    "accord": "Só constam aqui nomes cuja autorização foi pedida. Para ser retirado desta página, basta escrever.",
+    "nom": "Nome",
+    "role": "Papel",
+    "motif": "Porquê",
+    "lien": "Ligação (opcional)",
+    "lienIgnore": "Esta ligação não será clicável: só são apresentados endereços começados por http:// ou https://.",
+    "ajouter": "Adicionar uma pessoa",
+    "retirer": "Retirar",
+    "monter": "Subir",
+    "descendre": "Descer",
+    "aucun": "Ninguém por enquanto.",
+    "sansNom": "{nombre} entrada(s) sem nome: não serão publicadas.",
+    "publier": "Publicar os créditos",
+    "publiee": "Créditos publicados. Aparecerão após a reconstrução, dentro de um a dois minutos.",
+    "editeurAide": "Estes créditos fazem parte do site: publicá-los desencadeia uma reconstrução, ao contrário das correções de texto.",
+    "lienDepuisReglages": "Quem fez esta aplicação?"
   }
 }

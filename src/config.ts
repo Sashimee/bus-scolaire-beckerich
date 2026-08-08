@@ -21,6 +21,12 @@ export const CHEMIN_ARRETS = 'src/data/arrets.json'
 /** Plan de référence. Le nom du fichier ne change pas : seul son contenu est remplacé. */
 export const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
 
+/** Corrections de traduction, hors bundle : relues à chaque ouverture. */
+export const CHEMIN_TRADUCTIONS = 'public/traductions.json'
+
+/** Crédits. Dans le bundle : les modifier demande une reconstruction. */
+export const CHEMIN_CREDITS = 'src/data/credits.json'
+
 /**
  * Worker Cloudflare : échange OAuth GitHub et envoi des notifications push.
  * Défini à la construction via VITE_URL_WORKER. Vide = fonctionnalités désactivées.

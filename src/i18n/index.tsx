@@ -13,22 +13,16 @@ import lb from './lb.json'
 import pt from './pt.json'
 import en from './en.json'
 import { chargerLangue, enregistrerLangue } from '../lib/stockage'
+import { SURCOUCHE_VIDE, type Surcouche } from '../lib/traductions'
+import { chargerTraductions } from './surcouche'
+import { LANGUES, NOMS_LANGUES, type Langue } from './langues'
 
-export const LANGUES = ['fr', 'de', 'lb', 'pt', 'en'] as const
-export type Langue = (typeof LANGUES)[number]
+export { LANGUES, NOMS_LANGUES }
+export type { Langue }
 
 type Dictionnaire = Record<string, unknown>
 
 const DICTIONNAIRES: Record<Langue, Dictionnaire> = { fr, de, lb, pt, en }
-
-/** Nom de chaque langue, écrit dans cette langue. */
-export const NOMS_LANGUES: Record<Langue, string> = {
-  fr: 'Français',
-  de: 'Deutsch',
-  lb: 'Lëtzebuergesch',
-  pt: 'Português',
-  en: 'English',
-}
 
 function chercher(dico: Dictionnaire, chemin: string): unknown {
   return chemin.split('.').reduce<unknown>((acc, part) => {
@@ -51,6 +45,8 @@ export interface Traduction {
   t: (cle: string, params?: Record<string, string | number>) => string
   /** Traduit une clé dont la valeur est une liste (étapes d'installation, etc.). */
   tListe: (cle: string) => string[]
+  /** Corrections publiées, telles qu'elles ont été relues. Sert à l'éditeur. */
+  surcouche: Surcouche
 }
 
 const Contexte = createContext<Traduction | null>(null)
@@ -71,35 +67,52 @@ function langueInitiale(): Langue {
 
 export function FournisseurTraduction({ children }: { children: ReactNode }) {
   const [langue, setLangue] = useState<Langue>(langueInitiale)
+  const [surcouche, setSurcouche] = useState<Surcouche>(SURCOUCHE_VIDE)
 
   useEffect(() => {
     document.documentElement.lang = langue
   }, [langue])
+
+  // Les corrections publiées depuis `/traductions` ou `/admin`, relues à l'ouverture.
+  // Le premier rendu se fait avec les dictionnaires du bundle, qui sont complets : la
+  // surcouche ne fait que corriger, jamais compléter.
+  useEffect(() => {
+    const ctrl = new AbortController()
+    chargerTraductions(ctrl.signal).then(setSurcouche)
+    return () => ctrl.abort()
+  }, [])
 
   const changerLangue = useCallback((l: Langue) => {
     setLangue(l)
     enregistrerLangue(l)
   }, [])
 
+  /** Surcouche d'abord, puis la langue demandée, puis le français. */
+  const brut = useCallback(
+    (cle: string) =>
+      surcouche[langue]?.[cle] ?? chercher(DICTIONNAIRES[langue], cle) ?? chercher(fr, cle),
+    [langue, surcouche],
+  )
+
   const t = useCallback(
     (cle: string, params?: Record<string, string | number>) => {
-      const valeur = chercher(DICTIONNAIRES[langue], cle) ?? chercher(fr, cle)
+      const valeur = brut(cle)
       return typeof valeur === 'string' ? interpoler(valeur, params) : cle
     },
-    [langue],
+    [brut],
   )
 
   const tListe = useCallback(
     (cle: string) => {
-      const valeur = chercher(DICTIONNAIRES[langue], cle) ?? chercher(fr, cle)
+      const valeur = brut(cle)
       return Array.isArray(valeur) ? (valeur as string[]) : []
     },
-    [langue],
+    [brut],
   )
 
   const valeur = useMemo(
-    () => ({ langue, changerLangue, t, tListe }),
-    [langue, changerLangue, t, tListe],
+    () => ({ langue, changerLangue, t, tListe, surcouche }),
+    [langue, changerLangue, t, tListe, surcouche],
   )
 
   return <Contexte.Provider value={valeur}>{children}</Contexte.Provider>

@@ -112,11 +112,44 @@ agents :
 npx wrangler kv key list --binding ABONNEMENTS --remote --prefix "agent:"
 ```
 
+### Donner accès aux traductions (`/traductions`)
+
+Même mécanique, mais un espace à part : le code n'ouvre **que** la correction des textes
+de l'application. Un traducteur ne peut ni annuler un bus, ni toucher au plan.
+
+```bash
+./creer-agent.sh "Jean Muller" "bénévole" traductions
+```
+
+La séparation ne tient pas à une seule ligne de code. Les codes de traduction vivent sous
+le préfixe KV `traducteur:` et non `agent:` — un code de l'un n'existe littéralement pas
+là où l'autre le cherche — et le jeton de session porte son rôle, revérifié à chaque
+route. La liste et le retrait se font avec le même préfixe :
+
+```bash
+npx wrangler kv key list --binding ABONNEMENTS --remote --prefix "traducteur:"
+```
+
+Ce que le traducteur peut faire : choisir une langue, corriger n'importe quel texte de
+l'application, et publier. Les corrections vont dans `public/traductions.json`, relu à
+chaque ouverture — elles sont visibles **sans reconstruction du site**, contrairement au
+plan ou aux crédits. Une correction ne peut viser qu'une clé existante, du même type et
+avec les mêmes repères `{…}` que le français ; le reste est refusé, côté navigateur comme
+côté Worker.
+
 ### Donner accès au mainteneur (`/admin`)
 
-La page `/admin` reste réservée au mainteneur, avec les outils avancés : correction
-d'arrêts sur carte, édition du plan complet. Inviter le compte GitHub concerné en
-**Write** sur le dépôt (`Settings → Collaborators`) ; la page le reconnaîtra.
+La page `/admin` reste réservée au mainteneur, avec les outils avancés, répartis en
+cinq onglets : perturbations, position des arrêts sur carte, plan complet en JSON,
+textes de l'application, et crédits. Inviter le compte GitHub concerné en **Write** sur
+le dépôt (`Settings → Collaborators`) ; la page le reconnaîtra.
+
+L'onglet actif est dans l'adresse (`?onglet=credits`) : un lien envoyé ouvre le bon.
+
+L'onglet **Crédits** modifie `src/data/credits.json`, qui est dans le site : sa
+publication déclenche une reconstruction, contrairement aux textes. N'y inscrire que des
+noms dont l'accord est acquis — c'est la seule donnée personnelle que ce projet publie,
+et la page `/credits` le dit à ses lecteurs.
 
 Préférez cependant un jeton **fine-grained** saisi à la main dans le champ prévu par
 `/admin` : la connexion OAuth demande la portée `repo`, très large, que GitHub n'offre

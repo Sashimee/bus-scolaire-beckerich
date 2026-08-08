@@ -8,7 +8,7 @@ import planJson from '../data/plan-2025-2026.json'
 import arretsJson from '../data/arrets.json'
 import ecolesJson from '../data/ecoles.json'
 import vacancesJson from '../data/vacances-lu.json'
-import type { Arret, Cycle, CycleScolaire, Plan, SiteScolaire } from './types'
+import type { Arret, Cycle, CycleScolaire, MaisonRelais, Plan, SiteScolaire } from './types'
 
 export const plan = planJson as unknown as Plan
 
@@ -17,7 +17,7 @@ export const arrets: Arret[] = (arretsJson as unknown as { arrets: Arret[] }).ar
 const ecoles = ecolesJson as unknown as {
   cycles: CycleScolaire[]
   sites: SiteScolaire[]
-  maisonRelais: SiteScolaire & { arret: string }
+  maisonRelais: MaisonRelais
 }
 
 export const cycles = ecoles.cycles

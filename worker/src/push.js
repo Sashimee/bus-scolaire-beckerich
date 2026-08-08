@@ -202,7 +202,14 @@ export async function chiffrerAes128gcm(abonnement, charge, options = {}) {
  * Prépare la requête HTTP complète vers le service de push.
  * Renvoie de quoi appeler `fetch` directement.
  */
-export async function genererRequetePush({ cles, abonnement, charge, contact, ttl = 3600 }) {
+export async function genererRequetePush({
+  cles,
+  abonnement,
+  charge,
+  contact,
+  ttl = 3600,
+  urgence = 'normal',
+}) {
   const origine = new URL(abonnement.endpoint).origin
   const jwt = await construireJwtVapid(cles, origine, contact)
   const corps = await chiffrerAes128gcm(abonnement, charge)
@@ -214,6 +221,12 @@ export async function genererRequetePush({ cles, abonnement, charge, contact, tt
       'Content-Encoding': 'aes128gcm',
       'Content-Type': 'application/octet-stream',
       TTL: String(ttl),
+      // `Urgency` de la RFC 8030 : c'est le seul levier de priorité dont dispose une
+      // application web. Le service de push peut retenir une notification ordinaire
+      // quand le téléphone économise sa batterie ; il ne le fait pas pour `high`.
+      // Le reste — bannière persistante, exceptions au mode Ne pas déranger — est un
+      // réglage du système, que seul le parent peut poser.
+      Urgency: urgence,
     },
     body: corps,
   }

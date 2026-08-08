@@ -702,14 +702,20 @@
 
   /*
    * Deux dispositions de ligne, selon ce que le jour porte : un seul réglage
-   * (repas, bus) ou deux champs horaires côte à côte.
+   * (repas, bus), ou une case de présence suivie de son heure.
    */
   .grille-semaine__jour--simple {
     grid-template-columns: 5.5rem minmax(0, 1fr);
   }
 
-  .grille-semaine__jour--horaires {
-    grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 1fr);
+  /*
+   * Une présence par ligne : le jour, la case, et l'heure seulement si la case est
+   * cochée. Les deux moments de la journée étaient auparavant côte à côte sur la même
+   * ligne — deux champs d'heure de 44 px dans 390 px de large, sans libellé lisible.
+   */
+  .grille-semaine__jour--presence {
+    grid-template-columns: 5.5rem auto minmax(0, 1fr);
+    align-items: center;
   }
 
   /* Sans cela, une colonne ne descend jamais sous la largeur intrinsèque de son
@@ -719,22 +725,15 @@
   }
 
   @media (max-width: 34rem) {
-    .grille-semaine__jour--simple,
-    .grille-semaine__jour--horaires {
+    .grille-semaine__jour--simple {
       grid-template-columns: 1fr;
     }
-    /* Les deux horaires tiennent côte à côte même sur un téléphone : les séparer
-       ferait une colonne de dix champs pour une seule semaine. */
-    .grille-semaine__jour--horaires {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    }
 
-    /* Libellés resserrés : « Arrive à partir de » sur deux lignes vaut mieux qu'un
-       champ poussé hors de la carte. */
-    .grille-semaine__jour--horaires .champ label {
-      font-size: var(--texte-s);
+    /* Le nom du jour prend sa ligne, la case et l'heure se partagent la suivante. */
+    .grille-semaine__jour--presence {
+      grid-template-columns: auto minmax(0, 1fr);
     }
-    .grille-semaine__jour--horaires > .grille-semaine__nom {
+    .grille-semaine__jour--presence > .grille-semaine__nom {
       grid-column: 1 / -1;
     }
   }
@@ -787,6 +786,17 @@
     gap: var(--espace-1);
   }
 
+  /* Case posée dans une ligne de grille, à côté de son heure : le libellé s'aligne
+     sur la case au lieu de la surplomber, et l'écart se resserre. */
+  .case--compacte {
+    align-items: center;
+    gap: var(--espace-2);
+  }
+
+  .case--compacte input[type='checkbox'] {
+    margin-block-start: 0;
+  }
+
   /* Adresse dérogatoire retenue : une ligne, pas une carte — il y en a dix. */
   .adresse-retenue {
     padding: var(--espace-2) var(--espace-3);
@@ -794,23 +804,6 @@
     border: var(--trait) solid var(--info-bord);
     border-radius: var(--rayon-s);
     font-size: var(--texte-m);
-  }
-
-  /* Champ de présence au Dillendapp, sous la ligne du jour concerné. */
-  .grille-semaine__dillendapp {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--espace-2);
-    padding-inline-start: var(--espace-2);
-    border-inline-start: var(--trait-fort) solid var(--info-bord);
-    font-size: var(--texte-m);
-  }
-
-  .grille-semaine__dillendapp input[type='time'] {
-    inline-size: auto;
-    min-inline-size: 7rem;
   }
 
   /*
@@ -855,9 +848,28 @@
   }
 
   .bascule button[aria-pressed='true'],
-  .segments button[aria-pressed='true'] {
+  .segments button[aria-pressed='true'],
+  .segments button[aria-selected='true'] {
     background: var(--accent);
     color: var(--encre-sur-accent);
+  }
+
+  /*
+   * Barre d'onglets : les options ne se replient pas sur plusieurs rangées comme un
+   * groupe segmenté ordinaire — quatre ou cinq onglets empilés se lisent comme des
+   * boutons sans lien entre eux. Elles défilent horizontalement, ce qui reste la
+   * convention attendue sur un téléphone.
+   */
+  .segments--onglets {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .segments--onglets button {
+    flex: 1 0 auto;
+    padding-inline: var(--espace-3);
+    white-space: nowrap;
   }
 
   /* --- Trajets ---------------------------------------------------------------- */

@@ -160,7 +160,15 @@ export default defineConfig({
         // mettre en cache le rendrait aveugle. Le PDF, lui, pèse 2,2 Mo — l'imposer
         // à l'installation coûterait cher en données mobiles pour un fichier que
         // beaucoup de parents n'ouvriront jamais.
-        globIgnores: ['**/version.json', '**/plan-bus-*.pdf', '**/urgences.json'],
+        // `traductions.json` obéit à la même règle que les urgences : précaché, il
+        // figerait au déploiement les corrections qu'il sert justement à publier sans
+        // reconstruction.
+        globIgnores: [
+          '**/version.json',
+          '**/plan-bus-*.pdf',
+          '**/urgences.json',
+          '**/traductions.json',
+        ],
         /*
          * Ce qui ne doit JAMAIS être remplacé par `index.html`.
          *
@@ -188,6 +196,17 @@ export default defineConfig({
               cacheName: 'urgences',
               networkTimeoutSeconds: 5,
               expiration: { maxEntries: 1, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            // Même traitement pour les corrections de traduction : relues en ligne,
+            // avec le cache pour seul filet hors réseau.
+            urlPattern: /traductions\.json$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'traductions',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 1, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
           {

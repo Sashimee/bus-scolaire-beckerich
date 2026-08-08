@@ -120,6 +120,13 @@ export function PagePlan() {
         </p>
       </section>
 
+      {/* Reprise mot pour mot de l'avertissement du site officiel : c'est la commune
+          qui fixe ce qu'un horaire promet, pas cette application. */}
+      <div className="encart encart--attention">
+        <div className="encart__titre">{t('plan.avertissementHoraires')}</div>
+        <p>{t('plan.avertissementHorairesDetail')}</p>
+      </div>
+
       {plan.lignes.map((ligne) => (
         <TableauLigne ligne={ligne} key={ligne.id} />
       ))}

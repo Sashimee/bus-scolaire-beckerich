@@ -6,7 +6,9 @@
  * publication n'est possible — et c'est très bien ainsi, puisqu'une fausse annonce
  * « bus annulé » laisserait des enfants dehors.
  */
-import { CHEMIN_URGENCES, DEPOT } from '../config'
+import { CHEMIN_CREDITS, CHEMIN_TRADUCTIONS, CHEMIN_URGENCES, DEPOT } from '../config'
+import { relireCredits, type Credits } from './credits'
+import { relireSurcouche, type Surcouche } from './traductions'
 import type { Urgences } from './urgences'
 
 const API = 'https://api.github.com'
@@ -104,6 +106,53 @@ export async function ecrireFichier(
 
   if (rep.status === 409) throw new Error('conflit')
   if (!rep.ok) throw new Error(`publication-impossible-${rep.status}`)
+}
+
+/**
+ * Publie la surcouche de traduction depuis `/admin`, avec le jeton de l'utilisateur.
+ *
+ * Pendant du `publierTraductions` de l'espace `/traductions`, qui passe lui par le
+ * Worker. La validation est la même des deux côtés — `relireSurcouche` — pour qu'un
+ * fichier publié par l'un soit toujours lisible par l'autre.
+ */
+export async function publierSurcoucheGithub(jeton: string, surcouche: Surcouche): Promise<void> {
+  const { sha } = await lireFichier<unknown>(jeton, CHEMIN_TRADUCTIONS)
+  const propre = relireSurcouche({ langues: surcouche })
+  const langues = Object.keys(propre)
+  await ecrireFichier(
+    jeton,
+    CHEMIN_TRADUCTIONS,
+    {
+      $commentaire:
+        "Corrections de traduction, relues par l'application À CHAQUE OUVERTURE, sans " +
+        'reconstruction du bundle. Publié depuis /traductions ou /admin.',
+      misAJour: new Date().toISOString(),
+      langues: propre,
+    },
+    sha,
+    `Traductions (${langues.join(', ') || 'aucune'})`,
+  )
+}
+
+/**
+ * Publie les crédits.
+ *
+ * Contrairement aux traductions, ce fichier est DANS le bundle : sa publication
+ * déclenche une reconstruction du site. C'est acceptable pour une page qui change
+ * quelques fois par an, et cela lui évite un aller-réseau à chaque ouverture.
+ */
+export async function publierCreditsGithub(jeton: string, credits: Credits): Promise<void> {
+  const { contenu, sha } = await lireFichier<Record<string, unknown>>(jeton, CHEMIN_CREDITS)
+  const propre = relireCredits(credits)
+  await ecrireFichier(
+    jeton,
+    CHEMIN_CREDITS,
+    // Le `$commentaire` du fichier porte la règle sur les noms de tiers : le perdre à
+    // la première publication depuis /admin serait dommage.
+    { $commentaire: contenu.$commentaire, ...propre },
+    sha,
+    'Crédits : mise à jour',
+  )
 }
 
 export interface FichierUrgences {

@@ -4,6 +4,7 @@ import {
   egalConstant,
   empreinte,
   routerCommune,
+  routerTraductions,
   signerJeton,
   validerPerturbation,
   verifierJeton,
@@ -53,7 +54,11 @@ const requete = (methode, chemin, { corps, jeton, ip = '1.2.3.4' } = {}) =>
     ...(corps ? { body: JSON.stringify(corps) } : {}),
   })
 
-const router = (r) => routerCommune(r, env, new URL(r.url), {})
+/** Les deux routeurs, dans l'ordre où `index.js` les consulte. */
+const router = async (r) => {
+  const url = new URL(r.url)
+  return (await routerCommune(r, env, url, {})) ?? (await routerTraductions(r, env, url, {}))
+}
 
 async function inscrireAgent(code, nom = 'Marie', service = 'service technique') {
   await env.ABONNEMENTS.put(
@@ -213,9 +218,71 @@ describe('contrôle d’accès des routes', () => {
 
   it('reconnaît l’agent porteur d’une session valide', async () => {
     const expire = Math.floor(Date.now() / 1000) + 60
-    const jeton = await signerJeton({ nom: 'Marie', service: 'technique', expire }, SECRET)
-    const agent = await agentDeLaRequete(requete('GET', '/commune/journal', { jeton }), env)
+    const jeton = await signerJeton(
+      { nom: 'Marie', service: 'technique', role: 'commune', expire },
+      SECRET,
+    )
+    const agent = await agentDeLaRequete(
+      requete('GET', '/commune/journal', { jeton }),
+      env,
+      'commune',
+    )
     expect(agent.nom).toBe('Marie')
+  })
+
+  it('lit un jeton d’avant les rôles comme un jeton de commune', async () => {
+    // Les sessions déjà ouvertes au moment du déploiement ne portent pas de rôle :
+    // les invalider déconnecterait un agent en pleine publication.
+    const expire = Math.floor(Date.now() / 1000) + 60
+    const jeton = await signerJeton({ nom: 'Marie', service: '', expire }, SECRET)
+    const req = requete('GET', '/commune/journal', { jeton })
+    expect((await agentDeLaRequete(req, env, 'commune'))?.nom).toBe('Marie')
+    expect(await agentDeLaRequete(req, env, 'traductions')).toBeNull()
+  })
+})
+
+describe('séparation des espaces commune et traduction', () => {
+  /** Enregistre un code sous le préfixe du rôle demandé. */
+  const poserCode = async (code, role, nom) => {
+    const prefixe = role === 'traductions' ? 'traducteur:' : 'agent:'
+    await env.ABONNEMENTS.put(prefixe + (await empreinte(code)), JSON.stringify({ nom }))
+  }
+
+  it('refuse un code de commune sur l’espace traduction, et l’inverse', async () => {
+    // Deux préfixes KV distincts : le code de l'autre espace n'existe littéralement
+    // pas là où on le cherche.
+    await poserCode('aaaa-bbbb', 'commune', 'Marie')
+    await poserCode('cccc-dddd', 'traductions', 'Jean')
+
+    const essai = (chemin, code) =>
+      router(requete('POST', chemin, { corps: { code } })).then((r) => r.status)
+
+    expect(await essai('/traductions/connexion', 'aaaa-bbbb')).toBe(401)
+    expect(await essai('/commune/connexion', 'cccc-dddd')).toBe(401)
+    expect(await essai('/commune/connexion', 'aaaa-bbbb')).toBe(200)
+    expect(await essai('/traductions/connexion', 'cccc-dddd')).toBe(200)
+  })
+
+  it('refuse un jeton de commune sur une route de traduction', async () => {
+    // Seconde barrière, indépendante du préfixe : le rôle est inscrit dans le jeton
+    // signé et revérifié à chaque route.
+    const expire = Math.floor(Date.now() / 1000) + 60
+    const jeton = await signerJeton({ nom: 'Marie', role: 'commune', expire }, SECRET)
+    const rep = await router(
+      requete('POST', '/traductions/publier', { jeton, corps: { surcouche: {} } }),
+    )
+    expect(rep.status).toBe(401)
+  })
+
+  it('applique la limitation de débit aux deux connexions', async () => {
+    // Sans cela, l'espace le plus récent deviendrait la porte d'entrée de tous.
+    for (let i = 0; i < 5; i++) {
+      await router(requete('POST', '/traductions/connexion', { corps: { code: 'zzzz-zzzz' } }))
+    }
+    const rep = await router(
+      requete('POST', '/traductions/connexion', { corps: { code: 'zzzz-zzzz' } }),
+    )
+    expect(rep.status).toBe(429)
   })
 })
 

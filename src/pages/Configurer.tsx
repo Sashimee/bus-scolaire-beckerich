@@ -14,6 +14,7 @@ export function Configurer() {
   const { t } = useT()
   const {
     foyer,
+    contextes,
     definirAdresse,
     ajouterEnfant,
     modifierEnfant,
@@ -21,7 +22,8 @@ export function Configurer() {
     definirRepasSemaine,
     definirBus,
     definirBusSemaine,
-    definirPeriscolaire,
+    definirPeriscolaireMidi,
+    definirPeriscolaireHorsMidi,
     definirDillendappDepuis,
     definirDillendappJusqua,
     definirAdresseJour,
@@ -108,11 +110,13 @@ export function Configurer() {
 
             <GrilleSemaine
               enfant={enfant}
+              ctx={contextes.get(enfant.id) ?? null}
               onRepas={(jour, repas) => definirRepas(enfant.id, jour, repas)}
               onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
               onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
               onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
-              onPeriscolaire={(inscrit) => definirPeriscolaire(enfant.id, inscrit)}
+              onPeriscolaireMidi={(inscrit) => definirPeriscolaireMidi(enfant.id, inscrit)}
+              onPeriscolaireHorsMidi={(inscrit) => definirPeriscolaireHorsMidi(enfant.id, inscrit)}
               onDillendappDepuis={(jour, heure) =>
                 definirDillendappDepuis(enfant.id, jour, heure)
               }
