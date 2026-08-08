@@ -159,11 +159,11 @@
       "village": "Beckerich",
       "lieuCle": "village",
       "coord": [
-        49.729275,
-        5.885215
+        49.72958,
+        5.88536
       ],
-      "precision": "approximative",
-      "source": "Centre du village ; le plan officiel ne précise pas l'arrêt de ce départ de 13:25"
+      "precision": "verifiee",
+      "source": "Position corrigée à la main le 2026-08-08"
     },
     {
       "id": "levelange",
