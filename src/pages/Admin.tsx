@@ -173,9 +173,9 @@ export function Admin() {
           </a>
         )}
 
-        <details className="carte">
-          <summary style={{ cursor: 'pointer', fontWeight: 600 }}>{t('admin.jetonTitre')}</summary>
-          <div className="pile pile--serre" style={{ marginBlockStart: '0.75rem' }}>
+        <details className="carte repli">
+          <summary>{t('admin.jetonTitre')}</summary>
+          <div className="pile pile--serre">
             <p className="champ__aide">{t('admin.jetonAide')}</p>
             <div className="champ">
               <label htmlFor="jeton">{t('admin.jetonLabel')}</label>
@@ -236,7 +236,7 @@ export function Admin() {
   // — Connecté avec droit d'écriture ——————————————————————————————
   return (
     <div className="pile pile--large">
-      <header className="rangee" style={{ justifyContent: 'space-between' }}>
+      <header className="rangee rangee--espacee">
         <h2>{t('admin.titre')}</h2>
         <span className="rangee">
           <span className="etiquette">{identite.login}</span>
@@ -262,7 +262,7 @@ export function Admin() {
       {erreur && <div className="encart encart--alerte">{t(`admin.erreur.${erreur}`)}</div>}
 
       <section className="carte pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>{t('admin.nouvelle')}</h3>
+        <h3 className="titre-carte">{t('admin.nouvelle')}</h3>
 
         <div className="champ">
           <label htmlFor="type">{t('admin.type')}</label>
@@ -353,11 +353,11 @@ export function Admin() {
         )}
 
         <div className="rangee">
-          <div className="champ" style={{ flex: 1 }}>
+          <div className="champ champ--flexible">
             <label htmlFor="du">{t('admin.du')}</label>
             <input id="du" type="date" value={du} onChange={(e) => setDu(e.target.value)} />
           </div>
-          <div className="champ" style={{ flex: 1 }}>
+          <div className="champ champ--flexible">
             <label htmlFor="au">{t('admin.au')}</label>
             <input id="au" type="date" value={au} min={du} onChange={(e) => setAu(e.target.value)} />
           </div>
@@ -390,7 +390,7 @@ export function Admin() {
       </section>
 
       <section className="pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>{t('admin.apercu')}</h3>
+        <h3 className="titre-carte">{t('admin.apercu')}</h3>
         <p className="champ__aide">{t('admin.apercuAide')}</p>
         <div className={`encart encart--${gravite === 'alerte' ? 'alerte' : gravite}`}>
           <ResumePerturbation p={brouillon()} />
@@ -412,7 +412,7 @@ export function Admin() {
       </section>
 
       <section className="pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>
+        <h3 className="titre-carte">
           {t('admin.enCours', { nombre: urgences.perturbations.length })}
         </h3>
         {urgences.perturbations.length === 0 && (
@@ -443,11 +443,11 @@ export function Admin() {
         ))}
       </section>
 
-      <hr style={{ border: 0, borderBlockStart: '1px solid var(--line)' }} />
+      <hr className="separateur" />
 
       <AdminArrets jeton={jeton!} auteur={identite.nom ?? identite.login} onErreur={setErreur} />
 
-      <hr style={{ border: 0, borderBlockStart: '1px solid var(--line)' }} />
+      <hr className="separateur" />
 
       <AdminPlan jeton={jeton!} onErreur={setErreur} />
 

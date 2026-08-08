@@ -7,14 +7,17 @@
   },
   "nav": {
     "accueil": "Hoje",
+    "enfants": "Crianças",
     "semaine": "A semana",
     "reglages": "Definições",
     "plan": "Plano oficial",
+    "planCourt": "Plano",
     "limites": "Limites do site",
     "independance": "Site independente",
     "installer": "Instalar a aplicação",
     "menu": "Menu",
-    "retour": "Voltar"
+    "retour": "Voltar",
+    "principale": "Navegação principal"
   },
   "avertissement": {
     "titre": "Antes de começar",

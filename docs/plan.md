@@ -131,6 +131,29 @@ que les heures d'arrivée des retours sont l'élément le plus gros de la carte.
 
 ## Lot 2 — Refonte visuelle : le système de design
 
+> **Fait le 2026-08-08.** Les quatre points sont livrés. Écarts et ajouts par rapport au
+> texte ci-dessous :
+>
+> - Les jetons de couleur passent de l'anglais au français (`--bg` → `--fond`,
+>   `--text` → `--encre`, `--line` → `--bord`…), ce qui aligne la feuille de style sur la
+>   convention du dépôt et libère le préfixe `--texte-*` pour l'échelle typographique.
+> - Les couleurs décoratives `--cyan` et `--violet` disparaissent au profit de l'accent
+>   unique ; il ne reste qu'un `--accent-2`, dont le seul usage est de distinguer une
+>   ligne de bus.
+> - Deux défauts trouvés à la vérification et corrigés : l'URL de la source citée en
+>   toutes lettres élargissait la page « Limites » au-delà d'un écran de 320 px
+>   (`overflow-wrap: anywhere` sur les liens — `break-word` ne suffit pas, il ne réduit
+>   pas la largeur minimale intrinsèque), et le champ « jeton » de `/admin` restait à
+>   31 px de haut parce que `input[type='password']` n'était pas dans la liste des types
+>   énumérés (remplacée par une exclusion).
+> - `.bouton--discret` n'est plus gris sur fond transparent mais dans la couleur d'accent :
+>   l'ancienne variante tombait sous le seuil de contraste.
+> - Nouveaux fichiers : `src/composants/Navigation.tsx` (les deux variantes lisent la même
+>   liste d'entrées) et `src/composants/Bandeaux.tsx` (la pile priorisée).
+> - Vérification automatisée plutôt qu'à l'œil : 9 routes × 3 largeurs × 2 thèmes = 54
+>   combinaisons, mesurées dans des iframes de largeur fixe. Aucun débordement
+>   horizontal, aucune cible interactive sous 44 px.
+
 **Fondation de toute la refonte. À faire avant les lots 3 à 8**, qui construisent des
 écrans avec les nouvelles primitives.
 

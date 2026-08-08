@@ -1,11 +1,8 @@
-import { Link, NavLink, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes } from 'react-router-dom'
 import { useT } from './i18n'
-import { useFoyer } from './etat'
 import { plan } from './lib/donnees'
-import { planPerime } from './lib/affichage'
-import { BandeauVersion } from './composants/BandeauVersion'
-import { AvertissementInitial } from './composants/AvertissementInitial'
-import { ReceptionPartage } from './composants/ReceptionPartage'
+import { PileBandeaux } from './composants/Bandeaux'
+import { NavigationBasse, NavigationHaute } from './composants/Navigation'
 import { Accueil } from './pages/Accueil'
 import { Configurer } from './pages/Configurer'
 import { Semaine } from './pages/Semaine'
@@ -14,11 +11,9 @@ import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
 import { Reglages } from './pages/Reglages'
 import { Admin } from './pages/Admin'
-import { BandeauUrgences } from './composants/BandeauUrgences'
 
 export default function App() {
   const { t } = useT()
-  const { configure } = useFoyer()
 
   return (
     <>
@@ -26,37 +21,16 @@ export default function App() {
         {t('nav.menu')}
       </a>
 
-      <BandeauVersion />
-      {planPerime() && (
-        <div className="bandeau" role="status">
-          <div className="bandeau__interne">
-            <strong>⚠</strong>
-            <span>{t('validite.perime', { fin: plan.valideAu })}</span>
-          </div>
-        </div>
-      )}
-
       <header className="entete">
         <div className="entete__interne">
           <h1 className="entete__titre">
             <Link to="/">{t('app.court')}</Link>
           </h1>
-          <nav className="rangee" aria-label={t('nav.menu')}>
-            {configure && (
-              <NavLink to="/" className="bouton bouton--discret" end>
-                {t('nav.accueil')}
-              </NavLink>
-            )}
-            <NavLink to="/reglages" className="bouton bouton--discret">
-              {t('nav.reglages')}
-            </NavLink>
-          </nav>
+          <NavigationHaute />
         </div>
       </header>
 
-      <AvertissementInitial />
-      <BandeauUrgences />
-      <ReceptionPartage />
+      <PileBandeaux />
 
       <main className="page" id="contenu">
         <Routes>
@@ -74,7 +48,6 @@ export default function App() {
 
         <footer className="pied">
           <nav aria-label={t('nav.menu')}>
-            <Link to="/plan">{t('nav.plan')}</Link>
             <Link to="/limites">{t('nav.limites')}</Link>
             <Link to="/independance">{t('nav.independance')}</Link>
             <Link to="/installer">{t('nav.installer')}</Link>
@@ -87,6 +60,8 @@ export default function App() {
           </p>
         </footer>
       </main>
+
+      <NavigationBasse />
     </>
   )
 }

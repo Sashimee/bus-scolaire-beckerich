@@ -48,11 +48,13 @@ export function ChampAdresse({ valeur, onChoisir }: Props) {
   return (
     <div className="pile pile--serre">
       {valeur && (
-        <div className="carte carte--accent">
-          <div className="etiquette">{t('adresse.choisie')}</div>
-          <div style={{ fontWeight: 600, marginBlockStart: '0.25rem' }}>{valeur.libelle}</div>
-          <div className="localite" style={{ color: 'var(--muted)' }}>
-            {valeur.localite}
+        <div className="carte carte--accent pile pile--serre">
+          <div>
+            <span className="etiquette">{t('adresse.choisie')}</span>
+          </div>
+          <div>
+            <div className="texte-fort">{valeur.libelle}</div>
+            <div className="localite texte-doux">{valeur.localite}</div>
           </div>
         </div>
       )}

@@ -7,14 +7,17 @@
   },
   "nav": {
     "accueil": "Heute",
+    "enfants": "Kinder",
     "semaine": "Die Woche",
     "reglages": "Einstellungen",
     "plan": "Offizieller Plan",
+    "planCourt": "Plan",
     "limites": "Grenzen der Website",
     "independance": "Unabhängige Website",
     "installer": "App installieren",
     "menu": "Menü",
-    "retour": "Zurück"
+    "retour": "Zurück",
+    "principale": "Hauptnavigation"
   },
   "avertissement": {
     "titre": "Bevor Sie beginnen",

@@ -25,9 +25,9 @@ export function ResumePerturbation({ p }: { p: Perturbation }) {
 
   return (
     <>
-      <div className="encart__titre">
-        {t(`urgences.type.${p.type}`)}
-        {portee && <span className="etiquette" style={{ marginInlineStart: '0.5rem' }}>{portee}</span>}
+      <div className="encart__titre rangee">
+        <span>{t(`urgences.type.${p.type}`)}</span>
+        {portee && <span className="etiquette">{portee}</span>}
       </div>
       <p>{messagePerturbation(p, langue)}</p>
       {p.type === 'retard' && p.minutes ? (
@@ -51,10 +51,11 @@ export function ResumePerturbation({ p }: { p: Perturbation }) {
 }
 
 /**
- * Bandeau affiché en haut de l'application tant qu'une perturbation est en cours.
+ * Perturbations du jour, affichées en tête d'application tant qu'elles s'appliquent.
  *
- * Il n'est pas refermable : une annulation de bus doit rester sous les yeux du parent
- * tant qu'elle s'applique, pas disparaître au premier geste maladroit.
+ * Elles ne sont pas refermables : une annulation de bus doit rester sous les yeux du
+ * parent, pas disparaître au premier geste maladroit. Le placement dans la page revient
+ * à `PileBandeaux`, qui arbitre entre les bandeaux concurrents.
  */
 export function BandeauUrgences() {
   const { t } = useT()
@@ -68,15 +69,13 @@ export function BandeauUrgences() {
   if (!actives.length) return null
 
   return (
-    <div className="page" style={{ paddingBlockEnd: 0 }}>
-      <div className="pile pile--serre" role="status" aria-live="polite">
-        {actives.map((p) => (
-          <div className={`encart ${CLASSE_GRAVITE[p.gravite]}`} key={p.id}>
-            <ResumePerturbation p={p} />
-          </div>
-        ))}
-        <p className="champ__aide">{t('urgences.avertissementFiabilite')}</p>
-      </div>
+    <div className="pile pile--serre" role="status" aria-live="polite">
+      {actives.map((p) => (
+        <div className={`encart ${CLASSE_GRAVITE[p.gravite]}`} key={p.id}>
+          <ResumePerturbation p={p} />
+        </div>
+      ))}
+      <p className="champ__aide">{t('urgences.avertissementFiabilite')}</p>
     </div>
   )
 }

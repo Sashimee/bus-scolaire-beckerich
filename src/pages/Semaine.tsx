@@ -63,7 +63,7 @@ export function Semaine() {
 
       <div className="pile pile--large ecran-seulement">
       <header className="pile pile--serre">
-        <div className="rangee" style={{ justifyContent: 'space-between' }}>
+        <div className="rangee rangee--espacee">
           <h2>{enfant.prenom}</h2>
           <span className="etiquette">{t(`cycles.${enfant.cycle}`)}</span>
         </div>
@@ -87,7 +87,7 @@ export function Semaine() {
       ) : (
         <section className="carte pile pile--serre">
           <div className="etiquette">{t('enfant.arretLePlusProche')}</div>
-          <strong style={{ fontSize: '1.05rem' }}>{nomArret(ctx.arretDomicile, t)}</strong>
+          <strong className="titre-carte">{nomArret(ctx.arretDomicile, t)}</strong>
           <p className="champ__aide">
             {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })} ·{' '}
             {distanceLisible(ctx.distance)}
@@ -108,8 +108,8 @@ export function Semaine() {
         const journee = semaine.find((j) => j.jour === jour)!
         return (
           <section className="carte pile pile--serre" key={jour}>
-            <div className="rangee" style={{ justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '1rem' }}>{t(`jours.${jour}`)}</h3>
+            <div className="rangee rangee--espacee">
+              <h3 className="titre-carte">{t(`jours.${jour}`)}</h3>
               <span className="rangee">
                 <span className="etiquette">{t(`repas.${enfant.repas[jour]}Court`)}</span>
                 {(enfant.bus?.[jour] ?? 'aller-retour') !== 'aller-retour' && (
@@ -132,9 +132,7 @@ export function Semaine() {
       })}
 
       <section className="pile pile--serre sans-impression">
-        <h3 style={{ fontSize: '1rem' }}>
-          {aPied ? t('impression.titre') : t('calendrier.titre')}
-        </h3>
+        <h3 className="titre-carte">{aPied ? t('impression.titre') : t('calendrier.titre')}</h3>
         {/* Sans trajet, l'export produirait un calendrier vide : mieux vaut pas de bouton. */}
         {!aPied && (
           <>

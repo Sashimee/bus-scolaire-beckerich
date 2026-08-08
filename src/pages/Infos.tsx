@@ -24,14 +24,14 @@ export function Limites() {
 
       {sections.map((cle) => (
         <section className="carte pile pile--serre" key={cle}>
-          <h3 style={{ fontSize: '1rem' }}>{t(`limites.${cle}Titre`)}</h3>
+          <h3 className="titre-carte">{t(`limites.${cle}Titre`)}</h3>
           <p>{t(`limites.${cle}Corps`)}</p>
         </section>
       ))}
 
       <section className="carte pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>{t('reglages.donnees')}</h3>
-        <ul>
+        <h3 className="titre-carte">{t('reglages.donnees')}</h3>
+        <ul className="liste-puces">
           <li>
             {plan.source.document} — <a href={plan.source.url}>{plan.source.url}</a>
           </li>

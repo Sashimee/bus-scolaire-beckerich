@@ -10,7 +10,7 @@ function TableauLigne({ ligne }: { ligne: Ligne }) {
 
   return (
     <section className="pile pile--serre">
-      <h3 style={{ fontSize: '1rem' }}>{ligne.nom}</h3>
+      <h3 className="titre-carte">{ligne.nom}</h3>
 
       {ligne.reserve && (
         <p className="champ__aide">
@@ -41,7 +41,7 @@ function TableauLigne({ ligne }: { ligne: Ligne }) {
           <tbody>
             {reference.map((a, i) => (
               <tr key={`${a.arret}-${i}`}>
-                <th scope="row" style={{ fontWeight: 500 }}>
+                <th scope="row" className="tableau__arret">
                   {nomArretParId(a.arret, t)}
                 </th>
                 {colonnes.map(({ service, cases }) => {

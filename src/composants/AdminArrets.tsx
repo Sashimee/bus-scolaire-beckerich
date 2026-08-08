@@ -172,7 +172,7 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
 
   return (
     <section className="pile pile--serre">
-      <h3 style={{ fontSize: '1rem' }}>{t('adminArrets.titre')}</h3>
+      <h3 className="titre-carte">{t('adminArrets.titre')}</h3>
       <p className="champ__aide">{t('adminArrets.aide')}</p>
 
       {approximatifs.length > 0 && (
@@ -251,11 +251,9 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
 
       {corrections.length > 0 && (
         <div className="pile pile--serre">
-          <h4 style={{ fontSize: '0.95rem' }}>
-            {t('adminArrets.enCours', { nombre: corrections.length })}
-          </h4>
+          <h4>{t('adminArrets.enCours', { nombre: corrections.length })}</h4>
           {corrections.map((c) => (
-            <div className="carte rangee" key={c.arret} style={{ justifyContent: 'space-between' }}>
+            <div className="carte rangee rangee--espacee" key={c.arret}>
               <span>
                 <strong>{c.arret}</strong>{' '}
                 <span className="champ__aide">

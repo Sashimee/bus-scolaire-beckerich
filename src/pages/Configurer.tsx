@@ -50,8 +50,8 @@ export function Configurer() {
 
         {foyer.enfants.map((enfant) => (
           <article className="carte pile" key={enfant.id}>
-            <div className="rangee" style={{ justifyContent: 'space-between' }}>
-              <div className="champ" style={{ flex: '1 1 10rem' }}>
+            <div className="rangee rangee--espacee">
+              <div className="champ champ--flexible">
                 <label htmlFor={`prenom-${enfant.id}`}>{t('enfant.prenom')}</label>
                 <input
                   id={`prenom-${enfant.id}`}
@@ -61,7 +61,7 @@ export function Configurer() {
                 />
               </div>
 
-              <div className="champ" style={{ flex: '1 1 10rem' }}>
+              <div className="champ champ--flexible">
                 <label htmlFor={`cycle-${enfant.id}`}>{t('enfant.cycle')}</label>
                 <select
                   id={`cycle-${enfant.id}`}

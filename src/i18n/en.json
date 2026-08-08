@@ -7,14 +7,17 @@
   },
   "nav": {
     "accueil": "Today",
+    "enfants": "Children",
     "semaine": "The week",
     "reglages": "Settings",
     "plan": "Official plan",
+    "planCourt": "Plan",
     "limites": "Limits of this site",
     "independance": "Independent site",
     "installer": "Install the app",
     "menu": "Menu",
-    "retour": "Back"
+    "retour": "Back",
+    "principale": "Main navigation"
   },
   "avertissement": {
     "titre": "Before you start",

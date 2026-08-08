@@ -35,8 +35,8 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
 
   return (
     <article className="carte pile pile--serre">
-      <div className="rangee" style={{ justifyContent: 'space-between' }}>
-        <h3 style={{ fontSize: '1.05rem' }}>{ctx.enfant.prenom}</h3>
+      <div className="rangee rangee--espacee">
+        <h3 className="titre-carte">{ctx.enfant.prenom}</h3>
         <span className="etiquette">{t(`cycles.${ctx.enfant.cycle}`)}</span>
       </div>
 
@@ -67,7 +67,9 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
 
           {suivant ? (
             <p>
-              <strong className="trajet__heure">{suivant.depart.heure}</strong>{' '}
+              <strong className="trajet__heure trajet__heure--principale">
+                {suivant.depart.heure}
+              </strong>{' '}
               {t(`trajets.${suivant.type}`)}
               {minutesAvant !== null && minutesAvant > 0 && (
                 <span className="champ__aide"> · {t('aujourdhui.dans', { minutes: minutesAvant })}</span>
@@ -140,7 +142,7 @@ export function Accueil() {
           foyer.enfants.map((e) => {
             const ctx = contextes.get(e.id)
             return ctx ? (
-              <article className="carte rangee" key={e.id} style={{ justifyContent: 'space-between' }}>
+              <article className="carte rangee rangee--espacee" key={e.id}>
                 <span>
                   <strong>{e.prenom}</strong>{' '}
                   <span className="champ__aide">{t(`cycles.${e.cycle}`)}</span>

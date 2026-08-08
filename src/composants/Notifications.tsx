@@ -99,7 +99,7 @@ export function Notifications() {
 
   return (
     <section className="carte pile pile--serre">
-      <h3 style={{ fontSize: '1rem' }}>{t('notifications.titre')}</h3>
+      <h3 className="titre-carte">{t('notifications.titre')}</h3>
       <p className="champ__aide">{t('notifications.aide')}</p>
 
       {estIOS && !installee && (

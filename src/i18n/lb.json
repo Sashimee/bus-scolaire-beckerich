@@ -7,14 +7,17 @@
   },
   "nav": {
     "accueil": "Haut",
+    "enfants": "Kanner",
     "semaine": "D'Woch",
     "reglages": "Astellungen",
     "plan": "Offizielle Plang",
+    "planCourt": "Plang",
     "limites": "Grenze vun der Säit",
     "independance": "Onofhängeg Säit",
     "installer": "App installéieren",
     "menu": "Menü",
-    "retour": "Zréck"
+    "retour": "Zréck",
+    "principale": "Haaptnavigatioun"
   },
   "avertissement": {
     "titre": "Ier Dir ufänkt",

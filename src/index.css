@@ -1,10 +1,13 @@
 /*
  * Feuille de style unique, organisée en couches.
- * Toutes les couleurs passent par des variables : réaligner le site sur la charte
- * de la commune, si elle l'adoptait un jour, se ferait en changeant la couche
- * `tokens` et rien d'autre.
+ *
+ * Tout part de la couche `tokens` : couleurs, échelle typographique, échelle
+ * d'espacement, rayons, ombres, épaisseurs de trait. Aucune valeur brute (couleur,
+ * taille, marge) ne doit apparaître ailleurs — ni ici, ni dans un `style={{…}}` de
+ * composant. Réaligner le site sur la charte de la commune, si elle l'adoptait un
+ * jour, se ferait en changeant `tokens` et rien d'autre.
  */
-@layer reset, tokens, base, layout, composants, impression;
+@layer reset, tokens, base, layout, composants, utilitaires, impression;
 
 @layer reset {
   *,
@@ -25,13 +28,15 @@
   }
   button,
   input,
-  select {
+  select,
+  textarea {
     font: inherit;
     color: inherit;
   }
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     font-weight: 650;
     line-height: 1.2;
     text-wrap: balance;
@@ -44,66 +49,128 @@
 
 @layer tokens {
   :root {
-    /* Palette Tokyo Night : sombre par défaut, comme le reste des projets. */
-    --bg: #1a1b26;
-    --bg-2: #16161e;
-    --panel: #1f2335;
-    --panel-2: #24283b;
-    --line: #2f334d;
-    --text: #c0caf5;
-    --muted: #7982a9;
-    --accent: #7aa2f7;
-    --accent-contraste: #16161e;
-    --cyan: #7dcfff;
-    --violet: #bb9af7;
-    --vert: #9ece6a;
-    --orange: #e0af68;
-    --rouge: #f7768e;
+    /*
+     * Échelle typographique modulaire. Le corps de texte est `--texte-l` (1rem) :
+     * en dessous, on ne lit pas une heure de bus d'un coup d'œil sur un quai.
+     */
+    --texte-xs: 0.75rem; /* étiquettes, mentions */
+    --texte-s: 0.8125rem; /* aides, notes, détails */
+    --texte-m: 0.9375rem; /* libellés de champ, tableaux */
+    --texte-l: 1rem; /* corps */
+    --texte-xl: 1.125rem; /* titre de carte, heure mise en avant */
+    --texte-2xl: 1.375rem; /* titre de section */
+    --texte-3xl: 1.75rem; /* titre de page */
 
-    --rayon: 12px;
+    /* Espacement : une seule échelle, multiples de 4 px. */
+    --espace-1: 0.25rem;
+    --espace-2: 0.5rem;
+    --espace-3: 0.75rem;
+    --espace-4: 1rem;
+    --espace-5: 1.5rem;
+    --espace-6: 2rem;
+    --espace-7: 3rem;
+
+    /* Trois rayons, trois ombres, trois épaisseurs. Pas davantage. */
     --rayon-s: 8px;
-    --gouttiere: 1rem;
+    --rayon-m: 12px;
+    --rayon-l: 20px;
+    --ombre-1: 0 1px 2px rgb(0 0 0 / 0.18);
+    --ombre-2: 0 2px 6px -1px rgb(0 0 0 / 0.22), 0 8px 24px -14px rgb(0 0 0 / 0.4);
+    --ombre-3: 0 4px 12px -2px rgb(0 0 0 / 0.28), 0 20px 48px -20px rgb(0 0 0 / 0.5);
+    --trait: 1px;
+    --trait-fort: 2px;
+    --trait-accent: 3px;
+
+    /* Cible tactile minimale, imposée à tout élément interactif. */
+    --cible: 44px;
+
+    --gouttiere: var(--espace-4);
     --largeur: 46rem;
-    --ombre: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+    /* La navigation bascule de bas en haut à 48rem. En dur dans les media queries,
+       qui ne savent pas lire une variable. */
+
+    /*
+     * Palette sombre (défaut). Chaque encre a été vérifiée à un contraste ≥ 4.5:1
+     * sur les quatre fonds ci-dessous ; ne pas modifier une valeur sans refaire le
+     * calcul.
+     */
+    --fond: #14161f;
+    --fond-creux: #0f1118;
+    --surface: #1b1e2b;
+    --surface-haute: #242838;
+    --bord: #333a52;
+    --encre: #dfe3f2;
+    --encre-douce: #9aa3c2;
+
+    --accent: #82a9ff;
+    --encre-sur-accent: #0d1017;
+    --accent-2: #c3a6f9; /* seul usage : distinguer une ligne de bus */
+
+    --danger: #ff90a5;
+    --attention: #f2b869;
+    --succes: #9bd97d;
+    --info: var(--accent);
 
     color-scheme: dark;
   }
 
+  /*
+   * Les fonds et bordures sémantiques se déduisent de l'encre : une seule couleur à
+   * définir par famille, et les encarts restent cohérents dans les deux thèmes.
+   */
+  :root {
+    --danger-fond: color-mix(in oklab, var(--danger) 12%, var(--surface));
+    --danger-bord: color-mix(in oklab, var(--danger) 45%, var(--bord));
+    --attention-fond: color-mix(in oklab, var(--attention) 12%, var(--surface));
+    --attention-bord: color-mix(in oklab, var(--attention) 45%, var(--bord));
+    --succes-fond: color-mix(in oklab, var(--succes) 12%, var(--surface));
+    --succes-bord: color-mix(in oklab, var(--succes) 45%, var(--bord));
+    --info-fond: color-mix(in oklab, var(--info) 12%, var(--surface));
+    --info-bord: color-mix(in oklab, var(--info) 45%, var(--bord));
+  }
+
+  /*
+   * Palette claire. Elle est écrite deux fois — sur le choix explicite et sur la
+   * préférence système — parce qu'une media query ne peut pas figurer dans un
+   * sélecteur : c'est la seule duplication acceptée de la couche `tokens`.
+   */
   :root[data-theme='clair'] {
-    --bg: #f4f5f9;
-    --bg-2: #e9ebf2;
-    --panel: #ffffff;
-    --panel-2: #f7f8fc;
-    --line: #d5d9e6;
-    --text: #1f2335;
-    --muted: #5a6285;
-    --accent: #2f52c8;
-    --accent-contraste: #ffffff;
-    --cyan: #0b6f9c;
-    --violet: #6f42a8;
-    --vert: #3f7d20;
-    --orange: #8a5a00;
-    --rouge: #b3243c;
+    --fond: #f4f6fb;
+    --fond-creux: #e8ebf4;
+    --surface: #ffffff;
+    --surface-haute: #f1f4fb;
+    --bord: #d2d7e6;
+    --encre: #171a26;
+    --encre-douce: #565e7d;
+
+    --accent: #2946bd;
+    --encre-sur-accent: #ffffff;
+    --accent-2: #6a3fa8;
+
+    --danger: #b0143a;
+    --attention: #7d5000;
+    --succes: #2c6b22;
 
     color-scheme: light;
   }
 
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='sombre']) {
-      --bg: #f4f5f9;
-      --bg-2: #e9ebf2;
-      --panel: #ffffff;
-      --panel-2: #f7f8fc;
-      --line: #d5d9e6;
-      --text: #1f2335;
-      --muted: #5a6285;
-      --accent: #2f52c8;
-      --accent-contraste: #ffffff;
-      --cyan: #0b6f9c;
-      --violet: #6f42a8;
-      --vert: #3f7d20;
-      --orange: #8a5a00;
-      --rouge: #b3243c;
+      --fond: #f4f6fb;
+      --fond-creux: #e8ebf4;
+      --surface: #ffffff;
+      --surface-haute: #f1f4fb;
+      --bord: #d2d7e6;
+      --encre: #171a26;
+      --encre-douce: #565e7d;
+
+      --accent: #2946bd;
+      --encre-sur-accent: #ffffff;
+      --accent-2: #6a3fa8;
+
+      --danger: #b0143a;
+      --attention: #7d5000;
+      --succes: #2c6b22;
 
       color-scheme: light;
     }
@@ -116,25 +183,48 @@
   }
 
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--fond);
+    color: var(--encre);
     font-family:
       system-ui,
       -apple-system,
       'Segoe UI',
       sans-serif;
-    font-size: 1rem;
+    font-size: var(--texte-l);
     line-height: 1.55;
     min-block-size: 100dvh;
   }
 
+  h2 {
+    font-size: var(--texte-2xl);
+  }
+  h3 {
+    font-size: var(--texte-xl);
+  }
+  h4 {
+    font-size: var(--texte-l);
+  }
+
+  /*
+   * `anywhere` et non `break-word` : seul `anywhere` réduit la largeur minimale
+   * intrinsèque du texte. Une URL de source citée en toutes lettres élargissait
+   * sinon toute la page « Limites » au-delà d'un écran de 320 px.
+   */
   a {
     color: var(--accent);
     text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  /* Une heure se lit en colonne : sans chasse fixe, les chiffres dansent d'une ligne à l'autre. */
+  time,
+  .heure,
+  .tabulaire {
+    font-variant-numeric: tabular-nums;
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: var(--trait-fort) solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -145,7 +235,9 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
@@ -155,32 +247,46 @@
     max-inline-size: var(--largeur);
     margin-inline: auto;
     padding: var(--gouttiere);
-    padding-block-end: 5rem;
+    /* La navigation basse recouvre le bas de l'écran tant qu'on est sur téléphone. */
+    padding-block-end: calc(var(--espace-7) + var(--cible) + env(safe-area-inset-bottom));
+    padding-inline-start: max(var(--gouttiere), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gouttiere), env(safe-area-inset-right));
+  }
+
+  @media (min-width: 48rem) {
+    .page {
+      padding-block-end: var(--espace-7);
+    }
   }
 
   .entete {
     position: sticky;
     inset-block-start: 0;
     z-index: 10;
-    background: color-mix(in oklab, var(--bg) 88%, transparent);
+    background: color-mix(in oklab, var(--fond) 88%, transparent);
     backdrop-filter: blur(8px);
-    border-block-end: 1px solid var(--line);
+    border-block-end: var(--trait) solid var(--bord);
+    padding-block-start: env(safe-area-inset-top);
   }
 
   .entete__interne {
     max-inline-size: var(--largeur);
     margin-inline: auto;
-    padding: 0.65rem var(--gouttiere);
+    padding: var(--espace-2) var(--gouttiere);
+    padding-inline-start: max(var(--gouttiere), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gouttiere), env(safe-area-inset-right));
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--espace-3);
+    min-block-size: var(--cible);
   }
 
   .entete__titre {
-    font-size: 1rem;
+    font-size: var(--texte-l);
     font-weight: 700;
     letter-spacing: -0.01em;
     margin-inline-end: auto;
+    min-inline-size: 0;
   }
 
   .entete__titre a {
@@ -188,38 +294,129 @@
     text-decoration: none;
   }
 
-  .pied {
-    border-block-start: 1px solid var(--line);
-    margin-block-start: 2.5rem;
-    padding-block: 1.5rem 3rem;
-    color: var(--muted);
-    font-size: 0.8rem;
+  /*
+   * Navigation. Sur téléphone, elle vit en bas — c'est là que le pouce arrive.
+   * À partir de 48rem, elle remonte dans l'en-tête et la barre basse disparaît.
+   */
+  .nav-haute {
+    display: none;
+  }
+
+  .nav-basse {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 20;
     display: grid;
-    gap: 0.6rem;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background: color-mix(in oklab, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-block-start: var(--trait) solid var(--bord);
+    padding-block-end: env(safe-area-inset-bottom);
+  }
+
+  .nav-basse__lien {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-block-size: var(--cible);
+    padding-block: var(--espace-1);
+    color: var(--encre-douce);
+    text-decoration: none;
+    font-size: var(--texte-xs);
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .nav-basse__lien[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  .nav-basse__icone {
+    inline-size: 22px;
+    block-size: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-haute {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--espace-1);
+    }
+    .nav-basse {
+      display: none;
+    }
+  }
+
+  /*
+   * Zone des bandeaux de tête. Elle épouse la largeur de la page mais ne réserve
+   * aucune place en bas : le contenu suit immédiatement, et la zone disparaît
+   * entièrement quand elle est vide.
+   */
+  .bandeaux {
+    max-inline-size: var(--largeur);
+    margin-inline: auto;
+    display: grid;
+    gap: var(--espace-2);
+    padding-inline: max(var(--gouttiere), env(safe-area-inset-left))
+      max(var(--gouttiere), env(safe-area-inset-right));
+  }
+
+  .bandeaux:not(:empty) {
+    padding-block-start: var(--gouttiere);
+  }
+
+  .pied {
+    border-block-start: var(--trait) solid var(--bord);
+    margin-block-start: var(--espace-6);
+    padding-block: var(--espace-5) var(--espace-4);
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
+    display: grid;
+    gap: var(--espace-2);
   }
 
   .pied nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 1rem;
+    gap: var(--espace-1) var(--espace-4);
   }
 
+  /* Empilement vertical : la disposition la plus fréquente de l'application. */
   .pile {
     display: grid;
-    gap: 1rem;
+    gap: var(--espace-4);
   }
   .pile--serre {
-    gap: 0.5rem;
+    gap: var(--espace-2);
   }
   .pile--large {
-    gap: 1.75rem;
+    gap: var(--espace-5);
   }
 
+  /*
+   * Rangée horizontale. Elle passe à la ligne par défaut et ses enfants acceptent de
+   * rétrécir : sans ces deux règles, un long libellé pousse un bouton hors de l'écran.
+   */
   .rangee {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--espace-2);
+  }
+
+  .rangee > * {
+    min-inline-size: 0;
   }
 
   .rangee--espacee {
@@ -234,109 +431,192 @@
 }
 
 @layer composants {
+  /* --- Carte : le bloc de contenu de base ------------------------------------ */
   .carte {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--rayon);
-    padding: 1rem;
+    background: var(--surface);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-m);
+    padding: var(--espace-4);
+    box-shadow: var(--ombre-1);
   }
 
   .carte--accent {
-    border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+    border-color: var(--info-bord);
+    background: var(--info-fond);
   }
 
+  /*
+   * Réservée aux bandeaux qui attendent une décision : rayon et ombre plus marqués,
+   * pour qu'ils se détachent du contenu au lieu de s'y fondre.
+   */
+  .carte--surelevee {
+    border-radius: var(--rayon-l);
+    box-shadow: var(--ombre-3);
+  }
+
+  .carte__titre {
+    font-size: var(--texte-xl);
+    font-weight: 650;
+  }
+
+  /* --- Bouton ---------------------------------------------------------------- */
   .bouton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
-    padding: 0.6rem 1rem;
-    min-block-size: 44px; /* cible tactile confortable */
-    border: 1px solid var(--line);
+    gap: var(--espace-2);
+    padding: var(--espace-2) var(--espace-4);
+    min-block-size: var(--cible);
+    border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
-    background: var(--panel-2);
-    color: var(--text);
+    background: var(--surface-haute);
+    color: var(--encre);
+    font-size: var(--texte-m);
     font-weight: 600;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
   }
 
   .bouton:hover {
-    background: color-mix(in oklab, var(--panel-2) 80%, var(--accent));
+    background: color-mix(in oklab, var(--surface-haute) 82%, var(--accent));
+  }
+
+  .bouton:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .bouton--primaire {
     background: var(--accent);
     border-color: var(--accent);
-    color: var(--accent-contraste);
+    color: var(--encre-sur-accent);
   }
 
   .bouton--primaire:hover {
-    background: color-mix(in oklab, var(--accent) 85%, #fff);
+    background: color-mix(in oklab, var(--accent) 88%, var(--encre));
+    border-color: color-mix(in oklab, var(--accent) 88%, var(--encre));
   }
 
+  /*
+   * Variante discrète : elle reste un bouton lisible. L'ancienne version, en gris sur
+   * fond transparent, tombait sous le seuil de contraste dès qu'on la regardait sur un
+   * téléphone en plein soleil.
+   */
   .bouton--discret {
     background: transparent;
     border-color: transparent;
-    color: var(--muted);
-    font-weight: 500;
+    color: var(--accent);
   }
   .bouton--discret:hover {
-    background: var(--panel-2);
-    color: var(--text);
+    background: var(--surface-haute);
+    border-color: var(--bord);
   }
 
   .bouton--danger {
-    color: var(--rouge);
-    border-color: color-mix(in oklab, var(--rouge) 40%, var(--line));
+    color: var(--danger);
+    background: var(--danger-fond);
+    border-color: var(--danger-bord);
+  }
+  .bouton--danger:hover {
+    background: color-mix(in oklab, var(--danger) 22%, var(--surface));
   }
 
+  .bouton--pleine-largeur {
+    inline-size: 100%;
+  }
+
+  /* --- Champs de formulaire --------------------------------------------------- */
   .champ {
     display: grid;
-    gap: 0.35rem;
+    gap: var(--espace-1);
+    min-inline-size: 0;
   }
 
-  .champ label {
+  /* Deux champs côte à côte tant que la place le permet, l'un sous l'autre ensuite. */
+  .champ--flexible {
+    flex: 1 1 10rem;
+  }
+
+  .champ label,
+  .champ > .legende {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: var(--texte-m);
   }
 
   .champ__aide {
-    color: var(--muted);
-    font-size: 0.82rem;
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
   }
 
-  input[type='text'],
-  input[type='search'],
-  select {
+  /*
+   * Tous les champs de saisie, y compris ceux ajoutés plus tard : une liste de types
+   * énumérés laissait le champ « jeton » de `/admin` à 31 px de haut, sous la cible
+   * tactile minimale, parce que personne n'avait pensé à y ajouter `password`.
+   */
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']),
+  select,
+  textarea {
     inline-size: 100%;
-    padding: 0.6rem 0.75rem;
-    min-block-size: 44px;
-    background: var(--bg-2);
-    border: 1px solid var(--line);
+    max-inline-size: 100%;
+    padding: var(--espace-2) var(--espace-3);
+    min-block-size: var(--cible);
+    background: var(--fond-creux);
+    border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
-    color: var(--text);
+    color: var(--encre);
+    font-size: var(--texte-l); /* < 16 px déclenche un zoom automatique sur iOS */
   }
 
-  /* Autocomplétion d'adresse */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    border-color: var(--accent);
+  }
+
+  textarea {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--texte-s);
+    resize: vertical;
+  }
+
+  .fieldset-nu {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+  }
+
+  .legende {
+    font-weight: 600;
+    font-size: var(--texte-m);
+    padding: 0;
+  }
+
+  /* --- Autocomplétion d'adresse ----------------------------------------------- */
   .suggestions {
     list-style: none;
     padding: 0;
-    margin-block-start: 0.35rem;
-    border: 1px solid var(--line);
+    margin: 0;
+    border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
     overflow: hidden;
-    background: var(--panel);
+    background: var(--surface);
+    box-shadow: var(--ombre-2);
   }
 
   .suggestions li + li {
-    border-block-start: 1px solid var(--line);
+    border-block-start: var(--trait) solid var(--bord);
   }
 
   .suggestions button {
     inline-size: 100%;
+    min-block-size: var(--cible);
     text-align: start;
-    padding: 0.6rem 0.75rem;
+    padding: var(--espace-2) var(--espace-3);
     background: none;
     border: 0;
     cursor: pointer;
@@ -344,30 +624,18 @@
 
   .suggestions button:hover,
   .suggestions button[aria-selected='true'] {
-    background: var(--panel-2);
+    background: var(--surface-haute);
   }
 
   .suggestions .localite {
-    color: var(--muted);
-    font-size: 0.85rem;
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
   }
 
-  /* Grille hebdomadaire : repas de midi et usage du bus, jour par jour */
-  .fieldset-nu {
-    border: 0;
-    padding: 0;
-    margin: 0;
-  }
-
-  .legende {
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0;
-  }
-
+  /* --- Grille hebdomadaire : repas de midi et usage du bus, jour par jour ------ */
   .grille-semaine {
     display: grid;
-    gap: 0.45rem;
+    gap: var(--espace-2);
   }
 
   .grille-semaine__entete,
@@ -375,12 +643,12 @@
     display: grid;
     grid-template-columns: 5.5rem minmax(9rem, 1fr) minmax(9rem, 1.2fr);
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--espace-2);
   }
 
   .grille-semaine__entete {
-    color: var(--muted);
-    font-size: 0.75rem;
+    color: var(--encre-douce);
+    font-size: var(--texte-xs);
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -392,97 +660,99 @@
     }
     .grille-semaine__jour {
       grid-template-columns: 1fr;
-      gap: 0.3rem;
-      padding-block-end: 0.6rem;
-      border-block-end: 1px solid var(--line);
+      gap: var(--espace-1);
+      padding-block-end: var(--espace-3);
+      border-block-end: var(--trait) solid var(--bord);
     }
   }
 
   .grille-semaine__nom {
-    font-size: 0.9rem;
+    font-size: var(--texte-m);
     font-weight: 600;
   }
 
   .grille-semaine__nom small {
     display: block;
-    color: var(--muted);
+    color: var(--encre-douce);
     font-weight: 400;
-    font-size: 0.72rem;
+    font-size: var(--texte-xs);
   }
 
-  .bascule {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--line);
-    border-radius: var(--rayon-s);
-    overflow: hidden;
+  /* Champ de présence au Dillendapp, sous la ligne du jour concerné. */
+  .grille-semaine__dillendapp {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--espace-2);
+    padding-inline-start: var(--espace-2);
+    border-inline-start: var(--trait-fort) solid var(--info-bord);
+    font-size: var(--texte-m);
   }
 
-  .bascule button {
-    padding: 0.5rem 0.4rem;
-    min-block-size: 40px;
-    background: var(--bg-2);
-    border: 0;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-  }
-
-  .bascule button[aria-pressed='true'] {
-    background: var(--accent);
-    color: var(--accent-contraste);
+  .grille-semaine__dillendapp input[type='time'] {
+    inline-size: auto;
+    min-inline-size: 7rem;
   }
 
   /*
-   * Groupe segmenté en pleine largeur, pour un nombre quelconque d'options.
-   * `auto-fit` place les quatre usages du bus sur une ligne sur un téléphone et
-   * les replie en deux rangées sur un écran de 320 px, sans jamais déborder.
+   * --- Bascule et groupe segmenté ---------------------------------------------
+   * Deux options : `.bascule`. Un nombre quelconque : `.segments`, qui replie ses
+   * options sur plusieurs rangées plutôt que de déborder sur un écran de 320 px.
    */
+  .bascule,
   .segments {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
-    border: 1px solid var(--line);
+    border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
     overflow: hidden;
-    margin-block-start: 0.35rem;
+    background: var(--bord);
+    gap: var(--trait);
   }
 
+  .bascule {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .segments {
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  }
+
+  .bascule button,
   .segments button {
-    padding: 0.5rem 0.4rem;
-    min-block-size: 44px;
-    background: var(--panel-2);
+    padding: var(--espace-2) var(--espace-1);
+    min-block-size: var(--cible);
+    background: var(--surface-haute);
     border: 0;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: var(--texte-m);
     font-weight: 600;
-    color: var(--text);
+    color: var(--encre);
+    transition: background 0.15s ease;
   }
 
-  .segments button + button {
-    border-inline-start: 1px solid var(--line);
-  }
-
+  .bascule button:hover,
   .segments button:hover {
-    background: color-mix(in oklab, var(--panel-2) 80%, var(--accent));
+    background: color-mix(in oklab, var(--surface-haute) 82%, var(--accent));
   }
 
+  .bascule button[aria-pressed='true'],
   .segments button[aria-pressed='true'] {
     background: var(--accent);
-    color: var(--accent-contraste);
+    color: var(--encre-sur-accent);
   }
 
-  /* Trajets */
+  /* --- Trajets ---------------------------------------------------------------- */
   .trajet {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: baseline;
-    gap: 0.15rem 0.75rem;
-    padding-block: 0.6rem;
+    gap: var(--espace-1) var(--espace-3);
+    padding-block: var(--espace-3);
   }
 
   .trajet + .trajet {
-    border-block-start: 1px dashed var(--line);
+    border-block-start: var(--trait) dashed var(--bord);
   }
 
   .trajet__corps {
@@ -497,79 +767,115 @@
   /* L'heure qui décide de l'action du parent : partir, ou aller chercher l'enfant. */
   .trajet__heure--principale {
     font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--cyan);
+    font-size: var(--texte-xl);
+    color: var(--accent);
   }
 
   .trajet__heure--secondaire {
     font-weight: 600;
-    font-size: 0.82rem;
-    color: var(--muted);
+    font-size: var(--texte-s);
+    color: var(--encre-douce);
   }
 
   .trajet__titre {
     font-weight: 600;
+    font-size: var(--texte-m);
   }
 
   .trajet__detail {
     grid-column: 2 / -1;
-    color: var(--muted);
-    font-size: 0.85rem;
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
   }
 
+  .trajet__detail--attention {
+    color: var(--attention);
+  }
+
+  /* Un trajet interne ne demande rien au parent : il ne doit pas capter le regard. */
   .trajet--interne .trajet__heure--principale {
-    color: var(--muted);
+    color: var(--encre-douce);
     font-weight: 600;
+    font-size: var(--texte-l);
   }
 
+  /* --- Étiquette -------------------------------------------------------------- */
   .etiquette {
     display: inline-block;
-    padding: 0.1rem 0.45rem;
+    padding: var(--espace-1) var(--espace-2);
     border-radius: 999px;
-    font-size: 0.72rem;
+    font-size: var(--texte-xs);
     font-weight: 700;
     letter-spacing: 0.02em;
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    color: var(--muted);
+    line-height: 1.3;
+    background: var(--surface-haute);
+    border: var(--trait) solid var(--bord);
+    color: var(--encre-douce);
+    white-space: nowrap;
+    /* Sans cela, une étiquette posée seule dans une `.pile` s'étire sur toute la largeur. */
+    justify-self: start;
   }
 
   .etiquette--ligne {
-    color: var(--violet);
-    border-color: color-mix(in oklab, var(--violet) 40%, var(--line));
+    color: var(--accent-2);
+    border-color: color-mix(in oklab, var(--accent-2) 45%, var(--bord));
   }
 
-  /* Encarts d'avertissement, gradués par gravité */
+  .etiquette--danger {
+    color: var(--danger);
+    background: var(--danger-fond);
+    border-color: var(--danger-bord);
+  }
+
+  .etiquette--attention {
+    color: var(--attention);
+    background: var(--attention-fond);
+    border-color: var(--attention-bord);
+  }
+
+  /* --- Encarts d'avertissement, gradués par gravité ---------------------------- */
   .encart {
-    border: 1px solid var(--line);
-    border-inline-start: 3px solid var(--muted);
+    border: var(--trait) solid var(--bord);
+    border-inline-start: var(--trait-accent) solid var(--encre-douce);
     border-radius: var(--rayon-s);
-    padding: 0.7rem 0.85rem;
-    background: var(--panel-2);
-    font-size: 0.88rem;
+    padding: var(--espace-3);
+    background: var(--surface-haute);
+    font-size: var(--texte-m);
   }
 
   .encart__titre {
     font-weight: 700;
-    font-size: 0.85rem;
-    margin-block-end: 0.15rem;
+    font-size: var(--texte-m);
+    margin-block-end: var(--espace-1);
+  }
+
+  /* Un encart tient souvent en deux ou trois paragraphes : ils ne doivent pas se coller. */
+  .encart > p + p {
+    margin-block-start: var(--espace-2);
   }
 
   .encart--info {
-    border-inline-start-color: var(--accent);
+    border-color: var(--info-bord);
+    border-inline-start-color: var(--info);
+    background: var(--info-fond);
   }
   .encart--attention {
-    border-inline-start-color: var(--orange);
+    border-color: var(--attention-bord);
+    border-inline-start-color: var(--attention);
+    background: var(--attention-fond);
   }
   .encart--alerte {
-    border-inline-start-color: var(--rouge);
+    border-color: var(--danger-bord);
+    border-inline-start-color: var(--danger);
+    background: var(--danger-fond);
   }
 
+  /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
-    background: var(--panel-2);
-    border-block-end: 1px solid var(--line);
-    padding: 0.6rem var(--gouttiere);
-    font-size: 0.87rem;
+    background: var(--surface-haute);
+    border-block-end: var(--trait) solid var(--bord);
+    padding: var(--espace-2) var(--gouttiere);
+    font-size: var(--texte-m);
   }
 
   .bandeau__interne {
@@ -578,48 +884,112 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--espace-3);
   }
 
-  /* Tableaux d'horaires : doivent défiler seuls, sans déborder la page */
+  .bandeau__interne > * {
+    min-inline-size: 0;
+  }
+
+  /* --- Tableaux d'horaires : ils défilent seuls, sans déborder la page ---------- */
   .tableau-conteneur {
     overflow-x: auto;
-    border: 1px solid var(--line);
+    border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
   }
 
   table {
     inline-size: 100%;
     border-collapse: collapse;
-    font-size: 0.88rem;
+    font-size: var(--texte-m);
   }
 
   th,
   td {
-    padding: 0.4rem 0.6rem;
+    padding: var(--espace-2) var(--espace-3);
     text-align: start;
     white-space: nowrap;
   }
 
   thead th {
-    background: var(--panel-2);
-    border-block-end: 1px solid var(--line);
-    font-size: 0.8rem;
+    background: var(--surface-haute);
+    border-block-end: var(--trait) solid var(--bord);
+    font-size: var(--texte-s);
   }
 
-  tbody tr + tr td {
-    border-block-start: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+  tbody tr + tr td,
+  tbody tr + tr th {
+    border-block-start: var(--trait) solid color-mix(in oklab, var(--bord) 60%, transparent);
+  }
+
+  /* Le nom d'arrêt en tête de ligne reste un `th` sémantique, sans le gras qui va avec. */
+  .tableau__arret {
+    font-weight: 500;
   }
 
   td.heure {
     font-variant-numeric: tabular-nums;
   }
 
+  td.heure--incoherente {
+    color: var(--danger);
+    font-weight: 700;
+  }
+
   .carte-osm {
     block-size: 16rem;
     border-radius: var(--rayon-s);
     overflow: hidden;
-    border: 1px solid var(--line);
+    border: var(--trait) solid var(--bord);
+  }
+
+  /* --- Repli (`<details>`) ------------------------------------------------------ */
+  .repli > summary {
+    cursor: pointer;
+    min-block-size: var(--cible);
+    display: flex;
+    align-items: center;
+    gap: var(--espace-2);
+    font-weight: 600;
+    font-size: var(--texte-m);
+  }
+
+  .repli > summary.champ__aide {
+    font-weight: 400;
+  }
+}
+
+@layer utilitaires {
+  /*
+   * Utilitaires assumés : ils remplacent les `style={{…}}` qui parsemaient les
+   * composants. Un composant ne doit porter que des classes.
+   */
+  .titre-carte {
+    font-size: var(--texte-xl);
+  }
+
+  .texte-doux {
+    color: var(--encre-douce);
+  }
+  .texte-danger {
+    color: var(--danger);
+  }
+  .texte-attention {
+    color: var(--attention);
+  }
+  .texte-fort {
+    font-weight: 600;
+  }
+
+  .liste-puces {
+    padding-inline-start: var(--espace-5);
+    margin: 0;
+  }
+
+  .separateur {
+    border: 0;
+    border-block-start: var(--trait) solid var(--bord);
+    margin: 0;
   }
 
   .saut-contenu {
@@ -628,8 +998,8 @@
   }
   .saut-contenu:focus {
     position: static;
-    display: inline-block;
-    margin: 0.5rem;
+    display: inline-flex;
+    margin: var(--espace-2);
   }
 
   .visuellement-cache {
@@ -659,13 +1029,13 @@
     }
 
     :root {
-      --bg: #fff;
-      --bg-2: #fff;
-      --panel: #fff;
-      --panel-2: #fff;
-      --line: #767676;
-      --text: #000;
-      --muted: #333;
+      --fond: #fff;
+      --fond-creux: #fff;
+      --surface: #fff;
+      --surface-haute: #fff;
+      --bord: #767676;
+      --encre: #000;
+      --encre-douce: #333;
       --accent: #000;
     }
 
@@ -673,6 +1043,7 @@
     .entete,
     .pied,
     .bandeau,
+    .nav-basse,
     .sans-impression,
     .ecran-seulement {
       display: none !important;
@@ -793,39 +1164,5 @@
     .fiche__pied p {
       margin: 0 0 1mm;
     }
-  }
-}
-
-@layer composants {
-  /* Champ de fin de présence au Dillendapp, sous la ligne du jour concerné. */
-  .grille-semaine__dillendapp {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    padding-inline-start: 0.5rem;
-    border-inline-start: 2px solid color-mix(in oklab, var(--accent) 50%, transparent);
-    font-size: 0.85rem;
-  }
-
-  .grille-semaine__dillendapp input[type='time'] {
-    inline-size: auto;
-    min-inline-size: 7rem;
-  }
-}
-
-@layer composants {
-  /* Saisie du plan complet : du JSON, donc une chasse fixe et de la place. */
-  textarea {
-    inline-size: 100%;
-    padding: 0.6rem 0.75rem;
-    background: var(--bg-2);
-    border: 1px solid var(--line);
-    border-radius: var(--rayon-s);
-    color: var(--text);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.8rem;
-    resize: vertical;
   }
 }

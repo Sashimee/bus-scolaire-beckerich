@@ -94,7 +94,7 @@ export function AdminPlan({ jeton, onErreur }: Props) {
 
   return (
     <section className="pile pile--serre">
-      <h3 style={{ fontSize: '1rem' }}>{t('adminPlan.titre')}</h3>
+      <h3 className="titre-carte">{t('adminPlan.titre')}</h3>
       <p className="champ__aide">{t('adminPlan.aide')}</p>
 
       <div className="encart encart--attention">
@@ -152,7 +152,7 @@ export function AdminPlan({ jeton, onErreur }: Props) {
                     <div className="encart__titre">
                       {t(`adminPlan.${gravite}s`, { nombre: liste.length })}
                     </div>
-                    <ul style={{ paddingInlineStart: '1.1rem', margin: 0 }}>
+                    <ul className="liste-puces">
                       {liste.slice(0, 30).map((p, i) => (
                         <li key={i}>
                           <strong>{p.ou}</strong> — {p.message}
@@ -191,7 +191,7 @@ export function AdminPlan({ jeton, onErreur }: Props) {
                       <tr key={cle}>
                         <th scope="row">{t(`adminPlan.${cle}`)}</th>
                         <td className="heure">{a}</td>
-                        <td className="heure" style={{ color: b < a ? 'var(--rouge)' : undefined }}>
+                        <td className={`heure${b < a ? ' heure--incoherente' : ''}`}>
                           {b}
                           {b !== a && ` (${b > a ? '+' : ''}${b - a})`}
                         </td>
@@ -201,7 +201,7 @@ export function AdminPlan({ jeton, onErreur }: Props) {
                 </table>
               </div>
               {apres.courses < avant.courses && (
-                <p className="champ__aide" style={{ color: 'var(--orange)' }}>
+                <p className="champ__aide texte-attention">
                   {t('adminPlan.moinsQuAvant')}
                 </p>
               )}

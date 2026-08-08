@@ -70,7 +70,7 @@ export function Reglages() {
       </section>
 
       <section className="carte pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>{t('onboarding.etapeEnfants')}</h3>
+        <h3 className="titre-carte">{t('onboarding.etapeEnfants')}</h3>
         <p className="champ__aide">{foyer.adresse?.libelle ?? '—'}</p>
 
         {/* Un compte d'enfants ne dit rien : le parent vient ici pour reconnaître le
@@ -102,7 +102,7 @@ export function Reglages() {
 
       {configure && (
         <section className="carte pile pile--serre">
-          <h3 style={{ fontSize: '1rem' }}>{t('partage.titre')}</h3>
+          <h3 className="titre-carte">{t('partage.titre')}</h3>
           <p className="champ__aide">{t('partage.aide')}</p>
           <div className="rangee">
             <button
@@ -133,7 +133,7 @@ export function Reglages() {
       <Notifications />
 
       <section className="carte pile pile--serre">
-        <h3 style={{ fontSize: '1rem' }}>{t('reglages.donnees')}</h3>
+        <h3 className="titre-carte">{t('reglages.donnees')}</h3>
         <p className="champ__aide">
           {sourceAdresses.jeu} — {sourceAdresses.licence}
         </p>

@@ -53,9 +53,9 @@ export function Installer() {
 
   const bloc = (p: (typeof procedures)[number], principal: boolean) => (
     <section className={principal ? 'carte carte--accent pile pile--serre' : 'pile pile--serre'} key={p.cle}>
-      <h3 style={{ fontSize: '1rem' }}>{t(`installer.${p.cle}`)}</h3>
+      <h3 className="titre-carte">{t(`installer.${p.cle}`)}</h3>
       {p.etapes.length > 0 && (
-        <ol className="pile pile--serre" style={{ paddingInlineStart: '1.2rem' }}>
+        <ol className="pile pile--serre liste-puces">
           {p.etapes.map((etape) => (
             <li key={etape}>{etape}</li>
           ))}

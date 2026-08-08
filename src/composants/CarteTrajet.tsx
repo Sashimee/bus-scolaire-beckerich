@@ -44,7 +44,12 @@ export function CarteTrajet({ depuis, vers }: Props) {
 
         L.marker(domicile).addTo(carte).bindPopup(t('carte.domicile'))
         L.marker(arret).addTo(carte).bindPopup(nomArret(vers, t))
-        L.polyline([domicile, arret], { color: '#7aa2f7', dashArray: '6 6' }).addTo(carte)
+        // Leaflet dessine sur un canevas : il lui faut une couleur résolue, pas une
+        // variable CSS. On la lit donc sur la racine, pour que le tracé suive le thème.
+        const accent =
+          getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() ||
+          '#82a9ff'
+        L.polyline([domicile, arret], { color: accent, dashArray: '6 6' }).addTo(carte)
 
         carte.fitBounds(L.latLngBounds([domicile, arret]).pad(0.35))
       } catch {

@@ -86,17 +86,11 @@ export function LigneTrajet({
       </span>
 
       <div className="trajet__corps">
-        <div className="trajet__titre">
-          {t(`trajets.${trajet.type}`)}
-          {annule && (
-            <span className="etiquette" style={{ marginInlineStart: '0.5rem', color: 'var(--rouge)' }}>
-              {t('urgences.annule')}
-            </span>
-          )}
+        <div className="trajet__titre rangee">
+          <span>{t(`trajets.${trajet.type}`)}</span>
+          {annule && <span className="etiquette etiquette--danger">{t('urgences.annule')}</span>}
           {decale && (
-            <span className="etiquette" style={{ marginInlineStart: '0.5rem', color: 'var(--orange)' }}>
-              {t('urgences.horaireModifie')}
-            </span>
+            <span className="etiquette etiquette--attention">{t('urgences.horaireModifie')}</span>
           )}
         </div>
       </div>
@@ -112,7 +106,7 @@ export function LigneTrajet({
       </span>
 
       {concernees.map((p) => (
-        <p key={p.id} className="trajet__detail" style={{ color: 'var(--orange)' }}>
+        <p key={p.id} className="trajet__detail trajet__detail--attention">
           {messagePerturbation(p, langue)}
         </p>
       ))}
@@ -163,10 +157,8 @@ export function JourneeTrajets({
       ))}
 
       {internes.length > 0 && (
-        <details>
-          <summary className="champ__aide" style={{ cursor: 'pointer' }}>
-            {t('trajets.interne')}
-          </summary>
+        <details className="repli">
+          <summary className="champ__aide">{t('trajets.interne')}</summary>
           {internes.map((trajet, i) => (
             <LigneTrajet key={`${trajet.type}-${i}`} trajet={trajet} perturbations={perturbations} />
           ))}
@@ -194,9 +186,7 @@ export function JourneeTrajets({
           <div className="encart__titre">{t('incertitudes.titre')}</div>
           {t(`incertitudes.${id}`)}
           {incertitude(id)?.aVerifierAupres && (
-            <p className="champ__aide" style={{ marginBlockStart: '0.3rem' }}>
-              {incertitude(id)!.aVerifierAupres}
-            </p>
+            <p className="champ__aide">{incertitude(id)!.aVerifierAupres}</p>
           )}
         </div>
       ))}

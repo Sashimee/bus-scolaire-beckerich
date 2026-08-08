@@ -24,6 +24,11 @@ la commune ni avec l'école**.
   dictionnaires `src/i18n/*.json` (fr, de, lb, pt, en).
 - **Aucune donnée en dur dans le code** : horaires, arrêts, cycles et vacances vivent dans
   `src/data/`.
+- **Aucun `style={{ … }}` dans un composant, aucune valeur brute dans `src/index.css`** :
+  couleurs, tailles de texte, espacements, rayons et ombres passent par les jetons de la
+  couche `tokens`. Un composant ne porte que des classes. Toute cible tactile fait
+  ≥ 44 px (`--cible`), et chaque couple encre/fond se vérifie à un contraste ≥ 4.5:1
+  avant d'entrer dans la palette.
 - Les commentaires expliquent **pourquoi**, pas quoi.
 
 ## Carte du dépôt
