@@ -240,9 +240,53 @@
     "titre": "Add to a calendar",
     "ics": "Download for my calendar (.ics)",
     "icsAide": "Works with Google Calendar, Apple Calendar and Outlook. School holidays are already excluded.",
-    "google": "Add to Google Calendar",
-    "googleAide": "Quick to add, but Google handles holiday exclusions poorly: the .ics file is more accurate.",
-    "tousLesEnfants": "All children"
+    "tousLesEnfants": "All children",
+    "nomFoyer": "School bus — the family",
+    "tousLesEnfantsAide": "A single file for all the siblings: one calendar instead of three.",
+    "commentImporter": "How do I add it to my calendar?"
+  },
+  "agenda": {
+    "titre": "Add the timetable to your calendar",
+    "intro": "The downloaded file is imported once. The journeys then appear every week in your phone's calendar.",
+    "pourquoiTitre": "What it changes",
+    "atoutVacances": "School holidays and public holidays are already excluded: no bus announced in February.",
+    "atoutRappel": "A reminder goes off a few minutes before you need to leave the house.",
+    "atoutSupprimer": "Everything sits in a separate calendar you can hide or delete in one move.",
+    "remarqueMiseAJour": "The calendar does not update itself: after a change of cycle or timetable, download the file again and re-import it.",
+    "nomCalendrier": "School bus",
+    "exempleTrajet": "departure",
+    "ios": "iPhone or iPad",
+    "iosEtapes": [
+      "Tap the downloaded file, at the bottom of the screen or in the Files app.",
+      "Choose “Add All” when iOS offers it.",
+      "Pick the destination calendar, then “Add”."
+    ],
+    "android": "Android",
+    "androidEtapes": [
+      "Open the file from the notification bar or the Files app.",
+      "Choose Google Calendar from the list of apps.",
+      "Confirm the import."
+    ],
+    "google": "Google Calendar, on a computer",
+    "googleEtapes": [
+      "Open calendar.google.com.",
+      "Gear icon → Settings → Import & export.",
+      "Choose the file, then the destination calendar, and click “Import”."
+    ],
+    "outlook": "Outlook",
+    "outlookEtapes": [
+      "Open Outlook, then Calendar.",
+      "Add calendar → Upload from file.",
+      "Choose the file and confirm."
+    ],
+    "googleTitre": "Write straight into Google Calendar",
+    "googleAide": "No file to import: the app creates one calendar per child and writes the journeys into it.",
+    "googlePortee": "The permission requested only grants access to calendars created by this app. Your personal calendar stays out of reach, even for reading.",
+    "googleConnexion": "Connect my Google account",
+    "googleDeconnexion": "Disconnect my Google account",
+    "googleSynchroniser": "Update the calendar",
+    "googleFait": "{nombre} appointments written for {enfants} child(ren).",
+    "googleErreur": "Synchronisation failed. Reconnect your account and try again."
   },
   "partage": {
     "titre": "Share this setup",

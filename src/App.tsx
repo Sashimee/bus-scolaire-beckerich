@@ -11,6 +11,7 @@ import { AssistantEnfant } from './pages/AssistantEnfant'
 import { PagePlan } from './pages/Plan'
 import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
+import { Agenda } from './pages/Agenda'
 import { Reglages } from './pages/Reglages'
 import { Admin } from './pages/Admin'
 import { Commune } from './pages/Commune'
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/limites" element={<Limites />} />
           <Route path="/independance" element={<Independance />} />
           <Route path="/installer" element={<Installer />} />
+          <Route path="/agenda" element={<Agenda />} />
           <Route path="/reglages" element={<Reglages />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/commune" element={<Commune />} />

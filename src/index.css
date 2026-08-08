@@ -1296,6 +1296,33 @@
   .demo--bureau .demo__pointeur {
     animation-name: demo-pointeur-bureau;
   }
+
+  /* Import d'agenda : le pointeur va chercher le fichier, puis le calendrier apparaît. */
+  .demo--agenda .demo__pointeur {
+    animation-name: demo-pointeur-agenda;
+  }
+  @keyframes demo-pointeur-agenda {
+    0% {
+      transform: translate(80px, 120px);
+      opacity: 0;
+    }
+    10%,
+    35% {
+      transform: translate(44px, 220px);
+      opacity: 1;
+    }
+    60%,
+    100% {
+      transform: translate(80px, 120px);
+      opacity: 0;
+    }
+  }
+
+  .demo__fichier rect {
+    fill: var(--surface-haute);
+    stroke: var(--bord);
+    stroke-width: 1;
+  }
   @keyframes demo-pointeur-bureau {
     0% {
       transform: translate(110px, 90px);

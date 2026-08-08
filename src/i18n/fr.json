@@ -240,9 +240,53 @@
     "titre": "Ajouter à un agenda",
     "ics": "Télécharger pour mon agenda (.ics)",
     "icsAide": "Fonctionne avec Google Agenda, Apple Calendrier et Outlook. Les vacances scolaires sont déjà exclues.",
-    "google": "Ajouter à Google Agenda",
-    "googleAide": "Ajout rapide, mais Google gère mal les exclusions de vacances : le fichier .ics est plus fidèle.",
-    "tousLesEnfants": "Tous les enfants"
+    "tousLesEnfants": "Tous les enfants",
+    "nomFoyer": "Bus scolaire — la famille",
+    "tousLesEnfantsAide": "Un seul fichier pour toute la fratrie : un calendrier à gérer, pas trois.",
+    "commentImporter": "Comment l'ajouter à mon agenda ?"
+  },
+  "agenda": {
+    "titre": "Ajouter les horaires à votre agenda",
+    "intro": "Le fichier téléchargé s'importe une fois. Les trajets apparaissent ensuite chaque semaine dans l'agenda de votre téléphone.",
+    "pourquoiTitre": "Ce que ça change",
+    "atoutVacances": "Les vacances scolaires et les jours fériés sont déjà exclus : aucun bus annoncé en février.",
+    "atoutRappel": "Un rappel se déclenche quelques minutes avant qu'il faille partir de la maison.",
+    "atoutSupprimer": "Tout est dans un calendrier à part, que vous pouvez masquer ou supprimer d'un geste.",
+    "remarqueMiseAJour": "L'agenda ne se met pas à jour tout seul : après un changement de cycle ou d'horaires, retéléchargez le fichier et réimportez-le.",
+    "nomCalendrier": "Bus scolaire",
+    "exempleTrajet": "départ",
+    "ios": "iPhone ou iPad",
+    "iosEtapes": [
+      "Touchez le fichier téléchargé, en bas de l'écran ou dans l'app Fichiers.",
+      "Choisissez « Ajouter tout » quand iOS le propose.",
+      "Sélectionnez le calendrier de destination, puis « Ajouter »."
+    ],
+    "android": "Android",
+    "androidEtapes": [
+      "Ouvrez le fichier depuis la barre de notifications ou l'app Fichiers.",
+      "Choisissez Google Agenda dans la liste des applications.",
+      "Confirmez l'import."
+    ],
+    "google": "Google Agenda, sur ordinateur",
+    "googleEtapes": [
+      "Ouvrez calendar.google.com.",
+      "Roue dentée → Paramètres → Importer et exporter.",
+      "Choisissez le fichier, puis le calendrier de destination, et cliquez sur « Importer »."
+    ],
+    "outlook": "Outlook",
+    "outlookEtapes": [
+      "Ouvrez Outlook, puis Calendrier.",
+      "Ajouter un calendrier → Charger à partir d'un fichier.",
+      "Choisissez le fichier et validez."
+    ],
+    "googleTitre": "Écrire directement dans Google Agenda",
+    "googleAide": "Sans fichier à importer : l'application crée un agenda par enfant et y écrit les trajets.",
+    "googlePortee": "L'autorisation demandée ne donne accès qu'aux agendas créés par cette application. Votre agenda personnel reste hors de portée, même en lecture.",
+    "googleConnexion": "Connecter mon compte Google",
+    "googleDeconnexion": "Déconnecter mon compte Google",
+    "googleSynchroniser": "Mettre à jour l'agenda",
+    "googleFait": "{nombre} rendez-vous écrits pour {enfants} enfant(s).",
+    "googleErreur": "La synchronisation a échoué. Reconnectez votre compte et réessayez."
   },
   "partage": {
     "titre": "Partager cette configuration",

@@ -240,9 +240,53 @@
     "titre": "An e Kalenner derbäisetzen",
     "ics": "Fir mäi Kalenner eroflueden (.ics)",
     "icsAide": "Funktionéiert mat Google Kalenner, Apple Kalenner an Outlook. D'Schoulvakanze sinn scho erausgeholl.",
-    "google": "An de Google Kalenner derbäisetzen",
-    "googleAide": "Séier derbäigesat, mee Google gëtt schlecht mat de Vakanzausnamen ëm: d'.ics-Datei ass méi genee.",
-    "tousLesEnfants": "All Kanner"
+    "tousLesEnfants": "All Kanner",
+    "nomFoyer": "Schoulbus — d'Famill",
+    "tousLesEnfantsAide": "Eng eenzeg Datei fir all Geschwëster: ee Kalenner amplaz dräi.",
+    "commentImporter": "Wéi setzen ech en a mäi Kalenner?"
+  },
+  "agenda": {
+    "titre": "Auerzäiten an de Kalenner setzen",
+    "intro": "Déi erofgeluede Datei gëtt eemol importéiert. D'Weeër erschéngen duerno all Woch am Kalenner vun Ärem Telefon.",
+    "pourquoiTitre": "Wat dat ännert",
+    "atoutVacances": "Schoulvakanzen a Feierdeeg sinn scho ausgeschloss: kee Bus am Februar ugekënnegt.",
+    "atoutRappel": "Eng Erënnerung kënnt e puer Minutten ier Dir doheem lassmusst.",
+    "atoutSupprimer": "Alles läit an engem eegene Kalenner, deen Dir verstoppe oder mat engem Grëff läsche kënnt.",
+    "remarqueMiseAJour": "De Kalenner aktualiséiert sech net vun eleng: no engem Zyklus- oder Fahrplangwiessel d'Datei nei eroflueden an importéieren.",
+    "nomCalendrier": "Schoulbus",
+    "exempleTrajet": "Offaart",
+    "ios": "iPhone oder iPad",
+    "iosEtapes": [
+      "Tippt op déi erofgeluede Datei, ënnen um Bildschierm oder an der App „Fichieren“.",
+      "Wielt „Alles derbäisetzen“, wann iOS et proposéiert.",
+      "Zilkalenner wielen, dann „Derbäisetzen“."
+    ],
+    "android": "Android",
+    "androidEtapes": [
+      "Maacht d'Datei iwwer d'Meldungsleescht oder d'App „Fichieren“ op.",
+      "Wielt Google Kalenner aus der Lëscht vun den Apps.",
+      "Bestätegt den Import."
+    ],
+    "google": "Google Kalenner, um Computer",
+    "googleEtapes": [
+      "Maacht calendar.google.com op.",
+      "Zännrad → Astellungen → Importéieren an exportéieren.",
+      "Datei wielen, Zilkalenner wielen, op „Importéieren“ klicken."
+    ],
+    "outlook": "Outlook",
+    "outlookEtapes": [
+      "Maacht Outlook op, dann de Kalenner.",
+      "Kalenner derbäisetzen → Aus enger Datei lueden.",
+      "Datei wielen a bestätegen."
+    ],
+    "googleTitre": "Direkt an de Google Kalenner schreiwen",
+    "googleAide": "Ouni Datei z'importéieren: d'App leet ee Kalenner pro Kand un an dréit d'Weeër an.",
+    "googlePortee": "D'ugefrote Berechtegung gëllt nëmme fir Kalenner, déi dës App ugeluecht huet. Äre perséinleche Kalenner bleift onerreechbar, och beim Liesen.",
+    "googleConnexion": "Google-Kont verbannen",
+    "googleDeconnexion": "Google-Kont trennen",
+    "googleSynchroniser": "Kalenner aktualiséieren",
+    "googleFait": "{nombre} Rendez-vousë fir {enfants} Kand/Kanner geschriwwen.",
+    "googleErreur": "D'Synchronisatioun ass feelgeschloen. Verbannt de Kont nei a probéiert nach eng Kéier."
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

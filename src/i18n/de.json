@@ -240,9 +240,53 @@
     "titre": "Zum Kalender hinzufügen",
     "ics": "Für meinen Kalender herunterladen (.ics)",
     "icsAide": "Funktioniert mit Google Kalender, Apple Kalender und Outlook. Die Schulferien sind bereits ausgenommen.",
-    "google": "Zu Google Kalender hinzufügen",
-    "googleAide": "Schnell hinzugefügt, aber Google berücksichtigt Ferienausnahmen schlecht: die .ics-Datei ist genauer.",
-    "tousLesEnfants": "Alle Kinder"
+    "tousLesEnfants": "Alle Kinder",
+    "nomFoyer": "Schulbus — die Familie",
+    "tousLesEnfantsAide": "Eine einzige Datei für alle Geschwister: ein Kalender statt drei.",
+    "commentImporter": "Wie füge ich ihn meinem Kalender hinzu?"
+  },
+  "agenda": {
+    "titre": "Fahrzeiten zum Kalender hinzufügen",
+    "intro": "Die heruntergeladene Datei wird einmal importiert. Die Fahrten erscheinen danach jede Woche im Kalender Ihres Telefons.",
+    "pourquoiTitre": "Was sich dadurch ändert",
+    "atoutVacances": "Schulferien und Feiertage sind bereits ausgeschlossen: kein Bus im Februar angekündigt.",
+    "atoutRappel": "Eine Erinnerung erfolgt einige Minuten bevor Sie das Haus verlassen müssen.",
+    "atoutSupprimer": "Alles liegt in einem eigenen Kalender, den Sie ausblenden oder mit einem Griff löschen können.",
+    "remarqueMiseAJour": "Der Kalender aktualisiert sich nicht von selbst: nach einem Zyklus- oder Fahrplanwechsel die Datei erneut herunterladen und importieren.",
+    "nomCalendrier": "Schulbus",
+    "exempleTrajet": "Abfahrt",
+    "ios": "iPhone oder iPad",
+    "iosEtapes": [
+      "Tippen Sie auf die heruntergeladene Datei, unten am Bildschirm oder in der App „Dateien“.",
+      "Wählen Sie „Alle hinzufügen“, wenn iOS es anbietet.",
+      "Zielkalender auswählen, dann „Hinzufügen“."
+    ],
+    "android": "Android",
+    "androidEtapes": [
+      "Öffnen Sie die Datei über die Benachrichtigungsleiste oder die App „Dateien“.",
+      "Wählen Sie Google Kalender aus der App-Liste.",
+      "Bestätigen Sie den Import."
+    ],
+    "google": "Google Kalender, am Computer",
+    "googleEtapes": [
+      "Öffnen Sie calendar.google.com.",
+      "Zahnrad → Einstellungen → Importieren und exportieren.",
+      "Datei wählen, Zielkalender wählen, auf „Importieren“ klicken."
+    ],
+    "outlook": "Outlook",
+    "outlookEtapes": [
+      "Öffnen Sie Outlook, dann den Kalender.",
+      "Kalender hinzufügen → Aus Datei hochladen.",
+      "Datei auswählen und bestätigen."
+    ],
+    "googleTitre": "Direkt in Google Kalender schreiben",
+    "googleAide": "Ohne Datei-Import: die App erstellt einen Kalender pro Kind und trägt die Fahrten ein.",
+    "googlePortee": "Die angeforderte Berechtigung gilt nur für Kalender, die diese App erstellt hat. Ihr persönlicher Kalender bleibt unerreichbar, auch lesend.",
+    "googleConnexion": "Google-Konto verbinden",
+    "googleDeconnexion": "Google-Konto trennen",
+    "googleSynchroniser": "Kalender aktualisieren",
+    "googleFait": "{nombre} Termine für {enfants} Kind(er) geschrieben.",
+    "googleErreur": "Die Synchronisierung ist fehlgeschlagen. Konto erneut verbinden und nochmals versuchen."
   },
   "partage": {
     "titre": "Diese Konfiguration teilen",

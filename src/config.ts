@@ -30,6 +30,15 @@ export const URL_WORKER: string = (import.meta.env.VITE_URL_WORKER ?? '').replac
 /** Clé publique VAPID, nécessaire pour s'abonner aux notifications. */
 export const CLE_VAPID_PUBLIQUE: string = import.meta.env.VITE_CLE_VAPID ?? ''
 
+/**
+ * ID client OAuth Google, pour l'écriture dans Google Agenda.
+ *
+ * Public par construction : le flux PKCE n'a pas de secret client. Vide, l'intégration
+ * disparaît de l'interface et l'export `.ics` reste seul — même politique que les
+ * notifications.
+ */
+export const ID_CLIENT_GOOGLE: string = import.meta.env.VITE_ID_CLIENT_GOOGLE ?? ''
+
 export const notificationsConfigurees = () => Boolean(URL_WORKER && CLE_VAPID_PUBLIQUE)
 export const connexionGithubConfiguree = () => Boolean(URL_WORKER)
 

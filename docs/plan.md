@@ -45,7 +45,10 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
 | R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
 | R8 | 10 | **Le sélecteur de préférence n'a pas été vu à l'écran.** Il n'apparaît qu'une fois les notifications actives, ce qui exige d'accorder la permission du navigateur. | Activer les notifications sur un appareil réel et vérifier que les trois options s'affichent et se transmettent au Worker. |
-| R9 | 11 | **La CSP n'a pas été vérifiée en production.** Éprouvée sur le build local via `vite preview` — carte, service worker, QR code, sept routes, zéro violation — mais pas sur GitHub Pages, où le chemin de base et l'origine diffèrent. Une violation s'y traduirait par une carte vide, sans message visible. | Ouvrir le site déployé, console ouverte, sur `/enfant/:id` et `/reglages` ; guetter « Refused to… ». |
+| ~~R9~~ | 11 | ~~La CSP n'a pas été vérifiée en production.~~ **Levée le 2026-08-08** : vérifiée sur le site déployé — tuiles OpenStreetMap chargées, service worker actif, GoatCounter chargé, zéro violation. |
+| R10 | 12 | **Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.** Les 27 tests vérifient la structure du texte, pas qu'Apple Calendrier ou Google l'acceptent. | Télécharger le fichier depuis la fiche d'un enfant et l'importer sur un téléphone. |
+| R11 | 13 | **L'intégration Google n'a jamais tourné.** Le prérequis — projet Google Cloud, API Calendar, ID client OAuth, écran de consentement — n'est pas fait. Ni le flux PKCE, ni la création d'agenda, ni l'écriture d'un événement n'ont été exercés. | Créer l'ID client, poser `VITE_ID_CLIENT_GOOGLE` en variable de dépôt, puis connecter un compte de test. |
+| R12 | 11 | **La CSP avait cassé `npm run dev`** en bloquant le préambule inline de React Refresh — page blanche, découvert seulement au lot 13. Corrigé : la politique ne s'applique qu'au build. Rappel de méthode : vérifier le build **et** le serveur de développement après toute modification de `vite.config.ts`. | Corrigé. Ligne gardée comme trace. |
 | R6 | 3 | **Une arrivée après la sonnerie est affichée sans être signalée.** Pour un C2 déposé au Dillendapp le matin, aucune course n'arrive avant 07:55 : l'application montre 08:00, l'heure publiée, et la page « Limites » énonce le fait — mais la fiche de l'enfant ne le dit pas au moment où le parent la lit. | À trancher : soit c'est acceptable et la page « Limites » suffit, soit il faut une mention sur le trajet lui-même. Décision de conception, pas défaut. |
 
 ### Mise en service, non faite
@@ -961,6 +964,26 @@ des liens malformés), puis vérification manuelle qu'un lien de partage trafiqu
 
 ## Lot 12 — Agenda : ICS amélioré et architecture d'export
 
+> **Fait le 2026-08-08.** L'export est isolé dans `src/lib/agenda/` autour d'une
+> représentation intermédiaire `EvenementRecurrent`, et `calendrier.ts` retrouve une
+> seule responsabilité — savoir s'il y a école. Écarts et ajouts :
+>
+> - L'export « toute la famille » produit **un seul fichier** : trois enfants voulaient
+>   dire trois calendriers à activer, masquer et supprimer séparément.
+> - Le regroupement des trajets tient compte des **arrêts**, pas seulement de la ligne
+>   et de l'heure : une adresse dérogatoire change le lieu du rendez-vous ce jour-là, et
+>   un agenda qui annoncerait le mauvais arrêt serait pire qu'aucun agenda.
+> - Nouvelle page `/agenda` : ce qu'il faut faire du fichier une fois téléchargé, avec
+>   une démonstration animée par plateforme. Sans elle, le bouton produisait un fichier
+>   que beaucoup de parents ne retrouvaient jamais.
+> - `lienGoogleAgenda()` est supprimé, ainsi que ses clés i18n.
+> - Les tests ICS déménagent avec le code qu'ils couvrent, dans
+>   `src/lib/agenda/agenda.test.ts`.
+>
+> **Réserve** : aucun fichier `.ics` produit par la nouvelle chaîne n'a été importé dans
+> un vrai agenda. Les 27 tests vérifient la structure du texte, pas qu'Apple Calendrier
+> ou Google l'acceptent.
+
 *Dépend du lot 3 (les adresses par jour changent les lieux des événements).*
 
 - **Isoler l'export** : `src/lib/calendrier.ts` mélange calendrier scolaire et génération
@@ -981,6 +1004,23 @@ des liens malformés), puis vérification manuelle qu'un lien de partage trafiqu
 ---
 
 ## Lot 13 — Intégration Google Agenda (activable)
+
+> **Fait le 2026-08-08, mais INACTIF.** `src/lib/agenda/google.ts` livré : OAuth PKCE
+> dans l'onglet, portée `calendar.app.created`, un agenda dédié par enfant,
+> identifiants d'événements stables pour que la resynchronisation remplace au lieu de
+> dupliquer. Le bloc n'apparaît dans `/agenda` que si `VITE_ID_CLIENT_GOOGLE` est
+> défini — vérifié : sans lui, aucun bouton de connexion n'existe.
+>
+> - La CSP a dû être élargie à `oauth2.googleapis.com` et `www.googleapis.com` en
+>   `connect-src`, et `accounts.google.com` en `form-action`.
+> - `PUT` sur un identifiant dérivé de l'enfant et du trajet, et non `POST` : sans cela,
+>   chaque resynchronisation aurait créé un doublon.
+>
+> **Réserves** : le prérequis à ta charge — projet Google Cloud, API Calendar activée,
+> ID client OAuth « application web », écran de consentement publié pour la portée
+> `calendar.app.created` — **n'est pas fait**. Rien de ce module n'a donc jamais tourné :
+> ni le flux PKCE, ni la création d'agenda, ni l'écriture d'un événement. C'est du code
+> écrit contre une documentation, pas contre un serveur.
 
 *Dépend du lot 12. À lancer quand l'ID client Google Cloud existe.*
 

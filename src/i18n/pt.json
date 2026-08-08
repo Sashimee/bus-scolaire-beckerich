@@ -240,9 +240,53 @@
     "titre": "Adicionar a um calendário",
     "ics": "Transferir para o meu calendário (.ics)",
     "icsAide": "Funciona com o Google Agenda, o Calendário Apple e o Outlook. As férias escolares já estão excluídas.",
-    "google": "Adicionar ao Google Agenda",
-    "googleAide": "Adição rápida, mas o Google lida mal com as exclusões de férias: o ficheiro .ics é mais fiel.",
-    "tousLesEnfants": "Todas as crianças"
+    "tousLesEnfants": "Todas as crianças",
+    "nomFoyer": "Autocarro escolar — a família",
+    "tousLesEnfantsAide": "Um único ficheiro para todos os irmãos: um calendário em vez de três.",
+    "commentImporter": "Como o adiciono ao meu calendário?"
+  },
+  "agenda": {
+    "titre": "Adicionar os horários à sua agenda",
+    "intro": "O ficheiro descarregado importa-se uma vez. Os trajetos passam depois a aparecer todas as semanas na agenda do seu telemóvel.",
+    "pourquoiTitre": "O que isso muda",
+    "atoutVacances": "As férias escolares e os feriados já estão excluídos: nenhum autocarro anunciado em fevereiro.",
+    "atoutRappel": "Um lembrete toca alguns minutos antes de ser preciso sair de casa.",
+    "atoutSupprimer": "Está tudo num calendário à parte, que pode ocultar ou apagar num gesto.",
+    "remarqueMiseAJour": "A agenda não se atualiza sozinha: após uma mudança de ciclo ou de horários, volte a descarregar o ficheiro e a importá-lo.",
+    "nomCalendrier": "Autocarro escolar",
+    "exempleTrajet": "partida",
+    "ios": "iPhone ou iPad",
+    "iosEtapes": [
+      "Toque no ficheiro descarregado, no fundo do ecrã ou na app Ficheiros.",
+      "Escolha «Adicionar tudo» quando o iOS o propuser.",
+      "Selecione o calendário de destino e depois «Adicionar»."
+    ],
+    "android": "Android",
+    "androidEtapes": [
+      "Abra o ficheiro a partir da barra de notificações ou da app Ficheiros.",
+      "Escolha o Google Agenda na lista de aplicações.",
+      "Confirme a importação."
+    ],
+    "google": "Google Agenda, no computador",
+    "googleEtapes": [
+      "Abra calendar.google.com.",
+      "Roda dentada → Definições → Importar e exportar.",
+      "Escolha o ficheiro, depois o calendário de destino, e clique em «Importar»."
+    ],
+    "outlook": "Outlook",
+    "outlookEtapes": [
+      "Abra o Outlook e depois o Calendário.",
+      "Adicionar calendário → Carregar a partir de um ficheiro.",
+      "Escolha o ficheiro e confirme."
+    ],
+    "googleTitre": "Escrever diretamente no Google Agenda",
+    "googleAide": "Sem ficheiro a importar: a aplicação cria uma agenda por criança e escreve lá os trajetos.",
+    "googlePortee": "A autorização pedida só dá acesso às agendas criadas por esta aplicação. A sua agenda pessoal continua fora de alcance, mesmo para leitura.",
+    "googleConnexion": "Ligar a minha conta Google",
+    "googleDeconnexion": "Desligar a minha conta Google",
+    "googleSynchroniser": "Atualizar a agenda",
+    "googleFait": "{nombre} compromissos escritos para {enfants} criança(s).",
+    "googleErreur": "A sincronização falhou. Volte a ligar a conta e tente de novo."
   },
   "partage": {
     "titre": "Partilhar esta configuração",

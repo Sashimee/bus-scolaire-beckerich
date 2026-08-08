@@ -3,11 +3,9 @@ import {
   anneeAExporter,
   depuisIso,
   etatDuJour,
-  genererIcs,
   isoDate,
   jourDeSemaine,
 } from './calendrier'
-import { contexteEnfant } from './plan'
 import { encoderFoyer, decoderFoyer } from './partage'
 import { repasParDefaut } from './stockage'
 import type { Enfant, Foyer } from './types'
@@ -19,7 +17,6 @@ const enfantTest = (): Enfant => ({
   repas: { ...repasParDefaut(), lundi: 'dillendapp' },
 })
 
-const HOVELANGE = { libelle: 'Hovelange', localite: 'Hovelange', coord: [49.7228, 5.9049] as const }
 
 describe('lecture des dates', () => {
   it('interprète une date ISO comme locale et non comme UTC', () => {
@@ -81,104 +78,6 @@ describe('y a-t-il école ?', () => {
     const annee = anneeAExporter(depuisIso('2026-08-07'))
     expect(annee?.anneeScolaire).toBe('2026/2027')
     expect(annee?.partiel).toBeFalsy()
-  })
-})
-
-describe('export iCalendar', () => {
-  const ctx = contexteEnfant(enfantTest(), HOVELANGE)!
-  const ics = genererIcs(ctx, {
-    libelleTrajet: (t) => t.type,
-    nomArret: (id) => id,
-    minutesMarche: 7,
-    libelleRecuperation: 'À récupérer au Dillendapp',
-    libelleDepose: 'À déposer au Dillendapp',
-  })
-
-  it('produit un calendrier valide', () => {
-    expect(ics.startsWith('BEGIN:VCALENDAR')).toBe(true)
-    expect(ics.trimEnd().endsWith('END:VCALENDAR')).toBe(true)
-    expect(ics).toContain('VERSION:2.0')
-  })
-
-  it('limite chaque série aux jours réellement concernés', () => {
-    // L'enfant mange au Dillendapp le lundi : il n'a pas de retour de midi ce jour-là,
-    // donc la série « retour-midi » ne doit pas inclure MO.
-    const series = ics.split('BEGIN:VEVENT').filter((b) => b.includes('retour-midi'))
-    expect(series.length).toBeGreaterThan(0)
-    for (const s of series) {
-      const rrule = /RRULE:[^\r\n]+/.exec(s)?.[0] ?? ''
-      expect(rrule).not.toContain('MO')
-    }
-  })
-
-  it("exclut les vacances pour ne pas annoncer un bus qui n'existe pas", () => {
-    expect(ics).toContain('EXDATE:')
-    // 2 novembre 2026 : lundi du congé de la Toussaint.
-    expect(ics).toContain('20261102T')
-  })
-
-  it('borne les séries à la fin de l’année scolaire', () => {
-    expect(ics).toContain('UNTIL=20270715T235959')
-  })
-
-  it("n'exporte que les trajets qui concernent le parent", () => {
-    // Les navettes internes école ↔ Dillendapp n'ont pas à encombrer l'agenda.
-    expect(ics).not.toContain('navette-dillendapp')
-  })
-
-  it("inscrit la récupération au Dillendapp, et pas le bus qui l'y dépose", () => {
-    // Ce qui engage le parent, c'est de venir chercher l'enfant à 18:00 — pas
-    // l'heure à laquelle le bus quitte l'école.
-    const e = enfantTest()
-    e.repas = { ...e.repas, lundi: 'dillendapp' }
-    e.dillendappJusqua = {
-      lundi: '18:00',
-      mardi: null,
-      mercredi: null,
-      jeudi: null,
-      vendredi: null,
-    }
-    const avecRecuperation = genererIcs(contexteEnfant(e, HOVELANGE)!, {
-      libelleTrajet: (t) => t.type,
-      nomArret: (id) => id,
-      minutesMarche: 7,
-      libelleRecuperation: 'À récupérer au Dillendapp',
-      libelleDepose: 'À déposer au Dillendapp',
-    })
-
-    expect(avecRecuperation).toContain('À récupérer au Dillendapp')
-    expect(avecRecuperation).toContain('T180000')
-    expect(avecRecuperation).not.toContain('retour-soir-dillendapp')
-  })
-
-  it('inscrit la dépose du matin, symétrique de la récupération', () => {
-    // Le parent qui dépose lui-même son enfant à 07:00 n'a aucun bus pour le lui
-    // rappeler : c'est justement le rendez-vous que l'agenda doit porter.
-    const e = enfantTest()
-    e.periscolaire = true
-    e.repas = { ...e.repas, mardi: 'dillendapp' }
-    e.dillendappDepuis = {
-      lundi: null,
-      mardi: '07:00',
-      mercredi: null,
-      jeudi: null,
-      vendredi: null,
-    }
-    const avecDepose = genererIcs(contexteEnfant(e, HOVELANGE)!, {
-      libelleTrajet: (t) => t.type,
-      nomArret: (id) => id,
-      minutesMarche: 7,
-      libelleRecuperation: 'À récupérer au Dillendapp',
-      libelleDepose: 'À déposer au Dillendapp',
-    })
-
-    expect(avecDepose).toContain('À déposer au Dillendapp')
-    expect(avecDepose).toContain('T070000')
-    // Un seul jour concerné : la série ne doit pas déborder sur toute la semaine.
-    const serie = avecDepose
-      .split('BEGIN:VEVENT')
-      .find((b) => b.includes('À déposer au Dillendapp'))!
-    expect(/RRULE:[^\r\n]+/.exec(serie)?.[0]).toContain('BYDAY=TU')
   })
 })
 

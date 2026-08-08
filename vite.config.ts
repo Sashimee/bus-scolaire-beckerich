@@ -35,7 +35,13 @@ function politiqueSecurite(urlWorker: string): string {
     "script-src 'self' https://gc.zgo.at",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://*.tile.openstreetmap.org",
-    `connect-src 'self' https://gc.zgo.at${worker ? ` ${worker}` : ''}`,
+    // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
+    // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
+    // alors que l'ID client peut être posé sans reconstruire cette liste.
+    `connect-src 'self' https://gc.zgo.at https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
+    // L'écran de consentement Google est une navigation, pas une inclusion : seule
+    // `form-action` doit s'ouvrir, et uniquement vers Google.
+    "form-action 'self' https://accounts.google.com",
     "font-src 'self'",
     "manifest-src 'self'",
     "worker-src 'self'",
@@ -43,14 +49,23 @@ function politiqueSecurite(urlWorker: string): string {
     // relatifs, ni de poster un formulaire ailleurs que chez nous.
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
   ].join('; ')
 }
 
-/** Insère la politique dans `index.html`, au plus près de l'ouverture du `<head>`. */
+/**
+ * Insère la politique dans `index.html`, au plus près de l'ouverture du `<head>`.
+ *
+ * **Construction uniquement.** En développement, `@vitejs/plugin-react` injecte un
+ * préambule inline pour le rechargement à chaud ; `script-src 'self'` le bloque, et
+ * l'application ne démarre plus du tout — page blanche et « can't detect preamble »
+ * dans la console. Assouplir la politique pour satisfaire le serveur de développement
+ * reviendrait à affaiblir celle qui protège les parents ; on ne la pose donc qu'au
+ * build, qui est le seul artefact publié.
+ */
 function pluginCsp() {
   return {
     name: 'bus-csp',
+    apply: 'build' as const,
     transformIndexHtml(html: string) {
       const csp = politiqueSecurite(process.env.VITE_URL_WORKER ?? '')
       return html.replace(
