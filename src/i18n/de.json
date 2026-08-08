@@ -83,7 +83,11 @@
     "repartEnBus": "Fährt mit dem Bus",
     "aRecuperer": "Im Dillendapp abzuholen",
     "recuperation": "Um {heure} im Dillendapp abzuholen.",
-    "aide": "Wenn Sie eine Uhrzeit angeben, bleibt das Kind nach dem Unterricht in der Maison Relais: der Abendbus setzt es dort ab, statt es nach Hause zu bringen."
+    "aide": "Wenn Sie eine Uhrzeit angeben, bleibt das Kind nach dem Unterricht in der Maison Relais: der Abendbus setzt es dort ab, statt es nach Hause zu bringen.",
+    "depuis": "Kommt an ab",
+    "aDeposer": "Zum Dillendapp bringen",
+    "depose": "Um {heure} zum Dillendapp bringen.",
+    "aideDepuis": "Wenn Sie eine Uhrzeit angeben, bringen Sie das Kind vor dem Unterricht selbst zur Maison Relais: an diesem Morgen fährt kein Bus bei Ihnen ab."
   },
   "bus": {
     "titre": "Bus",
@@ -137,7 +141,12 @@
     "interne": "Während des Schultags",
     "concerneParent": "Ihre Fahrten",
     "aucun": "An diesem Tag keine Fahrt.",
-    "retour-soir-dillendapp": "Rückfahrt zum Dillendapp, abends"
+    "retour-soir-dillendapp": "Rückfahrt zum Dillendapp, abends",
+    "navette-dillendapp-matin": "Dillendapp → Schule, morgens"
+  },
+  "trajetAdresse": {
+    "matin": "Abfahrt von einer anderen Adresse",
+    "soir": "Rückkehr zu einer anderen Adresse"
   },
   "manquants": {
     "titre": "Vom Plan nicht abgedeckt",
@@ -280,6 +289,10 @@
     "planCorps": "Die Gemeinde kann die Fahrzeiten jederzeit ändern. Die Website wird von Hand nachgeführt, nach bestem Bemühen, doch eine Verzögerung ist möglich.",
     "incertitudesTitre": "Manche Regeln des Plans bleiben mehrdeutig",
     "incertitudesCorps": "Wo das offizielle Dokument keine Klarheit schafft, zeigt die Website ihre Annahme und weist darauf hin, statt eine Antwort als sicher darzustellen.",
+    "dillendappTitre": "Morgens ist die Maison Relais nicht überall gleich angebunden",
+    "dillendappCorps": "Wenn Sie Ihr Kind vor dem Unterricht selbst zum Dillendapp bringen, schlägt die Website keinen Bus mehr von zu Hause aus vor — sie sucht aber sehr wohl die Fahrt Dillendapp → Schule, die im Plan steht. Je nach Zyklus kommt diese Fahrt vor oder nach Unterrichtsbeginn an: ein Kind in Oberpallen um 07:45, ein Kind in Noerdange um 08:00, also nach dem Klingeln um 07:55. Die Website zeigt die von der Gemeinde veröffentlichte Zeit, sie korrigiert sie nicht und erfindet keine Fahrt.",
+    "adressesTitre": "Adressen pro Tag funktionieren nur innerhalb der Gemeinde",
+    "adressesCorps": "Sie können für einen bestimmten Tag eine andere Start- oder Zieladresse als Ihren Wohnsitz angeben. Die Adresssuche kennt jedoch nur die Gemeinde Beckerich: Für einen Ort außerhalb geben Sie bitte direkt die genutzte Haltestelle an, statt die Website raten zu lassen.",
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
     "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert. Es gibt kein Konto, keinen Server und keine Reichweitenmessung. Goat Counter Analysen werden über das installierte Skript aktiviert. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht."
   },

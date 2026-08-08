@@ -92,6 +92,11 @@ export function LigneTrajet({
           {decale && (
             <span className="etiquette etiquette--attention">{t('urgences.horaireModifie')}</span>
           )}
+          {/* Sans cette mention, un arrêt inhabituel se lit comme une erreur de calcul
+              plutôt que comme le réglage que le parent a lui-même saisi. */}
+          {trajet.adresseDerogatoire && (
+            <span className="etiquette">{t(`trajetAdresse.${trajet.adresseDerogatoire}`)}</span>
+          )}
         </div>
       </div>
 
@@ -163,6 +168,13 @@ export function JourneeTrajets({
             <LigneTrajet key={`${trajet.type}-${i}`} trajet={trajet} perturbations={perturbations} />
           ))}
         </details>
+      )}
+
+      {journee.depose && (
+        <div className="encart encart--info">
+          <div className="encart__titre">{t('dillendapp.aDeposer')}</div>
+          {t('dillendapp.depose', { heure: journee.depose.heure })}
+        </div>
       )}
 
       {journee.recuperation && (

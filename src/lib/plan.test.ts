@@ -382,3 +382,185 @@ describe('domicile mitoyen de l’école', () => {
     expect(types(ctx, 'lundi')).toContain('aller-matin')
   })
 })
+
+describe('adresses dérogatoires par jour', () => {
+  /** Un enfant qui part ou rentre ailleurs que chez lui, un jour donné. */
+  const avecAdresse = (jour: Jour, sens: 'matin' | 'soir', a: Adresse, cycle: Cycle = 'c2') => {
+    const e = enfant(cycle, 'maison')
+    e.adresses = { [jour]: { [sens]: a } }
+    return contexteEnfant(e, HOVELANGE)
+  }
+
+  it("rattache l'adresse de retour du mardi à son propre arrêt", () => {
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    expect(ctx!.arretsParJour.mardi.soir!.arret.village).toBe('Schweich')
+    // Les autres jours et l'autre sens restent au domicile.
+    expect(ctx!.arretsParJour.mardi.matin!.arret.id).toBe(ctx!.arretDomicile.id)
+    expect(ctx!.arretsParJour.lundi.soir!.arret.id).toBe(ctx!.arretDomicile.id)
+  })
+
+  it('fait déposer l’enfant à cet arrêt-là ce jour-là, et pas ailleurs', () => {
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    const mardi = trajetsDuJour(ctx!, 'mardi').trajets.find((t) => t.type === 'retour-midi')!
+    const lundi = trajetsDuJour(ctx!, 'lundi').trajets.find((t) => t.type === 'retour-midi')!
+    expect(mardi.arrivee.arret.village).toBe('Schweich')
+    expect(lundi.arrivee.arret.id).toBe(ctx!.arretDomicile.id)
+  })
+
+  it('signale la dérogation, pour qu’un arrêt inhabituel ne se lise pas comme une erreur', () => {
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    const mardi = trajetsDuJour(ctx!, 'mardi').trajets.find((t) => t.type === 'retour-midi')!
+    expect(mardi.adresseDerogatoire).toBe('soir')
+    const lundi = trajetsDuJour(ctx!, 'lundi').trajets.find((t) => t.type === 'retour-midi')!
+    expect(lundi.adresseDerogatoire).toBeUndefined()
+  })
+
+  it('fait partir l’enfant de l’adresse du matin sans toucher à son retour', () => {
+    const ctx = avecAdresse('jeudi', 'matin', LEVELANGE)
+    const jeudi = trajetsDuJour(ctx!, 'jeudi')
+    const aller = jeudi.trajets.find((t) => t.type === 'aller-matin')!
+    const retour = jeudi.trajets.find((t) => t.type === 'retour-midi')!
+    expect(aller.depart.arret.village).toBe('Levelange')
+    expect(aller.adresseDerogatoire).toBe('matin')
+    expect(retour.arrivee.arret.id).toBe(ctx!.arretDomicile.id)
+    expect(retour.adresseDerogatoire).toBeUndefined()
+  })
+
+  it('repart l’après-midi de là où l’enfant a déjeuné', () => {
+    // L'enfant rentre manger chez ses grands-parents : c'est de chez eux qu'il
+    // reprend le bus, pas de chez lui.
+    const ctx = avecAdresse('lundi', 'soir', SCHWEICH)
+    const lundi = trajetsDuJour(ctx!, 'lundi')
+    const apresMidi = lundi.trajets.find((t) => t.type === 'aller-apres-midi')!
+    expect(apresMidi.depart.arret.village).toBe('Schweich')
+  })
+
+  it('laisse la fiche annoncer le domicile comme arrêt de référence', () => {
+    // `arretDomicile` reste celui du foyer : c'est lui qui s'affiche en tête de fiche.
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    expect(ctx!.arretDomicile.village).toBe('Hovelange')
+  })
+
+  it("garde le trajet visible pour le parent malgré l'arrêt inhabituel", () => {
+    const ctx = avecAdresse('mardi', 'soir', SCHWEICH)
+    const mardi = trajetsDuJour(ctx!, 'mardi').trajets.find((t) => t.type === 'retour-midi')!
+    expect(mardi.concerneParent).toBe(true)
+  })
+})
+
+describe('inscription périscolaire', () => {
+  it('efface toute la mécanique Dillendapp quand la famille n’est pas inscrite', () => {
+    const e = enfant('c2', 'dillendapp')
+    e.periscolaire = false
+    e.dillendappJusqua = Object.fromEntries(JOURS.map((j) => [j, '16:30'])) as Record<
+      Jour,
+      string | null
+    >
+    const ctx = contexteEnfant(e, HOVELANGE)
+    const lundi = trajetsDuJour(ctx!, 'lundi')
+    // L'enfant rentre manger : quatre trajets, aucune navette, aucune récupération.
+    expect(types(ctx, 'lundi')).toEqual([
+      'aller-matin',
+      'retour-midi',
+      'aller-apres-midi',
+      'retour-soir',
+    ])
+    expect(lundi.recuperation).toBeUndefined()
+  })
+
+  it('déduit l’inscription des repas déjà saisis, pour ne pas effacer une configuration', () => {
+    // `periscolaire` n'existait pas : un enfant enregistré au Dillendapp ne doit pas
+    // se retrouver « rentre manger » du jour au lendemain.
+    const e = enfant('c2', 'dillendapp')
+    delete e.periscolaire
+    const ctx = contexteEnfant(e, HOVELANGE)
+    expect(types(ctx, 'lundi')).toContain('navette-dillendapp-midi')
+  })
+})
+
+describe('présence au Dillendapp avant la classe', () => {
+  const avecDebut = (jour: Jour, heure: string | null, cycle: Cycle = 'c2') => {
+    const e = enfant(cycle, 'dillendapp')
+    e.periscolaire = true
+    e.dillendappDepuis = Object.fromEntries(
+      JOURS.map((j) => [j, j === jour ? heure : null]),
+    ) as Record<Jour, string | null>
+    return contexteEnfant(e, HOVELANGE)
+  }
+
+  it('ne fait pas prendre le bus du matin à un enfant que son parent dépose', () => {
+    const ctx = avecDebut('lundi', '07:00')
+    expect(types(ctx, 'lundi')).not.toContain('aller-matin')
+  })
+
+  it('ne compte pas cet aller comme un trajet manquant : c’est un choix, pas un trou', () => {
+    const ctx = avecDebut('lundi', '07:00')
+    expect(trajetsDuJour(ctx!, 'lundi').manquants).not.toContain('aller-matin')
+  })
+
+  it('annonce l’heure de dépose, symétrique de la récupération', () => {
+    const ctx = avecDebut('lundi', '07:00')
+    expect(trajetsDuJour(ctx!, 'lundi').depose).toEqual({ lieu: 'dillendapp', heure: '07:00' })
+    expect(trajetsDuJour(ctx!, 'mardi').depose).toBeUndefined()
+  })
+
+  it('conduit malgré tout l’enfant du Dillendapp à sa classe : le plan le publie', () => {
+    // Ne pas proposer ce trajet laisserait croire que l'enfant reste à la maison
+    // relais toute la matinée. Le plan le couvre : l'Aller 3 passe au Dillendapp à
+    // 07:38 et 07:52, et l'Aller 2 s'arrête à l'école de Beckerich, à 86 m de là.
+    const ctx = avecDebut('lundi', '07:00')
+    const navette = trajetsDuJour(ctx!, 'lundi').trajets.find(
+      (t) => t.type === 'navette-dillendapp-matin',
+    )!
+    expect(navette).toBeDefined()
+    expect(navette.arrivee.arret.id).toBe('noerdange-ecole')
+    // Interne à la journée d'école : le parent a déjà fait sa part.
+    expect(navette.concerneParent).toBe(false)
+  })
+
+  it('mène un C1 à Oberpallen à 07:45, à temps pour le début de la classe', () => {
+    const navette = trajetsDuJour(avecDebut('lundi', '07:00', 'c1')!, 'lundi').trajets.find(
+      (t) => t.type === 'navette-dillendapp-matin',
+    )!
+    expect(navette.depart.heure).toBe('07:38')
+    expect(navette.arrivee.heure).toBe('07:45')
+  })
+
+  it('ne redresse pas une arrivée tardive : il annonce l’heure publiée', () => {
+    // Pour un C2, aucune course Dillendapp → Noerdange n'arrive avant 07:55. Le
+    // moteur retient la première au départ (Aller 2, 07:34 → 08:00) et laisse l'Aller 3
+    // en alternative. L'application affiche ces heures telles quelles : les corriger
+    // reviendrait à inventer une desserte que la commune ne publie pas. La page
+    // « Limites » le dit explicitement.
+    const navette = trajetsDuJour(avecDebut('lundi', '07:00')!, 'lundi').trajets.find(
+      (t) => t.type === 'navette-dillendapp-matin',
+    )!
+    expect(navette.arrivee.heure).toBe('08:00')
+    expect(navette.alternatives.length).toBeGreaterThan(0)
+  })
+
+  it('n’invente aucune navette pour un cycle scolarisé à côté de la maison relais', () => {
+    // Le Dillendapp est à 86 m de l'école de Beckerich : un C4 y va à pied. Proposer
+    // un bus reviendrait à lui faire faire l'aller-retour d'Oberpallen pour rien.
+    const journee = trajetsDuJour(avecDebut('lundi', '07:00', 'c4')!, 'lundi')
+    expect(journee.trajets.map((t) => t.type)).not.toContain('navette-dillendapp-matin')
+    expect(journee.manquants).not.toContain('navette-dillendapp-matin')
+    expect(journee.depose).toEqual({ lieu: 'dillendapp', heure: '07:00' })
+  })
+
+  it('reste sans effet sur les jours où aucune heure n’est donnée', () => {
+    const ctx = avecDebut('lundi', '07:00')
+    expect(types(ctx, 'mardi')).toContain('aller-matin')
+  })
+
+  it('ignore la présence du matin si la famille n’est pas inscrite au périscolaire', () => {
+    const e = enfant('c2', 'maison')
+    e.periscolaire = false
+    e.dillendappDepuis = Object.fromEntries(
+      JOURS.map((j) => [j, j === 'lundi' ? '07:00' : null]),
+    ) as Record<Jour, string | null>
+    const ctx = contexteEnfant(e, HOVELANGE)
+    expect(types(ctx, 'lundi')).toContain('aller-matin')
+    expect(trajetsDuJour(ctx!, 'lundi').depose).toBeUndefined()
+  })
+})

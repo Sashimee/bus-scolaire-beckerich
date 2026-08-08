@@ -47,6 +47,7 @@ export function Semaine() {
       nomArret: (idArret) => nomArretParId(idArret, t),
       minutesMarche: ctx.temps,
       libelleRecuperation: t('dillendapp.aRecuperer'),
+      libelleDepose: t('dillendapp.aDeposer'),
     })
     const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }))
     const a = document.createElement('a')

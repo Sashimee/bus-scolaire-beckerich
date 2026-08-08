@@ -89,6 +89,11 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
                   ) : (
                     <span className="fiche__vide">—</span>
                   )}
+                  {journee.depose && (
+                    <div className="fiche__note">
+                      <b>{t('dillendapp.depose', { heure: journee.depose.heure })}</b>
+                    </div>
+                  )}
                   {journee.recuperation && (
                     <div className="fiche__note">
                       <b>{t('dillendapp.recuperation', { heure: journee.recuperation.heure })}</b>

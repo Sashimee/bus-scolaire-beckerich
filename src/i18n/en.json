@@ -83,7 +83,11 @@
     "repartEnBus": "Takes the bus home",
     "aRecuperer": "To collect from the Dillendapp",
     "recuperation": "To collect from the Dillendapp at {heure}.",
-    "aide": "If you give a time, the child stays at the maison relais after class: the evening bus drops them there instead of taking them home."
+    "aide": "If you give a time, the child stays at the maison relais after class: the evening bus drops them there instead of taking them home.",
+    "depuis": "Arrives from",
+    "aDeposer": "To drop off at the Dillendapp",
+    "depose": "To drop off at the Dillendapp at {heure}.",
+    "aideDepuis": "If you set a time, you drop the child off at the after-school centre yourself before class: no bus leaves from your home that morning."
   },
   "bus": {
     "titre": "Bus",
@@ -137,7 +141,12 @@
     "interne": "During the school day",
     "concerneParent": "Your journeys",
     "aucun": "No journey that day.",
-    "retour-soir-dillendapp": "Back to the Dillendapp, evening"
+    "retour-soir-dillendapp": "Back to the Dillendapp, evening",
+    "navette-dillendapp-matin": "Dillendapp → school, morning"
+  },
+  "trajetAdresse": {
+    "matin": "Departure from another address",
+    "soir": "Return to another address"
   },
   "manquants": {
     "titre": "Not covered by the plan",
@@ -280,6 +289,10 @@
     "planCorps": "The municipality may change the times at any moment. The site is updated by hand, with best effort, but a lag is possible.",
     "incertitudesTitre": "Some rules in the plan remain ambiguous",
     "incertitudesCorps": "Where the official document does not decide, the site shows its assumption and says so, rather than presenting an answer as certain.",
+    "dillendappTitre": "In the morning, the after-school centre is not served the same way everywhere",
+    "dillendappCorps": "If you drop your child off at the Dillendapp yourself before class, the site no longer suggests a bus from your home — but it does look for the Dillendapp → school leg, which the plan publishes. Depending on the cycle, that leg arrives before or after the start of class: a child in Oberpallen arrives at 07:45, a child in Noerdange at 08:00, that is after the 07:55 bell. The site shows the time published by the municipality; it does not correct it and does not invent any service.",
+    "adressesTitre": "Per-day addresses only work inside the municipality",
+    "adressesCorps": "For a given day you can set a departure or arrival address other than your home. The address search, however, only knows the municipality of Beckerich: for a place outside it, name the stop used directly rather than letting the site guess.",
     "donneesTitre": "Your data stays with you",
     "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. Goat Counter analytics are enabled via the installed script. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off."
   },

@@ -83,7 +83,11 @@
     "repartEnBus": "Fiert mam Bus",
     "aRecuperer": "Am Dillendapp ofzehuelen",
     "recuperation": "Um {heure} am Dillendapp ofzehuelen.",
-    "aide": "Wann Dir eng Auerzäit uginn, bleift d'Kand nom Cours an der Maison Relais: den Owesbus setzt et do of, amplaz et heem ze bréngen."
+    "aide": "Wann Dir eng Auerzäit uginn, bleift d'Kand nom Cours an der Maison Relais: den Owesbus setzt et do of, amplaz et heem ze bréngen.",
+    "depuis": "Kënnt un ab",
+    "aDeposer": "An den Dillendapp bréngen",
+    "depose": "Um {heure} an den Dillendapp bréngen.",
+    "aideDepuis": "Wann Dir eng Auerzäit uginn, bréngt Dir d'Kand virun der Klass selwer an d'Maison Relais: dee Moie fiert kee Bus bei Iech fort."
   },
   "bus": {
     "titre": "Bus",
@@ -137,7 +141,12 @@
     "interne": "Wärend dem Schouldag",
     "concerneParent": "Är Fahrten",
     "aucun": "Keng Fahrt un dësem Dag.",
-    "retour-soir-dillendapp": "Zréck an den Dillendapp, owes"
+    "retour-soir-dillendapp": "Zréck an den Dillendapp, owes",
+    "navette-dillendapp-matin": "Dillendapp → Schoul, moies"
+  },
+  "trajetAdresse": {
+    "matin": "Offaart vun enger anerer Adress",
+    "soir": "Retour op eng aner Adress"
   },
   "manquants": {
     "titre": "Net vum Plang ofgedeckt",
@@ -280,6 +289,10 @@
     "planCorps": "D'Gemeng kann d'Ziichten zu all Moment änneren. D'Säit gëtt vun Hand nogefouert, mam beschten Effort, mee eng Verspéidung ass méiglech.",
     "incertitudesTitre": "E puer Regele vum Plang bleiwen zweideiteg",
     "incertitudesCorps": "Wou dat offiziellt Dokument net kloer ass, weist d'Säit hir Unhuelung a weist drop hin, amplaz eng Äntwert als sécher duerzestellen.",
+    "dillendappTitre": "Moies ass d'Maison Relais net iwwerall d'selwecht ugebonnen",
+    "dillendappCorps": "Wann Dir Äert Kand virun der Klass selwer an den Dillendapp bréngt, proposéiert d'Säit kee Bus méi vun doheem — mä si sicht wuel de Wee Dillendapp → Schoul, dee am Plang steet. Je no Zyklus kënnt dëse Wee virun oder nom Ufank vun der Klass un: e Kand zu Uewerpallen um 07:45, e Kand zu Näerden um 08:00, also nom Klacken um 07:55. D'Säit weist d'Auerzäit, déi d'Gemeng publizéiert, si korrigéiert se net an erfënnt keng Kurs.",
+    "adressesTitre": "Adresse pro Dag funktionéieren nëmmen an der Gemeng",
+    "adressesCorps": "Dir kënnt fir e bestëmmten Dag eng aner Ufanks- oder Ukunftsadress wéi Äre Wunnsëtz uginn. D'Adressiche kennt awer nëmmen d'Gemeng Biekerech: fir e Plaz baussent der Gemeng gitt direkt den Arrêt un, deen Dir benotzt, amplaz d'Säit roden ze loossen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
     "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Eenzeg Ausnam: wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparatkennung fir d'Dauer vum Abonnement op engem Server gespäichert, a beim Ausschalten erëm geläscht."
   },

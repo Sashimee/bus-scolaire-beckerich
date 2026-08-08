@@ -83,7 +83,11 @@
     "repartEnBus": "Repart en bus",
     "aRecuperer": "À récupérer au Dillendapp",
     "recuperation": "À récupérer au Dillendapp à {heure}.",
-    "aide": "Si vous indiquez une heure, l'enfant reste à la maison relais après la classe : le bus du soir l'y dépose au lieu de le ramener chez vous."
+    "aide": "Si vous indiquez une heure, l'enfant reste à la maison relais après la classe : le bus du soir l'y dépose au lieu de le ramener chez vous.",
+    "depuis": "Arrive à partir de",
+    "aDeposer": "À déposer au Dillendapp",
+    "depose": "À déposer au Dillendapp à {heure}.",
+    "aideDepuis": "Si vous indiquez une heure, c'est vous qui déposez l'enfant à la maison relais avant la classe : aucun bus ne part de chez vous ce matin-là."
   },
   "bus": {
     "titre": "Bus",
@@ -137,7 +141,12 @@
     "interne": "Pendant la journée d'école",
     "concerneParent": "Vos trajets",
     "aucun": "Aucun trajet ce jour-là.",
-    "retour-soir-dillendapp": "Retour au Dillendapp, soir"
+    "retour-soir-dillendapp": "Retour au Dillendapp, soir",
+    "navette-dillendapp-matin": "Dillendapp → école, matin"
+  },
+  "trajetAdresse": {
+    "matin": "Départ d'une autre adresse",
+    "soir": "Retour à une autre adresse"
   },
   "manquants": {
     "titre": "Non couvert par le plan",
@@ -280,6 +289,10 @@
     "planCorps": "La commune peut modifier les horaires à tout moment. Le site est mis à jour manuellement, avec le meilleur effort, mais un décalage est possible.",
     "incertitudesTitre": "Certaines règles du plan restent ambiguës",
     "incertitudesCorps": "Là où le document officiel ne tranche pas, le site affiche son hypothèse et le signale, plutôt que de présenter une réponse comme certaine.",
+    "dillendappTitre": "Le matin, la maison relais n'est pas desservie de la même façon partout",
+    "dillendappCorps": "Si vous déposez vous-même votre enfant au Dillendapp avant la classe, le site ne propose plus de bus depuis chez vous — mais il cherche bien le trajet Dillendapp → école, que le plan publie. Selon le cycle, ce trajet arrive avant ou après le début des cours : un enfant d'Oberpallen arrive à 07:45, un enfant de Noerdange à 08:00, soit après la sonnerie de 07:55. Le site affiche l'heure publiée par la commune, il ne la corrige pas et n'invente aucune course.",
+    "adressesTitre": "Les adresses par jour ne fonctionnent que dans la commune",
+    "adressesCorps": "Vous pouvez indiquer, pour un jour donné, une adresse de départ ou d'arrivée différente de votre domicile. La recherche d'adresse ne connaît toutefois que la commune de Beckerich : pour un lieu situé en dehors, indiquez directement l'arrêt utilisé, plutôt que de laisser le site deviner.",
     "donneesTitre": "Vos données restent chez vous",
     "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement. Il n'y a ni compte, ni serveur, ni mesure d'audience. Les analytics Goat Counter sont activés via le script installé. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez."
   },

@@ -212,6 +212,51 @@ aujourd'hui présents dans `App.tsx`, `Accueil.tsx`, `Semaine.tsx`, `Reglages.ts
 
 ## Lot 3 — Modèle de données : adresses par jour et inscription périscolaire
 
+> **Fait le 2026-08-08.** Livré, avec une **correction de fond sur le §3.3**.
+>
+> **Le §3.3 partait d'un fait faux.** Il affirmait, « vérifié dans
+> `src/data/plan-2025-2026.json` », qu'aucune course du plan ne dessert le Dillendapp le
+> matin. C'est inexact : le service `aller-3-matin` s'y arrête à **07:38 puis à 07:52**,
+> cinq jours sur cinq, en direction `vers-ecole`. Écrire sur la page « Limites » que la
+> commune ne publie aucune desserte aurait été affirmer une contre-vérité aux parents —
+> exactement ce que le deuxième principe du projet interdit.
+>
+> Ce qui a été fait à la place :
+> - `dillendappDepuis[jour]` supprime bien l'`aller-matin` depuis le domicile et ne le
+>   compte pas dans `manquants` — cette partie du §3.3 était juste.
+> - Un nouveau type `navette-dillendapp-matin` calcule le trajet maison relais → école
+>   sur le plan réel, au lieu de décréter qu'il n'existe pas. Il est interne à la journée
+>   d'école (`concerneParent: false`), comme les deux autres navettes.
+> - Cas particulier traité : la maison relais est à 86 m de l'école de Beckerich, donc le
+>   **même point d'embarquement**. Pour un précoce ou un C4, aucune navette n'est proposée
+>   — il y va à pied. Sans ce garde-fou, le moteur produisait un aller-retour à Oberpallen
+>   pour revenir à son point de départ.
+> - **Ce que le calcul révèle, et que l'application dit maintenant** : pour un C2, aucune
+>   course Dillendapp → Noerdange n'arrive avant la sonnerie de 07:55. La première au
+>   départ (Aller 2, 07:34 → 08:00) arrive cinq minutes après ; l'Aller 3 (07:52 → 07:58)
+>   reste en alternative. Un C1 arrive à 07:45, à l'heure. L'application affiche les
+>   heures publiées sans les corriger, et la page « Limites » énonce le fait.
+>
+> Autres écarts et ajouts :
+> - `arretUtile(coord, enfant, sens)` cherche bien `vers-domicile` en `midi`/`soir` pour
+>   une adresse de retour. Appliqué aussi au domicile : les 141 tests existants passent
+>   sans modification, donc aucun village de la commune n'est desservi dans un seul sens.
+> - `aller-apres-midi` repart de l'adresse du **retour de midi**, et non du domicile :
+>   l'enfant reprend le bus là où il a déjeuné.
+> - `depose` est affichée (fiche écran et fiche imprimable) et exportée dans l'ICS, comme
+>   le prévoyait le §3.3. La boucle ICS des passages à la maison relais est mutualisée
+>   entre dépose et récupération.
+> - `adresseDerogatoire` est signalée par une étiquette dans `LigneTrajet`, sans quoi un
+>   arrêt inhabituel se lit comme une erreur de calcul.
+> - Deux sections ajoutées à la page « Limites » (`dillendapp`, `adresses`) dans les cinq
+>   langues.
+> - `src/lib/partage.test.ts` créé : aller-retour v4, relecture d'un lien v1 et d'un v3,
+>   refus d'un lien corrompu. 172 tests au total.
+>
+> Reste explicitement au lot 4 : les écrans (`definirPeriscolaire`,
+> `definirDillendappDepuis`, `definirAdresseJour`, choix d'un arrêt pour une adresse hors
+> commune). Le modèle est en place, mais rien ne permet encore de le régler dans l'interface.
+
 *Dépend du lot 2 pour l'habillage, mais peut être développé en parallèle : ce lot porte
 d'abord sur `src/lib/`.*
 

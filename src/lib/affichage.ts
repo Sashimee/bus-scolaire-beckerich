@@ -13,6 +13,7 @@ export function destinationTrajet(type: TypeTrajet): 'ecole' | 'maison' | 'dille
   switch (type) {
     case 'aller-matin':
     case 'aller-apres-midi':
+    case 'navette-dillendapp-matin':
     case 'navette-dillendapp-retour':
       return 'ecole'
     case 'retour-midi':

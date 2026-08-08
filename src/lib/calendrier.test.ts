@@ -91,6 +91,7 @@ describe('export iCalendar', () => {
     nomArret: (id) => id,
     minutesMarche: 7,
     libelleRecuperation: 'À récupérer au Dillendapp',
+    libelleDepose: 'À déposer au Dillendapp',
   })
 
   it('produit un calendrier valide', () => {
@@ -142,11 +143,42 @@ describe('export iCalendar', () => {
       nomArret: (id) => id,
       minutesMarche: 7,
       libelleRecuperation: 'À récupérer au Dillendapp',
+      libelleDepose: 'À déposer au Dillendapp',
     })
 
     expect(avecRecuperation).toContain('À récupérer au Dillendapp')
     expect(avecRecuperation).toContain('T180000')
     expect(avecRecuperation).not.toContain('retour-soir-dillendapp')
+  })
+
+  it('inscrit la dépose du matin, symétrique de la récupération', () => {
+    // Le parent qui dépose lui-même son enfant à 07:00 n'a aucun bus pour le lui
+    // rappeler : c'est justement le rendez-vous que l'agenda doit porter.
+    const e = enfantTest()
+    e.periscolaire = true
+    e.repas = { ...e.repas, mardi: 'dillendapp' }
+    e.dillendappDepuis = {
+      lundi: null,
+      mardi: '07:00',
+      mercredi: null,
+      jeudi: null,
+      vendredi: null,
+    }
+    const avecDepose = genererIcs(contexteEnfant(e, HOVELANGE)!, {
+      libelleTrajet: (t) => t.type,
+      nomArret: (id) => id,
+      minutesMarche: 7,
+      libelleRecuperation: 'À récupérer au Dillendapp',
+      libelleDepose: 'À déposer au Dillendapp',
+    })
+
+    expect(avecDepose).toContain('À déposer au Dillendapp')
+    expect(avecDepose).toContain('T070000')
+    // Un seul jour concerné : la série ne doit pas déborder sur toute la semaine.
+    const serie = avecDepose
+      .split('BEGIN:VEVENT')
+      .find((b) => b.includes('À déposer au Dillendapp'))!
+    expect(/RRULE:[^\r\n]+/.exec(serie)?.[0]).toContain('BYDAY=TU')
   })
 })
 

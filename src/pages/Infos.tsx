@@ -12,6 +12,8 @@ export function Limites() {
     'tempsReel',
     'plan',
     'incertitudes',
+    'dillendapp',
+    'adresses',
     'donnees',
   ] as const
 

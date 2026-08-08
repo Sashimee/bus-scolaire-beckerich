@@ -23,7 +23,10 @@ export function busParDefaut(): Record<Jour, UsageBus> {
   return Object.fromEntries(JOURS.map((j) => [j, 'aller-retour'])) as Record<Jour, UsageBus>
 }
 
-/** Par défaut, aucune présence prolongée au Dillendapp : l'enfant repart en bus. */
+/**
+ * Par défaut, aucune présence déclarée au Dillendapp, ni avant ni après la classe :
+ * l'enfant arrive et repart en bus. Sert aux deux grilles horaires.
+ */
 export function dillendappParDefaut(): Record<Jour, string | null> {
   return Object.fromEntries(JOURS.map((j) => [j, null])) as Record<Jour, string | null>
 }
@@ -56,12 +59,21 @@ export const chargerFoyer = (): Foyer => {
   const f = lire(CLE_FOYER, foyerVide)
   return {
     ...f,
-    enfants: (f.enfants ?? []).map((e) => ({
-      ...e,
-      repas: { ...repasParDefaut(), ...e.repas },
-      bus: { ...busParDefaut(), ...e.bus },
-      dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua },
-    })),
+    enfants: (f.enfants ?? []).map((e) => {
+      const repas = { ...repasParDefaut(), ...e.repas }
+      return {
+        ...e,
+        repas,
+        bus: { ...busParDefaut(), ...e.bus },
+        // L'inscription au périscolaire n'existait pas : la déduire des repas déjà
+        // saisis, sans quoi une famille inscrite verrait sa grille de midi disparaître
+        // à la mise à jour.
+        periscolaire: e.periscolaire ?? JOURS.some((j) => repas[j] === 'dillendapp'),
+        dillendappDepuis: { ...dillendappParDefaut(), ...e.dillendappDepuis },
+        dillendappJusqua: { ...dillendappParDefaut(), ...e.dillendappJusqua },
+        adresses: e.adresses ?? {},
+      }
+    }),
   }
 }
 export const enregistrerFoyer = (f: Foyer): void => ecrire(CLE_FOYER, f)

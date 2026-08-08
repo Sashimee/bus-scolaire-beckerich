@@ -181,6 +181,15 @@ export function arretsProches(coord: Coord): ArretProche[] {
     .sort((x, y) => x.distance - y.distance)
 }
 
+/** De quel côté du trajet on cherche l'arrêt : celui du départ, ou celui du retour. */
+export type SensArret = 'depart' | 'arrivee'
+
+/** Les arrêts d'un jour, de part et d'autre de la journée de classe. */
+export interface ArretsDuJour {
+  matin: ArretProche | null
+  soir: ArretProche | null
+}
+
 export interface ContexteEnfant {
   enfant: Enfant
   arretDomicile: Arret
@@ -189,31 +198,34 @@ export interface ContexteEnfant {
   temps: number
   /** L'école est l'arrêt le plus proche : l'enfant peut y aller à pied. */
   marcheDirecte: boolean
+  /**
+   * L'arrêt réellement utilisé chaque jour, dans chaque sens. Il ne diffère du
+   * domicile que les jours où le parent a déclaré une adresse dérogatoire.
+   */
+  arretsParJour: Record<Jour, ArretsDuJour>
 }
 
 /**
- * Détermine l'arrêt de départ d'un enfant.
+ * Le plus proche arrêt réellement utile depuis (ou vers) un point donné.
  *
  * Ce n'est pas simplement l'arrêt le plus proche : encore faut-il qu'une ligne y passe
  * DANS LE BON SENS vers l'école de son cycle. Un enfant d'Hovelange scolarisé à
  * Noerdange ne peut pas prendre l'Aller 1, qui dessert Noerdange avant Hovelange ;
- * il lui faut l'Aller 2. On retient donc le plus proche arrêt réellement utile.
+ * il lui faut l'Aller 2.
+ *
+ * Le sens compte : un arrêt desservi le matin vers l'école ne l'est pas forcément au
+ * retour. Chercher l'arrêt d'une adresse de retour avec le critère du matin donnerait
+ * un arrêt où aucun bus ne dépose jamais l'enfant.
  */
-export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant | null {
+export function arretUtile(coord: Coord, enfant: Enfant, sens: SensArret): ArretProche | null {
   const arretEcole = arretEcoleDuCycle(enfant.cycle)
-  const proches = arretsProches(adresse.coord)
+  const proches = arretsProches(coord)
   if (!proches.length) return null
 
-  if (proches[0].arret.id === arretEcole.id) {
-    return {
-      enfant,
-      arretDomicile: arretEcole,
-      arretEcole,
-      distance: proches[0].distance,
-      temps: proches[0].temps,
-      marcheDirecte: true,
-    }
-  }
+  // L'école est l'arrêt le plus proche : l'enfant y va à pied, aucune ligne à trouver.
+  if (proches[0].arret.id === arretEcole.id) return proches[0]
+
+  const ecole = arretsEquivalents(arretEcole.id)
 
   for (const p of proches) {
     if (p.arret.id === arretEcole.id) continue
@@ -221,27 +233,62 @@ export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant
       (jour) =>
         liaisons({
           jour,
-          depuis: [p.arret.id],
-          vers: arretsEquivalents(arretEcole.id),
-          periodes: ['matin'],
-          directions: ['vers-ecole'],
+          depuis: sens === 'depart' ? [p.arret.id] : ecole,
+          vers: sens === 'depart' ? ecole : [p.arret.id],
+          periodes: sens === 'depart' ? ['matin'] : ['midi', 'soir'],
+          directions: sens === 'depart' ? ['vers-ecole'] : ['vers-domicile'],
           enfant,
           villageDomicile: p.arret.village,
           repas: enfant.repas[jour],
         }).length > 0,
     )
-    if (utile) {
-      return {
-        enfant,
-        arretDomicile: p.arret,
-        arretEcole,
-        distance: p.distance,
-        temps: p.temps,
-        marcheDirecte: false,
-      }
-    }
+    if (utile) return p
   }
   return null
+}
+
+/**
+ * Tout ce qu'il faut savoir pour calculer la semaine d'un enfant.
+ *
+ * `arretDomicile`, `distance` et `temps` décrivent le cas courant — le domicile du
+ * foyer — et restent la valeur affichée en tête de fiche. `arretsParJour` porte le
+ * détail, jour par jour et sens par sens.
+ */
+export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant | null {
+  const arretEcole = arretEcoleDuCycle(enfant.cycle)
+  const proches = arretsProches(adresse.coord)
+  if (!proches.length) return null
+
+  const marcheDirecte = proches[0].arret.id === arretEcole.id
+  const domicileMatin = arretUtile(adresse.coord, enfant, 'depart')
+  if (!domicileMatin) return null
+  // Faute d'arrêt de dépose identifié, on s'en tient à celui du matin plutôt que de
+  // priver l'enfant de tout retour : c'est le comportement d'avant les adresses par
+  // jour, et le cas ne se présente sur aucun village de la commune.
+  const domicileSoir = arretUtile(adresse.coord, enfant, 'arrivee') ?? domicileMatin
+
+  const arretDuSens = (a: Adresse | null | undefined, sens: SensArret, defaut: ArretProche) =>
+    a ? arretUtile(a.coord, enfant, sens) : defaut
+
+  const arretsParJour = Object.fromEntries(
+    JOURS.map((jour) => [
+      jour,
+      {
+        matin: arretDuSens(enfant.adresses?.[jour]?.matin, 'depart', domicileMatin),
+        soir: arretDuSens(enfant.adresses?.[jour]?.soir, 'arrivee', domicileSoir),
+      },
+    ]),
+  ) as Record<Jour, ArretsDuJour>
+
+  return {
+    enfant,
+    arretDomicile: domicileMatin.arret,
+    arretEcole,
+    distance: domicileMatin.distance,
+    temps: domicileMatin.temps,
+    marcheDirecte,
+    arretsParJour,
+  }
 }
 
 /** Y a-t-il cours l'après-midi ce jour-là ? */
@@ -258,9 +305,15 @@ export function coursApresMidi(jour: Jour): boolean {
  *  — mardi/jeudi (pas de cours l'après-midi) : aller, retour midi
  */
 export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
-  const { enfant, arretDomicile, arretEcole } = ctx
-  const repas = enfant.repas[jour]
+  const { enfant, arretEcole } = ctx
   const apresMidi = coursApresMidi(jour)
+
+  // Sans inscription au périscolaire, toute la mécanique Dillendapp disparaît : c'est
+  // le cas de la majorité des familles. Le réglage est absent des configurations
+  // antérieures ; on le déduit alors des repas déjà saisis, faute de quoi une famille
+  // inscrite verrait sa configuration s'évaporer à la mise à jour.
+  const periscolaire = enfant.periscolaire ?? JOURS.some((j) => enfant.repas[j] === 'dillendapp')
+  const repas = periscolaire ? enfant.repas[jour] : 'maison'
 
   // Une famille peut n'utiliser le bus qu'à moitié : déposer l'enfant en voiture le
   // matin et le laisser rentrer en bus, ou l'inverse. On ne propose alors que les
@@ -270,14 +323,27 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const prendAller = usage === 'aller-retour' || usage === 'aller'
   const prendRetour = usage === 'aller-retour' || usage === 'retour'
 
+  // Présence à la maison relais AVANT la classe : c'est le parent qui dépose, donc
+  // aucun bus depuis le domicile ce matin-là.
+  const debutDillendapp = periscolaire ? (enfant.dillendappDepuis?.[jour] ?? null) : null
+
   // Heure de fin de présence à la maison relais. Elle change la destination du soir :
   // l'enfant retourne bien en classe l'après-midi — l'école est obligatoire — mais le
   // bus du soir le dépose au Dillendapp au lieu de le ramener chez lui.
   const finDillendapp = repas === 'dillendapp' ? (enfant.dillendappJusqua?.[jour] ?? null) : null
 
-  const domicile = [arretDomicile.id]
+  // Les deux bouts de la journée peuvent être des adresses différentes.
+  const arretsJour = ctx.arretsParJour[jour]
+  const departDuJour = arretsJour.matin ? [arretsJour.matin.arret.id] : []
+  const arriveeDuJour = arretsJour.soir ? [arretsJour.soir.arret.id] : []
+  const derogationMatin = enfant.adresses?.[jour]?.matin ? ('matin' as const) : undefined
+  const derogationSoir = enfant.adresses?.[jour]?.soir ? ('soir' as const) : undefined
+
   const ecole = arretsEquivalents(arretEcole.id)
   const dillendapp = arretsEquivalents(maisonRelais.arret)
+  // Pour les cycles scolarisés à Beckerich, la maison relais est à 90 m de l'école :
+  // le même point d'embarquement. L'enfant y va à pied, il n'y a pas de navette.
+  const dillendappAuPiedDeLEcole = dillendapp.includes(arretEcole.id)
 
   const trajets: Trajet[] = []
   const manquants: TypeTrajet[] = []
@@ -288,7 +354,7 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const base = {
     jour,
     enfant,
-    villageDomicile: arretDomicile.village,
+    villageDomicile: arretsJour.matin?.arret.village ?? ctx.arretDomicile.village,
     repas,
   }
 
@@ -297,6 +363,7 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     o: Omit<RechercheOptions, 'jour' | 'enfant' | 'villageDomicile' | 'repas'> & {
       /** Force la visibilité côté parent quand le trajet ne touche pas son arrêt. */
       concerneParent?: boolean
+      derogation?: 'matin' | 'soir'
     },
   ) => {
     const trouvees = liaisons({ ...base, ...o })
@@ -315,19 +382,36 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       incertitude: principal.service.incertitude,
       concerneParent:
         o.concerneParent ??
-        (principal.depart.arret.id === arretDomicile.id ||
-          principal.arrivee.arret.id === arretDomicile.id),
+        (departDuJour.includes(principal.depart.arret.id) ||
+          arriveeDuJour.includes(principal.arrivee.arret.id)),
+      ...(o.derogation ? { adresseDerogatoire: o.derogation } : {}),
       alternatives: reste.map((l) => ({ ligne: l.ligne, heureDepart: l.depart.heure })),
     })
   }
 
-  // 1. Le matin, tout le monde va à l'école.
-  if (prendAller) {
+  // 1. Le matin, tout le monde va à l'école — mais pas forcément depuis chez lui.
+  if (debutDillendapp) {
+    // Le parent dépose l'enfant à la maison relais avant la classe. Il n'y a donc pas
+    // de bus depuis le domicile, et ce n'est pas un manque : c'est un choix.
+    // Reste à le conduire de la maison relais à sa classe, ce que le plan couvre bien
+    // — l'Aller 3 passe au Dillendapp à 07:38 puis à 07:52. Cette desserte-là, on ne
+    // l'invente pas : on la cherche, et si elle n'existe pas pour ce cycle, on le dit.
+    if (!dillendappAuPiedDeLEcole) {
+      ajouter('navette-dillendapp-matin', {
+        depuis: dillendapp,
+        vers: ecole,
+        periodes: ['matin'],
+        directions: ['vers-ecole'],
+        concerneParent: false,
+      })
+    }
+  } else if (prendAller) {
     ajouter('aller-matin', {
-      depuis: domicile,
+      depuis: departDuJour,
       vers: ecole,
       periodes: ['matin'],
       directions: ['vers-ecole'],
+      derogation: derogationMatin,
     })
   }
 
@@ -336,18 +420,21 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     if (prendRetour) {
       ajouter('retour-midi', {
         depuis: ecole,
-        vers: domicile,
+        vers: arriveeDuJour,
         periodes: ['midi'],
         directions: ['vers-domicile'],
+        derogation: derogationSoir,
       })
     }
-    // 3. Retour en classe, uniquement les jours où il y a cours l'après-midi.
+    // 3. Retour en classe, uniquement les jours où il y a cours l'après-midi. On
+    //    repart d'où l'enfant a déjeuné, donc de l'adresse du retour de midi.
     if (apresMidi && prendAller) {
       ajouter('aller-apres-midi', {
-        depuis: domicile,
+        depuis: arriveeDuJour,
         vers: ecole,
         periodes: ['apres-midi'],
         directions: ['vers-ecole'],
+        derogation: derogationSoir,
       })
     }
   } else {
@@ -386,9 +473,10 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       } else {
         ajouter('retour-soir', {
           depuis: ecole,
-          vers: domicile,
+          vers: arriveeDuJour,
           periodes: ['soir'],
           directions: ['vers-domicile'],
+          derogation: derogationSoir,
         })
       }
     }
@@ -413,6 +501,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     trajets,
     manquants,
     incertitudes,
+    // Symétrique de `recuperation` : le parent dépose l'enfant, l'application le
+    // rappelle plutôt que de signaler un aller manquant.
+    ...(debutDillendapp ? { depose: { lieu: 'dillendapp' as const, heure: debutDillendapp } } : {}),
     // Dès que le parent a indiqué une heure de fin de présence, l'absence de bus
     // n'est plus un manque : c'est lui qui vient chercher l'enfant, et l'application
     // le rappelle au lieu de l'alerter.

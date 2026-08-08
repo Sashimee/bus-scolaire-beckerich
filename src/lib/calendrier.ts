@@ -178,6 +178,8 @@ export interface OptionsIcs {
   minutesMarche: number
   /** Libellé de la récupération à la maison relais, fourni par la couche i18n. */
   libelleRecuperation: string
+  /** Libellé de la dépose à la maison relais, fourni par la couche i18n. */
+  libelleDepose: string
 }
 
 /**
@@ -197,10 +199,16 @@ export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
   // Regroupe les trajets identiques (même ligne, même heure, mêmes arrêts) et note
   // les jours où ils ont lieu.
   const groupes = new Map<string, { trajet: Trajet; jours: Jour[] }>()
-  // Récupérations à la maison relais, regroupées par heure.
+  // Passages du parent à la maison relais, regroupés par heure. Deux séries
+  // distinctes : le dépôt du matin et la récupération du soir.
+  const deposes = new Map<string, Jour[]>()
   const recuperations = new Map<string, Jour[]>()
 
   for (const journee of semaine) {
+    if (journee.depose) {
+      const h = journee.depose.heure
+      deposes.set(h, [...(deposes.get(h) ?? []), journee.jour])
+    }
     if (journee.recuperation) {
       const h = journee.recuperation.heure
       recuperations.set(h, [...(recuperations.get(h) ?? []), journee.jour])
@@ -272,9 +280,17 @@ export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
     )
   }
 
-  // Les récupérations au Dillendapp : c'est l'engagement le plus concret du parent,
-  // et le seul que rien d'autre ne lui rappellera.
-  for (const [heure, jours] of recuperations) {
+  /**
+   * Les passages du parent à la maison relais : c'est son engagement le plus concret,
+   * et le seul que rien d'autre ne lui rappellera. Dépose et récupération partagent
+   * la même forme, seul le libellé et l'identifiant changent.
+   */
+  const ajouterPassageMaisonRelais = (
+    genre: 'depose' | 'recuperation',
+    libelle: string,
+    heure: string,
+    jours: Jour[],
+  ) => {
     const debut = premiereOccurrence(annee.debut, jours)
     const exdates = exclusions
       .filter((d) => {
@@ -285,21 +301,28 @@ export function genererIcs(ctx: ContexteEnfant, o: OptionsIcs): string {
 
     lignes.push(
       'BEGIN:VEVENT',
-      `UID:${ctx.enfant.id}-recuperation-${heure.replace(':', '')}@bus-scolaire-beckerich`,
+      `UID:${ctx.enfant.id}-${genre}-${heure.replace(':', '')}@bus-scolaire-beckerich`,
       `DTSTAMP:${horodatage(new Date(), '00:00')}Z`,
       `DTSTART:${horodatage(debut, heure)}`,
       'DURATION:PT15M',
       `RRULE:FREQ=WEEKLY;BYDAY=${jours.map((j) => JOUR_ICS[j]).join(',')};UNTIL=${finIso}`,
       ...(exdates.length ? [plier(`EXDATE:${exdates.join(',')}`)] : []),
-      plier(`SUMMARY:${echapper(`${ctx.enfant.prenom} — ${o.libelleRecuperation}`)}`),
+      plier(`SUMMARY:${echapper(`${ctx.enfant.prenom} — ${libelle}`)}`),
       plier(`LOCATION:${echapper(o.nomArret(maisonRelais.arret))}`),
       'BEGIN:VALARM',
       'ACTION:DISPLAY',
       'TRIGGER:-PT20M',
-      plier(`DESCRIPTION:${echapper(`${ctx.enfant.prenom} — ${o.libelleRecuperation}`)}`),
+      plier(`DESCRIPTION:${echapper(`${ctx.enfant.prenom} — ${libelle}`)}`),
       'END:VALARM',
       'END:VEVENT',
     )
+  }
+
+  for (const [heure, jours] of deposes) {
+    ajouterPassageMaisonRelais('depose', o.libelleDepose, heure, jours)
+  }
+  for (const [heure, jours] of recuperations) {
+    ajouterPassageMaisonRelais('recuperation', o.libelleRecuperation, heure, jours)
   }
 
   lignes.push('END:VCALENDAR')

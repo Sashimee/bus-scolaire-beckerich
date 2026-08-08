@@ -83,7 +83,11 @@
     "repartEnBus": "Regressa de autocarro",
     "aRecuperer": "A ir buscar ao Dillendapp",
     "recuperation": "A ir buscar ao Dillendapp às {heure}.",
-    "aide": "Se indicar uma hora, a criança fica na maison relais depois das aulas: o autocarro do fim do dia deixa-a lá em vez de a levar a casa."
+    "aide": "Se indicar uma hora, a criança fica na maison relais depois das aulas: o autocarro do fim do dia deixa-a lá em vez de a levar a casa.",
+    "depuis": "Chega a partir das",
+    "aDeposer": "A levar ao Dillendapp",
+    "depose": "A levar ao Dillendapp às {heure}.",
+    "aideDepuis": "Se indicar uma hora, é você que leva a criança à casa de acolhimento antes das aulas: nenhum autocarro parte de sua casa nessa manhã."
   },
   "bus": {
     "titre": "Autocarro",
@@ -137,7 +141,12 @@
     "interne": "Durante o dia de escola",
     "concerneParent": "As suas deslocações",
     "aucun": "Nenhuma deslocação nesse dia.",
-    "retour-soir-dillendapp": "Regresso ao Dillendapp, ao fim do dia"
+    "retour-soir-dillendapp": "Regresso ao Dillendapp, ao fim do dia",
+    "navette-dillendapp-matin": "Dillendapp → escola, manhã"
+  },
+  "trajetAdresse": {
+    "matin": "Partida de outro endereço",
+    "soir": "Regresso a outro endereço"
   },
   "manquants": {
     "titre": "Não coberto pelo plano",
@@ -280,6 +289,10 @@
     "planCorps": "O município pode alterar os horários a qualquer momento. O site é atualizado manualmente, com o melhor esforço, mas é possível um desfasamento.",
     "incertitudesTitre": "Algumas regras do plano permanecem ambíguas",
     "incertitudesCorps": "Onde o documento oficial não decide, o site mostra a sua hipótese e assinala-a, em vez de apresentar uma resposta como certa.",
+    "dillendappTitre": "De manhã, a casa de acolhimento não é servida da mesma forma em todo o lado",
+    "dillendappCorps": "Se levar você mesmo a criança ao Dillendapp antes das aulas, o site deixa de propor autocarro a partir de sua casa — mas procura efetivamente o trajeto Dillendapp → escola, que o plano publica. Consoante o ciclo, esse trajeto chega antes ou depois do início das aulas: uma criança em Oberpallen chega às 07:45, uma criança em Noerdange às 08:00, ou seja, depois da campainha das 07:55. O site mostra a hora publicada pela comuna, não a corrige nem inventa qualquer carreira.",
+    "adressesTitre": "Os endereços por dia só funcionam dentro da comuna",
+    "adressesCorps": "Pode indicar, para um determinado dia, um endereço de partida ou de chegada diferente da sua morada. A pesquisa de endereços conhece, no entanto, apenas a comuna de Beckerich: para um local fora dela, indique diretamente a paragem utilizada, em vez de deixar o site adivinhar.",
     "donneesTitre": "Os seus dados ficam consigo",
     "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. As análises Goat Counter são ativadas via o script instalado. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar."
   },

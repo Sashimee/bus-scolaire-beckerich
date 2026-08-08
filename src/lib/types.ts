@@ -152,6 +152,27 @@ export interface CycleScolaire {
   arretEcole: string
 }
 
+export interface Adresse {
+  libelle: string
+  localite: string
+  coord: Coord
+}
+
+/**
+ * Une adresse qui remplace le domicile un jour donné, dans un sens donné.
+ *
+ * Le besoin est banal et le modèle à domicile unique ne le couvrait pas : l'enfant
+ * part de chez ses grands-parents le mardi matin, ou rentre chez la nounou le jeudi
+ * soir. Les deux sens sont indépendants — le plus souvent, un seul des deux change.
+ * Absent ou `null` = domicile du foyer.
+ */
+export interface AdresseJour {
+  /** D'où l'enfant part ce matin-là. */
+  matin?: Adresse | null
+  /** Où il est ramené ce soir-là. */
+  soir?: Adresse | null
+}
+
 /** Un enfant tel que le parent le décrit. */
 export interface Enfant {
   id: string
@@ -163,6 +184,28 @@ export interface Enfant {
    *  l'introduction du réglage : traiter alors comme « aller-retour ». */
   bus?: Record<Jour, UsageBus>
   /**
+   * Adresses dérogatoires, par jour et par sens. Absent = domicile du foyer.
+   */
+  adresses?: Partial<Record<Jour, AdresseJour>>
+  /**
+   * L'enfant est inscrit au périscolaire (Dillendapp / SEA).
+   *
+   * `false` masque toute la mécanique Dillendapp — repas comme présence — ce qui est
+   * le cas de la majorité des familles. Absent sur les données antérieures au
+   * réglage : on le déduit alors des repas déjà saisis, pour ne pas faire disparaître
+   * la configuration des familles concernées.
+   */
+  periscolaire?: boolean
+  /**
+   * Heure à partir de laquelle l'enfant est à la maison relais AVANT la classe, par
+   * jour. `null` = pas de présence le matin.
+   *
+   * Une heure signifie que le parent le dépose lui-même : il n'y a donc pas de bus
+   * depuis le domicile ce matin-là. Le trajet maison relais → école, lui, reste
+   * calculé sur le plan officiel, qui le publie bien (voir `navette-dillendapp-matin`).
+   */
+  dillendappDepuis?: Record<Jour, string | null>
+  /**
    * Heure à laquelle le parent vient chercher l'enfant au Dillendapp, par jour.
    *
    * `null` signifie que l'enfant repart avec le bus comme les autres. Une heure
@@ -171,12 +214,6 @@ export interface Enfant {
    * Ne vaut que les jours où le repas de midi est pris au Dillendapp.
    */
   dillendappJusqua?: Record<Jour, string | null>
-}
-
-export interface Adresse {
-  libelle: string
-  localite: string
-  coord: Coord
 }
 
 /** L'ensemble de la configuration d'une famille. Reste sur l'appareil. */
@@ -193,6 +230,11 @@ export type TypeTrajet =
   | 'retour-soir'
   /** Le bus du soir dépose l'enfant au Dillendapp au lieu de le ramener chez lui. */
   | 'retour-soir-dillendapp'
+  /**
+   * Maison relais → école, le matin, pour l'enfant déposé au Dillendapp avant la
+   * classe. Le plan le publie : l'Aller 3 passe au Dillendapp à 07:38 et à 07:52.
+   */
+  | 'navette-dillendapp-matin'
   | 'navette-dillendapp-midi'
   | 'navette-dillendapp-retour'
 
@@ -218,6 +260,12 @@ export interface Trajet {
    * internes à la journée d'école et ne le concernent pas directement.
    */
   concerneParent: boolean
+  /**
+   * Le bout de trajet côté famille n'est pas le domicile mais une adresse
+   * dérogatoire de ce jour-là. Sans cette mention, un arrêt inhabituel se lit comme
+   * une erreur de l'application plutôt que comme le réglage du parent.
+   */
+  adresseDerogatoire?: 'matin' | 'soir'
   /** Autres lignes qui assurent le même déplacement ce jour-là. */
   alternatives: { ligne: Ligne; heureDepart: string | null }[]
 }
@@ -235,6 +283,11 @@ export interface JourneeEnfant {
    * lundi d'une ambiguïté qui ne concerne que le mardi ne fait qu'inquiéter à tort.
    */
   incertitudes: string[]
+  /**
+   * L'enfant est déposé par ses parents, et non amené par un bus.
+   * Renseigné dès que le parent a indiqué une heure de début de présence au Dillendapp.
+   */
+  depose?: { lieu: 'dillendapp'; heure: string }
   /**
    * L'enfant est à récupérer par ses parents, et non ramené par un bus.
    * Renseigné dès que le parent a indiqué une heure de fin de présence au Dillendapp.

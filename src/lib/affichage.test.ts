@@ -50,11 +50,12 @@ describe('alignement des tableaux du plan officiel', () => {
 })
 
 describe('sens et destination d’un trajet', () => {
-  // Liste exhaustive : un huitième type de trajet ajouté sans être classé ici fera
-  // échouer ce test plutôt que de s'afficher au hasard.
+  // Liste exhaustive : un type de trajet ajouté sans être classé ici fera échouer ce
+  // test plutôt que de s'afficher au hasard.
   const attendu: Record<TypeTrajet, ['aller' | 'retour', 'ecole' | 'maison' | 'dillendapp']> = {
     'aller-matin': ['aller', 'ecole'],
     'aller-apres-midi': ['aller', 'ecole'],
+    'navette-dillendapp-matin': ['aller', 'ecole'],
     'navette-dillendapp-retour': ['aller', 'ecole'],
     'retour-midi': ['retour', 'maison'],
     'retour-soir': ['retour', 'maison'],
@@ -74,7 +75,7 @@ describe('sens et destination d’un trajet', () => {
 
   it('couvre tous les types de trajet du domaine', () => {
     // Le nombre est écrit en clair : ajouter un type sans le classer casse le test.
-    expect(Object.keys(attendu)).toHaveLength(7)
+    expect(Object.keys(attendu)).toHaveLength(8)
   })
 })
 
