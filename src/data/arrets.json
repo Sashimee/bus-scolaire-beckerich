@@ -83,11 +83,11 @@
       "village": "Hovelange",
       "lieuNom": "Kneppchen",
       "coord": [
-        49.722833,
-        5.904877
+        49.72349,
+        5.90348
       ],
-      "precision": "approximative",
-      "source": "OSM · voie « Kneppchen » (centre de rue)"
+      "precision": "verifiee",
+      "source": "Position corrigée à la main le 2026-08-08"
     },
     {
       "id": "hovelange-op-der-halte",
