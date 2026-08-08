@@ -43,6 +43,8 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
+| R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
+| R8 | 10 | **Le sélecteur de préférence n'a pas été vu à l'écran.** Il n'apparaît qu'une fois les notifications actives, ce qui exige d'accorder la permission du navigateur. | Activer les notifications sur un appareil réel et vérifier que les trois options s'affichent et se transmettent au Worker. |
 | R6 | 3 | **Une arrivée après la sonnerie est affichée sans être signalée.** Pour un C2 déposé au Dillendapp le matin, aucune course n'arrive avant 07:55 : l'application montre 08:00, l'heure publiée, et la page « Limites » énonce le fait — mais la fiche de l'enfant ne le dit pas au moment où le parent la lit. | À trancher : soit c'est acceptable et la page « Limites » suffit, soit il faut une mention sur le trajet lui-même. Décision de conception, pas défaut. |
 
 ### Mise en service, non faite
@@ -790,6 +792,38 @@ Le bloc `AdminPlan.tsx` (coller du JSON) **reste** sur `/admin`, réservé au ma
 ---
 
 ## Lot 10 — Notifications répétées pour les perturbations majeures
+
+> **Fait le 2026-08-08.** `worker/src/rappels.js` et son cron sont livrés, avec le
+> réglage parent et le champ `rappels` côté commune. 20 tests dédiés. Écarts et
+> corrections :
+>
+> - **Le créneau cron du texte ci-dessous est faux.** `*/15 5-9 * * 1-5` est en UTC,
+>   alors que les rappels sont écrits en heure locale : 06:45 à Beckerich vaut 04:45
+>   UTC l'été, donc **hors de la fenêtre**. Le rappel le plus utile n'aurait jamais
+>   été envoyé la moitié de l'année. Remplacé par `*/15 4-14 * * 1-5`, assez large
+>   pour couvrir les deux régimes horaires, et toute la décision est prise en heure
+>   locale via `Intl` avec `Europe/Luxembourg`.
+> - Quand plusieurs créneaux sont échus d'un coup — cron manqué, déploiement en cours
+>   de matinée — un seul rappel part, celui du créneau le plus proche. Les autres sont
+>   marqués comme consommés : trois notifications d'affilée seraient pires que le
+>   silence.
+> - Une perturbation sans course précisée est rappelée avant **tous** les départs, du
+>   matin comme de l'après-midi : on ne devine pas qu'elle ne concerne que la matinée.
+> - L'état est écrit **après** l'envoi : si le Worker tombe entre les deux, le rappel
+>   repart au cron suivant plutôt que de disparaître en silence.
+> - Le réglage parent réutilise `/abonner` au lieu d'une route de plus : la clé y étant
+>   dérivée du endpoint, l'enregistrement est remplacé et non dupliqué.
+> - **Conséquence assumée du réglage par défaut** (`urgences + rappels`) : une
+>   perturbation d'information ou d'attention **ne fait plus sonner les téléphones**,
+>   alors qu'elle le faisait jusqu'ici. Le bandeau dans l'application la montre déjà à
+>   l'ouverture, et réserver la sonnerie aux alertes est ce qui lui garde son sens. Le
+>   choix « Tout » rétablit l'ancien comportement.
+>
+> **Réserves** : aucun rappel réel n'a été envoyé. Le planificateur est couvert par 20
+> tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par
+> préférence n'a jamais été exercé sur un vrai abonnement. Par ailleurs, le sélecteur de
+> préférence n'a pas pu être vu à l'écran : il n'apparaît qu'une fois les notifications
+> réellement actives, ce qui exige d'accorder la permission du navigateur.
 
 *Dépend du lot 8 pour la partie Worker.*
 

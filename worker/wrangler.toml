@@ -37,6 +37,10 @@ DEPOT_PROPRIETAIRE = "Sashimee"
 DEPOT_NOM = "bus-scolaire-beckerich"
 DEPOT_BRANCHE = "main"
 
+# Site publié, relu par le cron pour connaître les perturbations en cours. On lit ce
+# que voient les parents, pas le dépôt : aucun jeton nécessaire.
+URL_SITE = "https://sashimee.github.io/bus-scolaire-beckerich"
+
 # Secrets à définir séparément, jamais dans ce fichier :
 #   npx wrangler secret put GITHUB_CLIENT_ID
 #   npx wrangler secret put GITHUB_CLIENT_SECRET
@@ -48,3 +52,12 @@ DEPOT_BRANCHE = "main"
 #   npx wrangler secret put GITHUB_PAT      # jeton *fine-grained*, contenu en
 #                                           # écriture, CE dépôt uniquement
 #   npx wrangler secret put SECRET_SESSION  # clé de signature des jetons de session
+
+# — Rappels des perturbations majeures ————————————————————————
+# La fenêtre est large parce que les créneaux de rappel sont écrits en HEURE LOCALE
+# (06:45, 07:15, 07:40, puis 11:15 et 15:00) et que le Luxembourg passe de UTC+1 à
+# UTC+2. Une fenêtre calée sur l'UTC raterait le rappel de 6 h 45 la moitié de
+# l'année. C'est `src/rappels.js` qui décide, à chaque réveil, s'il y a lieu
+# d'envoyer : le cron ne fait que réveiller le Worker.
+[triggers]
+crons = ["*/15 4-14 * * 1-5"]

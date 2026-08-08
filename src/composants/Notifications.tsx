@@ -4,6 +4,21 @@ import { CLE_VAPID_PUBLIQUE, URL_WORKER, notificationsConfigurees } from '../con
 
 type Etat = 'indisponible' | 'non-configure' | 'proposable' | 'active' | 'refusee' | 'erreur'
 
+/** Ce que le parent accepte de recevoir. Le Worker filtre sur cette valeur. */
+type Preference = 'urgences' | 'urgences-rappels' | 'tout'
+
+const PREFERENCES: Preference[] = ['urgences', 'urgences-rappels', 'tout']
+const CLE_PREFERENCE = 'bus-beckerich.notifications-preference'
+
+function preferenceInitiale(): Preference {
+  try {
+    const v = localStorage.getItem(CLE_PREFERENCE)
+    return PREFERENCES.includes(v as Preference) ? (v as Preference) : 'urgences-rappels'
+  } catch {
+    return 'urgences-rappels'
+  }
+}
+
 /**
  * Convertit la clé VAPID base64url en tableau d'octets, format exigé par l'API Push.
  * Le tampon est alloué explicitement pour satisfaire `BufferSource`, qui n'accepte
@@ -30,6 +45,7 @@ export function Notifications() {
   const { t } = useT()
   const [etat, setEtat] = useState<Etat>('proposable')
   const [occupe, setOccupe] = useState(false)
+  const [preference, setPreference] = useState<Preference>(preferenceInitiale)
 
   useEffect(() => {
     if (!notificationsConfigurees()) return setEtat('non-configure')
@@ -60,7 +76,7 @@ export function Notifications() {
       const rep = await fetch(`${URL_WORKER}/abonner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(abonnement),
+        body: JSON.stringify({ ...abonnement.toJSON(), preference }),
       })
       if (!rep.ok) throw new Error('abonnement-refuse')
       setEtat('active')
@@ -92,6 +108,35 @@ export function Notifications() {
     }
   }
 
+  /**
+   * Change la préférence.
+   *
+   * Elle est renvoyée au Worker en réutilisant `/abonner` : la clé y étant dérivée du
+   * endpoint, l'enregistrement est remplacé et non dupliqué. Pas besoin d'une route de
+   * plus pour un champ.
+   */
+  async function changerPreference(nouvelle: Preference) {
+    setPreference(nouvelle)
+    try {
+      localStorage.setItem(CLE_PREFERENCE, nouvelle)
+    } catch {
+      /* stockage indisponible : la préférence vaudra pour cette session */
+    }
+    if (etat !== 'active') return
+    try {
+      const sw = await navigator.serviceWorker.ready
+      const abonnement = await sw.pushManager.getSubscription()
+      if (!abonnement) return
+      await fetch(`${URL_WORKER}/abonner`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...abonnement.toJSON(), preference: nouvelle }),
+      })
+    } catch {
+      // Le réglage local est déjà enregistré : il repartira au prochain abonnement.
+    }
+  }
+
   if (etat === 'non-configure') return null
 
   const estIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -117,6 +162,23 @@ export function Notifications() {
       {etat === 'active' ? (
         <>
           <p>✓ {t('notifications.activees')}</p>
+
+          <div className="champ">
+            <label htmlFor="preference-notifications">{t('notifications.recevoir')}</label>
+            <select
+              id="preference-notifications"
+              value={preference}
+              onChange={(e) => void changerPreference(e.target.value as Preference)}
+            >
+              {PREFERENCES.map((p) => (
+                <option key={p} value={p}>
+                  {t(`notifications.preference.${p}`)}
+                </option>
+              ))}
+            </select>
+            <p className="champ__aide">{t(`notifications.preferenceAide.${preference}`)}</p>
+          </div>
+
           <button type="button" className="bouton" disabled={occupe} onClick={desactiver}>
             {t('notifications.desactiver')}
           </button>

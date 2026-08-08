@@ -434,7 +434,18 @@
     "nonConfigurees": "Benachrichtigungen sind auf dieser Website noch nicht eingerichtet.",
     "iosNote": "Auf iPhone und iPad funktionieren Benachrichtigungen nur, wenn die App zum Home-Bildschirm hinzugefügt wurde.",
     "confidentialite": "Das Aktivieren speichert eine anonyme Gerätekennung auf einem Server, solange das Abonnement besteht. Es ist die einzige Angabe, die Ihr Telefon verlässt, und sie wird beim Abmelden gelöscht.",
-    "erreur": "Das Abonnement ist fehlgeschlagen. Bitte später erneut versuchen."
+    "erreur": "Das Abonnement ist fehlgeschlagen. Bitte später erneut versuchen.",
+    "recevoir": "Was ich erhalten möchte",
+    "preference": {
+      "urgences": "Nur Notfälle",
+      "urgences-rappels": "Notfälle und ihre Erinnerungen",
+      "tout": "Alles"
+    },
+    "preferenceAide": {
+      "urgences": "Eine Benachrichtigung pro Ausfall oder schwerer Störung, ohne Wiederholung.",
+      "urgences-rappels": "Wie oben, plus eine Erinnerung am Morgen, wenn die Störung anhält. Empfohlene Einstellung.",
+      "tout": "Auch einfache Informationen. Das Banner in der App zeigt sie beim Öffnen ohnehin an."
+    }
   },
   "admin": {
     "titre": "Verwaltung",
@@ -577,6 +588,14 @@
       "conflit": "Jemand hat zwischenzeitlich veröffentlicht. Seite neu laden und noch einmal versuchen.",
       "reseau": "Der Server ist nicht erreichbar. Bitte Verbindung prüfen.",
       "inconnu": "Die Veröffentlichung ist fehlgeschlagen. Bitte gleich noch einmal versuchen."
+    },
+    "rappels": "Benachrichtigung wiederholen",
+    "rappelsAide": "Eine Erinnerung wird nur zu den sinnvollen Zeiten des betroffenen Tages verschickt — vor 7:40 Uhr morgens, vor 15 Uhr nachmittags — und nie an einem schulfreien Tag.",
+    "rappelsOption": {
+      "0": "Nur einmal",
+      "1": "Eine Erinnerung",
+      "2": "Zwei Erinnerungen",
+      "3": "Drei Erinnerungen (empfohlen)"
     }
   },
   "adminArrets": {

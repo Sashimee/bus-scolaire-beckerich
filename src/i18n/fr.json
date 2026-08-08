@@ -434,7 +434,18 @@
     "nonConfigurees": "Les notifications ne sont pas encore activées sur ce site.",
     "iosNote": "Sur iPhone et iPad, les notifications ne fonctionnent que si l'application a été ajoutée à l'écran d'accueil.",
     "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. C'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
-    "erreur": "L'abonnement a échoué. Réessayez plus tard."
+    "erreur": "L'abonnement a échoué. Réessayez plus tard.",
+    "recevoir": "Ce que je veux recevoir",
+    "preference": {
+      "urgences": "Seulement les urgences",
+      "urgences-rappels": "Urgences et leurs rappels",
+      "tout": "Tout"
+    },
+    "preferenceAide": {
+      "urgences": "Une notification par annulation ou perturbation grave, sans répétition.",
+      "urgences-rappels": "Comme ci-dessus, plus un rappel le matin si la perturbation dure. C'est le réglage conseillé.",
+      "tout": "Y compris les simples informations. Le bandeau dans l'application les montre déjà à l'ouverture."
+    }
   },
   "admin": {
     "titre": "Administration",
@@ -577,6 +588,14 @@
       "conflit": "Quelqu'un a publié entre-temps. Rechargez la page et recommencez.",
       "reseau": "Impossible de joindre le serveur. Vérifiez votre connexion.",
       "inconnu": "La publication a échoué. Réessayez dans un instant."
+    },
+    "rappels": "Répéter la notification",
+    "rappelsAide": "Un rappel n'est envoyé qu'aux créneaux utiles du jour concerné — avant 7 h 40 le matin, avant 15 h l'après-midi — et jamais un jour sans école.",
+    "rappelsOption": {
+      "0": "Une seule fois",
+      "1": "Un rappel",
+      "2": "Deux rappels",
+      "3": "Trois rappels (conseillé)"
     }
   },
   "adminArrets": {

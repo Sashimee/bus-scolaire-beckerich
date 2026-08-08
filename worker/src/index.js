@@ -11,9 +11,38 @@
  */
 import { base64urlEncode, genererRequetePush, importerClesVapid } from './push.js'
 import { routerCommune } from './commune.js'
+import { rappelsDus } from './rappels.js'
+import { etatDuJour } from '../../src/lib/calendrier.ts'
+import { plan } from '../../src/lib/donnees.ts'
 
 const PREFIXE_ABONNEMENT = 'abonnement:'
 const PREFIXE_ETAT = 'oauth:'
+const PREFIXE_RAPPEL = 'rappel:'
+
+/**
+ * Ce que chaque abonné accepte de recevoir.
+ *
+ * `urgences-rappels` est le défaut, y compris pour les abonnements enregistrés avant
+ * ce réglage : c'est le compromis que la plupart des parents choisiraient, et il vaut
+ * mieux qu'une absence de valeur ne veuille dire « tout » par accident.
+ */
+const PREFERENCES = ['urgences', 'urgences-rappels', 'tout']
+const PREFERENCE_DEFAUT = 'urgences-rappels'
+
+/**
+ * Cet abonné doit-il recevoir cette notification ?
+ *
+ * Conséquence assumée : avec le défaut, une perturbation d'information ou d'attention
+ * ne fait plus sonner les téléphones. Le bandeau dans l'application la montre déjà à
+ * la prochaine ouverture, et réserver la sonnerie aux alertes est ce qui lui garde son
+ * sens.
+ */
+function accepte(preference, charge) {
+  const p = PREFERENCES.includes(preference) ? preference : PREFERENCE_DEFAUT
+  if (charge?.rappel) return p !== 'urgences'
+  if (p === 'tout') return true
+  return charge?.gravite === 'alerte'
+}
 const DUREE_ETAT_S = 600
 
 const cors = (origine) => ({
@@ -123,10 +152,15 @@ async function abonner(requete, env, origine) {
   const abonnement = await requete.json()
   if (!abonnement?.endpoint) return json({ erreur: 'abonnement-invalide' }, 400, cors(origine))
 
-  // La clé est dérivée du endpoint : se réabonner ne crée pas de doublon.
+  const preference = PREFERENCES.includes(abonnement.preference)
+    ? abonnement.preference
+    : PREFERENCE_DEFAUT
+
+  // La clé est dérivée du endpoint : se réabonner ne crée pas de doublon, et
+  // rechanger de préférence remplace simplement l'enregistrement.
   const cle = PREFIXE_ABONNEMENT + (await empreinte(abonnement.endpoint))
-  await env.ABONNEMENTS.put(cle, JSON.stringify(abonnement))
-  return json({ ok: true }, 200, cors(origine))
+  await env.ABONNEMENTS.put(cle, JSON.stringify({ ...abonnement, preference }))
+  return json({ ok: true, preference }, 200, cors(origine))
 }
 
 async function desabonner(requete, env, origine) {
@@ -283,6 +317,10 @@ async function envoyerLot(charge, noms, env) {
       continue
     }
 
+    // Un abonné qui n'a pas demandé ce type d'envoi n'est pas un échec : il est
+    // simplement hors du périmètre, et ne doit apparaître dans aucun compteur d'erreur.
+    if (!accepte(abonnement.preference, charge)) continue
+
     try {
       const { headers, body, endpoint } = await genererRequetePush({
         cles,
@@ -341,7 +379,117 @@ async function santePush(env) {
   }
 }
 
+/**
+ * Relit les perturbations publiées.
+ *
+ * On lit le fichier tel qu'il est servi aux parents, et non le dépôt : c'est
+ * exactement ce qu'ils voient, et cela n'exige aucun jeton.
+ */
+async function lireUrgencesPubliees(env) {
+  const base = (env.URL_SITE ?? '').replace(/\/$/, '')
+  if (!base) return []
+  const rep = await fetch(`${base}/urgences.json`, { cache: 'no-store' })
+  if (!rep.ok) throw new Error(`urgences-illisibles-${rep.status}`)
+  const donnees = await rep.json()
+  return donnees?.perturbations ?? []
+}
+
+/**
+ * Envoi des rappels, déclenché par le cron.
+ *
+ * Le corps diffère du premier envoi — « Rappel : … » — sans quoi les téléphones
+ * regroupent les deux notifications et la seconde passe inaperçue, ce qui vide le
+ * rappel de son seul intérêt.
+ */
+async function envoyerRappels(env) {
+  const maintenant = new Date()
+  const perturbations = await lireUrgencesPubliees(env)
+  if (!perturbations.length) return { rappels: 0 }
+
+  // Les états sont relus un par un : il y a au plus une poignée d'alertes actives.
+  const etats = {}
+  for (const p of perturbations) {
+    const brut = await env.ABONNEMENTS.get(PREFIXE_RAPPEL + p.id)
+    if (brut) {
+      try {
+        etats[p.id] = JSON.parse(brut)
+      } catch {
+        /* état illisible : on repart de zéro plutôt que de ne rien envoyer */
+      }
+    }
+  }
+
+  const dus = rappelsDus({
+    perturbations,
+    maintenant,
+    etats,
+    plan,
+    // `etatDuJour` connaît vacances et fériés : un rappel un jour de congé n'aurait
+    // aucun sens, et c'est la même table que celle affichée aux parents.
+    jourEcole: etatDuJour(maintenant).ecole,
+  })
+
+  const titres = {
+    annulation: 'Bus annulé',
+    retard: 'Bus en retard',
+    'arret-deplace': 'Arrêt déplacé',
+    message: 'Information bus scolaire',
+  }
+
+  const liste = await env.ABONNEMENTS.list({ prefix: PREFIXE_ABONNEMENT })
+  const noms = liste.keys.map((k) => k.name)
+
+  let envoyes = 0
+  for (const du of dus) {
+    const p = du.perturbation
+    const charge = {
+      id: `${p.id}-rappel-${du.numero}`,
+      titre: `Rappel : ${titres[p.type] ?? 'Bus scolaire Beckerich'}`,
+      corps: `Toujours d'actualité — ${p.message?.fr ?? ''}`.trim(),
+      gravite: p.gravite,
+      rappel: true,
+      url: './',
+    }
+
+    const resultat = await envoyerLot(charge, noms, env)
+
+    // L'état est écrit APRÈS l'envoi : si le Worker tombe entre les deux, le rappel
+    // repartira au prochain cron plutôt que d'être perdu en silence.
+    const etat = etats[p.id] ?? { compte: 0, creneaux: [] }
+    await env.ABONNEMENTS.put(
+      PREFIXE_RAPPEL + p.id,
+      JSON.stringify({
+        compte: etat.compte + 1,
+        creneaux: [...new Set([...etat.creneaux, ...du.consommes])],
+        dernier: maintenant.toISOString(),
+      }),
+      // L'état survit à la perturbation le temps qu'elle expire, puis disparaît seul.
+      { expirationTtl: 30 * 24 * 3600 },
+    )
+
+    envoyes++
+    console.log(
+      `rappel ${du.numero}/${du.total} pour ${p.id} au créneau ${du.creneau} : ` +
+        `${resultat.envoyees} envoyée(s), ${resultat.echecs} échec(s)`,
+    )
+  }
+
+  return { rappels: envoyes }
+}
+
 export default {
+  /**
+   * Cron. La fenêtre est large — 4 h à 14 h UTC — parce que les créneaux sont écrits
+   * en heure locale et que le Luxembourg passe de UTC+1 à UTC+2 : une fenêtre calée
+   * sur l'UTC raterait le rappel de 6 h 45 la moitié de l'année. C'est `rappels.js`
+   * qui décide, à chaque réveil, s'il y a lieu d'envoyer quoi que ce soit.
+   */
+  async scheduled(_evenement, env, contexte) {
+    contexte.waitUntil(
+      envoyerRappels(env).catch((e) => console.log(`rappels : échec — ${e?.stack ?? e}`)),
+    )
+  },
+
   async fetch(requete, env) {
     const url = new URL(requete.url)
     const origine = requete.headers.get('Origin') ?? '*'
@@ -368,6 +516,7 @@ export default {
             oauth: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
             ...(await santePush(env)),
             commune: Boolean(env.SECRET_SESSION && env.GITHUB_PAT),
+            rappels: Boolean(env.URL_SITE),
             origines: env.ORIGINES_AUTORISEES ?? '',
           })
         case 'GET /auth/start':

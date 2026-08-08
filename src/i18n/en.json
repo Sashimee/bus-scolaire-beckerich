@@ -434,7 +434,18 @@
     "nonConfigurees": "Notifications are not set up on this site yet.",
     "iosNote": "On iPhone and iPad, notifications only work once the app has been added to the Home Screen.",
     "confidentialite": "Turning notifications on stores an anonymous device identifier on a server for as long as the subscription lasts. It is the only data that leaves your phone, and it is deleted as soon as you unsubscribe.",
-    "erreur": "Subscription failed. Please try again later."
+    "erreur": "Subscription failed. Please try again later.",
+    "recevoir": "What I want to receive",
+    "preference": {
+      "urgences": "Emergencies only",
+      "urgences-rappels": "Emergencies and their reminders",
+      "tout": "Everything"
+    },
+    "preferenceAide": {
+      "urgences": "One notification per cancellation or serious disruption, with no repeat.",
+      "urgences-rappels": "As above, plus a reminder in the morning if the disruption lasts. This is the recommended setting.",
+      "tout": "Including plain information. The banner in the app already shows those when you open it."
+    }
   },
   "admin": {
     "titre": "Administration",
@@ -577,6 +588,14 @@
       "conflit": "Someone published in the meantime. Reload the page and start again.",
       "reseau": "Could not reach the server. Check your connection.",
       "inconnu": "Publishing failed. Try again in a moment."
+    },
+    "rappels": "Repeat the notification",
+    "rappelsAide": "A reminder is only sent at the useful times of the day concerned — before 07:40 in the morning, before 15:00 in the afternoon — and never on a day without school.",
+    "rappelsOption": {
+      "0": "Once only",
+      "1": "One reminder",
+      "2": "Two reminders",
+      "3": "Three reminders (recommended)"
     }
   },
   "adminArrets": {

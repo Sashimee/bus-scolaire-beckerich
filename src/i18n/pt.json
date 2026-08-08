@@ -434,7 +434,18 @@
     "nonConfigurees": "As notificações ainda não estão configuradas neste site.",
     "iosNote": "No iPhone e no iPad, as notificações só funcionam se a aplicação tiver sido adicionada ao ecrã principal.",
     "confidentialite": "Ativar as notificações guarda um identificador anónimo do aparelho num servidor, enquanto durar a subscrição. É o único dado que sai do seu telemóvel e é apagado assim que cancelar.",
-    "erreur": "A subscrição falhou. Tente novamente mais tarde."
+    "erreur": "A subscrição falhou. Tente novamente mais tarde.",
+    "recevoir": "O que quero receber",
+    "preference": {
+      "urgences": "Apenas as urgências",
+      "urgences-rappels": "Urgências e os seus lembretes",
+      "tout": "Tudo"
+    },
+    "preferenceAide": {
+      "urgences": "Uma notificação por cancelamento ou perturbação grave, sem repetição.",
+      "urgences-rappels": "Como acima, mais um lembrete de manhã se a perturbação se mantiver. É a definição aconselhada.",
+      "tout": "Incluindo as simples informações. O aviso na aplicação já as mostra na abertura."
+    }
   },
   "admin": {
     "titre": "Administração",
@@ -577,6 +588,14 @@
       "conflit": "Alguém publicou entretanto. Recarregue a página e recomece.",
       "reseau": "Não foi possível contactar o servidor. Verifique a sua ligação.",
       "inconnu": "A publicação falhou. Tente novamente daqui a instantes."
+    },
+    "rappels": "Repetir a notificação",
+    "rappelsAide": "Um lembrete só é enviado nos horários úteis do dia em causa — antes das 7h40 de manhã, antes das 15h à tarde — e nunca num dia sem aulas.",
+    "rappelsOption": {
+      "0": "Uma só vez",
+      "1": "Um lembrete",
+      "2": "Dois lembretes",
+      "3": "Três lembretes (aconselhado)"
     }
   },
   "adminArrets": {

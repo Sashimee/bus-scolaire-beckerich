@@ -32,6 +32,12 @@ export interface Perturbation {
   publieLe: string
   publiePar: string
   gravite: Gravite
+  /**
+   * Nombre de rappels souhaités, envoyés par le Worker aux créneaux utiles du jour
+   * concerné. Absent = trois, le plafond. Ne vaut que pour la gravité `alerte` : une
+   * information ne fait pas sonner un téléphone trois fois.
+   */
+  rappels?: number
 }
 
 /**

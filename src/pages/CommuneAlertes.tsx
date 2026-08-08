@@ -62,6 +62,9 @@ export function CommuneAlertes() {
   const [du, setDu] = useState(jourIso())
   const [au, setAu] = useState(jourIso())
   const [gravite, setGravite] = useState<Gravite>(SITUATIONS[0].gravite)
+  // Trois rappels par défaut sur une alerte : c'est le plafond, et une annulation
+  // publiée à 6 h 40 n'est vue de personne sans eux.
+  const [rappels, setRappels] = useState(3)
   const [message, setMessage] = useState('')
   const [occupe, setOccupe] = useState(false)
   const [motif, setMotif] = useState<MotifCommune | null>(null)
@@ -101,6 +104,9 @@ export function CommuneAlertes() {
     publieLe: new Date().toISOString(),
     publiePar: session?.nom ?? '',
     gravite,
+    // Les rappels ne valent que pour une alerte : ailleurs, insister n'apporte rien
+    // et use la confiance dans la notification.
+    ...(gravite === 'alerte' ? { rappels } : {}),
   })
 
   if (!session) return null
@@ -334,6 +340,24 @@ export function CommuneAlertes() {
               ))}
             </div>
           </fieldset>
+
+          {gravite === 'alerte' && (
+            <div className="champ">
+              <label htmlFor="rappels">{t('commune.rappels')}</label>
+              <select
+                id="rappels"
+                value={rappels}
+                onChange={(e) => setRappels(Number(e.target.value))}
+              >
+                {[0, 1, 2, 3].map((n) => (
+                  <option key={n} value={n}>
+                    {t(`commune.rappelsOption.${n}`)}
+                  </option>
+                ))}
+              </select>
+              <p className="champ__aide">{t('commune.rappelsAide')}</p>
+            </div>
+          )}
         </div>
       ),
     },
