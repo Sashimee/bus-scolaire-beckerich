@@ -50,11 +50,11 @@
       "village": "Schweich",
       "lieuNom": "Hoh",
       "coord": [
-        49.723733,
-        5.929076
+        49.72373,
+        5.92908
       ],
-      "precision": "approximative",
-      "source": "OSM · rue « An der Hoh » (centre de rue) ; position cohérente avec le marqueur 6 des cartes du plan"
+      "precision": "verifiee",
+      "source": "Position corrigée à la main le 2026-08-08"
     },
     {
       "id": "elvange-ecole",
