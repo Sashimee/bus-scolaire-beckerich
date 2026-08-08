@@ -577,6 +577,28 @@
     border-color: var(--accent);
   }
 
+  /*
+   * Champs d'heure et de date.
+   *
+   * Safari sur iOS leur donne une largeur intrinsèque large et une hauteur gonflée par
+   * un remplissage interne : deux champs côte à côte débordaient de leur carte, et
+   * chaque ligne faisait le double de la hauteur voulue. `appearance: none` retire ce
+   * remplissage, `min-inline-size: 0` autorise enfin le champ à rétrécir — sans lui,
+   * une colonne de grille ne descend jamais sous la largeur intrinsèque de son contenu.
+   */
+  input[type='time'],
+  input[type='date'] {
+    appearance: none;
+    -webkit-appearance: none;
+    min-inline-size: 0;
+    block-size: var(--cible);
+    padding-block: 0;
+    padding-inline: var(--espace-2);
+    /* Le champ se centre sur son texte plutôt que de s'aligner à gauche d'une boîte
+       plus large que lui, ce qui rend deux champs voisins visuellement égaux. */
+    text-align: center;
+  }
+
   textarea {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: var(--texte-s);
@@ -690,6 +712,12 @@
     grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 1fr);
   }
 
+  /* Sans cela, une colonne ne descend jamais sous la largeur intrinsèque de son
+     contenu — c'est ce qui faisait déborder les champs d'heure sur iPhone. */
+  .grille-semaine__jour > * {
+    min-inline-size: 0;
+  }
+
   @media (max-width: 34rem) {
     .grille-semaine__jour--simple,
     .grille-semaine__jour--horaires {
@@ -698,7 +726,13 @@
     /* Les deux horaires tiennent côte à côte même sur un téléphone : les séparer
        ferait une colonne de dix champs pour une seule semaine. */
     .grille-semaine__jour--horaires {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    /* Libellés resserrés : « Arrive à partir de » sur deux lignes vaut mieux qu'un
+       champ poussé hors de la carte. */
+    .grille-semaine__jour--horaires .champ label {
+      font-size: var(--texte-s);
     }
     .grille-semaine__jour--horaires > .grille-semaine__nom {
       grid-column: 1 / -1;

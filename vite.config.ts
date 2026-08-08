@@ -53,7 +53,51 @@ function politiqueSecurite(urlWorker: string): string {
 }
 
 /**
- * Insère la politique dans `index.html`, au plus près de l'ouverture du `<head>`.
+ * Métadonnées de partage (Open Graph et Twitter Card).
+ *
+ * Engendrées ici plutôt qu'écrites dans `index.html` : `og:image` et `og:url` exigent
+ * des URL ABSOLUES — les crawlers ne résolvent pas les chemins relatifs —, or l'origine
+ * n'est connue qu'à la construction.
+ *
+ * La description répète l'indépendance du site. Un lien partagé dans un groupe de
+ * parents s'affiche avec ce texte et rien d'autre : laisser croire à une communication
+ * officielle contredirait le premier principe du projet avant même l'ouverture du site.
+ *
+ * `robots: noindex` reste par ailleurs en place ; il vise les moteurs de recherche, pas
+ * les aperçus de lien, et les deux ne se contredisent pas.
+ */
+function metasPartage(urlPublique: string): string {
+  const url = urlPublique.replace(/\/$/, '')
+  const titre = 'Bus scolaire Beckerich'
+  const description =
+    "Les horaires du bus scolaire de la commune de Beckerich, personnalisés pour chaque enfant. " +
+    "Site indépendant, sans lien avec la commune ni avec l'école."
+
+  return [
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:site_name" content="${titre}" />`,
+    `<meta property="og:title" content="${titre}" />`,
+    `<meta property="og:description" content="${description}" />`,
+    `<meta property="og:url" content="${url}/" />`,
+    `<meta property="og:image" content="${url}/icones/partage.png" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:alt" content="${titre} — site indépendant" />`,
+    `<meta property="og:locale" content="fr_LU" />`,
+    // `summary_large_image` : la vignette occupe toute la largeur de la carte, ce qui
+    // rend la mention d'indépendance lisible au lieu d'une miniature carrée.
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${titre}" />`,
+    `<meta name="twitter:description" content="${description}" />`,
+    `<meta name="twitter:image" content="${url}/icones/partage.png" />`,
+  ]
+    .map((m) => `    ${m}`)
+    .join('\n')
+}
+
+/**
+ * Insère la politique et les métadonnées dans `index.html`, au plus près de l'ouverture
+ * du `<head>`.
  *
  * **Construction uniquement.** En développement, `@vitejs/plugin-react` injecte un
  * préambule inline pour le rechargement à chaud ; `script-src 'self'` le bloque, et
@@ -68,9 +112,14 @@ function pluginCsp() {
     apply: 'build' as const,
     transformIndexHtml(html: string) {
       const csp = politiqueSecurite(process.env.VITE_URL_WORKER ?? '')
+      // Origine publique du site. Le défaut couvre GitHub Pages ; une commune qui
+      // hébergerait le site ailleurs pose la variable, comme pour `BASE_PATH`.
+      const urlPublique =
+        process.env.URL_PUBLIQUE ?? `https://sashimee.github.io${base.replace(/\/$/, '')}`
       return html.replace(
         '<head>',
-        `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />`,
+        `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />\n` +
+          `${metasPartage(urlPublique)}`,
       )
     },
   }
@@ -112,6 +161,21 @@ export default defineConfig({
         // à l'installation coûterait cher en données mobiles pour un fichier que
         // beaucoup de parents n'ouvriront jamais.
         globIgnores: ['**/version.json', '**/plan-bus-*.pdf', '**/urgences.json'],
+        /*
+         * Ce qui ne doit JAMAIS être remplacé par `index.html`.
+         *
+         * Un clic sur un lien `download` est une requête de navigation : sans cette
+         * liste, la `NavigationRoute` de Workbox l'interceptait et renvoyait la page
+         * de l'application. Le parent qui cliquait « Télécharger le plan officiel »
+         * récupérait donc un fichier HTML nommé `.pdf`, illisible par tout lecteur.
+         */
+        navigateFallbackDenylist: [
+          /\.pdf$/,
+          /\.json$/,
+          /^\/[^/]*\/icones\//,
+          // Le point d'entrée du Worker n'est pas une page de l'application.
+          /\/sw\.js$/,
+        ],
         // Ajoute les écouteurs push au service worker généré par Workbox.
         importScripts: ['push-handler.js'],
         runtimeCaching: [
