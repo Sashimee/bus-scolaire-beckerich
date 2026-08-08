@@ -539,7 +539,13 @@
     ],
     "pasUneGarantie": "This is not a guarantee",
     "pasUneGarantieDetail": "A web app cannot mark itself as priority: the iOS “time sensitive” level is reserved for native apps. And a notification may never arrive — phone off, Do Not Disturb, push service outage.",
-    "ecoleReste": "The school and the municipality remain the official channel. This app does not replace them, and relieves nobody of informing parents."
+    "ecoleReste": "The school and the municipality remain the official channel. This app does not replace them, and relieves nobody of informing parents.",
+    "essai": "Send a test notification",
+    "essaiTitre": "Test — School bus",
+    "essaiCorps": "If you are reading this, your notifications work.",
+    "essaiEnvoye": "Sent. It should arrive within a few seconds — if it does not, go through the steps above again.",
+    "essaiTropFrequent": "One test a minute is enough. Try again shortly.",
+    "essaiEchec": "The test did not go out. Turn notifications off and on again, then retry."
   },
   "admin": {
     "titre": "Administration",
@@ -686,7 +692,8 @@
       "sessionExpiree": "Your session has expired. Sign in again with your code.",
       "conflit": "Someone published in the meantime. Reload the page and start again.",
       "reseau": "Could not reach the server. Check your connection.",
-      "inconnu": "Publishing failed. Try again in a moment."
+      "inconnu": "Publishing failed. Try again in a moment.",
+      "nonActivee": "This space is not yet enabled on the server. Tell whoever maintains the app: a configuration key is missing."
     },
     "rappels": "Repeat the notification",
     "rappelsAide": "A reminder is only sent at the useful times of the day concerned — before 07:40 in the morning, before 15:00 in the afternoon — and never on a day without school.",
@@ -695,6 +702,16 @@
       "1": "One reminder",
       "2": "Two reminders",
       "3": "Three reminders (recommended)"
+    },
+    "journal": "Publication log",
+    "journalAide": "Who published what, and when. Kept for 90 days, then deleted automatically.",
+    "journalVide": "Nothing published yet.",
+    "journalEchec": "The log could not be read. Close and reopen it.",
+    "journalAction": {
+      "publication": "Published",
+      "retrait": "Withdrawn",
+      "horaires": "Timetable",
+      "traductions": "Wording"
     }
   },
   "adminArrets": {

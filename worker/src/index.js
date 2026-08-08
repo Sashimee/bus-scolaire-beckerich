@@ -16,6 +16,9 @@ import { etatDuJour } from '../../src/lib/calendrier.ts'
 import { plan } from '../../src/lib/donnees.ts'
 
 const PREFIXE_ABONNEMENT = 'abonnement:'
+/** Un essai par endpoint et par minute : de quoi vérifier, pas de quoi harceler. */
+const PREFIXE_DEBIT_ESSAI = 'essai:'
+const DELAI_ESSAI_S = 60
 const PREFIXE_ETAT = 'oauth:'
 const PREFIXE_RAPPEL = 'rappel:'
 
@@ -39,6 +42,10 @@ const PREFERENCE_DEFAUT = 'urgences-rappels'
  */
 function accepte(preference, charge) {
   const p = PREFERENCES.includes(preference) ? preference : PREFERENCE_DEFAUT
+  // Un essai est demandé par l'abonné lui-même, pour lui-même : le filtrer sur sa
+  // préférence le laisserait sans réponse, exactement là où il cherche à vérifier que
+  // le mécanisme fonctionne.
+  if (charge?.essai) return true
   if (charge?.rappel) return p !== 'urgences'
   if (p === 'tout') return true
   return charge?.gravite === 'alerte'
@@ -332,6 +339,56 @@ async function notifier(requete, env) {
   return json({ ...cumul, total: noms.length, lots: lots.length })
 }
 
+/**
+ * Envoie une notification d'essai à UN abonnement, celui du demandeur.
+ *
+ * C'est le seul moyen pour un parent de vérifier son propre réglage après avoir suivi
+ * la marche à suivre de son téléphone : autrement, il ne le découvrirait qu'un matin de
+ * bus annulé, au pire moment.
+ *
+ * L'authentification, c'est le endpoint lui-même. Il contient un jeton long tiré par le
+ * service de push et n'est connu que du navigateur abonné : le fournir prouve qu'on est
+ * cet abonné, et la seule chose qu'on obtient est de se faire vibrer soi-même. On
+ * n'accepte que des endpoints DÉJÀ enregistrés, et jamais plus d'un essai par minute —
+ * un endpoint qui fuiterait ne deviendrait pas un moyen de harceler quelqu'un.
+ */
+async function essai(requete, env, origine) {
+  let corps
+  try {
+    corps = await corpsJson(requete, 4 * 1024)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400, cors(origine, env))
+  }
+  if (!corps?.endpoint || typeof corps.endpoint !== 'string') {
+    return json({ erreur: 'abonnement-invalide' }, 400, cors(origine, env))
+  }
+
+  const cle = PREFIXE_ABONNEMENT + (await empreinte(corps.endpoint))
+  const brut = await env.ABONNEMENTS.get(cle)
+  if (!brut) return json({ erreur: 'abonnement-inconnu' }, 404, cors(origine, env))
+
+  const cleDebit = PREFIXE_DEBIT_ESSAI + (await empreinte(corps.endpoint))
+  if (await env.ABONNEMENTS.get(cleDebit)) {
+    return json({ erreur: 'trop-frequent' }, 429, cors(origine, env))
+  }
+  await env.ABONNEMENTS.put(cleDebit, '1', { expirationTtl: DELAI_ESSAI_S })
+
+  // Charge délibérément inoffensive : ni gravité `alerte`, ni `requireInteraction`.
+  // Un essai ne doit pas ressembler à une vraie annulation.
+  const resultat = await envoyerLot(
+    {
+      titre: corps.titre ?? 'Essai',
+      corps: corps.message ?? '',
+      gravite: 'info',
+      id: 'essai',
+      essai: true,
+    },
+    [cle],
+    env,
+  )
+  return json(resultat, 200, cors(origine, env))
+}
+
 /** Point d'entrée HTTP d'un lot : une invocation, donc un budget processeur propre. */
 async function notifierLot(requete, env) {
   if (requete.headers.get('Authorization') !== `Bearer ${env.SECRET_NOTIFICATION}`) {
@@ -616,6 +673,8 @@ export default {
           return await abonner(requete, env, origine)
         case 'POST /desabonner':
           return await desabonner(requete, env, origine)
+        case 'POST /essai':
+          return await essai(requete, env, origine)
         case 'POST /notifier':
           return await notifier(requete, env)
         case 'POST /notifier-lot':

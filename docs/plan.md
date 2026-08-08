@@ -56,7 +56,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R17 | 15 | **L'espace `/traductions` n'a jamais parlé à un vrai Worker.** La séparation des rôles est couverte par quatre tests contre un KV en mémoire ; la connexion par code, la publication sur GitHub et la relecture de la surcouche déployée ne l'ont pas été. | Même manœuvre que R3, avec `./creer-agent.sh "Nom" "" traductions`, puis corriger une clé allemande et vérifier qu'elle change sans reconstruction. |
 | R18 | 15 | **Les onglets d'`/admin` n'ont pas été vus connecté.** Le composant est couvert par huit tests (clavier, URL, ARIA) mais `/admin` exige un jeton GitHub, que le poste de développement n'a pas. | Se connecter sur `/admin` et parcourir les cinq onglets, dont ceux des textes et des crédits. |
 | R19 | 17 | **L'effet de l'en-tête `Urgency` n'est pas constatable ici.** Il ne se voit que sur un vrai téléphone en économie de batterie. La marche à suivre par plateforme n'a pas été vue à l'écran non plus : la section entière disparaît sans clé VAPID, absente en développement. | À rattacher à R7. Activer les notifications sur un appareil réel, vérifier que la marche à suivre iOS s'affiche, puis publier une alerte. |
-| R20 | 17 | **Aucune notification d'essai.** C'est le seul moyen pour un parent de vérifier son propre réglage après avoir suivi la marche à suivre. Écarté du périmètre : il faut une route Worker authentifiée par l'abonnement lui-même. | Piste, pas défaut. À reprendre si les réglages système se révèlent difficiles à suivre. |
+| ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
 ### Mise en service, non faite
@@ -1204,19 +1204,57 @@ des noms de tiers : seuls ceux dont l'accord est acquis y figurent, et la page l
 >   « temps réel » d'iOS est réservé aux applications natives, et le canal Android
 >   appartient au navigateur. Tout ce qui pouvait l'être l'est au niveau du transport ;
 >   le reste est écrit noir sur blanc à l'écran.
-> - **Notification d'essai écartée** du périmètre, voir R20.
+> - **Notification d'essai** d'abord écartée du périmètre, puis livrée le 2026-08-09
+>   avec les correctifs ci-dessous. R20 rayée.
 > - Ajouté au passage, hors plan initial : l'avertissement du site officiel sur les
 >   horaires indicatifs, repris mot pour mot sur `/plan`, `/limites` et la fiche enfant.
 >
 > Vérifié : 61 tests du Worker, dont deux nouveaux sur `Urgency`.
 >
-> **Réserves** : R19, R20.
+> **Réserves** : R19.
 
 *Indépendant des lots 14 à 16.*
 
 Un bus annulé est une information dont dix minutes de retard changent la valeur. La
 requête push ne portait aucun en-tête d'urgence, et rien n'expliquait au parent comment
 faire sortir ces notifications du lot sur son téléphone.
+
+---
+
+## Correctifs du 2026-08-09
+
+> **Fait le 2026-08-09**, après la mise en production des lots 14 à 17. Quatre défauts
+> relevés en relisant ce qui venait d'être déployé, dont aucun n'était propre aux
+> nouveaux lots.
+
+*Ne dépend de rien : chacun se tient seul.*
+
+### Un espace non activé le disait mal
+
+Sans `SECRET_SESSION`, le Worker répond 503 à tout `/commune/*` et `/traductions/*` —
+mais `src/lib/commune.ts` ne traduisait pas ce motif : l'agent lisait « la publication a
+échoué, réessayez dans un instant » devant un serveur qui ne serait jamais prêt. Motif
+`non-activee` ajouté, et les deux écrans de connexion partagent désormais un `cleErreur()`
+au lieu de trois ternaires imbriqués qu'il fallait penser à corriger des deux côtés.
+
+### Une perturbation publiait tout ce qu'on lui donnait
+
+`publierPerturbation` recopiait la charge par `...charge.perturbation` : n'importe quel
+champ envoyé par un client — le nôtre ou un `curl` porteur d'une session valide — partait
+tel quel dans `public/urgences.json`, donc dans un fichier public du dépôt. L'application
+l'aurait ignoré à la lecture ; il aurait tout de même été publié. Liste blanche
+`CHAMPS_PERTURBATION`, et `rappels` — que le client envoyait sans que personne le valide —
+borné entre 0 et 3, puisque chacun commande un envoi répété à toutes les familles.
+
+### Le journal ne rendait de comptes à personne
+
+`GET /commune/journal` existe depuis le lot 8, `lireJournal()` était exportée, et aucune
+page ne l'appelait. Un journal que personne ne peut lire ne sert à rien : il s'affiche
+maintenant, replié, sur `/commune`.
+
+### Notification d'essai
+
+Voir R20, rayée.
 
 ---
 

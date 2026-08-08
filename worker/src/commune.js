@@ -183,7 +183,44 @@ export function validerPerturbation(p) {
   }
   if (p.type === 'arret-deplace' && !texteSur(p.arret, 64)) motifs.push('arret-obligatoire')
 
+  // Le nombre de rappels commande autant d'envois répétés à toutes les familles
+  // abonnées. Non borné, il ferait du Worker un outil de harcèlement involontaire.
+  if (p.rappels !== undefined) {
+    if (!Number.isInteger(p.rappels) || p.rappels < 0 || p.rappels > 3) motifs.push('rappels')
+  }
+
   return motifs
+}
+
+/**
+ * Les seuls champs qu'une perturbation publiée a le droit de porter.
+ *
+ * Le contenu était recopié par `...charge.perturbation` : tout champ inconnu envoyé par
+ * un client — le nôtre ou un `curl` — partait tel quel dans un fichier public du dépôt.
+ * L'application l'aurait ignoré à la lecture, mais il aurait bel et bien été publié.
+ */
+const CHAMPS_PERTURBATION = [
+  'id',
+  'type',
+  'gravite',
+  'du',
+  'au',
+  'message',
+  'minutes',
+  'ligne',
+  'service',
+  'arret',
+  'arretRemplacement',
+  'rappels',
+]
+
+/** Ne garde que les champs connus, une fois la validation passée. */
+export function perturbationPropre(brute) {
+  const propre = {}
+  for (const champ of CHAMPS_PERTURBATION) {
+    if (brute[champ] !== undefined) propre[champ] = brute[champ]
+  }
+  return propre
 }
 
 // — Limitation de débit ——————————————————————————————————————————
@@ -339,7 +376,7 @@ async function publierPerturbation(requete, env, agent, entetesCors) {
   if (motifs.length) return json({ erreur: 'charge-invalide', motifs }, 400, entetesCors)
 
   const p = {
-    ...charge.perturbation,
+    ...perturbationPropre(charge.perturbation),
     publieLe: new Date().toISOString(),
     // Jamais celui que le client prétend : c'est la session qui fait foi.
     publiePar: agent.nom,

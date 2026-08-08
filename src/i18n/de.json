@@ -539,7 +539,13 @@
     ],
     "pasUneGarantie": "Das ist keine Garantie",
     "pasUneGarantieDetail": "Eine Webanwendung kann sich nicht selbst als vorrangig einstufen: die Stufe „zeitkritisch“ von iOS ist nativen Apps vorbehalten. Und eine Benachrichtigung kann ausbleiben — Telefon aus, Nicht stören, Ausfall des Push-Dienstes.",
-    "ecoleReste": "Schule und Gemeinde bleiben der offizielle Informationsweg. Diese Anwendung ersetzt sie nicht und entbindet niemanden davon, die Eltern zu benachrichtigen."
+    "ecoleReste": "Schule und Gemeinde bleiben der offizielle Informationsweg. Diese Anwendung ersetzt sie nicht und entbindet niemanden davon, die Eltern zu benachrichtigen.",
+    "essai": "Testbenachrichtigung senden",
+    "essaiTitre": "Test — Schulbus",
+    "essaiCorps": "Wenn Sie das lesen, funktionieren Ihre Benachrichtigungen.",
+    "essaiEnvoye": "Gesendet. Sie sollte in wenigen Sekunden ankommen — erscheint sie nicht, gehen Sie die Schritte oben noch einmal durch.",
+    "essaiTropFrequent": "Ein Test pro Minute genügt. Versuchen Sie es gleich noch einmal.",
+    "essaiEchec": "Der Test ist nicht abgegangen. Schalten Sie die Benachrichtigungen aus und wieder ein, und versuchen Sie es erneut."
   },
   "admin": {
     "titre": "Verwaltung",
@@ -686,7 +692,8 @@
       "sessionExpiree": "Ihre Sitzung ist abgelaufen. Bitte erneut mit Ihrem Code anmelden.",
       "conflit": "Jemand hat zwischenzeitlich veröffentlicht. Seite neu laden und noch einmal versuchen.",
       "reseau": "Der Server ist nicht erreichbar. Bitte Verbindung prüfen.",
-      "inconnu": "Die Veröffentlichung ist fehlgeschlagen. Bitte gleich noch einmal versuchen."
+      "inconnu": "Die Veröffentlichung ist fehlgeschlagen. Bitte gleich noch einmal versuchen.",
+      "nonActivee": "Dieser Bereich ist auf dem Server noch nicht aktiviert. Sagen Sie der Person Bescheid, die die Anwendung betreut: ihr fehlt ein Konfigurationsschlüssel."
     },
     "rappels": "Benachrichtigung wiederholen",
     "rappelsAide": "Eine Erinnerung wird nur zu den sinnvollen Zeiten des betroffenen Tages verschickt — vor 7:40 Uhr morgens, vor 15 Uhr nachmittags — und nie an einem schulfreien Tag.",
@@ -695,6 +702,16 @@
       "1": "Eine Erinnerung",
       "2": "Zwei Erinnerungen",
       "3": "Drei Erinnerungen (empfohlen)"
+    },
+    "journal": "Veröffentlichungsprotokoll",
+    "journalAide": "Wer was wann veröffentlicht hat. 90 Tage aufbewahrt, dann automatisch gelöscht.",
+    "journalVide": "Bisher nichts veröffentlicht.",
+    "journalEchec": "Das Protokoll konnte nicht gelesen werden. Zuklappen und wieder öffnen.",
+    "journalAction": {
+      "publication": "Veröffentlichung",
+      "retrait": "Rücknahme",
+      "horaires": "Fahrplan",
+      "traductions": "Texte"
     }
   },
   "adminArrets": {
