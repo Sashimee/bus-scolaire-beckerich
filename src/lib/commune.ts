@@ -1,0 +1,169 @@
+/**
+ * Client de l'espace commune.
+ *
+ * Un agent communal ne détient ni compte GitHub, ni jeton de dépôt : il échange un
+ * code personnel contre un jeton de session, et c'est le Worker qui publie en son nom.
+ * Ce module ne connaît donc que quatre routes et un jeton, jamais l'API GitHub.
+ *
+ * Le jeton vit en `sessionStorage` et pas en `localStorage` : il expire au bout de
+ * huit heures côté serveur, et fermer l'onglet doit suffire à se déconnecter d'un
+ * poste partagé — c'est la même politique que le jeton GitHub de `/admin`.
+ */
+import { URL_WORKER } from '../config'
+import type { Perturbation } from './urgences'
+
+const CLE_SESSION = 'bus-beckerich.session-commune'
+
+export interface SessionCommune {
+  jeton: string
+  nom: string
+  service: string
+  /** Secondes depuis l'époque, telles que le Worker les a signées. */
+  expire: number
+}
+
+export interface EntreeJournal {
+  quand: string
+  qui: string
+  service: string
+  action: string
+  detail: string
+}
+
+/** L'espace commune n'existe que si un Worker est configuré à la construction. */
+export const communeConfiguree = (): boolean => Boolean(URL_WORKER)
+
+export function chargerSession(): SessionCommune | null {
+  try {
+    const brut = sessionStorage.getItem(CLE_SESSION)
+    if (!brut) return null
+    const s = JSON.parse(brut) as SessionCommune
+    // Une session expirée vaut une absence de session : mieux vaut redemander le code
+    // que laisser l'agent saisir une annulation pour se voir refuser à la publication.
+    if (!s?.jeton || s.expire * 1000 < Date.now()) return null
+    return s
+  } catch {
+    return null
+  }
+}
+
+const enregistrerSession = (s: SessionCommune) => {
+  try {
+    sessionStorage.setItem(CLE_SESSION, JSON.stringify(s))
+  } catch {
+    /* stockage indisponible : la session vaudra pour cette page seulement */
+  }
+}
+
+export function oublierSession(): void {
+  try {
+    sessionStorage.removeItem(CLE_SESSION)
+  } catch {
+    /* rien à faire : il n'y avait rien à oublier */
+  }
+}
+
+/**
+ * Motifs d'échec, tels qu'ils seront traduits à l'écran.
+ *
+ * Le Worker répond en identifiants, pas en phrases : c'est l'interface qui décide de
+ * la formulation, et la même erreur doit se lire de la même façon dans les cinq langues.
+ */
+export type MotifCommune =
+  | 'code-inconnu'
+  | 'trop-de-tentatives'
+  | 'session-expiree'
+  | 'charge-invalide'
+  | 'plan-invalide'
+  | 'conflit'
+  | 'reseau'
+  | 'inconnu'
+
+export class ErreurCommune extends Error {
+  motif: MotifCommune
+  /** Détail exploitable : minutes d'attente, liste de problèmes du plan… */
+  detail?: unknown
+
+  constructor(motif: MotifCommune, detail?: unknown) {
+    super(motif)
+    this.motif = motif
+    this.detail = detail
+  }
+}
+
+async function appeler<T>(
+  chemin: string,
+  options: { methode?: string; corps?: unknown; jeton?: string } = {},
+): Promise<T> {
+  let reponse: Response
+  try {
+    reponse = await fetch(`${URL_WORKER}${chemin}`, {
+      method: options.methode ?? 'GET',
+      headers: {
+        ...(options.corps ? { 'Content-Type': 'application/json' } : {}),
+        ...(options.jeton ? { Authorization: `Bearer ${options.jeton}` } : {}),
+      },
+      ...(options.corps ? { body: JSON.stringify(options.corps) } : {}),
+    })
+  } catch {
+    throw new ErreurCommune('reseau')
+  }
+
+  const donnees = (await reponse.json().catch(() => ({}))) as Record<string, unknown>
+  if (reponse.ok) return donnees as T
+
+  const motif = String(donnees.erreur ?? '')
+  if (motif === 'code-inconnu') throw new ErreurCommune('code-inconnu')
+  if (motif === 'trop-de-tentatives') throw new ErreurCommune('trop-de-tentatives', donnees.minutes)
+  if (motif === 'session-expiree') throw new ErreurCommune('session-expiree')
+  if (motif === 'charge-invalide') throw new ErreurCommune('charge-invalide', donnees.motifs)
+  if (motif === 'plan-invalide') throw new ErreurCommune('plan-invalide', donnees.problemes)
+  if (reponse.status === 409) throw new ErreurCommune('conflit')
+  throw new ErreurCommune('inconnu', motif)
+}
+
+export async function seConnecter(code: string): Promise<SessionCommune> {
+  const s = await appeler<SessionCommune>('/commune/connexion', {
+    methode: 'POST',
+    corps: { code },
+  })
+  enregistrerSession(s)
+  return s
+}
+
+export async function publierPerturbation(
+  session: SessionCommune,
+  perturbation: Perturbation,
+): Promise<void> {
+  await appeler('/commune/perturbations', {
+    methode: 'POST',
+    corps: { perturbation },
+    jeton: session.jeton,
+  })
+}
+
+export async function retirerPerturbation(session: SessionCommune, id: string): Promise<void> {
+  await appeler(`/commune/perturbations/${encodeURIComponent(id)}`, {
+    methode: 'DELETE',
+    jeton: session.jeton,
+  })
+}
+
+export async function publierPlan(
+  session: SessionCommune,
+  plan: unknown,
+  resume: string,
+): Promise<void> {
+  await appeler('/commune/horaires', {
+    methode: 'POST',
+    corps: { plan, resume },
+    jeton: session.jeton,
+  })
+}
+
+export async function lireJournal(session: SessionCommune): Promise<EntreeJournal[]> {
+  const { entrees } = await appeler<{ entrees: EntreeJournal[] }>('/commune/journal', {
+    jeton: session.jeton,
+  })
+  return entrees ?? []
+}

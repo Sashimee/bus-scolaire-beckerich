@@ -233,6 +233,16 @@ describe('validation des perturbations', () => {
     expect(validerPerturbation(valide)).toEqual([])
   })
 
+  it("accepte les quatre types de l'application, et pas un de plus", () => {
+    for (const type of ['annulation', 'retard', 'arret-deplace', 'message']) {
+      const p = { ...valide, type, ...(type === 'retard' ? { minutes: 10 } : {}), ...(type === 'arret-deplace' ? { arret: 'levelange' } : {}) }
+      expect(validerPerturbation(p), type).toEqual([])
+    }
+    // « information » n'existe pas côté application : l'accepter publierait une
+    // perturbation que personne ne verrait.
+    expect(validerPerturbation({ ...valide, type: 'information' })).toContain('type')
+  })
+
   it('refuse un type ou une gravité inventés', () => {
     expect(validerPerturbation({ ...valide, type: 'explosion' })).toContain('type')
     expect(validerPerturbation({ ...valide, gravite: 'panique' })).toContain('gravite')

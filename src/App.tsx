@@ -13,6 +13,9 @@ import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
 import { Reglages } from './pages/Reglages'
 import { Admin } from './pages/Admin'
+import { Commune } from './pages/Commune'
+import { CommuneAlertes } from './pages/CommuneAlertes'
+import { CommuneHoraires } from './pages/CommuneHoraires'
 
 export default function App() {
   const { t } = useT()
@@ -46,6 +49,9 @@ export default function App() {
           <Route path="/installer" element={<Installer />} />
           <Route path="/reglages" element={<Reglages />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/commune" element={<Commune />} />
+          <Route path="/commune/alertes" element={<CommuneAlertes />} />
+          <Route path="/commune/horaires" element={<CommuneHoraires />} />
           <Route path="*" element={<Accueil />} />
         </Routes>
 

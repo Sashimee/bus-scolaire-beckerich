@@ -652,6 +652,38 @@ l'empreinte et affiche le code une seule fois.
 
 ## Lot 9 — Espace commune (partie interface)
 
+> **Fait le 2026-08-08.** Les trois pages sont livrées : `/commune`, `/commune/alertes`
+> et `/commune/horaires`, plus `src/lib/commune.ts` qui parle au Worker. Écarts et
+> ajouts :
+>
+> - **Incohérence trouvée entre le lot 8 et l'application** : le Worker validait un
+>   type de perturbation `information` que `TypePerturbation` ne connaît pas — le
+>   quatrième type s'appelle `message`. Le Worker aurait donc refusé les perturbations
+>   de l'application, et accepté un type que personne n'aurait su afficher. Corrigé des
+>   deux côtés, avec un test qui énumère les quatre types.
+> - Le formulaire guidé réutilise la coquille `Assistant` du lot 5 : progression,
+>   navigation et gestion du focus sont déjà écrites, il aurait été absurde de les
+>   refaire.
+> - `useBlocageRechargement` est branché sur les deux pages, comme le §1.4 le prévoyait :
+>   une annonce à moitié tapée ne doit pas disparaître sous un rechargement automatique.
+> - Le diff d'horaires se lit bien en langage naturel — « Aller — Bus 1 · Matin ·
+>   Noerdange · Gare : 07:28 → 07:35 » — et une heure ramenée à sa valeur d'origine
+>   disparaît de la liste plutôt que d'y figurer comme un changement nul.
+> - La validation locale par `validerPlan()` sert à montrer les problèmes tout de suite ;
+>   c'est celle du Worker qui fait autorité, et les deux appellent la même fonction.
+> - Le jeton de session vit en `sessionStorage` : fermer l'onglet suffit à se
+>   déconnecter d'un poste partagé.
+>
+> **Ce qui n'a pas pu être vérifié** : aucun aller-retour réel avec le Worker. Les
+> pages ont été éprouvées avec une session simulée et un Worker injoignable — le
+> rendu, la navigation, le diff et le message d'erreur réseau sont bons, mais la
+> connexion par code et la publication effective attendent le déploiement.
+>
+> **Reporté au lot 10, volontairement** : la modification temporaire d'horaire qui
+> produirait une perturbation de type `retard` depuis l'écran des horaires. Le §9 la
+> mentionne, mais l'écran des alertes la couvre déjà, et la dupliquer aurait fait deux
+> chemins vers le même résultat.
+
 *Dépend des lots 2 et 8.*
 
 Deux pages distinctes, volontairement séparées : un agent qui vient annoncer une annulation

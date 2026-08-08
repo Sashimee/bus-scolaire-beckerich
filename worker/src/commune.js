@@ -35,7 +35,10 @@ const JOURNAL_MAX = 50
 const TAILLE_CORPS_MAX = 64 * 1024
 const TAILLE_PLAN_MAX = 512 * 1024
 
-const TYPES = ['annulation', 'retard', 'arret-deplace', 'information']
+// Les quatre types que l'application sait afficher (`TypePerturbation` dans
+// `src/lib/types` côté navigateur). En accepter un cinquième ici publierait une
+// perturbation que personne ne verrait jamais.
+const TYPES = ['annulation', 'retard', 'arret-deplace', 'message']
 const GRAVITES = ['info', 'attention', 'alerte']
 const LANGUES = ['fr', 'de', 'lb', 'pt', 'en']
 const DATE_ISO = /^\d{4}-\d{2}-\d{2}$/

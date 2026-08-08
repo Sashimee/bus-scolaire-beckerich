@@ -982,6 +982,57 @@
     backdrop-filter: blur(2px);
   }
 
+  /*
+   * --- Carte de choix -----------------------------------------------------------
+   * Une grande cible cliquable qui porte un titre et son explication. Employée là où
+   * une liste déroulante demanderait de savoir d'avance ce que chaque option veut
+   * dire — le choix d'une situation ou d'une gravité, dans l'espace commune.
+   */
+  .choix {
+    display: grid;
+    gap: var(--espace-1);
+    inline-size: 100%;
+    text-align: start;
+    padding: var(--espace-3) var(--espace-4);
+    min-block-size: var(--cible);
+    background: var(--surface);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-m);
+    color: var(--encre);
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .choix:hover {
+    border-color: var(--accent);
+  }
+
+  .choix--retenu {
+    border-color: var(--accent);
+    border-inline-start-width: var(--trait-accent);
+    background: var(--info-fond);
+  }
+
+  .choix__titre {
+    font-weight: 650;
+    font-size: var(--texte-l);
+  }
+
+  .choix__aide {
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
+  }
+
+  /* Le code d'accès se lit et se retape : chasse fixe, gros, espacé. */
+  .champ-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--texte-2xl);
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
   /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
     background: var(--surface-haute);
