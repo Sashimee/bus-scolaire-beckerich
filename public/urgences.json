@@ -1,8 +1,21 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-08T00:18:00Z",
-  "perturbations": [],
+  "misAJour": "2026-08-08T00:28:30.679Z",
+  "perturbations": [
+    {
+      "id": "2026-08-08-0uqdw",
+      "du": "2026-08-08",
+      "au": "2026-08-08",
+      "type": "annulation",
+      "message": {
+        "fr": "L'route est barrée"
+      },
+      "publieLe": "2026-08-08T00:28:30.678Z",
+      "publiePar": "Alex",
+      "gravite": "alerte"
+    }
+  ],
   "correctionsArrets": [
     {
       "arret": "levelange",
