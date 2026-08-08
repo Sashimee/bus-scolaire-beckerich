@@ -123,11 +123,11 @@
         "École/Dillendapp"
       ],
       "coord": [
-        49.731065,
-        5.882671
+        49.73107,
+        5.88267
       ],
-      "precision": "approximative",
-      "source": "Nominatim · Dikrecherstrooss (centre de rue) ; l'école est au n° 8"
+      "precision": "verifiee",
+      "source": "Position corrigée à la main le 2026-08-08"
     },
     {
       "id": "beckerich-dillendapp",
