@@ -148,11 +148,11 @@
         "Liewelerwee"
       ],
       "coord": [
-        49.732556,
-        5.869434
+        49.73256,
+        5.86943
       ],
-      "precision": "approximative",
-      "source": "Nominatim · voie « Leewelerwee » (centre de rue)"
+      "precision": "verifiee",
+      "source": "Position corrigée à la main le 2026-08-08"
     },
     {
       "id": "beckerich-village",
