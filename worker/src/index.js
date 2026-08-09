@@ -399,21 +399,29 @@ async function essai(requete, env, origine) {
  */
 async function etatDepot(env) {
   if (!env.GITHUB_PAT) return 'absent'
-  try {
-    const d = depot(env)
-    const rep = await fetch(`https://api.github.com/repos/${d.proprietaire}/${d.nom}`, {
-      headers: {
-        Authorization: `Bearer ${env.GITHUB_PAT}`,
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'bus-scolaire-beckerich-worker',
-      },
-    })
-    if (rep.status === 401) return 'jeton-refuse'
-    if (!rep.ok) return `erreur-${rep.status}`
-    const donnees = await rep.json()
-    return donnees?.permissions?.push ? 'ok' : 'sans-droit-ecriture'
-  } catch (e) {
-    return `injoignable (${String(e).slice(0, 60)})`
+  const d = depot(env)
+  const entetes = {
+    Authorization: `Bearer ${env.GITHUB_PAT}`,
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'bus-scolaire-beckerich-worker',
+  }
+  // On sonde EXACTEMENT ce que fait une publication : lire un fichier du dépôt. Lire
+  // les métadonnées du dépôt ne prouve rien — un jeton peut voir le dépôt sans avoir
+  // la permission `Contents`, et c'est elle qui compte ici.
+  const sonder = async (chemin) => {
+    try {
+      const rep = await fetch(
+        `https://api.github.com/repos/${d.proprietaire}/${d.nom}/contents/${chemin}?ref=${d.branche}`,
+        { headers: entetes },
+      )
+      return rep.ok ? 'ok' : `${rep.status}`
+    } catch (e) {
+      return `injoignable (${String(e).slice(0, 40)})`
+    }
+  }
+  return {
+    urgences: await sonder('public/urgences.json'),
+    traductions: await sonder('public/traductions.json'),
   }
 }
 
