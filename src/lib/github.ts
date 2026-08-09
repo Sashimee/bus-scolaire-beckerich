@@ -46,10 +46,20 @@ function depuisBase64(base64: string): string {
  * Un jeton valide mais sans droit ne doit pas déverrouiller le formulaire.
  */
 export async function verifierAcces(jeton: string): Promise<Identite> {
-  const [utilisateur, depot] = await Promise.all([
-    fetch(`${API}/user`, { headers: entetes(jeton) }),
-    fetch(`${API}/repos/${DEPOT.proprietaire}/${DEPOT.nom}`, { headers: entetes(jeton) }),
-  ])
+  let utilisateur: Response
+  let depot: Response
+  try {
+    ;[utilisateur, depot] = await Promise.all([
+      fetch(`${API}/user`, { headers: entetes(jeton) }),
+      fetch(`${API}/repos/${DEPOT.proprietaire}/${DEPOT.nom}`, { headers: entetes(jeton) }),
+    ])
+  } catch {
+    // L'appel n'est jamais parti : réseau coupé, ou politique de sécurité du site qui
+    // bloque `api.github.com`. Le distinguer d'un refus de GitHub n'est pas un détail —
+    // c'est précisément la confusion qui a fait chercher un problème de jeton pendant
+    // que la CSP était en cause.
+    throw new Error('github-injoignable')
+  }
 
   if (!utilisateur.ok) throw new Error('jeton-invalide')
 

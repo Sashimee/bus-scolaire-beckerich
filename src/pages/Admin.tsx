@@ -97,10 +97,14 @@ export function Admin() {
           setErreur(null)
         }
       })
-      .catch(() => {
-        if (!annule) {
-          setIdentite(null)
-          setErreur('jeton-invalide')
+      .catch((e: unknown) => {
+        if (annule) return
+        const injoignable = e instanceof Error && e.message === 'github-injoignable'
+        setIdentite(null)
+        setErreur(injoignable ? 'github-injoignable' : 'jeton-invalide')
+        // Un jeton qu'on n'a pas pu soumettre n'est pas un jeton fautif : le jeter
+        // obligerait à refaire toute la connexion pour une coupure réseau.
+        if (!injoignable) {
           ecrireJeton(null)
           setJeton(null)
         }

@@ -599,7 +599,8 @@
       "jeton-invalide": "Token rejected by GitHub. Check that it is valid and has not expired.",
       "conflit": "Someone changed the file in the meantime. Reload the page and try again.",
       "lecture-impossible": "Could not read the disruptions file on GitHub.",
-      "publication-impossible": "Publishing failed."
+      "publication-impossible": "Publishing failed.",
+      "github-injoignable": "GitHub could not be reached. Check your connection — the token is not at fault."
     },
     "ongletPerturbations": "Disruptions",
     "ongletArrets": "Stops",

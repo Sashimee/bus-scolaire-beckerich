@@ -599,7 +599,8 @@
       "jeton-invalide": "Token recusado pelo GitHub. Verifique se é válido e não expirou.",
       "conflit": "Alguém alterou o ficheiro entretanto. Recarregue a página e tente novamente.",
       "lecture-impossible": "Não foi possível ler o ficheiro das perturbações no GitHub.",
-      "publication-impossible": "A publicação falhou."
+      "publication-impossible": "A publicação falhou.",
+      "github-injoignable": "Não foi possível contactar o GitHub. Verifique a sua ligação — o problema não é o token."
     },
     "ongletPerturbations": "Perturbações",
     "ongletArrets": "Paragens",

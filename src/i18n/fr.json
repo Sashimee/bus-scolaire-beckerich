@@ -599,7 +599,8 @@
       "jeton-invalide": "Jeton refusé par GitHub. Vérifiez qu'il est valide et non expiré.",
       "conflit": "Quelqu'un a modifié le fichier entre-temps. Rechargez la page et recommencez.",
       "lecture-impossible": "Impossible de lire le fichier des urgences sur GitHub.",
-      "publication-impossible": "La publication a échoué."
+      "publication-impossible": "La publication a échoué.",
+      "github-injoignable": "GitHub n'a pas pu être joint. Vérifiez votre connexion — le jeton, lui, n'est pas en cause."
     },
     "ongletPerturbations": "Perturbations",
     "ongletArrets": "Arrêts",

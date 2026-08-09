@@ -599,7 +599,8 @@
       "jeton-invalide": "Token von GitHub abgelehnt. Prüfen Sie, ob es gültig und nicht abgelaufen ist.",
       "conflit": "Jemand hat die Datei zwischenzeitlich geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
       "lecture-impossible": "Die Störungsdatei konnte auf GitHub nicht gelesen werden.",
-      "publication-impossible": "Die Veröffentlichung ist fehlgeschlagen."
+      "publication-impossible": "Die Veröffentlichung ist fehlgeschlagen.",
+      "github-injoignable": "GitHub war nicht erreichbar. Prüfen Sie Ihre Verbindung — am Token liegt es nicht."
     },
     "ongletPerturbations": "Störungen",
     "ongletArrets": "Haltestellen",

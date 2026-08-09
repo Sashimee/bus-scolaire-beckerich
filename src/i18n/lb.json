@@ -599,7 +599,8 @@
       "jeton-invalide": "Jeton vu GitHub refuséiert. Kuckt no, ob e gëlteg an net ofgelaf ass.",
       "conflit": "Een huet d'Datei an der Tëschenzäit geännert. Luet d'Säit nei a probéiert nach eng Kéier.",
       "lecture-impossible": "D'Stéierungsdatei konnt op GitHub net gelies ginn.",
-      "publication-impossible": "D'Publikatioun huet net geklappt."
+      "publication-impossible": "D'Publikatioun huet net geklappt.",
+      "github-injoignable": "GitHub konnt net erreecht ginn. Kuckt Är Verbindung no — um Jeton läit et net."
     },
     "ongletPerturbations": "Stéierungen",
     "ongletArrets": "Arrêten",

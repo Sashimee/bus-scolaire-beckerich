@@ -45,7 +45,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
 | R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
 | ~~R8~~ | 10 | ~~Le sélecteur de préférence n'a pas été vu à l'écran.~~ **Levée le 2026-08-09** sur iPhone, notifications actives. |
-| ~~R9~~ | 11 | ~~La CSP n'a pas été vérifiée en production.~~ **Levée le 2026-08-08** : vérifiée sur le site déployé — tuiles OpenStreetMap chargées, service worker actif, GoatCounter chargé, zéro violation. |
+| R9 | 11 | **La CSP avait été déclarée vérifiée à tort.** Le contrôle du 2026-08-08 portait sur les tuiles, le service worker et GoatCounter — pas sur `/admin`, qui exige une connexion GitHub et n'avait donc jamais été ouvert connecté. `connect-src` omettait `https://api.github.com` : TOUT `/admin` était muet en production depuis le lot 11, et l'échec se lisait « Jeton refusé par GitHub » alors que GitHub ne recevait rien. Corrigé le 2026-08-09. | Rouvrir `/admin` connecté et publier réellement quelque chose, une fois le déploiement passé. Ne pas redéclarer la CSP vérifiée sans avoir exercé chaque origine qu'elle autorise. |
 | ~~R10~~ | 12 | ~~Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.~~ **Levée le 2026-08-09** : importé dans Apple Calendrier depuis l'iPhone. |
 | R11 | 13 | **L'intégration Google n'a jamais tourné.** Le prérequis — projet Google Cloud, API Calendar, ID client OAuth, écran de consentement — n'est pas fait. Ni le flux PKCE, ni la création d'agenda, ni l'écriture d'un événement n'ont été exercés. | Créer l'ID client, poser `VITE_ID_CLIENT_GOOGLE` en variable de dépôt, puis connecter un compte de test. |
 | R12 | 11 | **La CSP avait cassé `npm run dev`** en bloquant le préambule inline de React Refresh — page blanche, découvert seulement au lot 13. Corrigé : la politique ne s'applique qu'au build. Rappel de méthode : vérifier le build **et** le serveur de développement après toute modification de `vite.config.ts`. | Corrigé. Ligne gardée comme trace. |
@@ -1355,6 +1355,34 @@ Voir R20, rayée.
 > Couvert par `src/composants/EditeurTraductions.test.tsx`.
 
 *Dépend du lot 15.*
+
+---
+
+## Correctif du 2026-08-09 — `/admin` était muet en production
+
+> **Fait le 2026-08-09.** Signalé en usage réel : « Jeton refusé par GitHub » à chaque
+> connexion. Le jeton n'y était pour rien.
+>
+> **`connect-src` n'autorisait pas `https://api.github.com`.** Toute la page `/admin`
+> passe par cette origine — vérification du jeton, urgences, plan, textes, crédits. La
+> CSP bloquait l'appel avant qu'il ne parte ; le navigateur rejetait le `fetch`, et le
+> `catch` de `verifierAcces` concluait à un jeton invalide. Le message accusait donc un
+> tiers qui n'avait rien reçu.
+>
+> Le défaut date du lot 11 et vivait en production depuis. Il n'a été vu ni par les
+> tests — aucun n'exerce la CSP, qui n'existe qu'au build — ni par la vérification de
+> R9, qui avait regardé les tuiles, le service worker et GoatCounter, mais pas `/admin` :
+> l'ouvrir demande une connexion GitHub, et c'est exactement ce que R18 disait n'avoir
+> jamais été fait. **R9 est donc rouverte** : une CSP n'est pas vérifiée tant que chaque
+> origine qu'elle autorise n'a pas été exercée.
+>
+> Second correctif, de méthode : `verifierAcces` distingue désormais un appel qui n'est
+> jamais parti d'un jeton refusé. Confondre les deux avait envoyé chercher un problème
+> de jeton pendant que la politique de sécurité était en cause — et un jeton qu'on n'a
+> pas pu soumettre n'est plus jeté, ce qui évitait de refaire toute la connexion pour
+> une coupure réseau.
+
+*Dépend du lot 11.*
 
 ---
 

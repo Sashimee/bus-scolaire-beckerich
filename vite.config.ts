@@ -35,10 +35,17 @@ function politiqueSecurite(urlWorker: string): string {
     "script-src 'self' https://gc.zgo.at",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://*.tile.openstreetmap.org",
+    // `api.github.com` : TOUT `/admin` passe par là — vérification du jeton, lecture et
+    // écriture des urgences, du plan, des textes et des crédits. Son absence rendait la
+    // page inutilisable en production sans qu'aucun test ne le voie : `/admin` exige une
+    // connexion GitHub, et la vérification de la CSP (lot 11) n'était jamais allée
+    // jusque-là. L'échec se lisait « Jeton refusé par GitHub », alors que GitHub n'avait
+    // rien reçu du tout.
+    //
     // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
     // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
     // alors que l'ID client peut être posé sans reconstruire cette liste.
-    `connect-src 'self' https://gc.zgo.at https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
+    `connect-src 'self' https://gc.zgo.at https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
     // L'écran de consentement Google est une navigation, pas une inclusion : seule
     // `form-action` doit s'ouvrir, et uniquement vers Google.
     "form-action 'self' https://accounts.google.com",
