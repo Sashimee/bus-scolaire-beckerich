@@ -10,7 +10,7 @@
  * poste partagé — c'est la même politique que le jeton GitHub de `/admin`.
  */
 import { URL_WORKER } from '../config'
-import type { Surcouche } from './traductions'
+import type { Modifications, Surcouche } from './traductions'
 import type { Perturbation } from './urgences'
 
 /**
@@ -214,16 +214,24 @@ export async function publierPlan(
   })
 }
 
-/** Publie la surcouche de traduction complète. Le Worker revalide entrée par entrée. */
+/**
+ * Publie des corrections pour UNE langue.
+ *
+ * On n'envoie que ce qui change, pas la surcouche entière : le Worker relit l'état en
+ * ligne et fusionne clé par clé. Deux traducteurs connectés en même temps ne se
+ * recouvrent donc plus. Renvoie l'état fusionné, qui devient la nouvelle base.
+ */
 export async function publierTraductions(
   session: SessionCommune,
-  surcouche: Surcouche,
-): Promise<void> {
-  await appeler('/traductions/publier', {
+  langue: string,
+  modifications: Modifications,
+): Promise<Surcouche> {
+  const { surcouche } = await appeler<{ surcouche: Surcouche }>('/traductions/publier', {
     methode: 'POST',
-    corps: { surcouche },
+    corps: { langue, modifications },
     jeton: session.jeton,
   })
+  return surcouche ?? {}
 }
 
 export async function lireJournal(session: SessionCommune): Promise<EntreeJournal[]> {

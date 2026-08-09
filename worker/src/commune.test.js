@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   agentDeLaRequete,
   egalConstant,
@@ -273,6 +273,54 @@ describe('séparation des espaces commune et traduction', () => {
       requete('POST', '/traductions/publier', { jeton, corps: { surcouche: {} } }),
     )
     expect(rep.status).toBe(401)
+  })
+
+  it('fusionne deux publications concurrentes au lieu de les écraser', async () => {
+    // Deux traducteurs ouvrent leur page au même moment, donc partent tous deux d'un
+    // fichier vide. Publier la surcouche entière faisait disparaître le travail du
+    // premier ; on envoie désormais les seules modifications, et le Worker relit le
+    // fichier avant de fusionner.
+    let fichier = { langues: {} }
+    vi.stubGlobal('fetch', async (url, options) => {
+      if (options?.method === 'PUT') {
+        fichier = JSON.parse(atob(JSON.parse(options.body).content))
+        return new Response(JSON.stringify({ content: {} }), { status: 200 })
+      }
+      return new Response(
+        JSON.stringify({ content: btoa(JSON.stringify(fichier)), sha: 'abc' }),
+        { status: 200 },
+      )
+    })
+
+    const expire = Math.floor(Date.now() / 1000) + 60
+    const publier = async (nom, langue, modifications) =>
+      router(
+        requete('POST', '/traductions/publier', {
+          jeton: await signerJeton({ nom, role: 'traductions', expire }, SECRET),
+          corps: { langue, modifications },
+        }),
+      )
+
+    expect((await publier('A', 'de', { 'assistant.terminer': 'Fertig' })).status).toBe(200)
+    const rep = await publier('B', 'pt', { 'assistant.terminer': 'Terminado' })
+    expect(rep.status).toBe(200)
+
+    // Les deux corrections coexistent dans le fichier réellement écrit.
+    expect(fichier.langues.de).toEqual({ 'assistant.terminer': 'Fertig' })
+    expect(fichier.langues.pt).toEqual({ 'assistant.terminer': 'Terminado' })
+    // Et le second reçoit l'état fusionné, pas le sien.
+    expect((await rep.json()).surcouche.de).toEqual({ 'assistant.terminer': 'Fertig' })
+
+    vi.unstubAllGlobals()
+  })
+
+  it('refuse une publication sans langue reconnue', async () => {
+    const expire = Math.floor(Date.now() / 1000) + 60
+    const jeton = await signerJeton({ nom: 'A', role: 'traductions', expire }, SECRET)
+    const rep = await router(
+      requete('POST', '/traductions/publier', { jeton, corps: { langue: 'es', modifications: {} } }),
+    )
+    expect(rep.status).toBe(400)
   })
 
   it('applique la limitation de débit aux deux connexions', async () => {

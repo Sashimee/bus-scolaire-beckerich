@@ -119,5 +119,42 @@ export function relireSurcouche(brut: unknown): Surcouche {
   return propre
 }
 
+/**
+ * Ce qu'un traducteur demande de changer : une clé vers sa nouvelle valeur, ou `null`
+ * pour retirer la correction et revenir au dictionnaire compilé.
+ */
+export type Modifications = Record<string, string | string[] | null>
+
+/**
+ * Applique des modifications sur la surcouche EN LIGNE, langue par langue et clé par clé.
+ *
+ * Publier la surcouche entière télescopait le travail des autres : deux traducteurs
+ * connectés en même temps partaient chacun de l'état chargé à l'ouverture de leur page,
+ * et le second à publier réécrivait le fichier complet — les corrections du premier
+ * disparaissaient sans un mot, y compris dans une autre langue.
+ *
+ * On raisonne donc comme `majUrgences` côté Worker : relire l'état courant, appliquer
+ * une transformation, réécrire. Deux personnes qui corrigent deux clés différentes ne se
+ * gênent plus. Deux personnes sur la MÊME clé restent en dernier-arrivé-gagnant, mais
+ * c'est là un vrai désaccord, pas un accident de mécanique.
+ */
+export function appliquerModifications(
+  actuelle: Surcouche,
+  langue: Langue,
+  modifications: Modifications,
+): Surcouche {
+  const entrees: Record<string, string | string[]> = { ...actuelle[langue] }
+
+  for (const [cle, valeur] of Object.entries(modifications ?? {})) {
+    if (valeur === null) delete entrees[cle]
+    else if (entreeValide(langue, cle, valeur)) entrees[cle] = valeur
+  }
+
+  const suite: Surcouche = { ...actuelle }
+  if (Object.keys(entrees).length) suite[langue] = entrees
+  else delete suite[langue]
+  return suite
+}
+
 // Le chargement du fichier vit dans `src/i18n/surcouche.ts` : ce module-ci est importé
 // par le Worker, qui n'a ni `fetch` vers le site ni `import.meta.env`.

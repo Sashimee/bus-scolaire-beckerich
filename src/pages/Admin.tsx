@@ -494,7 +494,7 @@ export function Admin() {
             contenu: (
               <EditeurTraductions
                 surcouche={surcouche}
-                publier={(suite) => publierSurcoucheGithub(jeton!, suite)}
+                publier={(langue, modifications) => publierSurcoucheGithub(jeton!, langue, modifications)}
               />
             ),
           },

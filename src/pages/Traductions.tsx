@@ -75,7 +75,7 @@ export function Traductions() {
 
         <EditeurTraductions
           surcouche={surcouche}
-          publier={(suite) => publierTraductions(session, suite)}
+          publier={(langue, modifications) => publierTraductions(session, langue, modifications)}
         />
       </div>
     )

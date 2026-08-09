@@ -122,7 +122,7 @@ function pluginCsp() {
           `${metasPartage(urlPublique)}`,
       )
     },
-  }
+  };
 }
 
 /** Écrit version.json dans le build pour que l'app installée détecte les nouveaux déploiements. */

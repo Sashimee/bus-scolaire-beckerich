@@ -16,7 +16,7 @@
 import { validerPlan } from '../../src/lib/validation.ts'
 // Mêmes règles que le navigateur, importées et non réécrites : une seconde
 // implémentation aurait divergé au premier ajustement.
-import { relireSurcouche } from '../../src/lib/traductions.ts'
+import { appliquerModifications, relireSurcouche } from '../../src/lib/traductions.ts'
 import { ecrireFichier, lireFichier } from './github.js'
 
 const PREFIXE_AGENT = 'agent:'
@@ -470,9 +470,19 @@ async function journal(env, entetesCors) {
  */
 async function publierTraductions(requete, env, agent, entetesCors) {
   const charge = await corpsJson(requete, TAILLE_CORPS_MAX)
-  const propre = relireSurcouche(charge?.surcouche)
+  if (!LANGUES.includes(charge?.langue)) {
+    return json({ erreur: 'charge-invalide', motifs: ['langue'] }, 400, entetesCors)
+  }
 
-  const { sha } = await lireFichier(env, CHEMIN_TRADUCTIONS)
+  // On relit l'état courant AVANT de fusionner : deux traducteurs connectés en même
+  // temps ne doivent pas se recouvrir. Même raisonnement que `majUrgences`.
+  const { contenu, sha } = await lireFichier(env, CHEMIN_TRADUCTIONS)
+  const propre = appliquerModifications(
+    relireSurcouche(contenu),
+    charge.langue,
+    charge.modifications ?? {},
+  )
+
   const langues = Object.keys(propre)
   const nouveau = {
     $commentaire:
@@ -487,14 +497,21 @@ async function publierTraductions(requete, env, agent, entetesCors) {
     CHEMIN_TRADUCTIONS,
     JSON.stringify(nouveau, null, 2) + '\n',
     sha,
-    `Traductions (${langues.join(', ') || 'aucune'}) — publié par ${agent.nom}${
+    `Traductions (${charge.langue}) — publié par ${agent.nom}${
       agent.service ? ` (${agent.service})` : ''
     }`,
   )
-  await journaliser(env, agent, 'traductions', langues.join(', '))
+  await journaliser(
+    env,
+    agent,
+    'traductions',
+    `${charge.langue} · ${Object.keys(charge.modifications ?? {}).length} clé(s)`,
+  )
 
+  // On renvoie l'état fusionné : le client s'en sert comme nouvelle base, plutôt que de
+  // rester sur celui qu'il avait chargé à l'ouverture.
   const retenues = langues.reduce((n, l) => n + Object.keys(propre[l]).length, 0)
-  return json({ ok: true, retenues }, 200, entetesCors)
+  return json({ ok: true, retenues, surcouche: propre }, 200, entetesCors)
 }
 
 /**

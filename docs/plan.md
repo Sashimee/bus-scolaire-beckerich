@@ -1290,6 +1290,38 @@ Voir R20, rayée.
 
 ---
 
+## Correctif du 2026-08-09 — deux traducteurs se recouvraient
+
+> **Fait le 2026-08-09.** Défaut introduit par le lot 15 et trouvé sur question de
+> l'auteur : « que se passe-t-il si deux traducteurs publient en même temps ? »
+>
+> **Le dernier gagnait, et effaçait l'autre sans un mot.** L'éditeur envoyait la
+> surcouche ENTIÈRE, construite à partir de l'état chargé à l'ouverture de sa page ; le
+> Worker écrivait cette charge par-dessus le fichier. Deux traducteurs partis du même
+> état se recouvraient donc intégralement — y compris entre langues différentes, où il
+> n'y avait pourtant aucun désaccord. Le `sha` de GitHub n'y changeait rien : relu juste
+> avant l'écriture, il n'attrape qu'une collision de quelques millisecondes, pas deux
+> personnes qui travaillent le même après-midi.
+>
+> Le patron correct existait déjà dans le même fichier — `majUrgences` relit, transforme,
+> réécrit — et n'avait pas été suivi. Désormais : l'éditeur n'envoie que ses
+> modifications (`{ langue, modifications }`, `null` valant retrait), le Worker relit
+> l'état en ligne et fusionne clé par clé, puis renvoie l'état fusionné dont l'éditeur
+> se sert comme nouvelle base. `/admin` suit le même chemin — rien n'empêche les deux
+> espaces d'être ouverts ensemble.
+>
+> Deux personnes sur la même clé restent en dernier-arrivé-gagnant : c'est un vrai
+> désaccord, pas un accident de mécanique, et fusionner deux traductions d'une même
+> phrase n'aurait aucun sens.
+>
+> Vérifié : 6 tests sur `appliquerModifications`, et un test de bout en bout côté Worker
+> avec le fichier GitHub simulé — A publie en allemand, B en portugais, les deux
+> corrections coexistent dans le fichier réellement écrit.
+
+*Dépend du lot 15.*
+
+---
+
 ## Ordre d'exécution conseillé
 
 ```

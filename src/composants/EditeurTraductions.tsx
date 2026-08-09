@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react'
 import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import fr from '../i18n/fr.json'
-import { motifRefus, valeurDeReference, type Surcouche } from '../lib/traductions'
+import {
+  motifRefus,
+  valeurDeReference,
+  type Modifications,
+  type Surcouche,
+} from '../lib/traductions'
 import { useBlocageRechargement } from '../rechargement-contexte'
 
 /**
@@ -37,8 +42,12 @@ type Brouillon = Record<string, string | string[]>
 interface Props {
   /** Ce qui est déjà publié, pour amorcer les champs. */
   surcouche: Surcouche
-  /** Publie la surcouche complète. Le résumé sert de message de commit. */
-  publier: (surcouche: Surcouche, resume: string) => Promise<void>
+  /**
+   * Publie les seules corrections faites, pour une langue. Renvoie l'état fusionné tel
+   * qu'il est désormais en ligne — il peut contenir le travail d'un autre traducteur
+   * publié entre-temps.
+   */
+  publier: (langue: Langue, modifications: Modifications) => Promise<Surcouche>
 }
 
 /**
@@ -53,6 +62,9 @@ interface Props {
  */
 export function EditeurTraductions({ surcouche, publier }: Props) {
   const { t } = useT()
+  // Ce qui est en ligne, à notre connaissance. Amorcé par la surcouche chargée à
+  // l'ouverture, puis remplacé par l'état que le serveur renvoie à chaque publication.
+  const [publiees, setPubliees] = useState<Surcouche>(surcouche)
   const [langue, setLangue] = useState<Langue>('de')
   const [recherche, setRecherche] = useState('')
   const [brouillon, setBrouillon] = useState<Brouillon>({})
@@ -67,13 +79,13 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
   const valeurAffichee = (cle: string): string | string[] => {
     const b = brouillon[cle]
     if (b !== undefined) return b
-    const s = surcouche[langue]?.[cle]
+    const s = publiees[langue]?.[cle]
     if (s !== undefined) return s
     const reference = valeurDeReference(cle)
     return Array.isArray(reference) ? (reference as string[]) : ''
   }
 
-  const modifiee = (cle: string) => cle in brouillon || surcouche[langue]?.[cle] !== undefined
+  const modifiee = (cle: string) => cle in brouillon || publiees[langue]?.[cle] !== undefined
 
   const noter = (cle: string, valeur: string | string[]) => {
     setPubliee(false)
@@ -88,7 +100,7 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
       delete suite[cle]
       return suite
     })
-    if (surcouche[langue]?.[cle] !== undefined) {
+    if (publiees[langue]?.[cle] !== undefined) {
       // Marquer explicitement le retrait : sans cela, publier ne ferait que ne pas
       // toucher à l'entrée déjà en ligne.
       setBrouillon((b) => ({ ...b, [cle]: '' }))
@@ -121,18 +133,19 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
     setOccupe(true)
     setErreur(null)
     try {
-      // On republie la surcouche entière : c'est un fichier unique, et l'envoyer
-      // complet évite toute fusion côté serveur.
-      const entrees: Record<string, string | string[]> = { ...surcouche[langue] }
-      for (const [cle, valeur] of Object.entries(brouillon)) {
-        if (typeof valeur === 'string' && valeur === '') delete entrees[cle]
-        else entrees[cle] = valeur
-      }
-      const suite: Surcouche = { ...surcouche }
-      if (Object.keys(entrees).length) suite[langue] = entrees
-      else delete suite[langue]
+      // On n'envoie QUE les corrections faites ici, jamais la surcouche entière :
+      // c'est ce qui permet à deux traducteurs de travailler en même temps sans se
+      // recouvrir. Une chaîne vide veut dire « retire cette correction ».
+      const modifications: Modifications = Object.fromEntries(
+        Object.entries(brouillon).map(([cle, valeur]) => [
+          cle,
+          typeof valeur === 'string' && valeur === '' ? null : valeur,
+        ]),
+      )
 
-      await publier(suite, `${NOMS_LANGUES[langue]} · ${enAttente} correction(s)`)
+      // L'état renvoyé fait foi : il peut porter le travail d'un autre, publié pendant
+      // que celui-ci tapait.
+      setPubliees(await publier(langue, modifications))
       setBrouillon({})
       setPubliee(true)
     } catch (e) {

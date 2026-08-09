@@ -8,7 +8,8 @@
  */
 import { CHEMIN_CREDITS, CHEMIN_TRADUCTIONS, CHEMIN_URGENCES, DEPOT } from '../config'
 import { relireCredits, type Credits } from './credits'
-import { relireSurcouche, type Surcouche } from './traductions'
+import { appliquerModifications, relireSurcouche, type Modifications, type Surcouche } from './traductions'
+import type { Langue } from '../i18n/langues'
 import type { Urgences } from './urgences'
 
 const API = 'https://api.github.com'
@@ -115,10 +116,15 @@ export async function ecrireFichier(
  * Worker. La validation est la même des deux côtés — `relireSurcouche` — pour qu'un
  * fichier publié par l'un soit toujours lisible par l'autre.
  */
-export async function publierSurcoucheGithub(jeton: string, surcouche: Surcouche): Promise<void> {
-  const { sha } = await lireFichier<unknown>(jeton, CHEMIN_TRADUCTIONS)
-  const propre = relireSurcouche({ langues: surcouche })
-  const langues = Object.keys(propre)
+export async function publierSurcoucheGithub(
+  jeton: string,
+  langue: string,
+  modifications: Modifications,
+): Promise<Surcouche> {
+  // Relire avant de fusionner, comme le Worker : /admin et /traductions écrivent dans
+  // le même fichier, et rien n'empêche les deux d'être ouverts en même temps.
+  const { contenu, sha } = await lireFichier<unknown>(jeton, CHEMIN_TRADUCTIONS)
+  const propre = appliquerModifications(relireSurcouche(contenu), langue as Langue, modifications)
   await ecrireFichier(
     jeton,
     CHEMIN_TRADUCTIONS,
@@ -130,8 +136,9 @@ export async function publierSurcoucheGithub(jeton: string, surcouche: Surcouche
       langues: propre,
     },
     sha,
-    `Traductions (${langues.join(', ') || 'aucune'})`,
+    `Traductions (${langue})`,
   )
+  return propre
 }
 
 /**
