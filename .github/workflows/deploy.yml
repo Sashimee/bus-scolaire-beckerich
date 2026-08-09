@@ -61,6 +61,9 @@ jobs:
           # Vides, l'application fonctionne à l'identique, sans ces fonctionnalités.
           VITE_URL_WORKER: ${{ vars.URL_WORKER }}
           VITE_CLE_VAPID: ${{ vars.CLE_VAPID }}
+          # Vide, l'intégration Google Agenda disparaît de l'interface et l'export .ics
+          # reste seul — c'est le comportement voulu tant qu'aucun ID client n'existe.
+          VITE_ID_CLIENT_GOOGLE: ${{ vars.ID_CLIENT_GOOGLE }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
