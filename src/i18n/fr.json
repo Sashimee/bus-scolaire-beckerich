@@ -315,7 +315,8 @@
     "googleDeconnexion": "Déconnecter mon compte Google",
     "googleSynchroniser": "Mettre à jour l'agenda",
     "googleFait": "{nombre} rendez-vous écrits pour {enfants} enfant(s).",
-    "googleErreur": "La synchronisation a échoué. Reconnectez votre compte et réessayez."
+    "googleErreur": "La synchronisation a échoué. Reconnectez votre compte et réessayez.",
+    "googleConnexionEchec": "La connexion à Google a échoué. Le détail ci-dessous vient de Google ; signalez-le si vous ne savez pas quoi en faire."
   },
   "partage": {
     "titre": "Partager cette configuration",

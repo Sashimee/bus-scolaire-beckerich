@@ -315,7 +315,8 @@
     "googleDeconnexion": "Desligar a minha conta Google",
     "googleSynchroniser": "Atualizar a agenda",
     "googleFait": "{nombre} compromissos escritos para {enfants} criança(s).",
-    "googleErreur": "A sincronização falhou. Volte a ligar a conta e tente de novo."
+    "googleErreur": "A sincronização falhou. Volte a ligar a conta e tente de novo.",
+    "googleConnexionEchec": "A ligação ao Google falhou. O detalhe abaixo vem do Google; comunique-o se não souber o que fazer com ele."
   },
   "partage": {
     "titre": "Partilhar esta configuração",

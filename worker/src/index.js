@@ -391,6 +391,71 @@ async function essai(requete, env, origine) {
 }
 
 /**
+ * Échange un code d'autorisation Google contre un jeton d'accès.
+ *
+ * Google n'accepte cet échange d'un client « Application Web » qu'avec son
+ * `client_secret` — PKCE seul ne suffit que pour un client public (mobile, ordinateur).
+ * Le navigateur ne peut donc pas le faire lui-même, et mettre un secret dans du code
+ * servi aux parents n'aurait aucun sens. Le Worker s'en charge, exactement comme il le
+ * fait déjà pour GitHub : il détient le secret, le navigateur ne voit que le jeton.
+ *
+ * Le `code_verifier` de PKCE reste fourni par le navigateur : le Worker ne peut pas
+ * fabriquer un jeton pour quelqu'un qui n'a pas commencé la connexion.
+ */
+async function jetonGoogle(requete, env, origine) {
+  const entetes = cors(origine, env)
+  if (!env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_CLIENT_ID) {
+    return json({ erreur: 'google-non-configure' }, 503, entetes)
+  }
+
+  let corps
+  try {
+    corps = await corpsJson(requete, 8 * 1024)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400, entetes)
+  }
+  if (!corps?.code || !corps?.verificateur || !corps?.redirection) {
+    return json({ erreur: 'charge-invalide' }, 400, entetes)
+  }
+
+  // La redirection doit être une des nôtres : sans ce contrôle, n'importe qui pourrait
+  // faire échanger un code contre un jeton au profit d'un autre site.
+  if (!retourAutorise(corps.redirection, env)) {
+    return json({ erreur: 'redirection-non-autorisee' }, 400, entetes)
+  }
+
+  const rep = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      code: corps.code,
+      code_verifier: corps.verificateur,
+      grant_type: 'authorization_code',
+      redirect_uri: corps.redirection,
+    }),
+  })
+
+  const donnees = await rep.json().catch(() => ({}))
+  if (!rep.ok || !donnees.access_token) {
+    // Le motif de Google est renvoyé tel quel : sans lui, une connexion refusée reste
+    // indiagnosticable, ce qui a déjà coûté une demi-journée sur l'espace commune.
+    return json(
+      { erreur: 'echange-refuse', detail: donnees.error_description ?? donnees.error ?? rep.status },
+      502,
+      entetes,
+    )
+  }
+
+  return json(
+    { access_token: donnees.access_token, expires_in: donnees.expires_in ?? 3600 },
+    200,
+    entetes,
+  )
+}
+
+/**
  * Le jeton machine peut-il écrire dans le dépôt ?
  *
  * Une lecture suffit à distinguer les trois cas qui comptent : pas de jeton, jeton
@@ -705,6 +770,7 @@ export default {
             oauth: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
             ...(await santePush(env)),
             commune: Boolean(env.SECRET_SESSION && env.GITHUB_PAT),
+            google: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
             // Que le jeton machine soit POSÉ ne dit pas qu'il fonctionne. Sans cette
             // ligne, un jeton révoqué ou sans droit d'écriture ne se manifestait qu'au
             // moment d'une vraie publication, sous la forme d'une erreur illisible.
@@ -720,6 +786,8 @@ export default {
           return await abonner(requete, env, origine)
         case 'POST /desabonner':
           return await desabonner(requete, env, origine)
+        case 'POST /google/jeton':
+          return await jetonGoogle(requete, env, origine)
         case 'POST /essai':
           return await essai(requete, env, origine)
         case 'POST /notifier':

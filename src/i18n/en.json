@@ -315,7 +315,8 @@
     "googleDeconnexion": "Disconnect my Google account",
     "googleSynchroniser": "Update the calendar",
     "googleFait": "{nombre} appointments written for {enfants} child(ren).",
-    "googleErreur": "Synchronisation failed. Reconnect your account and try again."
+    "googleErreur": "Synchronisation failed. Reconnect your account and try again.",
+    "googleConnexionEchec": "Connecting to Google failed. The detail below comes from Google; report it if it means nothing to you."
   },
   "partage": {
     "titre": "Share this setup",

@@ -315,7 +315,8 @@
     "googleDeconnexion": "Google-Kont trennen",
     "googleSynchroniser": "Kalenner aktualiséieren",
     "googleFait": "{nombre} Rendez-vousë fir {enfants} Kand/Kanner geschriwwen.",
-    "googleErreur": "D'Synchronisatioun ass feelgeschloen. Verbannt de Kont nei a probéiert nach eng Kéier."
+    "googleErreur": "D'Synchronisatioun ass feelgeschloen. Verbannt de Kont nei a probéiert nach eng Kéier.",
+    "googleConnexionEchec": "D'Verbindung mat Google ass feelgeschloen. D'Detail hei ënnen kënnt vu Google; mellt et, wann Dir näischt domat ufänke kënnt."
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

@@ -66,9 +66,16 @@ function BlocGoogle() {
 
   // Le retour de Google porte un code dans l'URL : on l'échange puis on l'efface.
   useEffect(() => {
-    void terminerConnexion().then((ok) => {
-      if (ok) setJeton(chargerJeton())
-    })
+    terminerConnexion()
+      .then((ok) => {
+        if (ok) setJeton(chargerJeton())
+      })
+      .catch((e: unknown) => {
+        // Sans cela, un échange refusé renvoyait sur le bouton de connexion sans un
+        // mot : le parent recliquait indéfiniment sans savoir ce qui n'allait pas.
+        setErreur(true)
+        setResultat(e instanceof Error ? e.message : null)
+      })
   }, [])
 
   const enfants = foyer.enfants
@@ -110,8 +117,19 @@ function BlocGoogle() {
       <p className="champ__aide">{t('agenda.googleAide')}</p>
       <p className="champ__aide">{t('agenda.googlePortee')}</p>
 
-      {erreur && <div className="encart encart--alerte">{t('agenda.googleErreur')}</div>}
-      {resultat && <div className="encart encart--info">{resultat}</div>}
+      {/* `resultat` porte soit un compte rendu de synchronisation, soit — en cas
+          d'échec — le motif renvoyé par Google. Les deux ne se lisent pas pareil. */}
+      {erreur && (
+        <div className="encart encart--alerte">
+          <div className="encart__titre">{t('agenda.googleConnexionEchec')}</div>
+          {resultat && (
+            <p className="champ__aide">
+              <code>{resultat}</code>
+            </p>
+          )}
+        </div>
+      )}
+      {!erreur && resultat && <div className="encart encart--info">{resultat}</div>}
 
       {jeton ? (
         <>

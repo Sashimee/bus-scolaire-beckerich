@@ -15,13 +15,12 @@
  * Sans `VITE_ID_CLIENT_GOOGLE`, tout ce module reste inerte et la fonctionnalité
  * disparaît de l'interface — même politique que les notifications.
  */
-import { ID_CLIENT_GOOGLE } from '../../config'
+import { ID_CLIENT_GOOGLE, URL_WORKER } from '../../config'
 import type { EvenementRecurrent } from './evenements'
 import type { Jour } from '../types'
 
 const API = 'https://www.googleapis.com/calendar/v3'
 const AUTORISATION = 'https://accounts.google.com/o/oauth2/v2/auth'
-const JETON = 'https://oauth2.googleapis.com/token'
 const PORTEE = 'https://www.googleapis.com/auth/calendar.app.created'
 
 const CLE_VERIFICATEUR = 'bus-beckerich.google-verificateur'
@@ -124,28 +123,41 @@ export async function demarrerConnexion(): Promise<void> {
 export async function terminerConnexion(): Promise<boolean> {
   const params = new URLSearchParams(window.location.search)
   const code = params.get('code')
-  if (!code) return false
+  // Google renvoie `error=access_denied` quand le parent refuse l'autorisation.
+  const refus = params.get('error')
+  if (!code) {
+    if (refus) {
+      history.replaceState(null, '', window.location.pathname)
+      throw new Error(refus)
+    }
+    return false
+  }
 
   const v = sessionStorage.getItem(CLE_VERIFICATEUR)
   sessionStorage.removeItem(CLE_VERIFICATEUR)
   history.replaceState(null, '', window.location.pathname)
-  if (!v) return false
+  if (!v) throw new Error('verificateur-perdu')
 
-  const rep = await fetch(JETON, {
+  // L'échange passe par le Worker et non par Google directement : Google l'exige avec
+  // le `client_secret` pour un client « Application Web », et ce secret n'a rien à
+  // faire dans du code servi aux parents. Même mécanique que la connexion GitHub.
+  const rep = await fetch(`${URL_WORKER}/google/jeton`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: ID_CLIENT_GOOGLE,
-      code,
-      code_verifier: v,
-      grant_type: 'authorization_code',
-      redirect_uri: urlRetour(),
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, verificateur: v, redirection: urlRetour() }),
   })
-  if (!rep.ok) return false
 
-  const donnees = (await rep.json()) as { access_token?: string; expires_in?: number }
-  if (!donnees.access_token) return false
+  const donnees = (await rep.json().catch(() => ({}))) as {
+    access_token?: string
+    expires_in?: number
+    erreur?: string
+    detail?: unknown
+  }
+  // Un échec muet renvoyait le parent sur le bouton de connexion sans un mot, comme si
+  // rien ne s'était passé. On lève : l'écran dira quoi.
+  if (!rep.ok || !donnees.access_token) {
+    throw new Error(String(donnees.detail ?? donnees.erreur ?? rep.status))
+  }
 
   sessionStorage.setItem(
     CLE_JETON,

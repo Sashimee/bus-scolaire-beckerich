@@ -315,7 +315,8 @@
     "googleDeconnexion": "Google-Konto trennen",
     "googleSynchroniser": "Kalender aktualisieren",
     "googleFait": "{nombre} Termine für {enfants} Kind(er) geschrieben.",
-    "googleErreur": "Die Synchronisierung ist fehlgeschlagen. Konto erneut verbinden und nochmals versuchen."
+    "googleErreur": "Die Synchronisierung ist fehlgeschlagen. Konto erneut verbinden und nochmals versuchen.",
+    "googleConnexionEchec": "Die Verbindung zu Google ist fehlgeschlagen. Das Detail unten stammt von Google; melden Sie es, wenn Sie damit nichts anfangen können."
   },
   "partage": {
     "titre": "Diese Konfiguration teilen",
