@@ -564,7 +564,8 @@ async function santePush(env) {
 async function lireUrgencesPubliees(env) {
   const base = (env.URL_SITE ?? '').replace(/\/$/, '')
   if (!base) return []
-  const rep = await fetch(`${base}/urgences.json`, { cache: 'no-store' })
+  // Même raison qu'en `github.js` : `cache` n'est pas implémenté côté Workers.
+  const rep = await fetch(`${base}/urgences.json`, { cf: { cacheTtl: 0 } })
   if (!rep.ok) throw new Error(`urgences-illisibles-${rep.status}`)
   const donnees = await rep.json()
   return donnees?.perturbations ?? []

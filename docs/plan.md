@@ -40,10 +40,10 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | --- | --- | --- | --- |
 | R1 | 2, 7 | **La feuille sort d'iOS Safari, mes mesures viennent de Chrome.** Trois corrections successives le 2026-08-09 : hauteur des trajets, puis bandeau imprimé et en-têtes collés (sur PDF de l'auteur), puis corps resserré. Le banc annonçait 241 mm pour 273 disponibles et la feuille faisait toujours deux pages : Safari n'a ni les mêmes métriques de police, ni la même surface utile — il ajoute son en-tête et son pied de page. On ne vise donc plus 273 au millimètre, on prend de la marge : 215 mm à deux enfants, 236 mm à trois. **Je ne peux pas prédire la pagination de Safari depuis Chrome.** | Réimprimer. Si cela déborde encore, décocher « En-têtes et pieds de page » dans la boîte d'impression avant d'aller plus loin. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
-| R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
+| R3 | 8 | **Le Worker n'avait jamais écrit sur GitHub, et il ne le pouvait pas.** Découvert le 2026-08-09 en usage réel : `worker/src/github.js` appelait `fetch` avec `cache: 'no-store'`, option qui n'existe pas dans le runtime Cloudflare — « The 'cache' field on 'RequestInitializerDict' is not implemented ». TOUTE publication échouait à sa première lecture, depuis le lot 8. Corrigé (`cf: { cacheTtl: 0 }`), et un test relit les sources du Worker pour empêcher le retour. | Republier une perturbation depuis `/commune` et une correction depuis `/traductions`. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
-| R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
+| R7 | 10 | **Aucun rappel réel n'a été envoyé, et le cron ne pouvait pas aboutir** : il relisait `urgences.json` avec le même `cache: 'no-store'` interdit côté Workers. Corrigé le 2026-08-09 en même temps que R3, mais toujours pas exercé. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
 | ~~R8~~ | 10 | ~~Le sélecteur de préférence n'a pas été vu à l'écran.~~ **Levée le 2026-08-09** sur iPhone, notifications actives. |
 | ~~R9~~ | 11 | ~~La CSP avait été déclarée vérifiée à tort.~~ **Levée le 2026-08-09**, pour de bon cette fois : `connect-src` omettait `https://api.github.com`, ce qui rendait tout `/admin` muet en production depuis le lot 11. Corrigé, puis éprouvé par deux publications réelles de l'auteur — `Crédits : mise à jour` et `Urgence : annulation`, toutes deux passées par l'API GitHub depuis le navigateur. Leçon inscrite : une CSP n'est pas vérifiée tant que chaque origine qu'elle autorise n'a pas été exercée. |
 | ~~R10~~ | 12 | ~~Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.~~ **Levée le 2026-08-09** : importé dans Apple Calendrier depuis l'iPhone. |
@@ -1460,6 +1460,35 @@ Voir R20, rayée.
 > marge pour absorber ce que je ne peux pas reproduire.
 
 *Dépend du lot 7.*
+
+---
+
+## Correctif du 2026-08-09 — le Worker ne pouvait pas écrire sur GitHub
+
+> **Fait le 2026-08-09.** Trouvé grâce au détail d'erreur remonté quelques minutes plus
+> tôt : `Error: The 'cache' field on 'RequestInitializerDict' is not implemented.`
+>
+> **`cache: 'no-store'` n'existe pas dans le runtime Cloudflare.** Parfaitement valable
+> dans un navigateur, l'option fait lever le Worker. `worker/src/github.js` la posait sur
+> chaque lecture du dépôt : toute publication échouait donc à sa PREMIÈRE ligne utile,
+> et ce depuis le lot 8. Le cron des rappels avait le même appel sur `urgences.json`,
+> ce qui explique R7 sans l'avoir jamais cherché.
+>
+> Remplacé par `cf: { cacheTtl: 0 }`, l'équivalent côté Workers.
+>
+> **Pourquoi rien ne l'avait vu.** Les 72 tests du Worker remplacent `fetch` par une
+> fonction qui ignore ses options : une option refusée par le vrai runtime y passe
+> inaperçue. Et R3 notait justement que « le Worker n'a jamais tourné contre GitHub » —
+> la réserve décrivait le trou par lequel le défaut est passé, sans que personne fasse
+> le lien. `worker/src/runtime.test.js` relit désormais les sources et refuse l'option.
+>
+> **Enchaînement des trois correctifs de la journée sur ce seul symptôme** : le message
+> disait « Impossible de joindre le serveur » parce que le 500 n'avait pas d'en-têtes
+> CORS ; une fois les CORS posés, il disait « le serveur a rencontré une erreur » sans
+> plus ; une fois le détail remonté, il a nommé la cause en une ligne. Chaque couche
+> cachait la suivante.
+
+*Dépend du lot 8.*
 
 ---
 

@@ -46,7 +46,10 @@ export async function lireFichier(env, chemin) {
   const d = depot(env)
   const rep = await fetch(
     `${API}/repos/${d.proprietaire}/${d.nom}/contents/${chemin}?ref=${d.branche}`,
-    { headers: entetes(env.GITHUB_PAT), cache: 'no-store' },
+    // `cache: 'no-store'` n'existe PAS dans le runtime Cloudflare : le Worker lève
+    // « The 'cache' field on 'RequestInitializerDict' is not implemented » et toute
+    // publication échouait à sa première lecture. `cf.cacheTtl` est l'équivalent ici.
+    { headers: entetes(env.GITHUB_PAT), cf: { cacheTtl: 0 } },
   )
   if (!rep.ok) throw new Error(`lecture-impossible-${rep.status}`)
   const donnees = await rep.json()
