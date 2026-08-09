@@ -38,7 +38,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **L'aperçu papier débordait, et personne ne l'avait vu.** Signalé en usage réel le 2026-08-09 : deux enfants ne tenaient pas sur une feuille. Cause mesurée — la mise en page supposait la largeur contraignante alors que c'est la hauteur : 285 mm pour 273 disponibles. Corrigé (deux lignes par trajet au lieu de trois, pagination par trois enfants au lieu de cinq) et remesuré : 1 à 3 enfants tiennent en 220 mm, 4 et 5 font deux pages. **Mais toujours pas imprimé sur du vrai papier.** | Réimprimer depuis `/reglages` avec deux enfants, puis avec quatre. |
+| R1 | 2, 7 | **La feuille tenait sur deux pages, et personne ne l'avait imprimée.** Deux corrections successives : la hauteur des trajets (2026-08-09, matin), puis — sur PDF envoyé par l'auteur — le bandeau des perturbations qui s'imprimait et deux lignes d'en-tête collées. Remesuré sur la PAGE entière cette fois, et non sur la fiche isolée : 245 mm pour 273 disponibles, avec deux enfants dont un au Dillendapp. Un test lit désormais la couche `impression` et vérifie les règles qui l'avaient cassée. | Réimprimer une dernière fois : c'est le seul écran que ni les tests ni le navigateur automatisé ne voient. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
@@ -1419,6 +1419,37 @@ Voir R20, rayée.
 > une heure plus tôt.
 
 *Dépend du lot 15.*
+
+---
+
+## Correctif du 2026-08-09 — ce que la mesure ne voyait pas
+
+> **Fait le 2026-08-09**, sur un PDF envoyé par l'auteur. La correction du matin avait
+> ramené la fiche sous les 273 mm ; la feuille faisait toujours deux pages.
+>
+> **Ma mesure portait sur le mauvais objet.** Le banc mesurait `.fiche-foyer` isolée, en
+> supposant que le reste était masqué à l'impression. Il ne l'était pas :
+>
+> - **`.bandeaux` manquait dans la liste des éléments masqués** — au pluriel, alors que
+>   la règle ne citait que `.bandeau`. Le bandeau des perturbations en cours s'imprimait
+>   donc en tête de feuille, avec l'avertissement d'indépendance, et poussait la semaine
+>   sur une seconde page. Au-delà de la place : une annulation valable deux jours n'a
+>   rien à faire sur une feuille qu'on garde sur le frigo.
+> - **`.fiche__ligne` n'était `display: block` que dans la liste des trajets.** Dans
+>   l'en-tête de colonne, deux lignes consécutives se suivaient : « École primaire de
+>   BeckerichElvange · Schoul », qui se lit comme un nom de lieu inventé.
+>
+> Remesuré sur la page entière, avec deux enfants dont un au Dillendapp : **245 mm**.
+> Deux artefacts du banc corrigés au passage — il forçait `.fiche` en `display: block`
+> au lieu de laisser l'impression décider, et `min-block-size: 100dvh` sur le corps
+> ajoutait la hauteur de la fenêtre au total.
+>
+> **Leçon** : `@media print` ne s'applique nulle part ailleurs que sur du papier. Ni les
+> tests ni le navigateur automatisé ne le voient. `src/impression.test.ts` lit désormais
+> la couche `impression` et vérifie les règles qui l'ont cassée — c'est faible, mais
+> c'est plus qu'une relecture.
+
+*Dépend du lot 7.*
 
 ---
 

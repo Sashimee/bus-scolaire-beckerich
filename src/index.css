@@ -1580,10 +1580,18 @@
       --accent: #000;
     }
 
-    /* On masque toute l'interface : seule la fiche est imprimée. */
+    /*
+     * On masque toute l'interface : seule la fiche est imprimée.
+     *
+     * `.bandeaux` au pluriel, et pas seulement `.bandeau` : le conteneur des
+     * perturbations en cours portait l'autre nom et s'imprimait donc en tête de
+     * feuille. Une annulation valable deux jours n'a rien à faire sur une feuille
+     * qu'on garde sur le frigo — et elle poussait la semaine sur une seconde page.
+     */
     .entete,
     .pied,
     .bandeau,
+    .bandeaux,
     .nav-basse,
     .sans-impression,
     .ecran-seulement {
@@ -1679,7 +1687,14 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /*
+     * `display: block` ici et non seulement dans la liste des trajets : dans l'en-tête
+     * de colonne, deux `fiche__ligne` consécutives se suivaient sur la même ligne et
+     * donnaient « École primaire de BeckerichElvange · Schoul », qui se lit comme un
+     * nom de lieu inventé.
+     */
     .fiche__ligne {
+      display: block;
       color: #333;
       font-size: 8.5pt;
     }
@@ -1767,6 +1782,7 @@
     }
 
     .fiche__destination {
+      display: inline;
       color: #333;
       font-size: 8.5pt;
     }
