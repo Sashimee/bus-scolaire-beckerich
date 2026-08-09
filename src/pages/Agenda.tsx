@@ -62,7 +62,14 @@ function BlocGoogle() {
   const [jeton, setJeton] = useState<string | null>(chargerJeton)
   const [occupe, setOccupe] = useState(false)
   const [resultat, setResultat] = useState<string | null>(null)
-  const [erreur, setErreur] = useState(false)
+  /**
+   * Ce qui a échoué : la connexion, ou l'écriture dans l'agenda.
+   *
+   * Les deux allumaient le même drapeau. Une synchronisation refusée s'annonçait donc
+   * comme un échec de connexion, et sans le moindre détail — alors que Google dit
+   * précisément ce qui bloque.
+   */
+  const [erreur, setErreur] = useState<'connexion' | 'synchronisation' | null>(null)
 
   // Le retour de Google porte un code dans l'URL : on l'échange puis on l'efface.
   useEffect(() => {
@@ -73,7 +80,7 @@ function BlocGoogle() {
       .catch((e: unknown) => {
         // Sans cela, un échange refusé renvoyait sur le bouton de connexion sans un
         // mot : le parent recliquait indéfiniment sans savoir ce qui n'allait pas.
-        setErreur(true)
+        setErreur('connexion')
         setResultat(e instanceof Error ? e.message : null)
       })
   }, [])
@@ -85,7 +92,7 @@ function BlocGoogle() {
   const synchroniser = async () => {
     if (!jeton) return
     setOccupe(true)
-    setErreur(false)
+    setErreur(null)
     setResultat(null)
     try {
       const options = {
@@ -100,12 +107,17 @@ function BlocGoogle() {
         total += r.ecrits
       }
       setResultat(t('agenda.googleFait', { nombre: total, enfants: enfants.length }))
-    } catch {
-      setErreur(true)
-      // Un jeton expiré est le cas le plus fréquent : on le jette pour que le parent
-      // se reconnecte au lieu de réessayer indéfiniment.
-      oublierJeton()
-      setJeton(null)
+    } catch (e) {
+      setErreur('synchronisation')
+      setResultat(e instanceof Error ? e.message : null)
+      // On ne jette le jeton que s'il est VRAIMENT refusé. Le jeter à la moindre
+      // erreur ramenait le bouton « Connecter » après une portée manquante ou une API
+      // non activée, ce qui laissait croire à un problème de connexion — et faisait
+      // recommencer une autorisation qui n'y changeait rien.
+      if ((e as { statut?: number })?.statut === 401) {
+        oublierJeton()
+        setJeton(null)
+      }
     } finally {
       setOccupe(false)
     }
@@ -121,7 +133,9 @@ function BlocGoogle() {
           d'échec — le motif renvoyé par Google. Les deux ne se lisent pas pareil. */}
       {erreur && (
         <div className="encart encart--alerte">
-          <div className="encart__titre">{t('agenda.googleConnexionEchec')}</div>
+          <div className="encart__titre">
+            {t(erreur === 'connexion' ? 'agenda.googleConnexionEchec' : 'agenda.googleEcritureEchec')}
+          </div>
           {resultat && (
             <p className="champ__aide">
               <code>{resultat}</code>
@@ -187,12 +201,26 @@ export function Agenda() {
         <p className="champ__aide">{t('agenda.remarqueMiseAJour')}</p>
       </section>
 
+      {/*
+          Les deux voies, de la plus directe à la plus manuelle.
+
+          Google arrivait APRÈS la marche à suivre d'import d'un fichier .ics — des
+          instructions qui ne le concernent en rien, puisqu'il n'y a aucun fichier à
+          importer. Un parent qui voulait Google devait donc traverser une procédure
+          sans rapport pour découvrir qu'elle ne s'appliquait pas à lui.
+      */}
+      {googleConfigure() && <BlocGoogle />}
+
       <section className="pile pile--serre">
+        {/* « Ou importer… » ne veut rien dire s'il n'y a pas de premier choix
+            au-dessus : sans Google configuré, cette voie est la seule. */}
+        <h3 className="titre-carte">
+          {t(googleConfigure() ? 'agenda.icsTitre' : 'agenda.icsTitreSeul')}
+        </h3>
+        <p className="champ__aide">{t('agenda.icsIntro')}</p>
         <span className="etiquette">{t('installer.detecte')}</span>
         <Procedure cle={plateforme} principal />
       </section>
-
-      {googleConfigure() && <BlocGoogle />}
 
       <details className="repli carte">
         <summary>{t('installer.autres')}</summary>

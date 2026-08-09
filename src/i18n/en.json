@@ -18,7 +18,8 @@
     "installerCourt": "Install",
     "menu": "Menu",
     "retour": "Back",
-    "principale": "Main navigation"
+    "principale": "Main navigation",
+    "credits": "Credits"
   },
   "avertissement": {
     "titre": "Before you start",
@@ -316,7 +317,12 @@
     "googleSynchroniser": "Update the calendar",
     "googleFait": "{nombre} appointments written for {enfants} child(ren).",
     "googleErreur": "Synchronisation failed. Reconnect your account and try again.",
-    "googleConnexionEchec": "Connecting to Google failed. The detail below comes from Google; report it if it means nothing to you."
+    "googleConnexionEchec": "Connecting to Google failed. The detail below comes from Google; report it if it means nothing to you.",
+    "icsTitre": "Or import the file once",
+    "icsIntro": "No account to connect: you download a file from the child's sheet and open it in your calendar. Works everywhere, but must be redone if timetables change.",
+    "lienDepuisFiche": "Calendar: Google, Apple, Outlook",
+    "googleEcritureEchec": "Writing to Google Calendar was refused. You stay connected: the detail below comes from Google and says what is blocking.",
+    "icsTitreSeul": "Import the file into your calendar"
   },
   "partage": {
     "titre": "Share this setup",

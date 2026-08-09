@@ -18,7 +18,8 @@
     "installerCourt": "Instalar",
     "menu": "Menu",
     "retour": "Voltar",
-    "principale": "Navegação principal"
+    "principale": "Navegação principal",
+    "credits": "Créditos"
   },
   "avertissement": {
     "titre": "Antes de começar",
@@ -316,7 +317,12 @@
     "googleSynchroniser": "Atualizar a agenda",
     "googleFait": "{nombre} compromissos escritos para {enfants} criança(s).",
     "googleErreur": "A sincronização falhou. Volte a ligar a conta e tente de novo.",
-    "googleConnexionEchec": "A ligação ao Google falhou. O detalhe abaixo vem do Google; comunique-o se não souber o que fazer com ele."
+    "googleConnexionEchec": "A ligação ao Google falhou. O detalhe abaixo vem do Google; comunique-o se não souber o que fazer com ele.",
+    "icsTitre": "Ou importar o ficheiro uma vez",
+    "icsIntro": "Sem ligar nenhuma conta: descarrega um ficheiro a partir da ficha da criança e abre-o na sua agenda. Funciona em todo o lado, mas há que repetir se os horários mudarem.",
+    "lienDepuisFiche": "Agenda: Google, Apple, Outlook",
+    "googleEcritureEchec": "A escrita na Agenda Google foi recusada. Continua ligado: o detalhe abaixo vem do Google e indica o que bloqueia.",
+    "icsTitreSeul": "Importar o ficheiro na sua agenda"
   },
   "partage": {
     "titre": "Partilhar esta configuração",

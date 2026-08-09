@@ -65,6 +65,7 @@ export default function App() {
           <nav aria-label={t('nav.menu')}>
             <Link to="/limites">{t('nav.limites')}</Link>
             <Link to="/independance">{t('nav.independance')}</Link>
+            <Link to="/credits">{t('nav.credits')}</Link>
             <Link to="/installer">{t('nav.installer')}</Link>
           </nav>
           <p>{t('avertissement.independance')}</p>

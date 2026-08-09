@@ -61,10 +61,6 @@ export function Reglages() {
               </option>
             ))}
           </select>
-          {/* Là où l'on choisit sa langue, c'est là que les traducteurs comptent. */}
-          <p className="champ__aide">
-            <Link to="/credits">{t('credits.lienDepuisReglages')}</Link>
-          </p>
         </div>
 
         <div className="champ">

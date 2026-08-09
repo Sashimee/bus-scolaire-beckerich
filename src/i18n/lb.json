@@ -18,7 +18,8 @@
     "installerCourt": "Installéieren",
     "menu": "Menü",
     "retour": "Zréck",
-    "principale": "Haaptnavigatioun"
+    "principale": "Haaptnavigatioun",
+    "credits": "Merci"
   },
   "avertissement": {
     "titre": "Ier Dir ufänkt",
@@ -316,7 +317,12 @@
     "googleSynchroniser": "Kalenner aktualiséieren",
     "googleFait": "{nombre} Rendez-vousë fir {enfants} Kand/Kanner geschriwwen.",
     "googleErreur": "D'Synchronisatioun ass feelgeschloen. Verbannt de Kont nei a probéiert nach eng Kéier.",
-    "googleConnexionEchec": "D'Verbindung mat Google ass feelgeschloen. D'Detail hei ënnen kënnt vu Google; mellt et, wann Dir näischt domat ufänke kënnt."
+    "googleConnexionEchec": "D'Verbindung mat Google ass feelgeschloen. D'Detail hei ënnen kënnt vu Google; mellt et, wann Dir näischt domat ufänke kënnt.",
+    "icsTitre": "Oder d'Datei eemol importéieren",
+    "icsIntro": "Ouni Kontverbindung: Dir luet eng Datei vun der Fiche vum Kand erof a maacht se an Ärem Kalenner op. Funktionéiert iwwerall, muss awer bei Ännerunge widderholl ginn.",
+    "lienDepuisFiche": "Kalenner: Google, Apple, Outlook",
+    "googleEcritureEchec": "D'Schreiwen an de Google Kalenner gouf refuséiert. Dir bleift verbonnen: d'Detail hei ënnen kënnt vu Google a seet, wat blockéiert.",
+    "icsTitreSeul": "D'Datei an Äre Kalenner importéieren"
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

@@ -18,7 +18,8 @@
     "installerCourt": "Installer",
     "menu": "Menu",
     "retour": "Retour",
-    "principale": "Navigation principale"
+    "principale": "Navigation principale",
+    "credits": "Crédits"
   },
   "avertissement": {
     "titre": "Avant de commencer",
@@ -316,7 +317,12 @@
     "googleSynchroniser": "Mettre à jour l'agenda",
     "googleFait": "{nombre} rendez-vous écrits pour {enfants} enfant(s).",
     "googleErreur": "La synchronisation a échoué. Reconnectez votre compte et réessayez.",
-    "googleConnexionEchec": "La connexion à Google a échoué. Le détail ci-dessous vient de Google ; signalez-le si vous ne savez pas quoi en faire."
+    "googleConnexionEchec": "La connexion à Google a échoué. Le détail ci-dessous vient de Google ; signalez-le si vous ne savez pas quoi en faire.",
+    "icsTitre": "Ou importer le fichier une fois",
+    "icsIntro": "Sans connexion à un compte : vous téléchargez un fichier depuis la fiche de l'enfant et vous l'ouvrez dans votre agenda. Fonctionne partout, mais à refaire si les horaires changent.",
+    "lienDepuisFiche": "Agenda : Google, Apple, Outlook",
+    "googleEcritureEchec": "L'écriture dans Google Agenda a été refusée. Vous restez connecté : le détail ci-dessous vient de Google et dit ce qui bloque.",
+    "icsTitreSeul": "Importer le fichier dans votre agenda"
   },
   "partage": {
     "titre": "Partager cette configuration",

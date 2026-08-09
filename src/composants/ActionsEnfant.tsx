@@ -90,7 +90,7 @@ export function ActionsEnfant({ ctx }: { ctx: ContexteEnfant }) {
           )}
 
           <Link to="/agenda" className="bouton bouton--discret">
-            {t('calendrier.commentImporter')}
+            {t('agenda.lienDepuisFiche')}
           </Link>
         </>
       )}

@@ -180,7 +180,19 @@ async function appeler<T>(jeton: string, chemin: string, options: RequestInit = 
       ...options.headers,
     },
   })
-  if (!rep.ok) throw new Error(`google-${rep.status}`)
+  if (!rep.ok) {
+    // Google explique précisément ce qui bloque — portée absente, API non activée,
+    // quota. Ne garder que le code HTTP privait le parent de la seule information
+    // exploitable, et moi du seul moyen de l'aider à distance.
+    const corps = (await rep.json().catch(() => ({}))) as {
+      error?: { message?: string; status?: string }
+    }
+    const motif = corps.error?.message ?? corps.error?.status ?? ''
+    const erreur = new Error(motif ? `${rep.status} — ${motif}` : `google-${rep.status}`)
+    // Marqué pour que l'appelant sache s'il faut redemander une connexion ou non.
+    ;(erreur as Error & { statut?: number }).statut = rep.status
+    throw erreur
+  }
   return (await rep.json()) as T
 }
 

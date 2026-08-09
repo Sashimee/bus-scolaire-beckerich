@@ -18,7 +18,8 @@
     "installerCourt": "Installieren",
     "menu": "Menü",
     "retour": "Zurück",
-    "principale": "Hauptnavigation"
+    "principale": "Hauptnavigation",
+    "credits": "Danksagung"
   },
   "avertissement": {
     "titre": "Bevor Sie beginnen",
@@ -316,7 +317,12 @@
     "googleSynchroniser": "Kalender aktualisieren",
     "googleFait": "{nombre} Termine für {enfants} Kind(er) geschrieben.",
     "googleErreur": "Die Synchronisierung ist fehlgeschlagen. Konto erneut verbinden und nochmals versuchen.",
-    "googleConnexionEchec": "Die Verbindung zu Google ist fehlgeschlagen. Das Detail unten stammt von Google; melden Sie es, wenn Sie damit nichts anfangen können."
+    "googleConnexionEchec": "Die Verbindung zu Google ist fehlgeschlagen. Das Detail unten stammt von Google; melden Sie es, wenn Sie damit nichts anfangen können.",
+    "icsTitre": "Oder die Datei einmalig importieren",
+    "icsIntro": "Ohne Kontoverbindung: Sie laden eine Datei aus der Übersicht des Kindes herunter und öffnen sie in Ihrem Kalender. Funktioniert überall, muss aber bei Fahrplanänderungen wiederholt werden.",
+    "lienDepuisFiche": "Kalender: Google, Apple, Outlook",
+    "googleEcritureEchec": "Das Schreiben in Google Kalender wurde abgelehnt. Sie bleiben verbunden: das Detail unten stammt von Google und nennt die Ursache.",
+    "icsTitreSeul": "Die Datei in Ihren Kalender importieren"
   },
   "partage": {
     "titre": "Diese Konfiguration teilen",
