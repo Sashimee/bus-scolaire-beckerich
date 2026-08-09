@@ -1,7 +1,21 @@
 {
   "$commentaire": "Perturbations en cours. Ce fichier est servi tel quel et relu par l'application À CHAQUE OUVERTURE, sans reconstruction du bundle : c'est ce qui permet de publier une urgence en une minute. Il se modifie depuis la page /admin, ou directement ici. Les dates sont inclusives et les perturbations expirent d'elles-mêmes.",
   "version": 1,
-  "misAJour": "2026-08-09T16:04:53.375Z",
-  "perturbations": [],
+  "misAJour": "2026-08-09T17:43:56.750Z",
+  "perturbations": [
+    {
+      "id": "commune-msm3ctv8",
+      "type": "annulation",
+      "gravite": "alerte",
+      "du": "2026-08-09",
+      "au": "2026-08-09",
+      "message": {
+        "fr": "Désolé prenez un taxi"
+      },
+      "rappels": 3,
+      "publieLe": "2026-08-09T17:43:29.482Z",
+      "publiePar": "Philippe Hoffmann"
+    }
+  ],
   "correctionsArrets": []
 }
