@@ -806,6 +806,8 @@
     "publier": "Publier les crédits",
     "publiee": "Crédits publiés. Ils apparaîtront après le redéploiement, dans une à deux minutes.",
     "editeurAide": "Ces crédits font partie du site : leur publication déclenche une reconstruction, contrairement aux corrections de texte.",
-    "lienDepuisReglages": "Qui a fait cette application ?"
+    "lienDepuisReglages": "Qui a fait cette application ?",
+    "lectureEchec": "Les crédits n'ont pas pu être lus depuis le dépôt. Rechargez la page.",
+    "conflit": "Quelqu'un a publié les crédits entre-temps. Rechargez la page : vos modifications ne sont pas enregistrées, mais celles de l'autre ne sont pas écrasées non plus."
   }
 }

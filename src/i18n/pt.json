@@ -806,6 +806,8 @@
     "publier": "Publicar os créditos",
     "publiee": "Créditos publicados. Aparecerão após a reconstrução, dentro de um a dois minutos.",
     "editeurAide": "Estes créditos fazem parte do site: publicá-los desencadeia uma reconstrução, ao contrário das correções de texto.",
-    "lienDepuisReglages": "Quem fez esta aplicação?"
+    "lienDepuisReglages": "Quem fez esta aplicação?",
+    "lectureEchec": "Não foi possível ler os créditos a partir do repositório. Recarregue a página.",
+    "conflit": "Alguém publicou os créditos entretanto. Recarregue a página: as suas alterações não ficaram guardadas, mas as do outro também não foram substituídas."
   }
 }

@@ -806,6 +806,8 @@
     "publier": "Danksagung veröffentlichen",
     "publiee": "Veröffentlicht. Erscheint nach der Neuerstellung, in ein bis zwei Minuten.",
     "editeurAide": "Diese Danksagung gehört zur Website: ihre Veröffentlichung löst eine Neuerstellung aus, anders als Textkorrekturen.",
-    "lienDepuisReglages": "Wer hat diese Anwendung gemacht?"
+    "lienDepuisReglages": "Wer hat diese Anwendung gemacht?",
+    "lectureEchec": "Die Danksagung konnte nicht aus dem Repository gelesen werden. Laden Sie die Seite neu.",
+    "conflit": "Jemand hat die Danksagung inzwischen veröffentlicht. Laden Sie die Seite neu: Ihre Änderungen sind nicht gespeichert, die des anderen aber auch nicht überschrieben."
   }
 }

@@ -141,25 +141,54 @@ export async function publierSurcoucheGithub(
   return propre
 }
 
+export interface CreditsEnLigne {
+  credits: Credits
+  /** Le fichier tel qu'il était au chargement : sert à refuser une écriture aveugle. */
+  sha: string
+  /** Conservé pour ne pas perdre la règle sur les noms de tiers à la republication. */
+  commentaire: unknown
+}
+
+/**
+ * Lit les crédits TELS QU'ILS SONT DANS LE DÉPÔT.
+ *
+ * L'éditeur s'amorçait sur `src/data/credits.json` compilé dans le bundle. Publier une
+ * modification, puis rouvrir `/admin` avant que le site soit reconstruit, réaffichait
+ * donc l'ancienne version — et la republier annulait le travail précédent. Le fichier
+ * du dépôt fait foi, pas celui de la dernière construction.
+ */
+export async function lireCreditsGithub(jeton: string): Promise<CreditsEnLigne> {
+  const { contenu, sha } = await lireFichier<Record<string, unknown>>(jeton, CHEMIN_CREDITS)
+  return { credits: relireCredits(contenu), sha, commentaire: contenu.$commentaire }
+}
+
 /**
  * Publie les crédits.
  *
  * Contrairement aux traductions, ce fichier est DANS le bundle : sa publication
  * déclenche une reconstruction du site. C'est acceptable pour une page qui change
  * quelques fois par an, et cela lui évite un aller-réseau à chaque ouverture.
+ *
+ * Le `sha` transmis est celui lu à l'ouverture de l'éditeur, et non un `sha` relu à
+ * l'instant : c'est GitHub qui refuse alors l'écriture si quelqu'un a publié entre
+ * temps. Une liste de personnes ne se fusionne pas — l'ordre compte, un renommage n'est
+ * pas distinguable d'un ajout — donc on préfère refuser franchement que deviner.
  */
-export async function publierCreditsGithub(jeton: string, credits: Credits): Promise<void> {
-  const { contenu, sha } = await lireFichier<Record<string, unknown>>(jeton, CHEMIN_CREDITS)
+export async function publierCreditsGithub(
+  jeton: string,
+  credits: Credits,
+  { sha, commentaire }: Pick<CreditsEnLigne, 'sha' | 'commentaire'>,
+): Promise<CreditsEnLigne> {
   const propre = relireCredits(credits)
   await ecrireFichier(
     jeton,
     CHEMIN_CREDITS,
-    // Le `$commentaire` du fichier porte la règle sur les noms de tiers : le perdre à
-    // la première publication depuis /admin serait dommage.
-    { $commentaire: contenu.$commentaire, ...propre },
+    { $commentaire: commentaire, ...propre },
     sha,
     'Crédits : mise à jour',
   )
+  // Le `sha` a changé : on relit pour que l'éditeur puisse republier sans recharger.
+  return lireCreditsGithub(jeton)
 }
 
 export interface FichierUrgences {

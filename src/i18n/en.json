@@ -806,6 +806,8 @@
     "publier": "Publish the credits",
     "publiee": "Credits published. They will appear after the rebuild, in a minute or two.",
     "editeurAide": "These credits are part of the site: publishing them triggers a rebuild, unlike wording corrections.",
-    "lienDepuisReglages": "Who made this app?"
+    "lienDepuisReglages": "Who made this app?",
+    "lectureEchec": "The credits could not be read from the repository. Reload the page.",
+    "conflit": "Someone published the credits in the meantime. Reload the page: your changes are not saved, but neither were theirs overwritten."
   }
 }

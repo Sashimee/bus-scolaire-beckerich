@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useT } from '../i18n'
 import { ResumePerturbation } from '../composants/BandeauUrgences'
 import { useUrgences } from '../urgences-contexte'
@@ -7,6 +7,7 @@ import { arrets, plan } from '../lib/donnees'
 import { nomArret } from '../lib/affichage'
 import { isoDate } from '../lib/calendrier'
 import {
+  lireCreditsGithub,
   lireUrgencesDepot,
   publierCreditsGithub,
   publierSurcoucheGithub,
@@ -16,7 +17,6 @@ import {
 } from '../lib/github'
 import { nouvelIdentifiant, type Gravite, type Perturbation, type TypePerturbation } from '../lib/urgences'
 import { URL_WORKER, connexionGithubConfiguree, lienEditeurGithub } from '../config'
-import { credits } from '../lib/credits'
 import { AdminArrets } from '../composants/AdminArrets'
 import { AdminPlan } from '../composants/AdminPlan'
 import { EditeurCredits } from '../composants/EditeurCredits'
@@ -128,6 +128,10 @@ export function Admin() {
   })
 
   const servicesDeLaLigne = plan.lignes.find((l) => l.id === ligne)?.services ?? []
+
+  // Stable : `EditeurCredits` en fait une dépendance d'effet, et une fonction recréée
+  // à chaque rendu relancerait la lecture GitHub sans fin.
+  const chargerCredits = useCallback(() => lireCreditsGithub(jeton!), [jeton])
 
   async function ecrire(transformer: (p: Perturbation[]) => Perturbation[], resume: string) {
     if (!jeton) return
@@ -503,8 +507,8 @@ export function Admin() {
             libelle: t('admin.ongletCredits'),
             contenu: (
               <EditeurCredits
-                credits={credits}
-                publier={(suite) => publierCreditsGithub(jeton!, suite)}
+                charger={chargerCredits}
+                publier={(suite, base) => publierCreditsGithub(jeton!, suite, base)}
               />
             ),
           },

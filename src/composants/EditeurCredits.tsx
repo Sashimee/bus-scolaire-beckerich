@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import { lienSur, relireCredits, type Credit, type Credits } from '../lib/credits'
+import type { CreditsEnLigne } from '../lib/github'
 import { useBlocageRechargement } from '../rechargement-contexte'
 
 /** Une liste de personnes, modifiable : ajouter, retirer, réordonner. */
@@ -122,25 +123,58 @@ function ListeCredits({
  * que corriger une tournure.
  */
 export function EditeurCredits({
-  credits: publies,
+  charger,
   publier,
 }: {
-  credits: Credits
-  publier: (credits: Credits) => Promise<void>
+  /** Lit les crédits du dépôt. Le bundle peut avoir une version en retard. */
+  charger: () => Promise<CreditsEnLigne>
+  publier: (credits: Credits, base: CreditsEnLigne) => Promise<CreditsEnLigne>
 }) {
   const { t } = useT()
-  const [brouillon, setBrouillon] = useState<Credits>(publies)
+  const [enLigne, setEnLigne] = useState<CreditsEnLigne | null>(null)
+  const [brouillon, setBrouillon] = useState<Credits | null>(null)
   const [langue, setLangue] = useState<Langue>('de')
   const [occupe, setOccupe] = useState(false)
-  const [erreur, setErreur] = useState(false)
+  const [erreur, setErreur] = useState<'conflit' | 'autre' | null>(null)
   const [publiee, setPubliee] = useState(false)
 
-  const modifie = JSON.stringify(brouillon) !== JSON.stringify(publies)
+  // On part de ce qui est dans le dépôt, pas de ce qui était dans la dernière
+  // construction : sans cela, republier après une modification récente l'annulait.
+  useEffect(() => {
+    let annule = false
+    charger()
+      .then((x) => {
+        if (annule) return
+        setEnLigne(x)
+        setBrouillon(x.credits)
+      })
+      .catch(() => !annule && setErreur('autre'))
+    return () => {
+      annule = true
+    }
+  }, [charger])
+
+  const modifie =
+    brouillon !== null && enLigne !== null &&
+    JSON.stringify(brouillon) !== JSON.stringify(enLigne.credits)
   useBlocageRechargement(modifie, 'brouillon-credits')
+
+  if (!brouillon || !enLigne) {
+    return (
+      <div className="pile">
+        {erreur ? (
+          <div className="encart encart--alerte">{t('credits.lectureEchec')}</div>
+        ) : (
+          <p className="champ__aide">{t('commun.chargement')}</p>
+        )}
+      </div>
+    )
+  }
 
   const changer = (champs: Partial<Credits>) => {
     setPubliee(false)
-    setBrouillon((b) => ({ ...b, ...champs }))
+    setErreur(null)
+    setBrouillon((b) => ({ ...b!, ...champs }))
   }
 
   // Un nom vide ne serait pas publié : autant le dire avant d'envoyer.
@@ -152,13 +186,17 @@ export function EditeurCredits({
 
   const envoyer = async () => {
     setOccupe(true)
-    setErreur(false)
+    setErreur(null)
     try {
-      // On republie ce que la page affichera réellement, pas le brouillon brut.
-      await publier(relireCredits(brouillon))
+      // On republie ce que la page affichera réellement, pas le brouillon brut. Le
+      // `sha` lu à l'ouverture part avec : GitHub refuse si quelqu'un a publié entre
+      // temps, plutôt que d'écraser son travail.
+      const suite = await publier(relireCredits(brouillon), enLigne)
+      setEnLigne(suite)
+      setBrouillon(suite.credits)
       setPubliee(true)
-    } catch {
-      setErreur(true)
+    } catch (e) {
+      setErreur(e instanceof Error && e.message === 'conflit' ? 'conflit' : 'autre')
     } finally {
       setOccupe(false)
     }
@@ -229,7 +267,12 @@ export function EditeurCredits({
         {sansNom > 0 && (
           <div className="encart encart--attention">{t('credits.sansNom', { nombre: sansNom })}</div>
         )}
-        {erreur && <div className="encart encart--alerte">{t('commune.erreur.inconnu')}</div>}
+        {erreur === 'conflit' && (
+          <div className="encart encart--alerte">{t('credits.conflit')}</div>
+        )}
+        {erreur === 'autre' && (
+          <div className="encart encart--alerte">{t('commune.erreur.inconnu')}</div>
+        )}
         {publiee && <p>✓ {t('credits.publiee')}</p>}
 
         <button

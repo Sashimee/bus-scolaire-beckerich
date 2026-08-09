@@ -806,6 +806,8 @@
     "publier": "Merci publizéieren",
     "publiee": "Publizéiert. Erschéngt nom Neibau, an enger bis zwou Minutten.",
     "editeurAide": "Dës Säit gehéiert zum Site: se ze publizéiere léist en Neibau aus, am Géigesaz zu den Textkorrekturen.",
-    "lienDepuisReglages": "Wien huet dës Applikatioun gemaach?"
+    "lienDepuisReglages": "Wien huet dës Applikatioun gemaach?",
+    "lectureEchec": "De Merci konnt net aus dem Repository gelies ginn. Lued d'Säit nei.",
+    "conflit": "Een huet de Merci an der Tëschenzäit publizéiert. Lued d'Säit nei: Är Ännerunge sinn net gespäichert, mä déi vum aneren och net iwwerschriwwen."
   }
 }

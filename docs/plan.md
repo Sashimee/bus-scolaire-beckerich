@@ -1317,6 +1317,20 @@ Voir R20, rayée.
 > Vérifié : 6 tests sur `appliquerModifications`, et un test de bout en bout côté Worker
 > avec le fichier GitHub simulé — A publie en allemand, B en portugais, les deux
 > corrections coexistent dans le fichier réellement écrit.
+>
+> **L'éditeur de crédits portait le même défaut, et un cousin plus vicieux** : il
+> s'amorçait sur `src/data/credits.json` COMPILÉ DANS LE BUNDLE. Publier une
+> modification puis rouvrir `/admin` avant la reconstruction du site réaffichait
+> l'ancienne version, et la republier annulait le travail. Il lit désormais le fichier
+> du dépôt, et republie avec le `sha` lu à l'ouverture : c'est GitHub qui refuse si
+> quelqu'un a publié entre-temps. Une liste de personnes ne se fusionne pas — l'ordre
+> compte, un renommage ne se distingue pas d'un ajout — donc on refuse franchement
+> plutôt que de deviner.
+>
+> Deux défauts trouvés en chemin et corrigés : `useBlocageRechargement` était appelé
+> après un `return` conditionnel (ordre des hooks), et `charger` était recréé à chaque
+> rendu alors qu'il sert de dépendance d'effet — ce qui aurait relancé la lecture GitHub
+> sans fin.
 
 *Dépend du lot 15.*
 
