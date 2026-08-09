@@ -1647,7 +1647,7 @@
     .fiche__tableau th,
     .fiche__tableau td {
       border: 1px solid #767676;
-      padding: 1.6mm 2mm;
+      padding: 1.1mm 1.6mm;
       text-align: start;
       vertical-align: top;
       white-space: normal;
@@ -1788,19 +1788,24 @@
     }
 
     /*
-     * Le corps de texte se resserre à trois colonnes, la plus chargée des trois mises
-     * en page possibles. En attribut de données plutôt qu'en `style={{ … }}` : un
-     * composant ne porte que des classes.
+     * Corps resserré pour toute la fiche du foyer, et non seulement à trois colonnes.
      *
-     * Il n'y a plus de règle pour 4 et 5 : la pagination par trois fait qu'une page
-     * n'en porte jamais autant, et réduire encore le corps ne rattrapait de toute
-     * façon pas les 30 mm manquants.
+     * La mesure au banc annonçait 241 mm pour 273 disponibles, et la feuille sortait
+     * malgré tout sur deux pages : le banc tourne sous Chrome, la feuille sort d'iOS
+     * Safari, qui n'a ni les mêmes métriques de police ni la même surface utile — il
+     * ajoute son propre en-tête et son pied de page. Viser 273 au millimètre depuis un
+     * autre moteur n'a pas de sens ; on prend de la marge.
      */
-    .fiche-foyer[data-enfants='3'] {
-      font-size: 9.5pt;
+    .fiche-foyer {
+      font-size: 9pt;
     }
-    .fiche-foyer[data-enfants='3'] .fiche-foyer__prenom {
+    .fiche-foyer .fiche-foyer__prenom {
       font-size: 10pt;
+    }
+    .fiche-foyer .fiche__ligne,
+    .fiche-foyer .fiche__destination,
+    .fiche-foyer .fiche__note {
+      font-size: 7.5pt;
     }
   }
 }

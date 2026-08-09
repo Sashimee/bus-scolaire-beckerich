@@ -38,7 +38,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **La feuille tenait sur deux pages, et personne ne l'avait imprimée.** Deux corrections successives : la hauteur des trajets (2026-08-09, matin), puis — sur PDF envoyé par l'auteur — le bandeau des perturbations qui s'imprimait et deux lignes d'en-tête collées. Remesuré sur la PAGE entière cette fois, et non sur la fiche isolée : 245 mm pour 273 disponibles, avec deux enfants dont un au Dillendapp. Un test lit désormais la couche `impression` et vérifie les règles qui l'avaient cassée. | Réimprimer une dernière fois : c'est le seul écran que ni les tests ni le navigateur automatisé ne voient. |
+| R1 | 2, 7 | **La feuille sort d'iOS Safari, mes mesures viennent de Chrome.** Trois corrections successives le 2026-08-09 : hauteur des trajets, puis bandeau imprimé et en-têtes collés (sur PDF de l'auteur), puis corps resserré. Le banc annonçait 241 mm pour 273 disponibles et la feuille faisait toujours deux pages : Safari n'a ni les mêmes métriques de police, ni la même surface utile — il ajoute son en-tête et son pied de page. On ne vise donc plus 273 au millimètre, on prend de la marge : 215 mm à deux enfants, 236 mm à trois. **Je ne peux pas prédire la pagination de Safari depuis Chrome.** | Réimprimer. Si cela déborde encore, décocher « En-têtes et pieds de page » dans la boîte d'impression avant d'aller plus loin. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
@@ -1448,6 +1448,16 @@ Voir R20, rayée.
 > tests ni le navigateur automatisé ne le voient. `src/impression.test.ts` lit désormais
 > la couche `impression` et vérifie les règles qui l'ont cassée — c'est faible, mais
 > c'est plus qu'une relecture.
+>
+> **Troisième passe, même jour.** Le second PDF montrait le bandeau parti et les
+> en-têtes séparés — et toujours deux pages. Le banc, refait en luxembourgeois (les
+> textes les plus longs des cinq langues), annonçait 241 mm pour 273. L'écart ne vient
+> pas du contenu : il vient du moteur. La feuille sort d'**iOS Safari**, mes mesures de
+> **Chrome** ; polices, métriques et surface utile diffèrent, et Safari ajoute son
+> en-tête et son pied de page à l'intérieur de la page. Viser 273 au millimètre depuis
+> un autre navigateur n'a aucun sens. Le corps de la fiche du foyer passe donc à 9 pt
+> avec des cellules resserrées : 215 mm à deux enfants, 236 mm à trois — 58 et 37 mm de
+> marge pour absorber ce que je ne peux pas reproduire.
 
 *Dépend du lot 7.*
 
