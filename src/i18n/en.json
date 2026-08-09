@@ -463,7 +463,10 @@
     "demoValider": "Install",
     "conditionNotifications": "No installation, no notifications",
     "conditionNotificationsIOS": "On iPhone and iPad, Safari only allows notifications from the home screen. Without installing the app you will never be told about a cancelled bus.",
-    "conditionNotificationsAutre": "Once installed, the app can warn you of a cancellation or a delay, even when closed. It is the only way to be told without opening the site."
+    "conditionNotificationsAutre": "Once installed, the app can warn you of a cancellation or a delay, even when closed. It is the only way to be told without opening the site.",
+    "reprendreTitre": "Take your data into the app",
+    "reprendreIntro": "On iPhone, the installed app cannot see what you set up in Safari: iOS keeps their storage separate. It therefore opens empty — and nothing is lost.",
+    "reprendreComment": "Copy this link or show the QR code BEFORE installing, then open it once inside the app: it will offer to take over your setup. On Android and desktop, the data follows on its own."
   },
   "maj": {
     "disponible": "A new version is available.",

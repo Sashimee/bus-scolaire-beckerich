@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useT } from '../i18n'
 import { estAppareilIOS, useInstallation } from '../installation-contexte'
 import { DEMONSTRATIONS } from '../composants/installation/Demonstrations'
+import { ReprendreDonnees } from '../composants/ReprendreDonnees'
 
 type Plateforme = keyof typeof DEMONSTRATIONS
 
@@ -84,6 +85,10 @@ export function Installer() {
         <span className="etiquette">{t('installer.detecte')}</span>
         <Procedure cle={plateforme} principal />
       </section>
+
+      {/* Après la marche à suivre, parce que c'est à ce moment-là que la question se
+          pose : l'application vient de s'ouvrir vide. */}
+      <ReprendreDonnees />
 
       <details className="repli carte">
         <summary>{t('installer.autres')}</summary>

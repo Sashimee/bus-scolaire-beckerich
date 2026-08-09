@@ -463,7 +463,10 @@
     "demoValider": "Installer",
     "conditionNotifications": "Sans installation, pas de notifications",
     "conditionNotificationsIOS": "Sur iPhone et iPad, Safari n'autorise les notifications que depuis l'écran d'accueil. Sans installer l'application, vous ne serez jamais prévenu d'une annulation de bus.",
-    "conditionNotificationsAutre": "Une fois installée, l'application peut vous prévenir d'une annulation ou d'un retard, même fermée. C'est la seule façon d'être averti sans ouvrir le site."
+    "conditionNotificationsAutre": "Une fois installée, l'application peut vous prévenir d'une annulation ou d'un retard, même fermée. C'est la seule façon d'être averti sans ouvrir le site.",
+    "reprendreTitre": "Emporter vos données dans l'application",
+    "reprendreIntro": "Sur iPhone, l'application installée ne voit pas ce que vous avez réglé dans Safari : iOS leur donne des espaces séparés. Elle s'ouvre donc vide, et rien n'est perdu pour autant.",
+    "reprendreComment": "Copiez ce lien ou affichez le QR code AVANT d'installer, puis ouvrez-le une fois dans l'application : elle vous proposera de reprendre votre configuration. Sur Android et sur ordinateur, les données suivent toutes seules."
   },
   "maj": {
     "disponible": "Une nouvelle version est disponible.",

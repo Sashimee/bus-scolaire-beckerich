@@ -463,7 +463,10 @@
     "demoValider": "Instalar",
     "conditionNotifications": "Sem instalação, não há notificações",
     "conditionNotificationsIOS": "No iPhone e no iPad, o Safari só permite notificações a partir do ecrã principal. Sem instalar a aplicação, nunca será avisado de um cancelamento de autocarro.",
-    "conditionNotificationsAutre": "Uma vez instalada, a aplicação pode avisá-lo de um cancelamento ou de um atraso, mesmo fechada. É a única forma de ser avisado sem abrir o site."
+    "conditionNotificationsAutre": "Uma vez instalada, a aplicação pode avisá-lo de um cancelamento ou de um atraso, mesmo fechada. É a única forma de ser avisado sem abrir o site.",
+    "reprendreTitre": "Levar os seus dados para a aplicação",
+    "reprendreIntro": "No iPhone, a aplicação instalada não vê o que configurou no Safari: o iOS dá-lhes espaços separados. Abre portanto vazia — e mesmo assim nada se perdeu.",
+    "reprendreComment": "Copie esta ligação ou mostre o código QR ANTES de instalar, e abra-o depois na aplicação: ela proporá retomar a sua configuração. No Android e no computador, os dados seguem sozinhos."
   },
   "maj": {
     "disponible": "Está disponível uma nova versão.",

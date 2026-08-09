@@ -463,7 +463,10 @@
     "demoValider": "Installieren",
     "conditionNotifications": "Ohne Installation keine Benachrichtigungen",
     "conditionNotificationsIOS": "Auf iPhone und iPad erlaubt Safari Benachrichtigungen nur vom Startbildschirm aus. Ohne Installation werden Sie nie über einen Busausfall informiert.",
-    "conditionNotificationsAutre": "Einmal installiert, kann die App Sie über Ausfälle oder Verspätungen informieren, auch wenn sie geschlossen ist. Nur so erfahren Sie es, ohne die Website zu öffnen."
+    "conditionNotificationsAutre": "Einmal installiert, kann die App Sie über Ausfälle oder Verspätungen informieren, auch wenn sie geschlossen ist. Nur so erfahren Sie es, ohne die Website zu öffnen.",
+    "reprendreTitre": "Ihre Daten in die App mitnehmen",
+    "reprendreIntro": "Auf dem iPhone sieht die installierte App nicht, was Sie in Safari eingestellt haben: iOS trennt beide Speicher. Sie startet also leer — verloren ist trotzdem nichts.",
+    "reprendreComment": "Kopieren Sie diesen Link oder zeigen Sie den QR-Code VOR der Installation an, und öffnen Sie ihn dann in der App: sie bietet an, Ihre Einstellungen zu übernehmen. Unter Android und am Rechner wandern die Daten von allein mit."
   },
   "maj": {
     "disponible": "Eine neue Version ist verfügbar.",

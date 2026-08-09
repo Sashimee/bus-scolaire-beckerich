@@ -463,7 +463,10 @@
     "demoValider": "Installéieren",
     "conditionNotifications": "Ouni Installatioun keng Meldungen",
     "conditionNotificationsIOS": "Um iPhone an iPad erlaabt Safari Meldunge nëmme vum Startbildschierm aus. Ouni d'App z'installéieren, gitt Dir ni iwwer en Busausfall informéiert.",
-    "conditionNotificationsAutre": "Eemol installéiert, kann d'App Iech iwwer en Ausfall oder eng Verspéidung informéieren, och wa se zou ass. Dat ass déi eenzeg Manéier, et zu gewuer ze ginn, ouni d'Säit opzemaachen."
+    "conditionNotificationsAutre": "Eemol installéiert, kann d'App Iech iwwer en Ausfall oder eng Verspéidung informéieren, och wa se zou ass. Dat ass déi eenzeg Manéier, et zu gewuer ze ginn, ouni d'Säit opzemaachen.",
+    "reprendreTitre": "Är Donnéeën an d'App matboen",
+    "reprendreIntro": "Um iPhone gesäit déi installéiert App net, wat Dir am Safari agestallt hutt: iOS trennt déi zwee Späicher. Si geet also eidel op — verluer ass trotzdem näischt.",
+    "reprendreComment": "Kopéiert dëse Link oder weist de QR-Code VIRUN der Installatioun, a maacht en duerno an der App op: si bitt un, Är Astellungen ze iwwerhuelen. Ënner Android an um Computer wanderen d'Donnéeë vun eleng mat."
   },
   "maj": {
     "disponible": "Eng nei Versioun ass verfügbar.",
