@@ -35,7 +35,19 @@ const JOUR_ICS: Record<Jour, string> = {
   vendredi: 'FR',
 }
 
-export const googleConfigure = (): boolean => Boolean(ID_CLIENT_GOOGLE)
+/**
+ * L'intégration n'est active qu'avec un identifiant qui EN EST UN.
+ *
+ * `Boolean(ID_CLIENT_GOOGLE)` suffisait : une variable de dépôt posée avec une valeur
+ * de remplacement — ce qui est vite arrivé en recopiant une consigne — faisait
+ * apparaître le bouton « Connecter mon compte Google », qui envoyait vers une page
+ * d'erreur de Google. Mieux vaut que la fonctionnalité reste absente que cassée.
+ *
+ * Un identifiant client Google se termine toujours par ce suffixe.
+ */
+const SUFFIXE_ID_GOOGLE = '.apps.googleusercontent.com'
+
+export const googleConfigure = (): boolean => ID_CLIENT_GOOGLE.endsWith(SUFFIXE_ID_GOOGLE)
 
 interface Session {
   jeton: string
