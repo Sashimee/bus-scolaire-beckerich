@@ -322,7 +322,8 @@
     "icsIntro": "Ouni Kontverbindung: Dir luet eng Datei vun der Fiche vum Kand erof a maacht se an Ärem Kalenner op. Funktionéiert iwwerall, muss awer bei Ännerunge widderholl ginn.",
     "lienDepuisFiche": "Kalenner: Google, Apple, Outlook",
     "googleEcritureEchec": "D'Schreiwen an de Google Kalenner gouf refuséiert. Dir bleift verbonnen: d'Detail hei ënnen kënnt vu Google a seet, wat blockéiert.",
-    "icsTitreSeul": "D'Datei an Äre Kalenner importéieren"
+    "icsTitreSeul": "D'Datei an Äre Kalenner importéieren",
+    "googlePorteeAbsente": "Google huet d'Verbindung ugeholl, mä ouni Zougrëff op de Kalenner. D'Berechtegung « calendar.app.created » muss um Zoustëmmungsschirm vum Google-Projet androe sinn. Duerno den Zougrëff vun der App am Google-Kont ewechhuelen a sech hei nei verbannen."
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

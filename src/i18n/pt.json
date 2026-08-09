@@ -322,7 +322,8 @@
     "icsIntro": "Sem ligar nenhuma conta: descarrega um ficheiro a partir da ficha da criança e abre-o na sua agenda. Funciona em todo o lado, mas há que repetir se os horários mudarem.",
     "lienDepuisFiche": "Agenda: Google, Apple, Outlook",
     "googleEcritureEchec": "A escrita na Agenda Google foi recusada. Continua ligado: o detalhe abaixo vem do Google e indica o que bloqueia.",
-    "icsTitreSeul": "Importar o ficheiro na sua agenda"
+    "icsTitreSeul": "Importar o ficheiro na sua agenda",
+    "googlePorteeAbsente": "O Google aceitou a ligação, mas sem dar acesso à agenda. A permissão «calendar.app.created» tem de estar declarada no ecrã de consentimento do projeto Google. Depois de a acrescentar, retire o acesso da aplicação na sua conta Google e volte a ligar-se aqui."
   },
   "partage": {
     "titre": "Partilhar esta configuração",

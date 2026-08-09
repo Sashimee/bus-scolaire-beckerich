@@ -150,6 +150,7 @@ export async function terminerConnexion(): Promise<boolean> {
   const donnees = (await rep.json().catch(() => ({}))) as {
     access_token?: string
     expires_in?: number
+    scope?: string
     erreur?: string
     detail?: unknown
   }
@@ -157,6 +158,14 @@ export async function terminerConnexion(): Promise<boolean> {
   // rien ne s'était passé. On lève : l'écran dira quoi.
   if (!rep.ok || !donnees.access_token) {
     throw new Error(String(donnees.detail ?? donnees.erreur ?? rep.status))
+  }
+
+  // Google peut accorder MOINS que ce qui a été demandé : c'est le cas quand la portée
+  // n'est pas déclarée sur l'écran de consentement du projet. Le jeton est alors
+  // parfaitement valable, mais inutile ici. Autant le dire tout de suite, plutôt que de
+  // laisser le parent découvrir un « 403 » à la première synchronisation.
+  if (donnees.scope !== undefined && !donnees.scope.split(' ').includes(PORTEE)) {
+    throw new Error('portee-absente')
   }
 
   sessionStorage.setItem(

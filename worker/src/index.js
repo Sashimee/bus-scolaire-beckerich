@@ -448,8 +448,15 @@ async function jetonGoogle(requete, env, origine) {
     )
   }
 
+  // `scope` est ce que Google a RÉELLEMENT accordé, qui peut être plus étroit que ce
+  // qui a été demandé. Le taire ferait découvrir le manque à la première écriture, avec
+  // un « 403 insufficient authentication scopes » que personne ne sait interpréter.
   return json(
-    { access_token: donnees.access_token, expires_in: donnees.expires_in ?? 3600 },
+    {
+      access_token: donnees.access_token,
+      expires_in: donnees.expires_in ?? 3600,
+      scope: donnees.scope ?? '',
+    },
     200,
     entetes,
   )

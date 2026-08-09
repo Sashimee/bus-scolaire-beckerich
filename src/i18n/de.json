@@ -322,7 +322,8 @@
     "icsIntro": "Ohne Kontoverbindung: Sie laden eine Datei aus der Übersicht des Kindes herunter und öffnen sie in Ihrem Kalender. Funktioniert überall, muss aber bei Fahrplanänderungen wiederholt werden.",
     "lienDepuisFiche": "Kalender: Google, Apple, Outlook",
     "googleEcritureEchec": "Das Schreiben in Google Kalender wurde abgelehnt. Sie bleiben verbunden: das Detail unten stammt von Google und nennt die Ursache.",
-    "icsTitreSeul": "Die Datei in Ihren Kalender importieren"
+    "icsTitreSeul": "Die Datei in Ihren Kalender importieren",
+    "googlePorteeAbsente": "Google hat die Verbindung akzeptiert, aber ohne Kalenderzugriff. Die Berechtigung „calendar.app.created“ muss auf dem Zustimmungsbildschirm des Google-Projekts eingetragen sein. Danach den Zugriff der App im Google-Konto entziehen und sich hier neu verbinden."
   },
   "partage": {
     "titre": "Diese Konfiguration teilen",

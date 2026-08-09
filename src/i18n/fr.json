@@ -322,7 +322,8 @@
     "icsIntro": "Sans connexion à un compte : vous téléchargez un fichier depuis la fiche de l'enfant et vous l'ouvrez dans votre agenda. Fonctionne partout, mais à refaire si les horaires changent.",
     "lienDepuisFiche": "Agenda : Google, Apple, Outlook",
     "googleEcritureEchec": "L'écriture dans Google Agenda a été refusée. Vous restez connecté : le détail ci-dessous vient de Google et dit ce qui bloque.",
-    "icsTitreSeul": "Importer le fichier dans votre agenda"
+    "icsTitreSeul": "Importer le fichier dans votre agenda",
+    "googlePorteeAbsente": "Google a bien accepté la connexion, mais sans donner l'accès à l'agenda. La permission « calendar.app.created » doit être déclarée sur l'écran de consentement du projet Google. Une fois ajoutée, retirez l'accès de l'application dans votre compte Google, puis reconnectez-vous ici."
   },
   "partage": {
     "titre": "Partager cette configuration",

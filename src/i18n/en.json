@@ -322,7 +322,8 @@
     "icsIntro": "No account to connect: you download a file from the child's sheet and open it in your calendar. Works everywhere, but must be redone if timetables change.",
     "lienDepuisFiche": "Calendar: Google, Apple, Outlook",
     "googleEcritureEchec": "Writing to Google Calendar was refused. You stay connected: the detail below comes from Google and says what is blocking.",
-    "icsTitreSeul": "Import the file into your calendar"
+    "icsTitreSeul": "Import the file into your calendar",
+    "googlePorteeAbsente": "Google accepted the connection, but without granting calendar access. The «calendar.app.created» permission must be declared on the Google project's consent screen. Once added, remove the app's access from your Google account, then connect again here."
   },
   "partage": {
     "titre": "Share this setup",

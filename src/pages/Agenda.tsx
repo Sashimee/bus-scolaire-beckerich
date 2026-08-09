@@ -136,10 +136,14 @@ function BlocGoogle() {
           <div className="encart__titre">
             {t(erreur === 'connexion' ? 'agenda.googleConnexionEchec' : 'agenda.googleEcritureEchec')}
           </div>
-          {resultat && (
-            <p className="champ__aide">
-              <code>{resultat}</code>
-            </p>
+          {resultat === 'portee-absente' ? (
+            <p>{t('agenda.googlePorteeAbsente')}</p>
+          ) : (
+            resultat && (
+              <p className="champ__aide">
+                <code>{resultat}</code>
+              </p>
+            )
           )}
         </div>
       )}
