@@ -14,15 +14,19 @@ const LIBELLE_DESTINATION = {
 const libelleDestination = (type: TypeTrajet) => LIBELLE_DESTINATION[destinationTrajet(type)]
 
 /**
- * Au-delà de cinq enfants, une colonne fait moins de 28 mm : les heures s'y cassent en
- * quatre morceaux et la feuille devient illisible. On pagine alors par groupes de
- * quatre, ce qui rend deux pages propres plutôt qu'une bouillie.
+ * Trois enfants par feuille, pas plus.
  *
- * Cinq est aussi la limite naturelle du domaine — précoce plus C1 à C4 — donc le cas
- * « six enfants » restera théorique. Il doit néanmoins produire quelque chose de juste.
+ * Le seuil valait cinq, déduit de la largeur : (186 − 22) / 5 ≈ 33 mm par colonne, ce
+ * qui suffisait en effet à écrire une heure. Mais la contrainte n'était pas là. À
+ * quatre colonnes, chacune tombe à 37 mm, les libellés reviennent à la ligne et la
+ * feuille passe à 304 mm pour 273 disponibles — signalé en usage réel, et confirmé à
+ * la mesure : 2 et 3 enfants tiennent en 220 mm, 4 en réclame 304, 5 en réclame 366.
+ *
+ * Une famille de quatre ou cinq enfants obtient donc deux feuilles propres plutôt
+ * qu'une page et demie.
  */
-const MAX_UNE_PAGE = 5
-const PAR_PAGE_AU_DELA = 4
+const MAX_UNE_PAGE = 3
+const PAR_PAGE_AU_DELA = 3
 
 function grouper<T>(elements: T[]): T[][] {
   if (elements.length <= MAX_UNE_PAGE) return [elements]
@@ -48,11 +52,18 @@ function CelluleJour({ ctx, jour }: { ctx: ContexteEnfant; jour: Jour }) {
         <ul className="fiche__trajets fiche__trajets--colonne">
           {utiles.map((trajet, i) => (
             <li key={`${trajet.type}-${i}`}>
+              {/*
+                  Les heures et la destination sur la même ligne, le nom de la ligne en
+                  dessous. Les trois empilés faisaient 57 mm par jour de cours : la
+                  feuille passait à 285 mm pour 273 disponibles, et débordait dès deux
+                  enfants. La destination tient en trois mots — « → école » — elle n'a
+                  pas besoin de sa propre ligne.
+              */}
               <b>{trajet.depart.heure ?? '—'}</b>
               <span aria-hidden="true"> → </span>
               <b>{trajet.arrivee.heure ?? '—'}</b>
-              <span className="fiche__ligne"> {t(libelleDestination(trajet.type))}</span>
-              <span className="fiche__ligne"> {trajet.ligne.nom}</span>
+              <span className="fiche__destination"> {t(libelleDestination(trajet.type))}</span>
+              <span className="fiche__ligne">{trajet.ligne.nom}</span>
             </li>
           ))}
         </ul>

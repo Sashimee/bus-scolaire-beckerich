@@ -38,24 +38,24 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **L'aperçu papier n'a jamais été regardé.** Le navigateur employé n'expose pas l'émulation du média `print`, et ouvrir la boîte d'impression bloquerait la session. Seule la structure du DOM a été vérifiée : 5 enfants sur une page de 6 colonnes, 7 enfants sur deux pages de 4 et 3. | `Cmd+P` sur `/enfant/:id` puis sur `/reglages`, avec 1, 3, 5 puis 7 enfants. |
-| R2 | 6 | **L'installation réelle n'a pas été essayée.** La boîte s'affiche désormais (défaut corrigé le 2026-08-08 : `beforeinstallprompt` était écouté dans un `useEffect`, donc après le montage de React, alors que Chrome l'émet avant — l'invitation était perdue à chaque fois et la boîte ne s'ouvrait jamais). Restent non éprouvés : `appinstalled`, l'installation effective, et le geste iOS. | Ouvrir le site déployé sur un Android et sur un iPhone, revenir une deuxième fois, vérifier que la boîte apparaît et que l'installation aboutit. |
+| R1 | 2, 7 | **L'aperçu papier débordait, et personne ne l'avait vu.** Signalé en usage réel le 2026-08-09 : deux enfants ne tenaient pas sur une feuille. Cause mesurée — la mise en page supposait la largeur contraignante alors que c'est la hauteur : 285 mm pour 273 disponibles. Corrigé (deux lignes par trajet au lieu de trois, pagination par trois enfants au lieu de cinq) et remesuré : 1 à 3 enfants tiennent en 220 mm, 4 et 5 font deux pages. **Mais toujours pas imprimé sur du vrai papier.** | Réimprimer depuis `/reglages` avec deux enfants, puis avec quatre. |
+| ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | R3 | 8 | **Le Worker n'a jamais tourné contre Cloudflare ni GitHub.** Les 29 tests s'appuient sur un KV en mémoire ; `worker/src/github.js` n'a émis aucun appel réel ; `creer-agent.sh` n'a été vérifié que par `bash -n`. | Poser les secrets, déployer, créer un agent, publier une perturbation de test puis la retirer. Voir « Mise en service » ci-dessous. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
 | R5 | 9 | **Aucun aller-retour réel avec le Worker.** Les trois pages ont été éprouvées avec une session simulée et un Worker injoignable : rendu, navigation, diff d'horaires et message d'erreur réseau sont bons ; la connexion par code et la publication effective ne le sont pas. | Même manœuvre que R3, depuis `/commune` cette fois. |
 | R7 | 10 | **Aucun rappel réel n'a été envoyé.** Le planificateur est couvert par 20 tests, mais le cron n'a jamais tourné, `URL_SITE` n'a jamais été lu, et le filtre par préférence n'a jamais été exercé sur un vrai abonnement. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
-| R8 | 10 | **Le sélecteur de préférence n'a pas été vu à l'écran.** Il n'apparaît qu'une fois les notifications actives, ce qui exige d'accorder la permission du navigateur. | Activer les notifications sur un appareil réel et vérifier que les trois options s'affichent et se transmettent au Worker. |
+| ~~R8~~ | 10 | ~~Le sélecteur de préférence n'a pas été vu à l'écran.~~ **Levée le 2026-08-09** sur iPhone, notifications actives. |
 | ~~R9~~ | 11 | ~~La CSP n'a pas été vérifiée en production.~~ **Levée le 2026-08-08** : vérifiée sur le site déployé — tuiles OpenStreetMap chargées, service worker actif, GoatCounter chargé, zéro violation. |
-| R10 | 12 | **Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.** Les 27 tests vérifient la structure du texte, pas qu'Apple Calendrier ou Google l'acceptent. | Télécharger le fichier depuis la fiche d'un enfant et l'importer sur un téléphone. |
+| ~~R10~~ | 12 | ~~Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.~~ **Levée le 2026-08-09** : importé dans Apple Calendrier depuis l'iPhone. |
 | R11 | 13 | **L'intégration Google n'a jamais tourné.** Le prérequis — projet Google Cloud, API Calendar, ID client OAuth, écran de consentement — n'est pas fait. Ni le flux PKCE, ni la création d'agenda, ni l'écriture d'un événement n'ont été exercés. | Créer l'ID client, poser `VITE_ID_CLIENT_GOOGLE` en variable de dépôt, puis connecter un compte de test. |
 | R12 | 11 | **La CSP avait cassé `npm run dev`** en bloquant le préambule inline de React Refresh — page blanche, découvert seulement au lot 13. Corrigé : la politique ne s'applique qu'au build. Rappel de méthode : vérifier le build **et** le serveur de développement après toute modification de `vite.config.ts`. | Corrigé. Ligne gardée comme trace. |
 | R13 | 6 | **Trois vérifications successives n'avaient pas montré que la boîte d'installation ne s'ouvrait jamais**, parce qu'elles simulaient `beforeinstallprompt` APRÈS le montage de React — exactement le cas qui fonctionnait. Rappel de méthode : un événement simulé ne prouve rien sur le moment où le vrai arrive. | Corrigé. Ligne gardée comme trace. |
-| R14 | — | **Les champs d'heure débordaient sur iPhone**, signalé en usage réel : Safari leur donne une largeur intrinsèque large et une hauteur gonflée. Corrigé (`appearance: none`, `min-inline-size: 0`, hauteur fixe) et mesuré à 390 px sous Chrome — **mais pas sur un iPhone réel**, que je n'ai pas. | Rouvrir `/configurer` sur l'iPhone, déplier un enfant inscrit au périscolaire, vérifier que les deux champs tiennent dans la carte. |
+| ~~R14~~ | — | ~~Les champs d'heure débordaient sur iPhone.~~ **Levée le 2026-08-09** : la refonte du lot 14 — une case et un champ par ligne, deux blocs séparés — vérifiée sur l'iPhone de l'auteur. |
 | R15 | — | **La vignette de partage n'a pas été soumise aux validateurs.** Les métadonnées Open Graph sont posées et l'image existe, mais aucun aperçu réel n'a été obtenu depuis WhatsApp, Facebook ou LinkedIn. | Coller le lien dans une conversation WhatsApp, ou passer par le débogueur de partage de chaque plateforme. |
-| R16 | 14 | **Les bornes `min`/`max` des champs d'heure n'ont pas été vues sur Safari iOS.** Elles sont posées et mesurées à 390 px sous Chrome, mais Safari applique sa propre roue de sélection : rien ne dit qu'il la borne comme Chrome. | Ouvrir l'étape des horaires sur l'iPhone et vérifier qu'on ne peut pas descendre sous 07:00 ni dépasser la borne du cycle. |
+| ~~R16~~ | 14 | ~~Les bornes `min`/`max` n'ont pas été vues sur Safari iOS.~~ **Levée le 2026-08-09** : la roue de sélection les respecte. |
 | R17 | 15 | **L'espace `/traductions` n'a jamais parlé à un vrai Worker.** La séparation des rôles est couverte par quatre tests contre un KV en mémoire ; la connexion par code, la publication sur GitHub et la relecture de la surcouche déployée ne l'ont pas été. | Même manœuvre que R3, avec `./creer-agent.sh "Nom" "" traductions`, puis corriger une clé allemande et vérifier qu'elle change sans reconstruction. |
 | R18 | 15 | **Les onglets d'`/admin` n'ont pas été vus connecté.** Le composant est couvert par huit tests (clavier, URL, ARIA) mais `/admin` exige un jeton GitHub, que le poste de développement n'a pas. | Se connecter sur `/admin` et parcourir les cinq onglets, dont ceux des textes et des crédits. |
-| R19 | 17 | **L'effet de l'en-tête `Urgency` n'est pas constatable ici.** Il ne se voit que sur un vrai téléphone en économie de batterie. La marche à suivre par plateforme n'a pas été vue à l'écran non plus : la section entière disparaît sans clé VAPID, absente en développement. | À rattacher à R7. Activer les notifications sur un appareil réel, vérifier que la marche à suivre iOS s'affiche, puis publier une alerte. |
+| ~~R19~~ | 17 | ~~L'effet de l'en-tête `Urgency` n'est pas constatable ici.~~ **Levée le 2026-08-09** : marche à suivre iOS affichée, notification d'essai reçue en quelques secondes sur l'iPhone de l'auteur. |
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
@@ -1255,6 +1255,38 @@ maintenant, replié, sur `/commune`.
 ### Notification d'essai
 
 Voir R20, rayée.
+
+---
+
+## Correctif du 2026-08-09 — la feuille A4 débordait
+
+> **Fait le 2026-08-09.** Signalé en usage réel : deux enfants ne tenaient pas sur une
+> feuille. C'est le défaut que R1 attendait depuis le lot 7.
+>
+> **La cause n'était pas celle qu'on croyait.** Le lot 7 avait raisonné sur la largeur —
+> « (186 mm − 22) / 5, soit 33 mm par colonne, ce qui suffit » — et pagine à cinq
+> enfants. Mais la contrainte est la HAUTEUR, jamais mesurée : chaque trajet occupait
+> trois lignes (les heures, la destination, le nom de la ligne), les trois jours avec
+> cours l'après-midi coûtaient 57,9 mm chacun, et la feuille réclamait 285 mm pour
+> 273 disponibles.
+>
+> Deux changements : la destination remonte sur la ligne des heures — « 07:25 → 07:45 →
+> école » se lit d'un bloc — et la pagination passe de cinq à trois enfants par feuille.
+>
+> Mesuré au banc (règles de la couche impression rejouées dans un cadre de 186 mm,
+> `table-layout: fixed` vérifié) : 1 enfant 117,6 mm · 2 enfants 220,0 · 3 enfants 219,6 ·
+> 4 enfants deux pages de 204,8 et 164,1 · 5 enfants deux pages de 219,6 et 220,0. Toutes
+> sous 273.
+>
+> **Écart de méthode, à retenir** : la première version du banc lisait la CSS dans les
+> `<link rel=stylesheet>`, absents en développement — Vite injecte un `<style>`. Trois
+> mesures ont donc tourné sans les règles d'impression et donnaient 166 mm pour tout
+> effectif. Un banc doit contrôler qu'il mesure bien ce qu'il prétend : celui-ci vérifie
+> désormais `table-layout` et la largeur du tableau avant de rendre un chiffre.
+>
+> **Réserve** : R1 reste ouverte — toujours pas d'impression sur papier.
+
+*Dépend du lot 7.*
 
 ---
 

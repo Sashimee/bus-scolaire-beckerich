@@ -1708,11 +1708,13 @@
 
     /*
      * — Fiche de tout le foyer ————————————————————————————————
-     * Un tableau, les cinq jours en lignes, un enfant par colonne. La contrainte est
-     * la largeur : (186 mm − 22 mm pour la colonne des jours) / N. À cinq enfants,
-     * 33 mm par colonne, ce qui suffit tout juste à « 07:25 → 07:45 » sur deux lignes.
-     * Au-delà, `FicheFoyer` pagine par groupes de quatre — d'où l'absence de bascule
-     * en paysage, qui n'aurait plus rien à corriger.
+     * Un tableau, les cinq jours en lignes, un enfant par colonne.
+     *
+     * La contrainte n'est pas la largeur, contrairement à ce qui était supposé ici :
+     * c'est la HAUTEUR. Une colonne étroite fait revenir les libellés à la ligne, et
+     * cinq journées de quatre trajets débordent vite les 273 mm utiles d'un A4. Mesuré :
+     * 2 et 3 enfants tiennent en 220 mm, 4 en réclame 304. `FicheFoyer` pagine donc par
+     * groupes de trois.
      */
     .fiche-foyer + .fiche-foyer {
       break-before: page;
@@ -1752,23 +1754,36 @@
       margin-block-start: 1mm;
     }
 
+    /*
+     * Deux lignes par trajet, pas trois.
+     *
+     * La destination reste avec les heures — « 07:25 → 07:45 → école » se lit d'un
+     * bloc — et seul le nom de la ligne descend. Mesuré : à trois trajets empilés sur
+     * trois jours de cours, la troisième ligne coûtait 57 mm par jour et faisait
+     * déborder la feuille dès deux enfants.
+     */
     .fiche__trajets--colonne .fiche__ligne {
       display: block;
     }
 
+    .fiche__destination {
+      color: #333;
+      font-size: 8.5pt;
+    }
+
     /*
-     * Le corps de texte suit le nombre d'enfants de la page. En attribut de données
-     * plutôt qu'en variable posée par un `style={{ … }}` : un composant ne porte que
-     * des classes, et cinq cas se listent plus vite qu'ils ne se calculent.
+     * Le corps de texte se resserre à trois colonnes, la plus chargée des trois mises
+     * en page possibles. En attribut de données plutôt qu'en `style={{ … }}` : un
+     * composant ne porte que des classes.
+     *
+     * Il n'y a plus de règle pour 4 et 5 : la pagination par trois fait qu'une page
+     * n'en porte jamais autant, et réduire encore le corps ne rattrapait de toute
+     * façon pas les 30 mm manquants.
      */
-    .fiche-foyer[data-enfants='4'] {
+    .fiche-foyer[data-enfants='3'] {
       font-size: 9.5pt;
     }
-    .fiche-foyer[data-enfants='5'] {
-      font-size: 9pt;
-    }
-    .fiche-foyer[data-enfants='4'] .fiche-foyer__prenom,
-    .fiche-foyer[data-enfants='5'] .fiche-foyer__prenom {
+    .fiche-foyer[data-enfants='3'] .fiche-foyer__prenom {
       font-size: 10pt;
     }
   }
