@@ -110,7 +110,9 @@
     "calquerSur": "Configuração inicial",
     "commeLui": "Como {prenom}",
     "depuisZero": "Começar do zero",
-    "calquerSurAide": "Almoço, autocarro, Dillendapp e moradas particulares são retomados. Tudo continua alterável no passo seguinte, e os horários ajustam-se ao ciclo escolhido."
+    "calquerSurAide": "Almoço, autocarro, Dillendapp e moradas particulares são retomados. Tudo continua alterável no passo seguinte, e os horários ajustam-se ao ciclo escolhido.",
+    "repriseTitre": "Configuração retomada de {prenom}",
+    "repriseDetail": "Almoço, autocarro, Dillendapp e moradas particulares são os mesmos. O ciclo, esse, muda a escola, a paragem e os horários possíveis: verifique a semana abaixo, e as horas no Dillendapp se tiveram de ser ajustadas."
   },
   "repas": {
     "titre": "Almoço",

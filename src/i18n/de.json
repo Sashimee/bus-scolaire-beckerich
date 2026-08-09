@@ -110,7 +110,9 @@
     "calquerSur": "Ausgangseinstellung",
     "commeLui": "Wie {prenom}",
     "depuisZero": "Bei null anfangen",
-    "calquerSurAide": "Mittagessen, Bus, Dillendapp und besondere Adressen werden übernommen. Alles bleibt im nächsten Schritt änderbar, und die Uhrzeiten passen sich dem gewählten Zyklus an."
+    "calquerSurAide": "Mittagessen, Bus, Dillendapp und besondere Adressen werden übernommen. Alles bleibt im nächsten Schritt änderbar, und die Uhrzeiten passen sich dem gewählten Zyklus an.",
+    "repriseTitre": "Einstellungen von {prenom} übernommen",
+    "repriseDetail": "Mittagessen, Bus, Dillendapp und besondere Adressen sind dieselben. Der Zyklus ändert dagegen Schule, Haltestelle und mögliche Uhrzeiten: prüfen Sie die Woche unten, und die Dillendapp-Zeiten, falls sie angepasst werden mussten."
   },
   "repas": {
     "titre": "Mittagessen",

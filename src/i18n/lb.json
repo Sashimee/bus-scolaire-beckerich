@@ -110,7 +110,9 @@
     "calquerSur": "Ufanksastellung",
     "commeLui": "Wéi {prenom}",
     "depuisZero": "Bei null ufänken",
-    "calquerSurAide": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse ginn iwwerholl. Alles bleift am nächste Schrëtt änderbar, an d'Auerzäite passe sech dem gewielte Cycle un."
+    "calquerSurAide": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse ginn iwwerholl. Alles bleift am nächste Schrëtt änderbar, an d'Auerzäite passe sech dem gewielte Cycle un.",
+    "repriseTitre": "Astellunge vu {prenom} iwwerholl",
+    "repriseDetail": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse sinn déiselwecht. De Cycle ännert dogéint d'Schoul, den Arrêt an déi méiglech Auerzäiten: kuckt d'Woch hei ënnen no, an d'Dillendapp-Zäiten, wa se ugepasst goufen."
   },
   "repas": {
     "titre": "Mëttegiessen",

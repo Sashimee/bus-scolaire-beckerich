@@ -44,14 +44,25 @@ export function Configurer() {
   const [modele, setModele] = useState<string>('')
   const modeleChoisi = modele || foyer.enfants[0]?.id || 'zero'
 
-  // Un enfant qui vient d'être créé n'a que son prénom : l'assistant enchaîne sur les
-  // questions qui manquent, plutôt que de laisser le parent chercher dans la page.
+  /**
+   * Où atterrir après la création.
+   *
+   * Un enfant parti de zéro n'a que son prénom : l'assistant enchaîne sur les questions
+   * qui manquent. Un enfant calqué sur son aîné, lui, est déjà complet — lui faire
+   * reparcourir sept écrans qui ne demandent rien de nouveau ferait perdre du temps
+   * pour rien. On l'envoie donc sur sa fiche, qui montre aussitôt sa semaine ; la
+   * fiche porte déjà un lien vers l'assistant pour qui veut ajuster.
+   */
   const soumettre = (e: React.FormEvent) => {
     e.preventDefault()
     if (!prenom.trim()) return
-    const id = ajouterEnfant(prenom, cycle, modeleChoisi === 'zero' ? undefined : modeleChoisi)
+    const modele = modeleChoisi === 'zero' ? undefined : modeleChoisi
+    const source = foyer.enfants.find((x) => x.id === modele)
+    const id = ajouterEnfant(prenom, cycle, modele)
     setPrenom('')
-    naviguer(`/enfant/${id}/assistant`)
+    naviguer(source ? `/enfant/${id}` : `/enfant/${id}/assistant`, {
+      state: source ? { repriseDe: source.prenom } : undefined,
+    })
   }
 
   return (

@@ -110,7 +110,9 @@
     "calquerSur": "Configuration de départ",
     "commeLui": "Comme {prenom}",
     "depuisZero": "Repartir de zéro",
-    "calquerSurAide": "Repas, bus, Dillendapp et adresses particulières sont repris. Tout reste modifiable à l'étape suivante, et les heures s'ajustent au cycle choisi."
+    "calquerSurAide": "Repas, bus, Dillendapp et adresses particulières sont repris. Tout reste modifiable à l'étape suivante, et les heures s'ajustent au cycle choisi.",
+    "repriseTitre": "Configuration reprise de {prenom}",
+    "repriseDetail": "Repas, bus, Dillendapp et adresses particulières sont les mêmes. Le cycle, lui, change l'école, l'arrêt et les horaires possibles : vérifiez la semaine ci-dessous, et les heures au Dillendapp si elles ont dû être ajustées."
   },
   "repas": {
     "titre": "Repas de midi",

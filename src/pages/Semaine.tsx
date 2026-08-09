@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { useInstallation } from '../installation-contexte'
@@ -20,6 +20,8 @@ export function Semaine() {
   const { t } = useT()
   const { id } = useParams()
   const { foyer, contextes } = useFoyer()
+  // Posé par `/configurer` quand l'enfant vient d'être calqué sur son aîné.
+  const repriseDe = (useLocation().state as { repriseDe?: string } | null)?.repriseDe
   const { urgences } = useUrgences()
   const { noterFicheVue } = useInstallation()
 
@@ -106,6 +108,19 @@ export function Semaine() {
             <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretDomicile} />
           )}
         </section>
+      )}
+
+      {/*
+          Un enfant calqué sur son aîné n'a pas parcouru l'assistant : il faut lui dire
+          d'où viennent ces horaires, et surtout que le CYCLE a pu tout déplacer — école,
+          arrêt, heures possibles au Dillendapp.
+      */}
+      {repriseDe && (
+        <div className="encart encart--info sans-impression">
+          <div className="encart__titre">{t('enfant.repriseTitre', { prenom: repriseDe })}</div>
+          <p>{t('enfant.repriseDetail')}</p>
+          <Link to={`/enfant/${enfant.id}/assistant`}>{t('assistant.reprendre')}</Link>
+        </div>
       )}
 
       {/*

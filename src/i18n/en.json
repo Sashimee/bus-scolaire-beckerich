@@ -110,7 +110,9 @@
     "calquerSur": "Starting point",
     "commeLui": "Same as {prenom}",
     "depuisZero": "Start from scratch",
-    "calquerSurAide": "Lunch, bus, Dillendapp and special addresses are carried over. Everything stays editable in the next step, and times adjust to the chosen cycle."
+    "calquerSurAide": "Lunch, bus, Dillendapp and special addresses are carried over. Everything stays editable in the next step, and times adjust to the chosen cycle.",
+    "repriseTitre": "Setup carried over from {prenom}",
+    "repriseDetail": "Lunch, bus, Dillendapp and special addresses are the same. The cycle, however, changes the school, the stop and the possible times: check the week below, and the Dillendapp times if they had to be adjusted."
   },
   "repas": {
     "titre": "Lunch",
