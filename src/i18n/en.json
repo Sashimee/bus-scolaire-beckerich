@@ -106,7 +106,11 @@
     "aucunArret": "From your address, no stop serves this child's school. Please check the official plan.",
     "aPied": "No bus: the school is right next door",
     "aPiedDetail": "Your address is about {minutes} min on foot from {site}. No bus journey is planned for {prenom}: the nearest stop is the school’s own.",
-    "sansPrenom": "Child with no first name"
+    "sansPrenom": "Child with no first name",
+    "calquerSur": "Starting point",
+    "commeLui": "Same as {prenom}",
+    "depuisZero": "Start from scratch",
+    "calquerSurAide": "Lunch, bus, Dillendapp and special addresses are carried over. Everything stays editable in the next step, and times adjust to the chosen cycle."
   },
   "repas": {
     "titre": "Lunch",

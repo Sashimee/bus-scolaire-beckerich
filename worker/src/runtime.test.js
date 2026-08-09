@@ -10,11 +10,15 @@
  * On ne peut pas exécuter le runtime ici. On peut relire le code source.
  */
 import { describe, expect, it } from 'vitest'
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 
-const sources = readdirSync('src')
+// `npm test` tourne à la racine du dépôt, `npm test` dans `worker/` tourne ici : le
+// chemin doit valoir dans les deux cas, sinon la garde ne s'exécute qu'à moitié.
+const racine = existsSync('worker/src') ? 'worker/src' : 'src'
+
+const sources = readdirSync(racine)
   .filter((f) => f.endsWith('.js') && !f.endsWith('.test.js'))
-  .map((f) => ({ nom: f, texte: readFileSync(`src/${f}`, 'utf8') }))
+  .map((f) => ({ nom: f, texte: readFileSync(`${racine}/${f}`, 'utf8') }))
 
 describe('options de fetch acceptées par le runtime Workers', () => {
   it('lit bien les sources du Worker', () => {

@@ -106,7 +106,11 @@
     "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan.",
     "aPied": "Kein Bus: die Schule liegt gleich nebenan",
     "aPiedDetail": "Ihre Adresse liegt etwa {minutes} Min. zu Fuß von {site} entfernt. Für {prenom} ist keine Busfahrt vorgesehen: die nächste Haltestelle ist die der Schule selbst.",
-    "sansPrenom": "Kind ohne Vornamen"
+    "sansPrenom": "Kind ohne Vornamen",
+    "calquerSur": "Ausgangseinstellung",
+    "commeLui": "Wie {prenom}",
+    "depuisZero": "Bei null anfangen",
+    "calquerSurAide": "Mittagessen, Bus, Dillendapp und besondere Adressen werden übernommen. Alles bleibt im nächsten Schritt änderbar, und die Uhrzeiten passen sich dem gewählten Zyklus an."
   },
   "repas": {
     "titre": "Mittagessen",

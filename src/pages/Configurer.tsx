@@ -34,13 +34,22 @@ export function Configurer() {
   const naviguer = useNavigate()
   const [prenom, setPrenom] = useState('')
   const [cycle, setCycle] = useState<Cycle>('c1')
+  /**
+   * Sur qui calquer le nouvel enfant, `'zero'` pour repartir d'une page blanche.
+   *
+   * Vide tant que rien n'est choisi : on retombe alors sur l'aîné. C'est le défaut
+   * voulu — dans une même famille le rythme se ressemble, et retaper la même grille
+   * pour le deuxième enfant est le meilleur moyen de s'y tromper.
+   */
+  const [modele, setModele] = useState<string>('')
+  const modeleChoisi = modele || foyer.enfants[0]?.id || 'zero'
 
   // Un enfant qui vient d'être créé n'a que son prénom : l'assistant enchaîne sur les
   // questions qui manquent, plutôt que de laisser le parent chercher dans la page.
   const soumettre = (e: React.FormEvent) => {
     e.preventDefault()
     if (!prenom.trim()) return
-    const id = ajouterEnfant(prenom, cycle)
+    const id = ajouterEnfant(prenom, cycle, modeleChoisi === 'zero' ? undefined : modeleChoisi)
     setPrenom('')
     naviguer(`/enfant/${id}/assistant`)
   }
@@ -173,6 +182,25 @@ export function Configurer() {
               ))}
             </select>
           </div>
+          {foyer.enfants.length > 0 && (
+            <div className="champ">
+              <label htmlFor="nouveau-modele">{t('enfant.calquerSur')}</label>
+              <select
+                id="nouveau-modele"
+                value={modeleChoisi}
+                onChange={(e) => setModele(e.target.value)}
+              >
+                {foyer.enfants.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {t('enfant.commeLui', { prenom: e.prenom || t('enfant.sansPrenom') })}
+                  </option>
+                ))}
+                <option value="zero">{t('enfant.depuisZero')}</option>
+              </select>
+              <p className="champ__aide">{t('enfant.calquerSurAide')}</p>
+            </div>
+          )}
+
           <button type="submit" className="bouton" disabled={!prenom.trim()}>
             {t('enfant.ajouter')}
           </button>

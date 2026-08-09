@@ -106,7 +106,11 @@
     "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no.",
     "aPied": "Kee Bus: d’Schoul ass direkt niewendrun",
     "aPiedDetail": "Är Adress ass ongeféier {minutes} Min. zu Fouss vu(n) {site} ewech. Fir {prenom} ass keng Busfaart virgesinn: déi nooste Statioun ass déi vun der Schoul selwer.",
-    "sansPrenom": "Kand ouni Virnumm"
+    "sansPrenom": "Kand ouni Virnumm",
+    "calquerSur": "Ufanksastellung",
+    "commeLui": "Wéi {prenom}",
+    "depuisZero": "Bei null ufänken",
+    "calquerSurAide": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse ginn iwwerholl. Alles bleift am nächste Schrëtt änderbar, an d'Auerzäite passe sech dem gewielte Cycle un."
   },
   "repas": {
     "titre": "Mëttegiessen",

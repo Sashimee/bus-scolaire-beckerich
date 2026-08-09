@@ -12,8 +12,9 @@ import {
   busParDefaut,
   chargerFoyer,
   dillendappParDefaut,
+  enfantCalqueSur,
+  enfantVierge,
   enregistrerFoyer,
-  repasParDefaut,
 } from './lib/stockage'
 import { ajusterDillendapp, contexteEnfant, coursApresMidi, type ContexteEnfant } from './lib/plan'
 import { useUrgences } from './urgences-contexte'
@@ -55,8 +56,11 @@ interface EtatFoyer {
   contextes: Map<string, ContexteEnfant | null>
   configure: boolean
   definirAdresse: (a: Adresse) => void
-  /** Renvoie l'identifiant du nouvel enfant, pour enchaîner sur son assistant. */
-  ajouterEnfant: (prenom: string, cycle: Cycle) => string
+  /**
+   * Renvoie l'identifiant du nouvel enfant, pour enchaîner sur son assistant.
+   * `modele` : identifiant d'un frère ou d'une sœur dont on reprend la configuration.
+   */
+  ajouterEnfant: (prenom: string, cycle: Cycle, modele?: string) => string
   modifierEnfant: (id: string, champs: Partial<Omit<Enfant, 'id'>>) => void
   definirRepas: (id: string, jour: Jour, repas: RepasMidi) => void
   definirRepasSemaine: (id: string, repas: RepasMidi) => void
@@ -132,28 +136,28 @@ export function FournisseurFoyer({ children }: { children: ReactNode }) {
 
       definirAdresse: (adresse) => setFoyer((f) => ({ ...f, adresse })),
 
-      ajouterEnfant: (prenom, cycle) => {
+      /**
+       * Crée un enfant, éventuellement calqué sur un frère ou une sœur.
+       *
+       * `modele` est l'identifiant de l'enfant à recopier ; sans lui, on part d'une
+       * configuration vierge. Les heures de présence au Dillendapp sont écrêtées aux
+       * bornes du NOUVEAU cycle : recopier telles quelles celles d'un C2 sur un C4
+       * décrirait un dépôt que plus aucune navette ne prolonge.
+       */
+      ajouterEnfant: (prenom, cycle, modele) => {
         // L'identifiant est forgé ici, et non dans le `setFoyer`, pour pouvoir être
         // renvoyé à l'appelant : c'est lui qui enchaîne sur l'assistant du nouvel enfant.
         const id = `${Date.now().toString(36)}-${foyer.enfants.length}`
-        setFoyer((f) => ({
-          ...f,
-          enfants: [
-            ...f.enfants,
-            {
-              id,
-              prenom: prenom.trim(),
-              cycle,
-              repas: repasParDefaut(),
-              bus: busParDefaut(),
-              periscolaireMidi: false,
-              periscolaireHorsMidi: false,
-              dillendappDepuis: dillendappParDefaut(),
-              dillendappJusqua: dillendappParDefaut(),
-              adresses: {},
-            },
-          ],
-        }))
+        setFoyer((f) => {
+          const source = modele ? f.enfants.find((e) => e.id === modele) : undefined
+          const neuf = source
+            ? enfantCalqueSur(source, id, prenom, cycle)
+            : enfantVierge(id, prenom, cycle)
+          return {
+            ...f,
+            enfants: [...f.enfants, f.adresse ? ajusterDillendapp(neuf, f.adresse) : neuf],
+          }
+        })
         return id
       },
 

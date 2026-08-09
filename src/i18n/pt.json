@@ -106,7 +106,11 @@
     "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial.",
     "aPied": "Sem autocarro: a escola fica mesmo ao lado",
     "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola.",
-    "sansPrenom": "Criança sem nome"
+    "sansPrenom": "Criança sem nome",
+    "calquerSur": "Configuração inicial",
+    "commeLui": "Como {prenom}",
+    "depuisZero": "Começar do zero",
+    "calquerSurAide": "Almoço, autocarro, Dillendapp e moradas particulares são retomados. Tudo continua alterável no passo seguinte, e os horários ajustam-se ao ciclo escolhido."
   },
   "repas": {
     "titre": "Almoço",

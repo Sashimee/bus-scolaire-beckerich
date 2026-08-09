@@ -106,7 +106,11 @@
     "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel.",
     "aPied": "Pas de bus : l’école est juste à côté",
     "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même.",
-    "sansPrenom": "Enfant sans prénom"
+    "sansPrenom": "Enfant sans prénom",
+    "calquerSur": "Configuration de départ",
+    "commeLui": "Comme {prenom}",
+    "depuisZero": "Repartir de zéro",
+    "calquerSurAide": "Repas, bus, Dillendapp et adresses particulières sont repris. Tout reste modifiable à l'étape suivante, et les heures s'ajustent au cycle choisi."
   },
   "repas": {
     "titre": "Repas de midi",
