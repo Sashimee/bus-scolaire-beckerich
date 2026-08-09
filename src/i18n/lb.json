@@ -145,7 +145,10 @@
     "deposeCase": "Ech bréngen et deen Dag",
     "recupereCase": "Ech kommen et deen Dag sichen",
     "bornes": "Tëscht {min} an {max}, jee no Bus vu sengem Cycle",
-    "midiObligatoire": "Deen Dag ass kee Cours nomëttes: am Dillendapp ze bleiwen heescht, do ze iessen. D’Mëttegiessen gouf deementspriechend agestallt."
+    "midiObligatoire": "Deen Dag ass kee Cours nomëttes: am Dillendapp ze bleiwen heescht, do ze iessen. D’Mëttegiessen gouf deementspriechend agestallt.",
+    "transportTitre": "Kënnt Dir et net sichen?",
+    "transportDetail": "{nom} ass en Transport op Ufro, deen d'Regioun bedéngt. E muss am Viraus reservéiert ginn — dacks gutt virum Dag selwer: kuckt d'Frist an d'Konditiounen direkt bei hinnen no.",
+    "transportLien": "{nom} kucken"
   },
   "bus": {
     "titre": "Bus",

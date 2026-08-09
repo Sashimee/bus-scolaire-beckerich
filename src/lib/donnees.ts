@@ -8,7 +8,16 @@ import planJson from '../data/plan-2025-2026.json'
 import arretsJson from '../data/arrets.json'
 import ecolesJson from '../data/ecoles.json'
 import vacancesJson from '../data/vacances-lu.json'
-import type { Arret, Cycle, CycleScolaire, MaisonRelais, Plan, SiteScolaire } from './types'
+import transportJson from '../data/transport-a-la-demande.json'
+import type {
+  Arret,
+  Cycle,
+  CycleScolaire,
+  MaisonRelais,
+  Plan,
+  SiteScolaire,
+  TransportALaDemande,
+} from './types'
 
 export const plan = planJson as unknown as Plan
 
@@ -23,6 +32,9 @@ const ecoles = ecolesJson as unknown as {
 export const cycles = ecoles.cycles
 export const sites = ecoles.sites
 export const maisonRelais = ecoles.maisonRelais
+
+/** Service de transport à la demande. Voir `src/data/transport-a-la-demande.json`. */
+export const transportALaDemande = transportJson as unknown as TransportALaDemande
 
 export interface AnneeVacances {
   anneeScolaire: string

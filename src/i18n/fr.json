@@ -145,7 +145,10 @@
     "deposeCase": "Je le dépose ce jour-là",
     "recupereCase": "Je viens le chercher ce jour-là",
     "bornes": "Entre {min} et {max}, selon le bus de son cycle",
-    "midiObligatoire": "Ce jour-là, il n'y a pas cours l'après-midi : rester au Dillendapp suppose d'y déjeuner. Le repas de midi a été réglé en conséquence."
+    "midiObligatoire": "Ce jour-là, il n'y a pas cours l'après-midi : rester au Dillendapp suppose d'y déjeuner. Le repas de midi a été réglé en conséquence.",
+    "transportTitre": "Vous ne pouvez pas venir le chercher ?",
+    "transportDetail": "{nom} est un service de transport à la demande qui dessert la région. Il faut le réserver à l'avance — souvent bien avant le jour même : vérifiez le délai et les conditions directement auprès d'eux.",
+    "transportLien": "Voir {nom}"
   },
   "bus": {
     "titre": "Bus",

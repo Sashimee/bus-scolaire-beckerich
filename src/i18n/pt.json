@@ -145,7 +145,10 @@
     "deposeCase": "Levo-a nesse dia",
     "recupereCase": "Vou buscá-la nesse dia",
     "bornes": "Entre {min} e {max}, conforme o autocarro do seu ciclo",
-    "midiObligatoire": "Nesse dia não há aulas à tarde: ficar no Dillendapp implica almoçar lá. O almoço foi configurado em conformidade."
+    "midiObligatoire": "Nesse dia não há aulas à tarde: ficar no Dillendapp implica almoçar lá. O almoço foi configurado em conformidade.",
+    "transportTitre": "Não pode ir buscá-lo?",
+    "transportDetail": "{nom} é um serviço de transporte a pedido que serve a região. Tem de ser reservado com antecedência — muitas vezes bem antes do próprio dia: confirme o prazo e as condições diretamente com eles.",
+    "transportLien": "Ver {nom}"
   },
   "bus": {
     "titre": "Autocarro",

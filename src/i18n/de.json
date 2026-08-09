@@ -145,7 +145,10 @@
     "deposeCase": "Ich bringe es an diesem Tag",
     "recupereCase": "Ich hole es an diesem Tag ab",
     "bornes": "Zwischen {min} und {max}, je nach Bus seines Zyklus",
-    "midiObligatoire": "An diesem Tag gibt es keinen Nachmittagsunterricht: im Dillendapp zu bleiben setzt voraus, dort zu essen. Das Mittagessen wurde entsprechend eingestellt."
+    "midiObligatoire": "An diesem Tag gibt es keinen Nachmittagsunterricht: im Dillendapp zu bleiben setzt voraus, dort zu essen. Das Mittagessen wurde entsprechend eingestellt.",
+    "transportTitre": "Sie können es nicht abholen?",
+    "transportDetail": "{nom} ist ein Bedarfsverkehr, der die Region bedient. Er muss im Voraus gebucht werden — oft deutlich vor dem Tag selbst: Frist und Bedingungen bitte direkt dort prüfen.",
+    "transportLien": "{nom} ansehen"
   },
   "bus": {
     "titre": "Bus",

@@ -145,7 +145,10 @@
     "deposeCase": "I drop them off that day",
     "recupereCase": "I collect them that day",
     "bornes": "Between {min} and {max}, depending on their cycle’s bus",
-    "midiObligatoire": "There are no afternoon classes that day: staying at the Dillendapp means having lunch there. Lunch has been set accordingly."
+    "midiObligatoire": "There are no afternoon classes that day: staying at the Dillendapp means having lunch there. Lunch has been set accordingly.",
+    "transportTitre": "Can't come and collect them?",
+    "transportDetail": "{nom} is an on-demand transport service covering the area. It must be booked ahead — often well before the day itself: check the notice period and conditions with them directly.",
+    "transportLien": "See {nom}"
   },
   "bus": {
     "titre": "Bus",

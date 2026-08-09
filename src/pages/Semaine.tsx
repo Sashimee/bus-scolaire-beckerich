@@ -10,7 +10,7 @@ import { ActionsEnfant } from '../composants/ActionsEnfant'
 import { datesDeLaSemaine } from '../lib/calendrier'
 import { semaineEnfant } from '../lib/plan'
 import { distanceLisible, nomArret } from '../lib/affichage'
-import { siteDuCycle } from '../lib/donnees'
+import { siteDuCycle, transportALaDemande } from '../lib/donnees'
 import { JOURS } from '../lib/types'
 import { useUrgences } from '../urgences-contexte'
 import { perturbationsDuJour } from '../lib/urgences'
@@ -150,6 +150,23 @@ export function Semaine() {
               </li>
             ))}
           </ul>
+
+          {/*
+              Seulement quand le parent doit VENIR CHERCHER l'enfant : c'est là que la
+              question « et si je ne peux pas ? » se pose, et elle se pose la veille au
+              soir, pas le matin même. On ne dit rien des tarifs, des zones ni du délai
+              exact — ce service n'est pas le nôtre et l'afficher faux serait pire que
+              de ne rien dire.
+          */}
+          {presences.some((p) => p.recuperation) && (
+            <div className="encart encart--info">
+              <div className="encart__titre">{t('dillendapp.transportTitre')}</div>
+              <p>{t('dillendapp.transportDetail', { nom: transportALaDemande.nom })}</p>
+              <a href={transportALaDemande.url} target="_blank" rel="noopener noreferrer">
+                {t('dillendapp.transportLien', { nom: transportALaDemande.nom })}
+              </a>
+            </div>
+          )}
         </section>
       )}
 

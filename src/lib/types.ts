@@ -166,6 +166,15 @@ export interface HorairesMaisonRelais {
   margeAvantBusMinutes: number
 }
 
+/**
+ * Un service de transport à la demande, pour le parent qui ne peut pas venir chercher
+ * son enfant. Le projet n'en connaît que le nom et l'adresse : ni tarifs, ni délais.
+ */
+export interface TransportALaDemande {
+  nom: string
+  url: string
+}
+
 export interface MaisonRelais extends SiteScolaire {
   arret: string
   horaires: HorairesMaisonRelais

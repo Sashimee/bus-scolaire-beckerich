@@ -1,0 +1,10 @@
+{
+  "$commentaire": "Service de transport à la demande utilisable quand un parent ne peut pas venir chercher son enfant à la maison relais. Ce site n'a AUCUN lien avec ce service et ne connaît ni ses tarifs, ni ses zones exactes, ni son délai de réservation : il se contente de donner le lien. Ne rien ajouter ici qui ne soit vérifiable sur le site officiel du service.",
+
+  "nom": "Bummelbus",
+  "url": "https://www.bummelbus.lu/",
+  "source": {
+    "dateReleve": "2026-08-09",
+    "note": "Transport à la demande du Forum pour l'Emploi, actif dans les communes rurales dont le canton de Redange. Délai de réservation et conditions à vérifier auprès du service : ils ne sont pas repris ici pour ne pas risquer de les afficher faux."
+  }
+}
