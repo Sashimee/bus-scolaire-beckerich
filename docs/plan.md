@@ -54,7 +54,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R15 | — | **La vignette de partage n'a pas été soumise aux validateurs.** Les métadonnées Open Graph sont posées et l'image existe, mais aucun aperçu réel n'a été obtenu depuis WhatsApp, Facebook ou LinkedIn. | Coller le lien dans une conversation WhatsApp, ou passer par le débogueur de partage de chaque plateforme. |
 | ~~R16~~ | 14 | ~~Les bornes `min`/`max` n'ont pas été vues sur Safari iOS.~~ **Levée le 2026-08-09** : la roue de sélection les respecte. |
 | R17 | 15 | **L'espace `/traductions` n'a jamais parlé à un vrai Worker.** La séparation des rôles est couverte par quatre tests contre un KV en mémoire ; la connexion par code, la publication sur GitHub et la relecture de la surcouche déployée ne l'ont pas été. | Même manœuvre que R3, avec `./creer-agent.sh "Nom" "" traductions`, puis corriger une clé allemande et vérifier qu'elle change sans reconstruction. |
-| R18 | 15 | **Les onglets d'`/admin` n'ont été vus que lus, jamais utilisés.** Vérifié connecté le 2026-08-09, une fois la CSP corrigée : les cinq onglets s'affichent, l'onglet actif suit l'URL, l'éditeur de crédits lit bien le fichier du dépôt, et l'éditeur de textes ne monte aucun champ tant qu'une section n'est pas dépliée (44 sections, 0 `textarea`). **Aucune publication n'a été faite** — c'est ce qui reste à éprouver. | Publier une correction de texte et une modification de crédits depuis `/admin`, et vérifier les deux commits. Lève aussi R9. |
+| R18 | 15 | **Aucune publication depuis `/admin` n'a été éprouvée par mes soins.** Les cinq onglets ont été vus connectés le 2026-08-09 ; l'auteur a confirmé qu'une modification de crédits aboutit. Restent non exercées : la publication d'une correction de texte, et la détection de conflit sur les crédits. | Corriger une clé depuis `/admin`, vérifier le commit et le texte en ligne. Lève aussi R9. |
 | ~~R19~~ | 17 | ~~L'effet de l'en-tête `Urgency` n'est pas constatable ici.~~ **Levée le 2026-08-09** : marche à suivre iOS affichée, notification d'essai reçue en quelques secondes sur l'iPhone de l'auteur. |
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
@@ -1383,6 +1383,38 @@ Voir R20, rayée.
 > une coupure réseau.
 
 *Dépend du lot 11.*
+
+---
+
+## Correctif du 2026-08-09 — l'éditeur de textes proposait du vide
+
+> **Fait le 2026-08-09.** Signalé en usage réel : « quand on choisit une langue, ça ne
+> change pas le contenu de la page, ça reste français ».
+>
+> **Le champ ne partait pas de la traduction existante.** `valeurAffichee` retombait sur
+> `valeurDeReference`, c'est-à-dire le français — et pour un texte, sur une chaîne VIDE.
+> Le traducteur voyait donc un champ blanc et devait retaper une phrase qui existait
+> déjà dans `de.json`. Changer de langue ne changeait rien à l'écran, puisque tout était
+> vide dans toutes les langues : seul le bloc de référence, en français, restait visible.
+> D'où la description.
+>
+> Le champ propose désormais ce qu'un parent lit aujourd'hui : correction publiée s'il y
+> en a une, sinon le dictionnaire compilé de la langue, avec repli sur le français.
+>
+> **Et un sélecteur « Comparer à »** : le bloc de référence affichait le français et lui
+> seul. Traduire vers le portugais en regardant l'allemand est souvent plus parlant. Le
+> français reste la référence de VALIDATION — les marqueurs `{…}` s'y comparent — mais
+> plus forcément celle qu'on lit. Une langue ne peut pas se comparer à elle-même.
+>
+> Les dictionnaires compilés sortent de `src/i18n/index.tsx` vers
+> `src/i18n/dictionnaires.ts` : l'éditeur a besoin de lire une langue qui n'est pas
+> celle affichée, et `src/lib/traductions.ts` — importé par le Worker — ne doit pas se
+> charger des cinq.
+>
+> Vérifié par 3 tests de plus, dont celui qui a échoué en premier pour la bonne raison :
+> il écrivait « Fertig » dans un champ qui contenait déjà « Fertig ».
+
+*Dépend du lot 15.*
 
 ---
 

@@ -783,7 +783,9 @@
     "connexion": "Iwwersetzungsberäich",
     "connexionAide": "Gitt de Code an, deen Dir kritt hutt fir d'Texter ze korrigéieren. En dréit nëmmen d'Iwwersetzungen op.",
     "brouillonConserve": "Är Korrekture bleiwen erhalen: maacht dësen Tab net zou a probéiert nach eng Kéier. Wann Är Sessioun ofgelaf ass, mellt Iech an engem anerem Tab un a publizéiert duerno vun hei aus.",
-    "enAttenteAilleurs": "{nombre} Korrektur(en) an anere Sproochen nach net publizéiert. All Sprooch gëtt eenzel publizéiert."
+    "enAttenteAilleurs": "{nombre} Korrektur(en) an anere Sproochen nach net publizéiert. All Sprooch gëtt eenzel publizéiert.",
+    "comparerA": "Vergläiche mat",
+    "comparerAAide": "D'Referenzsprooch, déi iwwer all Feld ugewise gëtt. Franséisch bleift d'Referenz fir d'Kontroll, mä eng aner Sprooch ass heiansdo méi sproochend."
   },
   "credits": {
     "titre": "Merci",

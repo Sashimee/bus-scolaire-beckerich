@@ -783,7 +783,9 @@
     "connexion": "Übersetzungsbereich",
     "connexionAide": "Geben Sie den Code ein, den Sie zum Korrigieren der Texte erhalten haben. Er gibt ausschließlich Zugang zu den Übersetzungen.",
     "brouillonConserve": "Ihre Korrekturen bleiben erhalten: schließen Sie diesen Tab nicht und versuchen Sie es erneut. Ist Ihre Sitzung abgelaufen, melden Sie sich in einem anderen Tab an und veröffentlichen Sie dann von hier aus.",
-    "enAttenteAilleurs": "{nombre} Korrektur(en) in anderen Sprachen noch nicht veröffentlicht. Jede Sprache wird einzeln veröffentlicht."
+    "enAttenteAilleurs": "{nombre} Korrektur(en) in anderen Sprachen noch nicht veröffentlicht. Jede Sprache wird einzeln veröffentlicht.",
+    "comparerA": "Vergleichen mit",
+    "comparerAAide": "Die über jedem Feld angezeigte Referenzsprache. Französisch bleibt die Prüfreferenz, aber eine andere Sprache ist manchmal aufschlussreicher."
   },
   "credits": {
     "titre": "Danksagung",

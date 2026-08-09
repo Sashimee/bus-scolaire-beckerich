@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import fr from '../i18n/fr.json'
+import { valeurCompilee } from '../i18n/dictionnaires'
 import {
   motifRefus,
   valeurDeReference,
@@ -84,6 +85,9 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
   const [langue, setLangue] = useState<Langue>('de')
   const [recherche, setRecherche] = useState('')
   const [depliees, setDepliees] = useState<Record<string, boolean>>({})
+  // Traduire vers le portugais en regardant l'allemand plutôt que le français : le
+  // français reste la référence de validation, pas forcément la plus utile à l'écran.
+  const [comparaison, setComparaison] = useState<Langue>('fr')
   /**
    * Un brouillon PAR LANGUE.
    *
@@ -109,15 +113,26 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
   const majBrouillon = (transformer: (b: Brouillon) => Brouillon) =>
     setBrouillons((tous) => ({ ...tous, [langue]: transformer(tous[langue] ?? {}) }))
 
-  /** La valeur affichée : brouillon, puis surcouche publiée, puis le dictionnaire. */
-  const valeurAffichee = (cle: string): string | string[] => {
-    const b = brouillon[cle]
-    if (b !== undefined) return b
-    const s = publiees[langue]?.[cle]
-    if (s !== undefined) return s
-    const reference = valeurDeReference(cle)
-    return Array.isArray(reference) ? (reference as string[]) : ''
+  /**
+   * Ce qu'un parent lit AUJOURD'HUI dans cette langue : correction publiée s'il y en a
+   * une, sinon le dictionnaire compilé de la langue, avec repli sur le français.
+   */
+  const valeurEnLigne = (l: Langue, cle: string): string | string[] => {
+    const publiee = publiees[l]?.[cle]
+    if (publiee !== undefined) return publiee
+    const compilee = valeurCompilee(l, cle)
+    if (typeof compilee === 'string') return compilee
+    return Array.isArray(compilee) ? (compilee as string[]) : ''
   }
+
+  /**
+   * La valeur du champ : brouillon en cours, sinon ce qui est en ligne.
+   *
+   * Elle retombait sur le français, donc sur une chaîne VIDE pour les textes : le
+   * traducteur voyait un champ blanc et devait retaper une traduction qui existait
+   * déjà. Changer de langue ne changeait rien à l'écran, puisque tout était vide.
+   */
+  const valeurAffichee = (cle: string): string | string[] => brouillon[cle] ?? valeurEnLigne(langue, cle)
 
   const modifiee = (cle: string) => cle in brouillon || publiees[langue]?.[cle] !== undefined
 
@@ -201,7 +216,10 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
             id="traductions-langue"
             value={langue}
             onChange={(e) => {
-              setLangue(e.target.value as Langue)
+              const suivante = e.target.value as Langue
+              setLangue(suivante)
+              // Comparer une langue à elle-même n'apprend rien.
+              if (comparaison === suivante) setComparaison(suivante === 'fr' ? 'de' : 'fr')
               setPubliee(false)
               setErreur(null)
             }}
@@ -213,6 +231,22 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
             ))}
           </select>
           <p className="champ__aide">{t('traductions.langueAide')}</p>
+        </div>
+
+        <div className="champ">
+          <label htmlFor="traductions-comparaison">{t('traductions.comparerA')}</label>
+          <select
+            id="traductions-comparaison"
+            value={comparaison}
+            onChange={(e) => setComparaison(e.target.value as Langue)}
+          >
+            {LANGUES.filter((l) => l !== langue).map((l) => (
+              <option key={l} value={l}>
+                {NOMS_LANGUES[l]}
+              </option>
+            ))}
+          </select>
+          <p className="champ__aide">{t('traductions.comparerAAide')}</p>
         </div>
 
         <div className="champ">
@@ -270,7 +304,11 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
                 <div className="pile pile--serre" key={cle}>
                   <code className="champ__aide">{cle}</code>
                   <p className="adresse-retenue">
-                    {Array.isArray(reference) ? reference.join(' · ') : String(reference)}
+                    <span className="etiquette">{NOMS_LANGUES[comparaison]}</span>{' '}
+                    {(() => {
+                      const c = valeurEnLigne(comparaison, cle)
+                      return Array.isArray(c) ? c.join(' · ') : c
+                    })()}
                   </p>
 
                   {Array.isArray(reference) ? (

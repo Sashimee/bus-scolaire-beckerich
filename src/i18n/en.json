@@ -783,7 +783,9 @@
     "connexion": "Translation space",
     "connexionAide": "Enter the code you were given to correct the app's wording. It grants access to translations only.",
     "brouillonConserve": "Your corrections are kept: do not close this tab, and try again. If your session expired, sign in from another tab, then publish from this one.",
-    "enAttenteAilleurs": "{nombre} correction(s) awaiting publication in other languages. Each language is published separately."
+    "enAttenteAilleurs": "{nombre} correction(s) awaiting publication in other languages. Each language is published separately.",
+    "comparerA": "Compare with",
+    "comparerAAide": "The reference language shown above each field. French remains the validation reference, but another language is sometimes more telling."
   },
   "credits": {
     "titre": "Credits",

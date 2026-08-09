@@ -783,7 +783,9 @@
     "connexion": "Espaço de tradução",
     "connexionAide": "Introduza o código que lhe foi entregue para corrigir os textos da aplicação. Dá acesso apenas às traduções.",
     "brouillonConserve": "As suas correções foram guardadas: não feche este separador e tente de novo. Se a sua sessão expirou, inicie sessão noutro separador e publique depois a partir deste.",
-    "enAttenteAilleurs": "{nombre} correção(ões) por publicar noutras línguas. Cada língua publica-se separadamente."
+    "enAttenteAilleurs": "{nombre} correção(ões) por publicar noutras línguas. Cada língua publica-se separadamente.",
+    "comparerA": "Comparar com",
+    "comparerAAide": "A língua de referência apresentada acima de cada campo. O francês continua a ser a referência de validação, mas outra língua é por vezes mais esclarecedora."
   },
   "credits": {
     "titre": "Créditos",

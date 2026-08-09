@@ -12,6 +12,8 @@ import { FournisseurTraduction } from '../i18n'
 import { FournisseurRechargement } from '../rechargement-contexte'
 import { ErreurCommune } from '../lib/commune'
 import fr from '../i18n/fr.json'
+import de from '../i18n/de.json'
+import en from '../i18n/en.json'
 import type { Modifications, Surcouche } from '../lib/traductions'
 import type { Langue } from '../i18n/langues'
 
@@ -63,33 +65,76 @@ function corriger(cle: string, texte: string) {
 const changerLangue = (code: string) =>
   poserValeur(screen.getByLabelText(fr.traductions.langue), code)
 
+describe('ce que le champ propose', () => {
+  it('part de la traduction existante, pas d’un champ vide', () => {
+    // Le champ retombait sur le français, donc sur une chaîne vide : le traducteur
+    // voyait un blanc et devait retaper ce qui existait déjà. Changer de langue ne
+    // changeait alors rien à l'écran.
+    monter(async () => ({}))
+    poserValeur(screen.getByLabelText(fr.traductions.recherche), 'assistant.terminer')
+    const repli = document.querySelector('details')!
+    act(() => {
+      repli.open = true
+      repli.dispatchEvent(new Event('toggle'))
+    })
+    expect((document.getElementById('assistant.terminer') as HTMLTextAreaElement).value).toBe(
+      de.assistant.terminer,
+    )
+  })
+
+  it('montre la langue de comparaison en référence, et pas seulement le français', () => {
+    monter(async () => ({}))
+    poserValeur(screen.getByLabelText(fr.traductions.recherche), 'assistant.terminer')
+    const repli = document.querySelector('details')!
+    act(() => {
+      repli.open = true
+      repli.dispatchEvent(new Event('toggle'))
+    })
+    // Par défaut on compare au français.
+    expect(screen.getByText(fr.assistant.terminer, { exact: false })).toBeDefined()
+
+    poserValeur(screen.getByLabelText(fr.traductions.comparerA), 'en')
+    expect(screen.getByText(en.assistant.terminer, { exact: false })).toBeDefined()
+  })
+
+  it('ne propose jamais de comparer une langue à elle-même', () => {
+    monter(async () => ({}))
+    const comparer = screen.getByLabelText(fr.traductions.comparerA) as HTMLSelectElement
+    expect([...comparer.options].map((o) => o.value)).not.toContain('de')
+
+    changerLangue('fr')
+    const suite = screen.getByLabelText(fr.traductions.comparerA) as HTMLSelectElement
+    expect([...suite.options].map((o) => o.value)).not.toContain('fr')
+  })
+})
+
 describe('brouillon du traducteur', () => {
   it('survit à un changement de langue', () => {
     // Le sélecteur vidait le brouillon : passer à une autre langue pour vérifier une
     // tournure effaçait tout le travail en cours, sans confirmation ni message.
     monter(async () => ({}))
-    corriger('assistant.terminer', 'Fertig')
+    corriger('assistant.terminer', 'Erledigt')
 
     changerLangue('pt')
     expect(screen.getAllByText(/en attente dans d'autres langues/)[0]).toBeDefined()
 
     changerLangue('de')
     expect((document.getElementById('assistant.terminer') as HTMLTextAreaElement).value).toBe(
-      'Fertig',
+      'Erledigt',
     )
   })
 
   it('survit à un échec de publication', async () => {
     const publier = vi.fn().mockRejectedValue(new ErreurCommune('session-expiree'))
     monter(publier)
-    corriger('assistant.terminer', 'Fertig')
+    corriger('assistant.terminer', 'Erledigt')
 
     await act(async () => {
       screen.getByRole('button', { name: fr.traductions.publier }).click()
     })
 
     expect((document.getElementById('assistant.terminer') as HTMLTextAreaElement).value).toBe(
-      'Fertig',
+      'Erledigt',
     )
     expect(screen.getAllByText(fr.traductions.brouillonConserve)[0]).toBeDefined()
   })
@@ -103,12 +148,12 @@ describe('brouillon du traducteur', () => {
   it('ne publie que la langue affichée', async () => {
     const publier = vi.fn().mockResolvedValue({})
     monter(publier)
-    corriger('assistant.terminer', 'Fertig')
+    corriger('assistant.terminer', 'Erledigt')
 
     await act(async () => {
       screen.getByRole('button', { name: fr.traductions.publier }).click()
     })
 
-    expect(publier).toHaveBeenCalledWith('de', { 'assistant.terminer': 'Fertig' })
+    expect(publier).toHaveBeenCalledWith('de', { 'assistant.terminer': 'Erledigt' })
   })
 })

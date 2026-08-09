@@ -8,28 +8,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import fr from './fr.json'
-import de from './de.json'
-import lb from './lb.json'
-import pt from './pt.json'
-import en from './en.json'
 import { chargerLangue, enregistrerLangue } from '../lib/stockage'
+import { chercher, DICTIONNAIRES } from './dictionnaires'
 import { SURCOUCHE_VIDE, type Surcouche } from '../lib/traductions'
 import { chargerTraductions } from './surcouche'
 import { LANGUES, NOMS_LANGUES, type Langue } from './langues'
 
 export { LANGUES, NOMS_LANGUES }
 export type { Langue }
-
-type Dictionnaire = Record<string, unknown>
-
-const DICTIONNAIRES: Record<Langue, Dictionnaire> = { fr, de, lb, pt, en }
-
-function chercher(dico: Dictionnaire, chemin: string): unknown {
-  return chemin.split('.').reduce<unknown>((acc, part) => {
-    if (acc && typeof acc === 'object') return (acc as Record<string, unknown>)[part]
-    return undefined
-  }, dico)
-}
 
 function interpoler(texte: string, params?: Record<string, string | number>): string {
   if (!params) return texte
