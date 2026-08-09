@@ -694,7 +694,8 @@
       "conflit": "Iergendeen huet an der Tëschenzäit publizéiert. Luet d'Säit nei a fänkt nach eng Kéier un.",
       "reseau": "De Server ass net erreechbar. Kuckt Är Verbindung no.",
       "inconnu": "D'Verëffentlechung ass feelgeschloen. Probéiert gläich nach eng Kéier.",
-      "nonActivee": "Dëse Beräich ass um Server nach net aktivéiert. Sot der Persoun Bescheed, déi d'Applikatioun bedreit: hir feelt e Konfiguratiounsschlëssel."
+      "nonActivee": "Dëse Beräich ass um Server nach net aktivéiert. Sot der Persoun Bescheed, déi d'Applikatioun bedreit: hir feelt e Konfiguratiounsschlëssel.",
+      "exception": "Um Server ass e Feeler geschitt. Mellt e mat dem Detail hei ënnen."
     },
     "rappels": "Meldung widderhuelen",
     "rappelsAide": "En Erënnerung gëtt nëmmen zu de sënnvollen Zäite vum betraffenen Dag geschéckt — virun 07:40 moies, virun 15 Auer nomëttes — an ni un engem schoulfräien Dag.",

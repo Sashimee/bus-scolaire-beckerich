@@ -47,11 +47,14 @@ const TOTAL_CLES = SECTIONS.reduce((n, s) => n + s.cles.length, 0)
  * lettres. Devant un échec, il doit savoir ce qui s'est passé et si son travail est
  * perdu — ici, il ne l'est jamais, le brouillon reste en mémoire.
  */
-function motifAffichable(e: unknown): string {
-  if (e instanceof ErreurCommune) return cleErreur(e.motif)
+function motifAffichable(e: unknown): { cle: string; detail?: string } {
+  if (e instanceof ErreurCommune) {
+    return { cle: cleErreur(e.motif), detail: e.detail ? String(e.detail) : undefined }
+  }
   // `/admin` passe par l'API GitHub, qui lève des `Error` ordinaires.
-  if (e instanceof Error && e.message === 'conflit') return 'conflit'
-  return 'inconnu'
+  if (e instanceof Error && e.message === 'conflit') return { cle: 'conflit' }
+  if (e instanceof Error) return { cle: 'inconnu', detail: e.message }
+  return { cle: 'inconnu' }
 }
 
 type Brouillon = Record<string, string | string[]>
@@ -97,7 +100,7 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
    */
   const [brouillons, setBrouillons] = useState<Partial<Record<Langue, Brouillon>>>({})
   const [occupe, setOccupe] = useState(false)
-  const [erreur, setErreur] = useState<string | null>(null)
+  const [erreur, setErreur] = useState<{ cle: string; detail?: string } | null>(null)
   const [publiee, setPubliee] = useState(false)
 
   // Le `?? {}` créait un objet neuf à chaque rendu, ce qui rejouait le `useMemo` des
@@ -385,9 +388,10 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
         )}
         {erreur && (
           <div className="encart encart--alerte" role="alert">
-            <div className="encart__titre">{t(`commune.erreur.${erreur}`)}</div>
+            <div className="encart__titre">{t(`commune.erreur.${erreur.cle}`)}</div>
             {/* Le point qui compte : rien n'est perdu tant que l'onglet reste ouvert. */}
             <p>{t('traductions.brouillonConserve')}</p>
+            {erreur.detail && <p className="champ__aide"><code>{erreur.detail}</code></p>}
           </div>
         )}
         {publiee && <p>✓ {t('traductions.publiee')}</p>}

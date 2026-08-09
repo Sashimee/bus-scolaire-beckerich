@@ -8,6 +8,7 @@ import { useBlocageRechargement } from '../rechargement-contexte'
 import { arrets, plan } from '../lib/donnees'
 import { nomArret } from '../lib/affichage'
 import {
+  cleErreur,
   ErreurCommune,
   chargerSession,
   publierPerturbation,
@@ -68,6 +69,8 @@ export function CommuneAlertes() {
   const [message, setMessage] = useState('')
   const [occupe, setOccupe] = useState(false)
   const [motif, setMotif] = useState<MotifCommune | null>(null)
+  // Ce que le serveur dit de sa propre panne. Sans lui, une erreur reste indiagnosticable.
+  const [detail, setDetail] = useState<string | null>(null)
   const [publiee, setPubliee] = useState(false)
 
   // Une saisie en cours ne doit pas disparaître sous un rechargement automatique.
@@ -120,6 +123,7 @@ export function CommuneAlertes() {
       rafraichir()
     } catch (erreur) {
       setMotif(erreur instanceof ErreurCommune ? erreur.motif : 'inconnu')
+      setDetail(erreur instanceof ErreurCommune && erreur.detail ? String(erreur.detail) : null)
     } finally {
       setOccupe(false)
     }
@@ -133,6 +137,7 @@ export function CommuneAlertes() {
       rafraichir()
     } catch (erreur) {
       setMotif(erreur instanceof ErreurCommune ? erreur.motif : 'inconnu')
+      setDetail(erreur instanceof ErreurCommune && erreur.detail ? String(erreur.detail) : null)
     } finally {
       setOccupe(false)
     }
@@ -375,7 +380,12 @@ export function CommuneAlertes() {
           {publiee && <div className="encart encart--info">{t('commune.publiee')}</div>}
           {motif && (
             <div className="encart encart--alerte" role="alert">
-              {t(`commune.erreur.${motif === 'session-expiree' ? 'sessionExpiree' : motif === 'reseau' ? 'reseau' : 'inconnu'}`)}
+              {t(`commune.erreur.${cleErreur(motif)}`)}
+              {detail && (
+                <p className="champ__aide">
+                  <code>{detail}</code>
+                </p>
+              )}
             </div>
           )}
         </div>

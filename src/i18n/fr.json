@@ -694,7 +694,8 @@
       "conflit": "Quelqu'un a publié entre-temps. Rechargez la page et recommencez.",
       "reseau": "Impossible de joindre le serveur. Vérifiez votre connexion.",
       "inconnu": "La publication a échoué. Réessayez dans un instant.",
-      "nonActivee": "Cet espace n'est pas encore activé sur le serveur. Prévenez la personne qui gère l'application : il lui manque une clé de configuration."
+      "nonActivee": "Cet espace n'est pas encore activé sur le serveur. Prévenez la personne qui gère l'application : il lui manque une clé de configuration.",
+      "exception": "Le serveur a rencontré une erreur. Signalez-la avec le détail ci-dessous."
     },
     "rappels": "Répéter la notification",
     "rappelsAide": "Un rappel n'est envoyé qu'aux créneaux utiles du jour concerné — avant 7 h 40 le matin, avant 15 h l'après-midi — et jamais un jour sans école.",

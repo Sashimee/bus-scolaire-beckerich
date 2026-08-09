@@ -694,7 +694,8 @@
       "conflit": "Someone published in the meantime. Reload the page and start again.",
       "reseau": "Could not reach the server. Check your connection.",
       "inconnu": "Publishing failed. Try again in a moment.",
-      "nonActivee": "This space is not yet enabled on the server. Tell whoever maintains the app: a configuration key is missing."
+      "nonActivee": "This space is not yet enabled on the server. Tell whoever maintains the app: a configuration key is missing.",
+      "exception": "The server hit an error. Report it with the detail below."
     },
     "rappels": "Repeat the notification",
     "rappelsAide": "A reminder is only sent at the useful times of the day concerned — before 07:40 in the morning, before 15:00 in the afternoon — and never on a day without school.",

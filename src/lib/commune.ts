@@ -88,6 +88,8 @@ export type MotifCommune =
   | 'session-expiree'
   /** Le Worker tourne, mais ses secrets ne sont pas posés : l'espace n'existe pas encore. */
   | 'non-activee'
+  /** Le Worker a levé une exception. `detail` porte ce qu'il a bien voulu en dire. */
+  | 'exception'
   | 'charge-invalide'
   | 'plan-invalide'
   | 'conflit'
@@ -111,6 +113,8 @@ export function cleErreur(motif: MotifCommune): string {
       return 'sessionExpiree'
     case 'non-activee':
       return 'nonActivee'
+    case 'exception':
+      return 'exception'
     case 'conflit':
       return 'conflit'
     case 'reseau':
@@ -160,6 +164,10 @@ async function appeler<T>(
   // Sans `SECRET_SESSION`, le Worker répond 503 à tout l'espace. Le dire franchement
   // vaut mieux qu'une « erreur inconnue » devant laquelle personne ne sait quoi faire.
   if (motif === 'espace-commune-non-configure') throw new ErreurCommune('non-activee')
+  // Le Worker dit ce qui a cassé chez lui. Ces écrans sont ceux d'un agent ou d'un
+  // traducteur, pas d'un parent : leur cacher le motif ne protège personne et rend
+  // toute panne indiagnosticable à distance.
+  if (motif === 'exception') throw new ErreurCommune('exception', donnees.detail)
   if (motif === 'charge-invalide') throw new ErreurCommune('charge-invalide', donnees.motifs)
   if (motif === 'plan-invalide') throw new ErreurCommune('plan-invalide', donnees.problemes)
   if (reponse.status === 409) throw new ErreurCommune('conflit')

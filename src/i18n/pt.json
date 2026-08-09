@@ -694,7 +694,8 @@
       "conflit": "Alguém publicou entretanto. Recarregue a página e recomece.",
       "reseau": "Não foi possível contactar o servidor. Verifique a sua ligação.",
       "inconnu": "A publicação falhou. Tente novamente daqui a instantes.",
-      "nonActivee": "Este espaço ainda não está ativado no servidor. Avise a pessoa que gere a aplicação: falta-lhe uma chave de configuração."
+      "nonActivee": "Este espaço ainda não está ativado no servidor. Avise a pessoa que gere a aplicação: falta-lhe uma chave de configuração.",
+      "exception": "O servidor encontrou um erro. Comunique-o com o detalhe abaixo."
     },
     "rappels": "Repetir a notificação",
     "rappelsAide": "Um lembrete só é enviado nos horários úteis do dia em causa — antes das 7h40 de manhã, antes das 15h à tarde — e nunca num dia sem aulas.",

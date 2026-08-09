@@ -11,6 +11,7 @@
  */
 import { base64urlEncode, genererRequetePush, importerClesVapid } from './push.js'
 import { routerCommune, routerTraductions } from './commune.js'
+import { depot } from './github.js'
 import { rappelsDus } from './rappels.js'
 import { etatDuJour } from '../../src/lib/calendrier.ts'
 import { plan } from '../../src/lib/donnees.ts'
@@ -389,6 +390,33 @@ async function essai(requete, env, origine) {
   return json(resultat, 200, cors(origine, env))
 }
 
+/**
+ * Le jeton machine peut-il écrire dans le dépôt ?
+ *
+ * Une lecture suffit à distinguer les trois cas qui comptent : pas de jeton, jeton
+ * refusé, jeton sans droit d'écriture. C'est la question qu'on se pose quand une
+ * publication échoue, et elle n'avait aucune réponse consultable.
+ */
+async function etatDepot(env) {
+  if (!env.GITHUB_PAT) return 'absent'
+  try {
+    const d = depot(env)
+    const rep = await fetch(`https://api.github.com/repos/${d.proprietaire}/${d.nom}`, {
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_PAT}`,
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'bus-scolaire-beckerich-worker',
+      },
+    })
+    if (rep.status === 401) return 'jeton-refuse'
+    if (!rep.ok) return `erreur-${rep.status}`
+    const donnees = await rep.json()
+    return donnees?.permissions?.push ? 'ok' : 'sans-droit-ecriture'
+  } catch (e) {
+    return `injoignable (${String(e).slice(0, 60)})`
+  }
+}
+
 /** Point d'entrée HTTP d'un lot : une invocation, donc un budget processeur propre. */
 async function notifierLot(requete, env) {
   if (requete.headers.get('Authorization') !== `Bearer ${env.SECRET_NOTIFICATION}`) {
@@ -634,6 +662,12 @@ export default {
     const url = new URL(requete.url)
     const origine = requete.headers.get('Origin') ?? '*'
 
+    // Les espaces à code personnel envoient un en-tête `Authorization` : leurs réponses,
+    // y compris les erreurs, doivent porter les en-têtes correspondants.
+    const aJeton =
+      url.pathname.startsWith('/commune/') || url.pathname.startsWith('/traductions/')
+    const entetesErreur = aJeton ? corsCommune(origine, env) : cors(origine, env)
+
     if (requete.method === 'OPTIONS') {
       // Les deux espaces à code personnel envoient un en-tête `Authorization` : sans
       // ce préflight-là, le navigateur refuse la requête avant même de l'émettre.
@@ -662,6 +696,10 @@ export default {
             oauth: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
             ...(await santePush(env)),
             commune: Boolean(env.SECRET_SESSION && env.GITHUB_PAT),
+            // Que le jeton machine soit POSÉ ne dit pas qu'il fonctionne. Sans cette
+            // ligne, un jeton révoqué ou sans droit d'écriture ne se manifestait qu'au
+            // moment d'une vraie publication, sous la forme d'une erreur illisible.
+            depot: await etatDepot(env),
             rappels: Boolean(env.URL_SITE),
             origines: env.ORIGINES_AUTORISEES ?? '',
           })
@@ -680,11 +718,15 @@ export default {
         case 'POST /notifier-lot':
           return await notifierLot(requete, env)
         default:
-          return json({ erreur: 'route-inconnue' }, 404)
+          return json({ erreur: 'route-inconnue' }, 404, entetesErreur)
       }
     } catch (e) {
       console.log(`exception sur ${requete.method} ${url.pathname} : ${e?.stack ?? e}`)
-      return json({ erreur: 'exception', detail: String(e) }, 500)
+      // Les en-têtes CORS comptent SURTOUT ici. Sans eux, le navigateur bloque la
+      // réponse d'erreur et `fetch` échoue : l'application concluait à une panne
+      // réseau alors que le serveur avait répondu, et le vrai motif — un jeton machine
+      // refusé par GitHub, par exemple — restait invisible.
+      return json({ erreur: 'exception', detail: String(e) }, 500, entetesErreur)
     }
   },
 }

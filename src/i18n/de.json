@@ -694,7 +694,8 @@
       "conflit": "Jemand hat zwischenzeitlich veröffentlicht. Seite neu laden und noch einmal versuchen.",
       "reseau": "Der Server ist nicht erreichbar. Bitte Verbindung prüfen.",
       "inconnu": "Die Veröffentlichung ist fehlgeschlagen. Bitte gleich noch einmal versuchen.",
-      "nonActivee": "Dieser Bereich ist auf dem Server noch nicht aktiviert. Sagen Sie der Person Bescheid, die die Anwendung betreut: ihr fehlt ein Konfigurationsschlüssel."
+      "nonActivee": "Dieser Bereich ist auf dem Server noch nicht aktiviert. Sagen Sie der Person Bescheid, die die Anwendung betreut: ihr fehlt ein Konfigurationsschlüssel.",
+      "exception": "Auf dem Server ist ein Fehler aufgetreten. Melden Sie ihn mit dem Detail unten."
     },
     "rappels": "Benachrichtigung wiederholen",
     "rappelsAide": "Eine Erinnerung wird nur zu den sinnvollen Zeiten des betroffenen Tages verschickt — vor 7:40 Uhr morgens, vor 15 Uhr nachmittags — und nie an einem schulfreien Tag.",
