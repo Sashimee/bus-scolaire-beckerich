@@ -7,6 +7,7 @@ import {
   type Modifications,
   type Surcouche,
 } from '../lib/traductions'
+import { cleErreur, ErreurCommune } from '../lib/commune'
 import { useBlocageRechargement } from '../rechargement-contexte'
 
 /**
@@ -36,6 +37,21 @@ const SECTIONS: { nom: string; cles: string[] }[] = Object.entries(
 })
 
 const TOTAL_CLES = SECTIONS.reduce((n, s) => n + s.cles.length, 0)
+
+/**
+ * Traduit un échec de publication en clé de message.
+ *
+ * L'écran affichait `t('commune.erreur')`, qui désigne un OBJET du dictionnaire : `t`
+ * renvoyait donc la clé elle-même, et le traducteur lisait « commune.erreur » en toutes
+ * lettres. Devant un échec, il doit savoir ce qui s'est passé et si son travail est
+ * perdu — ici, il ne l'est jamais, le brouillon reste en mémoire.
+ */
+function motifAffichable(e: unknown): string {
+  if (e instanceof ErreurCommune) return cleErreur(e.motif)
+  // `/admin` passe par l'API GitHub, qui lève des `Error` ordinaires.
+  if (e instanceof Error && e.message === 'conflit') return 'conflit'
+  return 'inconnu'
+}
 
 type Brouillon = Record<string, string | string[]>
 
@@ -67,13 +83,31 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
   const [publiees, setPubliees] = useState<Surcouche>(surcouche)
   const [langue, setLangue] = useState<Langue>('de')
   const [recherche, setRecherche] = useState('')
-  const [brouillon, setBrouillon] = useState<Brouillon>({})
+  const [depliees, setDepliees] = useState<Record<string, boolean>>({})
+  /**
+   * Un brouillon PAR LANGUE.
+   *
+   * Le sélecteur de langue vidait le brouillon : passer à l'allemand pour vérifier une
+   * tournure effaçait vingt corrections portugaises, sans confirmation ni message. Un
+   * traducteur doit pouvoir circuler entre les langues sans perdre son travail.
+   */
+  const [brouillons, setBrouillons] = useState<Partial<Record<Langue, Brouillon>>>({})
   const [occupe, setOccupe] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
   const [publiee, setPubliee] = useState(false)
 
+  // Le `?? {}` créait un objet neuf à chaque rendu, ce qui rejouait le `useMemo` des
+  // problèmes de saisie sans arrêt.
+  const brouillon = useMemo(() => brouillons[langue] ?? {}, [brouillons, langue])
   const enAttente = Object.keys(brouillon).length
-  useBlocageRechargement(enAttente > 0, 'brouillon-traductions')
+  const enAttenteAilleurs = LANGUES.filter((l) => l !== langue).reduce(
+    (n, l) => n + Object.keys(brouillons[l] ?? {}).length,
+    0,
+  )
+  useBlocageRechargement(enAttente + enAttenteAilleurs > 0, 'brouillon-traductions')
+
+  const majBrouillon = (transformer: (b: Brouillon) => Brouillon) =>
+    setBrouillons((tous) => ({ ...tous, [langue]: transformer(tous[langue] ?? {}) }))
 
   /** La valeur affichée : brouillon, puis surcouche publiée, puis le dictionnaire. */
   const valeurAffichee = (cle: string): string | string[] => {
@@ -89,22 +123,21 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
 
   const noter = (cle: string, valeur: string | string[]) => {
     setPubliee(false)
-    setBrouillon((b) => ({ ...b, [cle]: valeur }))
+    setErreur(null)
+    majBrouillon((b) => ({ ...b, [cle]: valeur }))
   }
 
   /** Retire la correction : la clé revient au dictionnaire compilé. */
   const revenirALOrigine = (cle: string) => {
     setPubliee(false)
-    setBrouillon((b) => {
+    majBrouillon((b) => {
       const suite = { ...b }
-      delete suite[cle]
+      // Marquer explicitement le retrait quand l'entrée est en ligne : sans cela,
+      // publier ne ferait que ne pas y toucher.
+      if (publiees[langue]?.[cle] !== undefined) suite[cle] = ''
+      else delete suite[cle]
       return suite
     })
-    if (publiees[langue]?.[cle] !== undefined) {
-      // Marquer explicitement le retrait : sans cela, publier ne ferait que ne pas
-      // toucher à l'entrée déjà en ligne.
-      setBrouillon((b) => ({ ...b, [cle]: '' }))
-    }
   }
 
   const problemes = useMemo(
@@ -146,10 +179,11 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
       // L'état renvoyé fait foi : il peut porter le travail d'un autre, publié pendant
       // que celui-ci tapait.
       setPubliees(await publier(langue, modifications))
-      setBrouillon({})
+      setBrouillons((tous) => ({ ...tous, [langue]: {} }))
       setPubliee(true)
     } catch (e) {
-      setErreur(e instanceof Error ? e.message : 'inconnu')
+      // Le brouillon reste en mémoire : c'est justement ce que le message doit dire.
+      setErreur(motifAffichable(e))
     } finally {
       setOccupe(false)
     }
@@ -168,7 +202,8 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
             value={langue}
             onChange={(e) => {
               setLangue(e.target.value as Langue)
-              setBrouillon({})
+              setPubliee(false)
+              setErreur(null)
             }}
           >
             {LANGUES.map((l) => (
@@ -198,8 +233,23 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
         </div>
       </section>
 
+      {/*
+          Le contenu d'une section n'est monté qu'une fois la section dépliée.
+          Un `<details>` fermé garde bien ses enfants dans le DOM : les 555 clés du
+          dictionnaire faisaient donc autant de champs de saisie construits à
+          l'ouverture de la page, pour n'en montrer aucun.
+      */}
       {sectionsFiltrees.map((section) => (
-        <details className="repli carte" key={section.nom}>
+        <details
+          className="repli carte"
+          key={section.nom}
+          onToggle={(e) => {
+            // Lu tout de suite : `currentTarget` ne vaut plus rien au moment où React
+            // exécutera la fonction de mise à jour.
+            const ouverte = e.currentTarget.open
+            setDepliees((d) => ({ ...d, [section.nom]: ouverte }))
+          }}
+        >
           <summary>
             <span className="repli__resume rangee">
               <span className="texte-fort">{section.nom}</span>
@@ -211,7 +261,7 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
           </summary>
 
           <div className="pile">
-            {section.cles.map((cle) => {
+            {(depliees[section.nom] ? section.cles : []).map((cle) => {
               const reference = valeurDeReference(cle)
               const valeur = valeurAffichee(cle)
               const motif = cle in brouillon ? motifRefus(langue, cle, valeur) : null
@@ -276,6 +326,13 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
 
       <section className="carte pile pile--serre">
         <p className="champ__aide">{t('traductions.enAttente', { nombre: enAttente })}</p>
+        {/* Sans cela, un traducteur qui a changé de langue oublie ce qu'il y a laissé
+            et ferme l'onglet dessus. */}
+        {enAttenteAilleurs > 0 && (
+          <p className="champ__aide">
+            {t('traductions.enAttenteAilleurs', { nombre: enAttenteAilleurs })}
+          </p>
+        )}
         {problemes.length > 0 && (
           <div className="encart encart--alerte">
             <div className="encart__titre">{t('traductions.bloquantes')}</div>
@@ -288,7 +345,13 @@ export function EditeurTraductions({ surcouche, publier }: Props) {
             </ul>
           </div>
         )}
-        {erreur && <div className="encart encart--alerte">{t('commune.erreur')}</div>}
+        {erreur && (
+          <div className="encart encart--alerte" role="alert">
+            <div className="encart__titre">{t(`commune.erreur.${erreur}`)}</div>
+            {/* Le point qui compte : rien n'est perdu tant que l'onglet reste ouvert. */}
+            <p>{t('traductions.brouillonConserve')}</p>
+          </div>
+        )}
         {publiee && <p>✓ {t('traductions.publiee')}</p>}
 
         <button

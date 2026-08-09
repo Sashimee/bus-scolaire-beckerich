@@ -780,7 +780,9 @@
       "marqueurs": "Os marcadores entre chavetas, como {heure}, têm de ser exatamente os mesmos do texto francês. São substituídos por um valor real na apresentação."
     },
     "connexion": "Espaço de tradução",
-    "connexionAide": "Introduza o código que lhe foi entregue para corrigir os textos da aplicação. Dá acesso apenas às traduções."
+    "connexionAide": "Introduza o código que lhe foi entregue para corrigir os textos da aplicação. Dá acesso apenas às traduções.",
+    "brouillonConserve": "As suas correções foram guardadas: não feche este separador e tente de novo. Se a sua sessão expirou, inicie sessão noutro separador e publique depois a partir deste.",
+    "enAttenteAilleurs": "{nombre} correção(ões) por publicar noutras línguas. Cada língua publica-se separadamente."
   },
   "credits": {
     "titre": "Créditos",

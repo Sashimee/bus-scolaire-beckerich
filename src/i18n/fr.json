@@ -780,7 +780,9 @@
       "marqueurs": "Les repères entre accolades, comme {heure}, doivent être exactement les mêmes que dans le texte français. Ils sont remplacés par une vraie valeur à l'affichage."
     },
     "connexion": "Espace traduction",
-    "connexionAide": "Entrez le code qui vous a été remis pour corriger les textes de l'application. Il ne donne accès qu'aux traductions."
+    "connexionAide": "Entrez le code qui vous a été remis pour corriger les textes de l'application. Il ne donne accès qu'aux traductions.",
+    "brouillonConserve": "Vos corrections sont conservées : ne fermez pas cet onglet et réessayez. Si votre session a expiré, reconnectez-vous dans un autre onglet, puis republiez depuis celui-ci.",
+    "enAttenteAilleurs": "{nombre} correction(s) en attente dans d'autres langues. Publiez chaque langue séparément."
   },
   "credits": {
     "titre": "Crédits",

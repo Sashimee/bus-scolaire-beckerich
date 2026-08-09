@@ -780,7 +780,9 @@
       "marqueurs": "D'Marqueuren tëscht Klameren, wéi {heure}, musse genee déi selwecht si wéi am franséischen Text. Si gi beim Uweise duerch e richtege Wäert ersat."
     },
     "connexion": "Iwwersetzungsberäich",
-    "connexionAide": "Gitt de Code an, deen Dir kritt hutt fir d'Texter ze korrigéieren. En dréit nëmmen d'Iwwersetzungen op."
+    "connexionAide": "Gitt de Code an, deen Dir kritt hutt fir d'Texter ze korrigéieren. En dréit nëmmen d'Iwwersetzungen op.",
+    "brouillonConserve": "Är Korrekture bleiwen erhalen: maacht dësen Tab net zou a probéiert nach eng Kéier. Wann Är Sessioun ofgelaf ass, mellt Iech an engem anerem Tab un a publizéiert duerno vun hei aus.",
+    "enAttenteAilleurs": "{nombre} Korrektur(en) an anere Sproochen nach net publizéiert. All Sprooch gëtt eenzel publizéiert."
   },
   "credits": {
     "titre": "Merci",

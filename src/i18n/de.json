@@ -780,7 +780,9 @@
       "marqueurs": "Die Platzhalter in geschweiften Klammern, etwa {heure}, müssen genau denen des französischen Textes entsprechen. Sie werden bei der Anzeige durch einen echten Wert ersetzt."
     },
     "connexion": "Übersetzungsbereich",
-    "connexionAide": "Geben Sie den Code ein, den Sie zum Korrigieren der Texte erhalten haben. Er gibt ausschließlich Zugang zu den Übersetzungen."
+    "connexionAide": "Geben Sie den Code ein, den Sie zum Korrigieren der Texte erhalten haben. Er gibt ausschließlich Zugang zu den Übersetzungen.",
+    "brouillonConserve": "Ihre Korrekturen bleiben erhalten: schließen Sie diesen Tab nicht und versuchen Sie es erneut. Ist Ihre Sitzung abgelaufen, melden Sie sich in einem anderen Tab an und veröffentlichen Sie dann von hier aus.",
+    "enAttenteAilleurs": "{nombre} Korrektur(en) in anderen Sprachen noch nicht veröffentlicht. Jede Sprache wird einzeln veröffentlicht."
   },
   "credits": {
     "titre": "Danksagung",

@@ -780,7 +780,9 @@
       "marqueurs": "The placeholders in braces, such as {heure}, must match the French text exactly. They are replaced by a real value when displayed."
     },
     "connexion": "Translation space",
-    "connexionAide": "Enter the code you were given to correct the app's wording. It grants access to translations only."
+    "connexionAide": "Enter the code you were given to correct the app's wording. It grants access to translations only.",
+    "brouillonConserve": "Your corrections are kept: do not close this tab, and try again. If your session expired, sign in from another tab, then publish from this one.",
+    "enAttenteAilleurs": "{nombre} correction(s) awaiting publication in other languages. Each language is published separately."
   },
   "credits": {
     "titre": "Credits",

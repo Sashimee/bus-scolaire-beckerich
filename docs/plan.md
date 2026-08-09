@@ -1331,6 +1331,28 @@ Voir R20, rayée.
 > après un `return` conditionnel (ordre des hooks), et `charger` était recréé à chaque
 > rendu alors qu'il sert de dépendance d'effet — ce qui aurait relancé la lecture GitHub
 > sans fin.
+>
+> **Trois pertes de travail de plus, trouvées sur la question « du coup le traducteur
+> perd son travail ? »** — et aucune n'était celle que j'avais décrite :
+>
+> - **Le sélecteur de langue vidait le brouillon.** Passer à l'allemand pour vérifier une
+>   tournure effaçait vingt corrections portugaises, sans confirmation ni message. Il y a
+>   désormais un brouillon par langue, et le nombre de corrections en attente dans les
+>   autres langues est affiché.
+> - **L'échec de publication affichait `t('commune.erreur')`**, qui désigne un objet du
+>   dictionnaire : `t` renvoyait donc la clé, et le traducteur lisait « commune.erreur »
+>   en toutes lettres, sans savoir si son travail était perdu. Le motif est maintenant
+>   traduit, avec la mention explicite que le brouillon est conservé.
+> - **Une session expirée après huit heures** laissait le traducteur sans issue. Le
+>   message dit maintenant quoi faire : se reconnecter dans un autre onglet, puis
+>   republier depuis celui-ci — le brouillon vit en mémoire, il survit.
+>
+> **Et un défaut de performance** : l'éditeur montait les 555 champs du dictionnaire à
+> l'ouverture, y compris ceux des sections repliées — un `<details>` fermé garde ses
+> enfants dans le DOM. Une section n'est plus montée qu'une fois dépliée. Mesuré par le
+> temps du test : 86 s → 0,8 s.
+>
+> Couvert par `src/composants/EditeurTraductions.test.tsx`.
 
 *Dépend du lot 15.*
 
