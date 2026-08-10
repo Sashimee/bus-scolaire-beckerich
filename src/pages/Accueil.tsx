@@ -155,8 +155,10 @@ function HoraireDuJour({
       */}
       {!ecole && (
         <div className="sous-tuile__incrustation">
-          <strong className="sous-tuile__mention">{t('aujourdhui.pasEcole')}</strong>
-          <span className="sous-tuile__raison">{raison}</span>
+          <div className="sous-tuile__plaque">
+            <strong className="sous-tuile__mention">{t('aujourdhui.pasEcole')}</strong>
+            <span className="sous-tuile__raison">{raison}</span>
+          </div>
         </div>
       )}
 

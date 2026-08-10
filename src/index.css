@@ -1328,19 +1328,31 @@
   }
 
   .sous-tuile__incrustation {
-    /* Le voile va jusqu'au bord de la vitre : il doit couvrir le rembourrage aussi. */
+    /* Elle s'étend jusqu'au bord de la vitre : la plaque doit pouvoir s'y centrer. */
     margin: calc(var(--espace-3) * -1);
-    border-radius: inherit;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: var(--espace-2);
+  }
+
+  /*
+   * La plaque est OPAQUE — `--fond`, le seul jeton uni de la palette, et non un voile
+   * de plus. Un message translucide posé sur des horaires eux-mêmes translucides laisse
+   * transparaître les chiffres à travers les lettres : deux textes à demi effacés l'un
+   * sur l'autre, illisibles tous les deux. Le fond éteint reste visible tout autour,
+   * ce qui suffit à dire que la journée est vide.
+   */
+  .sous-tuile__plaque {
+    display: grid;
     gap: var(--espace-1);
-    padding: var(--espace-2) var(--espace-3);
+    justify-items: center;
     text-align: center;
-    background: color-mix(in oklab, var(--fond) 55%, transparent);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    background: var(--fond);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-s);
+    padding: var(--espace-2) var(--espace-3);
+    box-shadow: var(--lustre);
   }
 
   .sous-tuile__mention {

@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { googleConfigure, oublierAgendas, synchroniserEnfant } from './google'
+import {
+  chargerJeton,
+  googleConfigure,
+  jetonValide,
+  oublierAgendas,
+  oublierJeton,
+  synchroniserEnfant,
+} from './google'
 import type { EvenementRecurrent } from './evenements'
 
 describe('activation de l’intégration Google', () => {
@@ -195,5 +202,87 @@ describe('synchronisation d’un enfant', () => {
       { ...EVENEMENT, id: 'lea-retour' },
     ])
     expect(r).toEqual({ agenda: 'Bus scolaire — Léa', ecrits: 1, echecs: 1 })
+  })
+})
+
+/**
+ * La session, depuis qu'elle survit à la fermeture de l'application.
+ *
+ * Elle vivait en `sessionStorage` : fermer l'onglet ou l'application effaçait tout, et
+ * le parent retrouvait « Connecter mon compte Google » alors que son compte Google, lui,
+ * affichait toujours l'autorisation comme accordée. Constaté à l'usage le 2026-08-10.
+ */
+describe('reprise de la session Google', () => {
+  /** Pose une session telle que `terminerConnexion` l'écrirait. */
+  const poser = (session: Record<string, unknown>) =>
+    localStorage.setItem('bus-beckerich.google-session', JSON.stringify(session))
+
+  const dans = (secondes: number) => Math.floor(Date.now() / 1000) + secondes
+
+  it('rend le jeton encore valable sans appeler personne', async () => {
+    poser({ jeton: 'acces', expire: dans(600), rafraichissement: 'r' })
+    vi.stubGlobal('fetch', vi.fn())
+
+    expect(chargerJeton()).toBe('acces')
+    expect(await jetonValide()).toBe('acces')
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('rafraîchit un jeton périmé sans rien demander au parent', async () => {
+    poser({ jeton: 'acces-vieux', expire: dans(-10), rafraichissement: 'r' })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => reponse(200, { access_token: 'acces-neuf', expires_in: 3600 })),
+    )
+
+    expect(chargerJeton()).toBeNull()
+    expect(await jetonValide()).toBe('acces-neuf')
+    // Et le nouveau jeton est retenu : la synchronisation suivante n'y revient pas.
+    expect(chargerJeton()).toBe('acces-neuf')
+  })
+
+  it('déclare la session finie quand l’accès a été retiré', async () => {
+    // `invalid_grant` : le parent a retiré l'accès depuis son compte Google. C'est le
+    // seul cas où il faut vraiment se reconnecter.
+    poser({ jeton: 'acces', expire: dans(-10), rafraichissement: 'r' })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => reponse(502, { erreur: 'rafraichissement-refuse', detail: 'invalid_grant' })),
+    )
+
+    await expect(jetonValide()).rejects.toThrow('session-finie')
+    // La session est jetée : inutile de la retenter à chaque ouverture.
+    expect(localStorage.getItem('bus-beckerich.google-session')).toBeNull()
+  })
+
+  it('garde la session quand c’est le réseau qui manque', async () => {
+    // Hors ligne, la connexion n'est pas en cause : la jeter obligerait à refaire une
+    // autorisation Google pour un tunnel.
+    poser({ jeton: 'acces', expire: dans(-10), rafraichissement: 'r' })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new TypeError('Failed to fetch')
+      }),
+    )
+
+    expect(await jetonValide()).toBeNull()
+    expect(localStorage.getItem('bus-beckerich.google-session')).not.toBeNull()
+  })
+
+  it('n’a rien à reprendre sans jeton de rafraîchissement', async () => {
+    // Les sessions d'avant ce correctif n'en portent pas : elles s'éteignent, une fois.
+    poser({ jeton: 'acces', expire: dans(-10) })
+    vi.stubGlobal('fetch', vi.fn())
+
+    expect(await jetonValide()).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('oublie tout à la déconnexion', async () => {
+    poser({ jeton: 'acces', expire: dans(600), rafraichissement: 'r' })
+    oublierJeton()
+    expect(chargerJeton()).toBeNull()
+    expect(await jetonValide()).toBeNull()
   })
 })

@@ -3,10 +3,12 @@
  *
  * Deux garanties, qui sont la raison d'être de ce choix technique :
  *
- *  1. **Le jeton ne quitte pas l'onglet.** Le flux est un OAuth PKCE public : rien ne
- *     transite par le Worker ni par GitHub Pages, qui n'ont donc aucun moyen de lire
- *     l'agenda de qui que ce soit. L'ID client est public par construction — il n'y a
- *     pas de secret à protéger.
+ *  1. **Le jeton ne quitte pas l'appareil.** Le flux est un OAuth PKCE ; seul l'échange
+ *     du code passe par le Worker, que Google oblige à détenir le `client_secret`. Le
+ *     Worker relaie et ne retient rien : ni lui ni GitHub Pages n'ont de moyen de lire
+ *     l'agenda de qui que ce soit. La session, elle, vit dans `localStorage` — elle
+ *     survit donc à la fermeture de l'application, comme l'autorisation survit chez
+ *     Google.
  *  2. **La portée `calendar.app.created` ne donne accès QU'AUX agendas créés par cette
  *     application.** L'agenda personnel du parent reste hors de portée, y compris en
  *     lecture. C'est exactement la garantie recherchée, et elle est imposée par Google,
@@ -24,7 +26,7 @@ const AUTORISATION = 'https://accounts.google.com/o/oauth2/v2/auth'
 const PORTEE = 'https://www.googleapis.com/auth/calendar.app.created'
 
 const CLE_VERIFICATEUR = 'bus-beckerich.google-verificateur'
-const CLE_JETON = 'bus-beckerich.google-jeton'
+const CLE_JETON = 'bus-beckerich.google-session'
 const CLE_AGENDAS = 'bus-beckerich.google-agendas'
 
 const JOUR_ICS: Record<Jour, string> = {
@@ -53,27 +55,98 @@ interface Session {
   jeton: string
   /** Secondes depuis l'époque. */
   expire: number
+  /**
+   * Le jeton de rafraîchissement, quand Google l'a accordé.
+   *
+   * Sans lui, la session vivait le temps de l'onglet : fermer l'application et la
+   * rouvrir redemandait une connexion, alors que l'autorisation, elle, restait
+   * accordée du côté de Google. Le parent voyait « Connecter mon compte » sur un compte
+   * déjà connecté, ce qui ne veut rien dire pour lui.
+   *
+   * Il vit dans `localStorage`, comme le reste : il ne quitte pas l'appareil. C'est un
+   * identifiant durable, mais sa portée est `calendar.app.created` — il n'ouvre que les
+   * agendas créés ici, jamais l'agenda personnel. Il s'efface avec les données locales.
+   */
+  rafraichissement?: string
 }
 
-export function chargerJeton(): string | null {
+function session(): Session | null {
   try {
-    const brut = sessionStorage.getItem(CLE_JETON)
-    if (!brut) return null
-    const s = JSON.parse(brut) as Session
-    // Le jeton d'accès Google vit une heure. Expiré, il vaut mieux redemander que
-    // laisser le parent lancer une synchronisation qui échouera à mi-parcours.
-    return s.expire * 1000 > Date.now() ? s.jeton : null
+    const brut = localStorage.getItem(CLE_JETON)
+    return brut ? (JSON.parse(brut) as Session) : null
   } catch {
     return null
   }
 }
 
+function enregistrerSession(s: Session): void {
+  try {
+    localStorage.setItem(CLE_JETON, JSON.stringify(s))
+  } catch {
+    /* Stockage indisponible : la connexion ne survivra pas au rechargement, sans plus. */
+  }
+}
+
+export function chargerJeton(): string | null {
+  const s = session()
+  // Le jeton d'accès Google vit une heure. Expiré, il vaut mieux redemander que laisser
+  // le parent lancer une synchronisation qui échouera à mi-parcours.
+  return s && s.expire * 1000 > Date.now() ? s.jeton : null
+}
+
 export function oublierJeton(): void {
   try {
-    sessionStorage.removeItem(CLE_JETON)
+    localStorage.removeItem(CLE_JETON)
   } catch {
     /* rien à oublier */
   }
+}
+
+/**
+ * Le jeton à utiliser maintenant : celui en réserve s'il est encore bon, sinon un
+ * nouveau, obtenu sans rien demander au parent.
+ *
+ * Lève `session-finie` quand Google refuse le rafraîchissement pour de bon — accès
+ * retiré depuis le compte, ou jeton périmé faute d'usage. C'est le seul cas où il faut
+ * vraiment se reconnecter, et l'écran doit le dire ; une coupure réseau, elle, ne jette
+ * rien et se retente plus tard.
+ */
+export async function jetonValide(): Promise<string | null> {
+  const valide = chargerJeton()
+  if (valide) return valide
+
+  const s = session()
+  if (!s?.rafraichissement) return null
+
+  let donnees: { access_token?: string; expires_in?: number; detail?: unknown; erreur?: string }
+  let rep: Response
+  try {
+    rep = await fetch(`${URL_WORKER}/google/rafraichir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rafraichissement: s.rafraichissement }),
+    })
+    donnees = (await rep.json().catch(() => ({}))) as typeof donnees
+  } catch {
+    // Hors ligne : la session n'est pas en cause, on n'y touche pas.
+    return null
+  }
+
+  if (!rep.ok || !donnees.access_token) {
+    if (/invalid_grant/i.test(String(donnees.detail ?? donnees.erreur ?? ''))) {
+      oublierJeton()
+      throw new Error('session-finie')
+    }
+    return null
+  }
+
+  // Google ne renvoie pas de nouveau jeton de rafraîchissement : on garde le nôtre.
+  enregistrerSession({
+    jeton: donnees.access_token,
+    expire: Math.floor(Date.now() / 1000) + (donnees.expires_in ?? 3600) - 60,
+    rafraichissement: s.rafraichissement,
+  })
+  return donnees.access_token
 }
 
 // — OAuth PKCE ————————————————————————————————————————————————
@@ -110,8 +183,12 @@ export async function demarrerConnexion(): Promise<void> {
   url.searchParams.set('scope', PORTEE)
   url.searchParams.set('code_challenge', defi)
   url.searchParams.set('code_challenge_method', 'S256')
-  // Sans cela, Google renvoie parfois un écran vide au second passage.
+  // Sans cela, Google renvoie parfois un écran vide au second passage. `consent` est
+  // aussi la condition pour obtenir un jeton de rafraîchissement : Google ne le donne
+  // qu'à un consentement explicitement redemandé.
   url.searchParams.set('prompt', 'consent')
+  // Sans `offline`, la session mourait avec l'onglet — voir `Session.rafraichissement`.
+  url.searchParams.set('access_type', 'offline')
   window.location.href = url.toString()
 }
 
@@ -150,6 +227,7 @@ export async function terminerConnexion(): Promise<boolean> {
 
   const donnees = (await rep.json().catch(() => ({}))) as {
     access_token?: string
+    refresh_token?: string
     expires_in?: number
     scope?: string
     erreur?: string
@@ -169,13 +247,11 @@ export async function terminerConnexion(): Promise<boolean> {
     throw new Error('portee-absente')
   }
 
-  sessionStorage.setItem(
-    CLE_JETON,
-    JSON.stringify({
-      jeton: donnees.access_token,
-      expire: Math.floor(Date.now() / 1000) + (donnees.expires_in ?? 3600) - 60,
-    }),
-  )
+  enregistrerSession({
+    jeton: donnees.access_token,
+    expire: Math.floor(Date.now() / 1000) + (donnees.expires_in ?? 3600) - 60,
+    rafraichissement: donnees.refresh_token,
+  })
   return true
 }
 

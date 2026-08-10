@@ -47,10 +47,10 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R8~~ | 10 | ~~Le sélecteur de préférence n'a pas été vu à l'écran.~~ **Levée le 2026-08-09** sur iPhone, notifications actives. |
 | ~~R9~~ | 11 | ~~La CSP avait été déclarée vérifiée à tort.~~ **Levée le 2026-08-09**, pour de bon cette fois : `connect-src` omettait `https://api.github.com`, ce qui rendait tout `/admin` muet en production depuis le lot 11. Corrigé, puis éprouvé par deux publications réelles de l'auteur — `Crédits : mise à jour` et `Urgence : annulation`, toutes deux passées par l'API GitHub depuis le navigateur. Leçon inscrite : une CSP n'est pas vérifiée tant que chaque origine qu'elle autorise n'a pas été exercée. |
 | ~~R10~~ | 12 | ~~Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.~~ **Levée le 2026-08-09** : importé dans Apple Calendrier depuis l'iPhone. |
-| R11 | 13 | **L'intégration Google fonctionne jusqu'à l'écriture.** Deux obstacles levés le 2026-08-09 : la CI ne passait pas l'ID client, et l'échange de jeton se faisait sans `client_secret` — il passe désormais par le Worker. Restait un `403 insufficient authentication scopes` à la synchronisation, attribué à une portée non déclarée sur l'écran de consentement. **Le 2026-08-10, la cause s'est révélée être dans le dépôt** (voir R23) : `calendarList.list` n'accepte pas `calendar.app.created`. La consigne « déclarer la portée » reste valable en soi, mais elle ne suffisait pas — et elle ne pouvait rien contre cet appel-là. L'application détecte maintenant une portée réellement absente à la connexion **et** à la première écriture : un jeton pris avant la déclaration reste en session et ne repasse jamais par le contrôle de connexion. | Déclarer la portée, retirer l'accès de l'application dans le compte Google, se reconnecter, synchroniser. |
-| R21 | 13 | **Le `401` de Google n'a jamais été vu levé.** Constaté le 2026-08-10 sur l'iPhone de l'auteur : après un accès retiré depuis le compte Google, l'onglet resté ouvert gardait son jeton et l'écran annonçait « vous restez connecté » au-dessus d'un bouton « Connecter mon compte », en recopiant le message anglais de Google. Corrigé : un `401` vide la session, dit qu'elle n'est plus valable et invite à se reconnecter ; il remonte aussi depuis la boucle d'écriture, qui l'avalait et annonçait « 0 rendez-vous écrits » comme une réussite. Éprouvé par 5 tests à `fetch` simulé, **pas contre Google**. | Se reconnecter et synchroniser une fois la portée déclarée (R11) : ce chemin ne se vérifie qu'avec un vrai compte. |
+| ~~R11~~ | 13 | ~~L'intégration Google fonctionne jusqu'à l'écriture.~~ **Levée le 2026-08-10** par l'auteur : portée déclarée, connexion établie, rendez-vous écrits dans Google Agenda. Deux jours d'accusations portées contre la configuration Google alors que la cause était dans le dépôt (voir R23) — leçon inscrite : une portée s'accorde par méthode, pas par API. |
+| ~~R21~~ | 13 | ~~Le `401` de Google n'a jamais été vu levé.~~ **Levée le 2026-08-10** : accès retiré depuis le compte Google, puis retour sur l'onglet resté ouvert — l'écran annonce bien que la connexion n'est plus valable. **Nuance constatée** : rien ne se voit au simple retour dans l'onglet, il faut cliquer sur « mettre à jour l'agenda » pour que ce soit dit. C'est inhérent — un jeton mort ne se distingue d'un jeton vivant qu'en s'en servant — et c'est désormais atténué : depuis le correctif de session, la reprise au chargement interroge Google et dit tout de suite que la session est finie. |
 | R22 | 13 | **Les échecs d'écriture non authentifiés restent invisibles.** `synchroniserEnfant` renvoie `echecs`, la page ne lit que `ecrits` : un événement refusé pour lui-même — corps rejeté, quota — se solde par un compte rendu qui ne le mentionne pas. Sans conséquence tant que rien n'échoue, trompeur le jour où quelque chose échouera. | Afficher `echecs` dans le compte rendu de `/agenda`, avec une clé de traduction dédiée. |
-| R23 | 13 | **Deux appels sur trois étaient interdits ou inopérants avec la portée demandée**, découvert le 2026-08-10 en lisant enfin la référence Google méthode par méthode. `calendarList.list` n'accepte que les portées ouvrant l'agenda du parent — jamais `calendar.app.created` : il répondait `403 insufficient authentication scopes` **avant toute écriture, portée pourtant accordée**, ce qui a fait accuser la configuration Google pendant deux jours. Et `events.update` (`PUT`) ne crée pas : sans événement préexistant, Google répond 404 — la toute première synchronisation n'écrivait donc rien, chaque 404 étant compté en échec silencieux. Corrigé : l'identifiant d'agenda est retenu en `localStorage` et vérifié par `calendars.get`, le `PUT` bascule en `POST` sur 404. Rappel de méthode : **une portée s'accorde par méthode, pas par API** — vérifier chaque appel dans la référence avant de l'écrire. | 11 tests à `fetch` simulé, mais **rien contre le vrai Google** : à reprendre avec R21. |
+| ~~R23~~ | 13 | ~~Deux appels sur trois étaient interdits ou inopérants avec la portée demandée.~~ **Levée le 2026-08-10** par l'auteur, contre le vrai Google : première synchronisation avec agenda créé de zéro (le cas où le `PUT` répondait 404 et où rien n'était écrit), puis seconde synchronisation sans doublon d'événements. `calendars.get` et le repli `POST` sur 404 tiennent. |
 | R24 | 13 | **Un agenda peut se dupliquer.** Faute de pouvoir lister, l'application ne reconnaît ses agendas que par la mémoire locale du navigateur : effacée, ou vue depuis un autre navigateur ou un autre appareil, la synchronisation crée un second « Bus scolaire — Léa » au lieu de retrouver le premier. Les événements ayant des identifiants stables, rien n'est perdu ni dupliqué **dans** l'agenda — c'est l'agenda lui-même qui fait doublon. | Le parent supprime l'agenda en trop d'un geste. Sans une portée plus large (`calendar.calendarlist.readonly`), qui donnerait vue sur son agenda personnel, il n'y a pas de moyen propre de faire mieux : le doublon est le prix de la garantie de confidentialité. |
 | R12 | 11 | **La CSP avait cassé `npm run dev`** en bloquant le préambule inline de React Refresh — page blanche, découvert seulement au lot 13. Corrigé : la politique ne s'applique qu'au build. Rappel de méthode : vérifier le build **et** le serveur de développement après toute modification de `vite.config.ts`. | Corrigé. Ligne gardée comme trace. |
 | R13 | 6 | **Trois vérifications successives n'avaient pas montré que la boîte d'installation ne s'ouvrait jamais**, parce qu'elles simulaient `beforeinstallprompt` APRÈS le montage de React — exactement le cas qui fonctionnait. Rappel de méthode : un événement simulé ne prouve rien sur le moment où le vrai arrive. | Corrigé. Ligne gardée comme trace. |
@@ -64,9 +64,10 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R25 | 18 | **La couche `impression` n'a toujours pas été vue sur papier** — même réserve qu'au lot 2, aggravée : le thème repose désormais sur un dégradé, des voiles translucides et des `backdrop-filter`. Tout est neutralisé dans `@media print` (jetons repassés en opaque, `backdrop-filter` et `box-shadow` coupés partout par un `!important`), et les variables ont été recroisées une à une, mais **aucune feuille n'est sortie d'une imprimante**. Un voile translucide qui survivrait sortirait en gris moucheté. | Un `Cmd+P` sur `/` avec deux enfants, et un sur une fiche enfant. À faire avant de lever R1, qui porte sur la même feuille. |
 | R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
 | R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
-| R28 | 19 | **Le pied de page collé en bas n'a pas été vu sur iPhone.** `#root` fait au moins `100dvh` et `.page` est devenue une colonne souple : mesuré dans Chrome (pied à 297 px du dernier bloc sur `/independance`, écart de 32 px inchangé sur une page longue), jamais sur Safari iOS, où `dvh` se recalcule au repli de la barre d'adresse et où le rail de navigation flotte au-dessus. Le pire cas serait un pied qui glisse sous le rail. | Ouvrir `/independance` et `/credits` sur l'iPhone, faire défiler jusqu'en bas, vérifier que les quatre liens du pied restent atteignables au pouce. |
+| ~~R28~~ | 19 | ~~Le pied de page collé en bas n'a pas été vu sur iPhone.~~ **Levée le 2026-08-10** : vérifié sous Safari iOS par l'auteur, avec le reste des écrans du lot. |
 | R29 | 19 | **La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.** La couche `impression` remet `#root` et `.page` en `display: block` et annule la hauteur minimale — précisément les deux réglages qui avaient allongé la feuille au correctif du 2026-08-09 — et `src/impression.test.ts` passe, mais **aucune page n'est sortie**. Même terrain que R1 et R25. | À joindre au prochain `Cmd+P` : si la fiche du foyer gagne une seconde feuille, c'est ici qu'il faut regarder d'abord. |
-| R30 | 19 | **Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.** Le bandeau qui demandait de recharger a disparu ; il ne reste que le message affiché pendant les deux secondes qui précèdent le rechargement automatique. Ce chemin demande deux déploiements successifs dans un onglet resté ouvert : il n'a été relu que dans le code. Les deux cas où le rechargement est simplement remis à plus tard — saisie en cours, tentative déjà vaine — n'affichent désormais plus rien du tout. | Déployer deux fois, laisser un onglet ouvert entre les deux, vérifier que la page se remet à jour seule et qu'aucun bouton n'apparaît. |
+| ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
+| R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
 ### Mise en service, non faite
@@ -1659,6 +1660,50 @@ Voir R20, rayée.
 > écrit et efface bien ses deux clés.
 
 *Dépend des lots 2, 12, 13 et 18. Réserves R28, R29, R30.*
+
+---
+
+## Correctif du 2026-08-10 — la session Google mourait avec l'onglet
+
+> **Fait le 2026-08-10**, après l'essai de bout en bout de l'auteur — le premier contre
+> le vrai Google. L'essai lève R11, R21 et R23 : portée accordée, agenda créé de zéro,
+> rendez-vous écrits, seconde synchronisation sans doublon, et accès retiré depuis le
+> compte Google qui donne bien « la connexion n'est plus valable ». Il a montré deux
+> choses de plus.
+>
+> **La session ne survivait pas à la fermeture.** Le jeton vivait en `sessionStorage` :
+> fermer l'application et la rouvrir renvoyait sur « Connecter mon compte Google », alors
+> que le compte Google, lui, affichait toujours l'autorisation comme accordée. Le parent
+> voit un écran qui lui dit le contraire de ce que dit Google — et se reconnecte à chaque
+> fois, pour rien.
+>
+> La connexion demande désormais un accès hors ligne (`access_type=offline` ; le
+> `prompt=consent` déjà posé est la condition pour que Google accorde le jeton de
+> rafraîchissement). La session vit en `localStorage` et porte ce jeton ; quand le jeton
+> d'accès a expiré — une heure —, un nouveau s'obtient sans rien demander, par une route
+> `POST /google/rafraichir` du Worker. Le Worker relaie parce que Google exige le
+> `client_secret`, et ne retient rien, comme pour l'échange initial.
+>
+> Le jeton de rafraîchissement est un identifiant durable, et il est écrit sur l'appareil.
+> C'est acceptable ici parce que sa portée est `calendar.app.created` : il n'ouvre que les
+> agendas créés par cette application, jamais l'agenda personnel. Il part avec
+> « Effacer toutes mes données », qui l'oubliait jusqu'ici.
+>
+> **Trois motifs de refus, trois conduites.** `invalid_grant` — accès retiré, ou jeton
+> périmé faute d'usage — est le seul qui justifie de tout jeter et de redemander une
+> connexion ; l'écran le dit dès le chargement de la page, sans attendre un clic. Une
+> panne réseau ne jette rien et se retente plus tard. Le reste passe par le chemin
+> existant.
+>
+> **Ce que l'essai a aussi montré, et qui ne se corrige pas** : revenir dans un onglet
+> resté ouvert ne montre rien d'un accès retiré entre-temps — il faut agir pour
+> l'apprendre. Un jeton mort ne se distingue d'un jeton vivant qu'en s'en servant. La
+> reprise au chargement réduit la fenêtre à la prochaine ouverture de la page.
+>
+> 6 tests côté navigateur, 6 côté Worker — le premier fichier de tests des routes Google
+> du Worker, qui n'en avait aucun.
+
+*Dépend du lot 13. Réserve R31.*
 
 ---
 

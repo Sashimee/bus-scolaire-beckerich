@@ -10,6 +10,7 @@ import {
   chargerJeton,
   demarrerConnexion,
   googleConfigure,
+  jetonValide,
   oublierJeton,
   synchroniserEnfant,
   terminerConnexion,
@@ -84,18 +85,39 @@ function BlocGoogle() {
    */
   const [erreur, setErreur] = useState<'connexion' | 'synchronisation' | 'session' | null>(null)
 
-  // Le retour de Google porte un code dans l'URL : on l'échange puis on l'efface.
+  // Le retour de Google porte un code dans l'URL : on l'échange puis on l'efface. Sans
+  // code, il reste peut-être une session à reprendre — c'est le cas courant, celui du
+  // parent qui rouvre l'application le lendemain.
   useEffect(() => {
-    terminerConnexion()
-      .then((ok) => {
-        if (ok) setJeton(chargerJeton())
-      })
-      .catch((e: unknown) => {
+    let annule = false
+    const reprendre = async () => {
+      try {
+        if (await terminerConnexion()) {
+          if (!annule) setJeton(chargerJeton())
+          return
+        }
+      } catch (e) {
         // Sans cela, un échange refusé renvoyait sur le bouton de connexion sans un
         // mot : le parent recliquait indéfiniment sans savoir ce qui n'allait pas.
+        if (annule) return
         setErreur('connexion')
         setResultat(e instanceof Error ? e.message : null)
-      })
+        return
+      }
+
+      try {
+        const j = await jetonValide()
+        if (j && !annule) setJeton(j)
+      } catch {
+        // `session-finie` : l'accès a été retiré depuis le compte Google. Le dire ici
+        // évite au parent de découvrir en cliquant que sa connexion n'existe plus.
+        if (!annule) setErreur('session')
+      }
+    }
+    void reprendre()
+    return () => {
+      annule = true
+    }
   }, [])
 
   const enfants = foyer.enfants
@@ -114,9 +136,13 @@ function BlocGoogle() {
         libelleRecuperation: t('dillendapp.aRecuperer'),
         libelleDepose: t('dillendapp.aDeposer'),
       }
+      // Le jeton d'accès ne vit qu'une heure. Un onglet ouvert depuis le matin, ou une
+      // application rouverte, en tient un périmé : on le renouvelle sans rien demander
+      // plutôt que d'aller échouer en 401 au milieu de l'écriture.
+      const actif = (await jetonValide()) ?? jeton
       let total = 0
       for (const ctx of enfants) {
-        const r = await synchroniserEnfant(jeton, ctx.enfant.prenom, evenementsEnfant(ctx, options))
+        const r = await synchroniserEnfant(actif, ctx.enfant.prenom, evenementsEnfant(ctx, options))
         total += r.ecrits
       }
       setResultat(t('agenda.googleFait', { nombre: total, enfants: enfants.length }))
@@ -125,7 +151,8 @@ function BlocGoogle() {
       // erreur ramenait le bouton « Connecter » après une portée manquante ou une API
       // non activée, ce qui laissait croire à un problème de connexion — et faisait
       // recommencer une autorisation qui n'y changeait rien.
-      if ((e as { statut?: number })?.statut === 401) {
+      const finie = e instanceof Error && e.message === 'session-finie'
+      if (finie || (e as { statut?: number })?.statut === 401) {
         // Le jeton est mort : expiré, ou révoqué depuis le compte Google — ce qui
         // arrive justement en suivant la consigne « retirez l'accès, puis
         // reconnectez-vous » avec l'onglet resté ouvert. L'écran annonçait pourtant

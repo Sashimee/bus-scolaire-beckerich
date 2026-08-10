@@ -454,9 +454,66 @@ async function jetonGoogle(requete, env, origine) {
   return json(
     {
       access_token: donnees.access_token,
+      // Sans lui, la session mourait avec l'onglet : le parent devait se reconnecter à
+      // chaque ouverture, alors que l'autorisation restait accordée chez Google.
+      refresh_token: donnees.refresh_token,
       expires_in: donnees.expires_in ?? 3600,
       scope: donnees.scope ?? '',
     },
+    200,
+    entetes,
+  )
+}
+
+/**
+ * Redonne un jeton d'accès à partir d'un jeton de rafraîchissement.
+ *
+ * Même raison d'être que l'échange ci-dessus : Google exige le `client_secret`, que le
+ * navigateur ne peut pas détenir. Le Worker relaie et ne retient rien — il ne stocke ni
+ * le jeton reçu, ni celui qu'il rend.
+ *
+ * Le motif de refus est renvoyé tel quel : `invalid_grant` distingue le seul cas où il
+ * faut vraiment se reconnecter (accès retiré depuis le compte Google, ou jeton périmé
+ * faute d'usage) d'une panne passagère, qui ne doit rien jeter.
+ */
+async function rafraichirGoogle(requete, env, origine) {
+  const entetes = cors(origine, env)
+  if (!env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_CLIENT_ID) {
+    return json({ erreur: 'google-non-configure' }, 503, entetes)
+  }
+
+  let corps
+  try {
+    corps = await corpsJson(requete, 8 * 1024)
+  } catch (e) {
+    return json({ erreur: String(e.message) }, 400, entetes)
+  }
+  if (typeof corps?.rafraichissement !== 'string' || !corps.rafraichissement) {
+    return json({ erreur: 'charge-invalide' }, 400, entetes)
+  }
+
+  const rep = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      refresh_token: corps.rafraichissement,
+      grant_type: 'refresh_token',
+    }),
+  })
+
+  const donnees = await rep.json().catch(() => ({}))
+  if (!rep.ok || !donnees.access_token) {
+    return json(
+      { erreur: 'rafraichissement-refuse', detail: donnees.error ?? rep.status },
+      502,
+      entetes,
+    )
+  }
+
+  return json(
+    { access_token: donnees.access_token, expires_in: donnees.expires_in ?? 3600 },
     200,
     entetes,
   )
@@ -795,6 +852,8 @@ export default {
           return await desabonner(requete, env, origine)
         case 'POST /google/jeton':
           return await jetonGoogle(requete, env, origine)
+        case 'POST /google/rafraichir':
+          return await rafraichirGoogle(requete, env, origine)
         case 'POST /essai':
           return await essai(requete, env, origine)
         case 'POST /notifier':
