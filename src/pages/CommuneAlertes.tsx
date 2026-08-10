@@ -147,6 +147,7 @@ export function CommuneAlertes() {
     // 1. Que se passe-t-il ? Quatre grandes cartes, sans jargon.
     {
       cle: 'situation',
+      titre: t('assistant.situation'),
       contenu: (
         <div className="pile pile--serre">
           {SITUATIONS.map((s) => (
@@ -172,6 +173,7 @@ export function CommuneAlertes() {
     // 2. Qui est concerné ? Jamais d'identifiant technique à l'écran.
     {
       cle: 'portee',
+      titre: t('assistant.portee'),
       contenu: (
         <div className="carte pile pile--serre">
           <div className="champ">
@@ -263,6 +265,7 @@ export function CommuneAlertes() {
     // 3. Quand ? Des boutons, pas deux champs date nus.
     {
       cle: 'quand',
+      titre: t('assistant.quand'),
       contenu: (
         <div className="carte pile pile--serre">
           <div className="segments" role="group" aria-label={t('assistant.quand')}>
@@ -308,7 +311,9 @@ export function CommuneAlertes() {
     // 4. Message et gravité. La gravité s'exprime en conséquences, pas en jargon.
     {
       cle: 'message',
+      titre: t('assistant.message'),
       pretePourLaSuite: message.trim().length > 0,
+      obstacle: t('commune.messageObligatoire'),
       contenu: (
         <div className="carte pile pile--serre">
           <div className="champ">
@@ -370,6 +375,7 @@ export function CommuneAlertes() {
     // 5. Aperçu à l'identique, puis publication.
     {
       cle: 'apercu',
+      titre: t('assistant.apercu'),
       contenu: (
         <div className="pile pile--serre">
           <p className="champ__aide">{t('commune.apercuAide')}</p>

@@ -42,13 +42,7 @@
   },
   "assistant": {
     "progression": "Schritt {etape} von {total}",
-    "enfant": "Wer ist dieses Kind?",
-    "adresse": "Wo fährt es morgens los?",
-    "bus": "Nimmt es den Bus?",
-    "midi": "Wo isst es zu Mittag?",
-    "periscolaire": "Zu welchen Zeiten ist es im Dillendapp?",
-    "recapitulatif": "Das ist seine Woche",
-    "terminer": "Fertig",
+    "terminer": "Ich bin fertig",
     "reglageFin": "Alles auf einer Seite einstellen",
     "reprendre": "Schritt für Schritt einrichten",
     "situation": "Was ist passiert?",
@@ -56,7 +50,79 @@
     "quand": "Wann?",
     "message": "Was sollen die Eltern erfahren?",
     "apercu": "Vor dem Veröffentlichen prüfen",
-    "adresses": "Fährt es immer von zu Hause los?"
+    "etapes": "Schritte des Assistenten",
+    "allerA": "Zu Schritt {numero}: {titre}",
+    "enregistre": "Ihre Antworten werden fortlaufend gespeichert, nur auf diesem Gerät. Sie können jederzeit aufhören und später weitermachen.",
+    "titreEnfant": "Wer ist dieses Kind?",
+    "titreAdresse": "Wo wohnt {prenom}?",
+    "titreMatin": "Der Morgen",
+    "titreMidi": "Der Mittag",
+    "titreSoir": "Nach dem Unterricht",
+    "titreRecapitulatif": "Die Woche von {prenom}",
+    "obstaclePrenom": "Geben Sie zuerst den Vornamen des Kindes an.",
+    "obstacleAdresse": "Wählen Sie zuerst Ihre Adresse: ohne sie lässt sich keine Haltestelle berechnen."
+  },
+  "moments": {
+    "matin": "Der Morgen",
+    "midi": "Der Mittag",
+    "soir": "Nach dem Unterricht",
+    "aPiedAide": "Die nächstgelegene Haltestelle ist die der Schule: es ist keine Busfahrt vorgesehen, hier gibt es also nichts einzustellen."
+  },
+  "matin": {
+    "question": "Wie kommt {prenom} morgens zur Schule?",
+    "bus": "Mit dem Bus",
+    "busCourt": "Bus",
+    "busAide": "Zu Fuß bis zur nächstgelegenen Haltestelle, dann mit dem Bus zur Schule.",
+    "busAideArret": "Ab Haltestelle {arret}, zu Fuß von zu Hause.",
+    "voiture": "Ich bringe es selbst zur Schule",
+    "voitureCourt": "Auto",
+    "voitureAide": "An diesem Tag wird keine Busfahrt zur Schule angezeigt — weder morgens noch nach dem Mittagessen.",
+    "relais": "Ich bringe es zuerst zur Maison Relais",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "Sie bringen es vor dem Unterricht dorthin ({relais}); danach bringt der Bus es zur Schule."
+  },
+  "midi": {
+    "question": "Wo isst {prenom} mittags?",
+    "maison": "Zu Hause",
+    "maisonCourt": "Zuhause",
+    "maisonAide": "Mittags mit dem Bus nach Hause, dann zurück zum Unterricht um {heure}.",
+    "relais": "In der Maison Relais",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "Essen vor Ort ({relais}): mittags keine Fahrt nach Hause.",
+    "sansApresMidi": "{jours}: der Unterricht endet um {heure}, es gibt kein Mittagessen einzustellen. Diese Tage werden im nächsten Schritt geregelt."
+  },
+  "soir": {
+    "question": "Wohin geht {prenom} nach dem Unterricht?",
+    "bus": "Nach Hause, mit dem Bus",
+    "busCourt": "Bus",
+    "busAide": "Rückfahrt mit dem Bus bis zur nächstgelegenen Haltestelle.",
+    "voiture": "Ich hole es an der Schule ab",
+    "voitureCourt": "Auto",
+    "voitureAide": "An diesem Tag wird keine Rückfahrt mit dem Bus angezeigt.",
+    "relais": "In die Maison Relais, bis ich komme",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "Der Bus bringt es nach dem Unterricht dorthin ({relais}), und Sie holen es dort ab."
+  },
+  "semaine": {
+    "detailler": "Nicht an jedem Tag gleich",
+    "touteLaSemaine": "Ganze Woche"
+  },
+  "heure": {
+    "matin": "Ankunftszeit in der Maison Relais",
+    "soir": "Uhrzeit, zu der Sie es abholen",
+    "detailler": "Nicht jeden Tag zur gleichen Zeit",
+    "pourJour": "Uhrzeit am {jour}"
+  },
+  "apercu": {
+    "titre": "Das ergibt sich daraus",
+    "aide": "Zeiten aus dem offiziellen Plan, bei jeder Antwort neu berechnet. Sie sind von der Gemeinde nicht garantiert.",
+    "manquant": "Kein Bus",
+    "rien": "Zu diesem Zeitpunkt nichts"
+  },
+  "recapitulatif": {
+    "reponses": "Was Sie angegeben haben",
+    "semaine": "Die Fahrten, die sich daraus ergeben",
+    "modifier": "Ändern: {moment}"
   },
   "adresse": {
     "label": "Wohnadresse",
@@ -75,25 +141,25 @@
     "partageeFratrie": "Das ist die Adresse des Haushalts: sie hier zu ändern würde sie auch für Ihre anderen Kinder ändern.",
     "modifierPourTous": "Adresse des Haushalts ändern"
   },
-  "adresseJour": {
-    "titre": "Besondere Adressen",
-    "aide": "Standardmäßig fährt das Kind von Ihrem Wohnsitz los und kehrt dorthin zurück. Tragen Sie hier die Tage ein, an denen das nicht so ist — bei den Großeltern, bei der Tagesmutter. Jeder Moment des Tages wird getrennt eingestellt.",
-    "domicile": "Wohnsitz",
-    "matin": "Fährt morgens los von",
-    "soir": "Kehrt abends zurück nach",
-    "midi": "Isst zu Mittag bei",
-    "joursDerogatoires": "{nombre} abweichende(r) Tag(e)",
-    "auDillendapp": {
-      "matin": "An diesem Morgen zum Dillendapp gebracht: es fährt von keiner anderen Adresse los.",
-      "midi": "Isst an diesem Tag im Dillendapp zu Mittag.",
-      "soir": "An diesem Abend im Dillendapp abzuholen: der Bus bringt es nirgendwo anders hin."
-    }
+  "adresseMoment": {
+    "matinDefaut": "Abfahrt von Ihrem Wohnsitz, an allen Tagen.",
+    "matinOuvrir": "An manchen Tagen ist der Startpunkt ein anderer",
+    "matinTitre": "Startadresse, Tag für Tag",
+    "matinAide": "Lassen Sie die Tage leer, an denen das Kind von Ihrem Wohnsitz losfährt. Bei den Großeltern, bei der Tagesmutter: geben Sie die Adresse an, die Haltestelle wird neu berechnet.",
+    "midiDefaut": "Mittagessen bei Ihnen zu Hause.",
+    "midiOuvrir": "An manchen Tagen isst es woanders",
+    "midiTitre": "Adresse des Mittagessens, Tag für Tag",
+    "midiAide": "Lassen Sie die Tage leer, an denen das Kind bei Ihnen zu Hause isst.",
+    "soirDefaut": "Rückkehr zu Ihrem Wohnsitz, an allen Tagen.",
+    "soirOuvrir": "An manchen Tagen ist das Ziel ein anderes",
+    "soirTitre": "Rückkehradresse, Tag für Tag",
+    "soirAide": "Lassen Sie die Tage leer, an denen das Kind zu Ihnen zurückkehrt."
   },
   "enfant": {
     "prenom": "Vorname",
     "prenomPlaceholder": "Vorname des Kindes",
     "cycle": "Zyklus",
-    "cycleAide": "Der Schulstandort ergibt sich aus dem Zyklus. Ändern Sie den Zyklus zum Schuljahresbeginn: der gesamte Plan aktualisiert sich.",
+    "cycleAide": "Der Zyklus bestimmt Schule, Haltestelle und Fahrzeiten. Im Zweifel gilt der Zyklus, der im Zeugnis steht.",
     "ajouter": "Kind hinzufügen",
     "supprimer": "Löschen",
     "supprimerConfirmation": "{prenom} löschen?",
@@ -113,38 +179,21 @@
     "depuisZero": "Bei null anfangen",
     "calquerSurAide": "Mittagessen, Bus, Dillendapp und besondere Adressen werden übernommen. Alles bleibt im nächsten Schritt änderbar, und die Uhrzeiten passen sich dem gewählten Zyklus an.",
     "repriseTitre": "Einstellungen von {prenom} übernommen",
-    "repriseDetail": "Mittagessen, Bus, Dillendapp und besondere Adressen sind dieselben. Der Zyklus ändert dagegen Schule, Haltestelle und mögliche Uhrzeiten: prüfen Sie die Woche unten, und die Dillendapp-Zeiten, falls sie angepasst werden mussten."
+    "repriseDetail": "Mittagessen, Bus, Dillendapp und besondere Adressen sind dieselben. Der Zyklus ändert dagegen Schule, Haltestelle und mögliche Uhrzeiten: prüfen Sie die Woche unten, und die Dillendapp-Zeiten, falls sie angepasst werden mussten.",
+    "cycleQuestion": "In welchem Zyklus ist dieses Kind?"
   },
   "repas": {
-    "titre": "Mittagessen",
-    "aide": "Tageweise einstellbar: ein Kind kann montags im Dillendapp essen und dienstags nach Hause fahren.",
-    "maison": "Fährt zum Essen heim",
     "maisonCourt": "Zuhause",
-    "dillendapp": "Isst im Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Ganze Woche einstellen",
-    "sansCoursApresMidi": "Kein Nachmittagsunterricht",
-    "sansPeriscolaire": "Dieses Kind isst jeden Tag zu Hause. Kreuzen Sie „Isst mittags im Dillendapp“ an, wenn es dort manchmal zu Mittag isst."
+    "sansCoursApresMidi": "Kein Nachmittagsunterricht"
   },
   "dillendapp": {
     "titre": "Anwesenheit im Dillendapp",
-    "jusqua": "Bleibt bis",
     "repartEnBus": "Fährt mit dem Bus",
     "aRecuperer": "Im Dillendapp abzuholen",
     "recuperation": "Um {heure} im Dillendapp abzuholen.",
-    "depuis": "Kommt an ab",
     "aDeposer": "Zum Dillendapp bringen",
     "depose": "Um {heure} zum Dillendapp bringen.",
-    "inscriptionMidi": "Isst mittags im Dillendapp",
-    "inscriptionMidiAide": "Ankreuzen, wenn das Kind dort zu Mittag isst, sei es auch nur an einem Tag pro Woche.",
-    "inscriptionHorsMidi": "Im Dillendapp vor dem Unterricht oder nach der Schule",
-    "inscriptionHorsMidiAide": "Ankreuzen, wenn Sie es morgens dorthin bringen oder abends dort abholen. Das wird unabhängig vom Mittagessen eingestellt.",
-    "blocMatin": "Morgens, vor dem Unterricht",
-    "blocMatinAide": "Sie bringen das Kind selbst zur Maison Relais: an diesen Morgen fährt kein Bus bei Ihnen ab. Danach bringt der Bus es zum Unterricht.",
-    "blocSoir": "Abends, nach der Schule",
-    "blocSoirAide": "Das Kind bleibt nach dem Unterricht in der Maison Relais: der Bus setzt es dort ab, statt es nach Hause zu bringen, und Sie holen es dort ab.",
-    "deposeCase": "Ich bringe es an diesem Tag",
-    "recupereCase": "Ich hole es an diesem Tag ab",
     "bornes": "Zwischen {min} und {max}, je nach Bus seines Zyklus",
     "midiObligatoire": "An diesem Tag gibt es keinen Nachmittagsunterricht: im Dillendapp zu bleiben setzt voraus, dort zu essen. Das Mittagessen wurde entsprechend eingestellt.",
     "transportTitre": "Sie können es nicht abholen?",
@@ -152,14 +201,6 @@
     "transportLien": "{nom} ansehen"
   },
   "bus": {
-    "titre": "Bus",
-    "aide": "Wenn Sie Ihr Kind an manchen Tagen selbst bringen oder abholen, geben Sie es hier an: die App zeigt dann nur die Fahrten, die es wirklich nimmt.",
-    "pourJour": "Busnutzung am {jour}",
-    "touteLaSemaine": "Ganze Woche einstellen",
-    "aller-retour": "Hin und zurück",
-    "aller": "Nur Hinfahrt",
-    "retour": "Nur Rückfahrt",
-    "aucun": "Kein Bus",
     "aller-retourCourt": "Hin/zurück",
     "allerCourt": "Hin",
     "retourCourt": "Zurück",
@@ -171,7 +212,12 @@
     "c1": "Zyklus 1",
     "c2": "Zyklus 2",
     "c3": "Zyklus 3",
-    "c4": "Zyklus 4"
+    "c4": "Zyklus 4",
+    "precoceAges": "3 Jahre",
+    "c1Ages": "4 bis 5 Jahre",
+    "c2Ages": "6 bis 7 Jahre",
+    "c3Ages": "8 bis 9 Jahre",
+    "c4Ages": "10 bis 11 Jahre"
   },
   "jours": {
     "lundi": "Montag",
@@ -740,7 +786,8 @@
       "retrait": "Rücknahme",
       "horaires": "Fahrplan",
       "traductions": "Texte"
-    }
+    },
+    "messageObligatoire": "Schreiben Sie zuerst die Nachricht, die die Eltern erhalten."
   },
   "adminArrets": {
     "titre": "Position der Haltestellen",

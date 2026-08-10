@@ -5,57 +5,42 @@ import { useFoyer } from '../etat'
 import { Assistant, type Etape } from '../composants/Assistant'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { ChampAdresse } from '../composants/ChampAdresse'
-import {
-  CasesPeriscolaire,
-  HorairesPeriscolaire,
-  SectionAdresses,
-  SectionBus,
-  SectionRepas,
-  estPeriscolaireHorsMidi,
-  estPeriscolaireMidi,
-} from '../composants/GrilleSemaine'
+import { ChoixSimple, type OptionChoix } from '../composants/ChoixSemaine'
+import { SectionMatin, SectionMidi, SectionSoir } from '../composants/Moments'
 import { JourneeTrajets } from '../composants/Trajets'
 import { semaineEnfant } from '../lib/plan'
+import { semaineReglee } from '../lib/moments'
 import { distanceLisible, nomArret } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
 import type { Cycle } from '../lib/types'
 
 const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 
-/** Enfant, adresse, bus, Dillendapp, horaires, adresses, récapitulatif. */
-const ETAPES_MAX = 7
+/** Les trois moments, dans l'ordre où l'assistant les demande. */
+const ETAPE_DU_MOMENT = { matin: 2, midi: 3, soir: 4 } as const
 
 /**
  * Configuration d'un enfant, une question par écran.
  *
  * Vient en complément de `/configurer`, qui reste la vue dense pour corriger un
- * détail. L'assistant s'adresse au parent qui découvre l'application : il ne montre
- * qu'une décision à la fois et affiche aussitôt ce qu'elle change — le site scolaire
- * déduit, l'arrêt calculé, la semaine obtenue.
+ * détail. L'assistant s'adresse au parent qui découvre l'application.
  *
- * Aucun brouillon : chaque réponse est écrite immédiatement par les mêmes actions que
- * `/configurer`. Il n'y a donc pas de bouton « annuler », rien à valider, et quitter
- * l'assistant en cours de route ne perd rien.
+ * Il suit la JOURNÉE de l'enfant, et non les champs du stockage : qui il est, où il
+ * habite, puis son matin, son midi, sa fin de journée. Ce sont les quatre choses qu'un
+ * parent sait dire sans y réfléchir. Les réglages qu'elles impliquent — usage du bus,
+ * repas, heures de présence, adresses dérogatoires — sont déduits par
+ * `src/lib/moments.ts` : c'était au parent de les accorder entre eux, et rien à
+ * l'écran ne disait qu'ils décrivaient la même chose.
+ *
+ * Aucun brouillon : chaque réponse est écrite immédiatement. Il n'y a donc pas de
+ * bouton « annuler », rien à valider, et quitter l'assistant en cours de route ne perd
+ * rien. Les six étapes sont fixes : aucune ne se dérobe selon les réponses.
  */
 export function AssistantEnfant() {
   const { t } = useT()
   const { id } = useParams()
   const naviguer = useNavigate()
-  const {
-    foyer,
-    contextes,
-    definirAdresse,
-    modifierEnfant,
-    definirRepas,
-    definirRepasSemaine,
-    definirBus,
-    definirBusSemaine,
-    definirPeriscolaireMidi,
-    definirPeriscolaireHorsMidi,
-    definirDillendappDepuis,
-    definirDillendappJusqua,
-    definirAdresseJour,
-  } = useFoyer()
+  const { foyer, contextes, definirAdresse, modifierEnfant } = useFoyer()
   const [indice, setIndice] = useState(0)
 
   const enfant = foyer.enfants.find((e) => e.id === id)
@@ -63,19 +48,27 @@ export function AssistantEnfant() {
 
   const ctx = contextes.get(enfant.id) ?? null
   const site = siteDuCycle(enfant.cycle)
-  const periscolaireMidi = estPeriscolaireMidi(enfant)
-  const periscolaireHorsMidi = estPeriscolaireHorsMidi(enfant)
+  const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
   // L'adresse est celle du FOYER : la modifier ici la déplacerait pour toute la
   // fratrie, sans que rien ne le dise. Dès le deuxième enfant, l'assistant la montre
   // sans permettre d'y toucher, et renvoie à l'écran qui la règle pour tout le monde.
   const adressePartagee = foyer.enfants.length > 1
+
+  const cycles: OptionChoix<Cycle>[] = CYCLES.map((c) => ({
+    valeur: c,
+    libelle: t(`cycles.${c}`),
+    court: t(`cycles.${c}`),
+    aide: `${t(`cycles.${c}Ages`)} · ${siteDuCycle(c).nom}`,
+  }))
 
   const etapes: Etape[] = [
     // 1. Qui est l'enfant. Le site scolaire se déduit du cycle : le montrer aussitôt
     //    évite au parent de se demander s'il a bien répondu.
     {
       cle: 'enfant',
+      titre: t('assistant.titreEnfant'),
       pretePourLaSuite: enfant.prenom.trim().length > 0,
+      obstacle: t('assistant.obstaclePrenom'),
       contenu: (
         <section className="carte pile">
           <div className="champ">
@@ -89,24 +82,20 @@ export function AssistantEnfant() {
             />
           </div>
 
-          <div className="champ">
-            <label htmlFor="assistant-cycle">{t('enfant.cycle')}</label>
-            <select
+          <fieldset className="fieldset-nu pile pile--serre">
+            <legend className="legende legende--question">{t('enfant.cycleQuestion')}</legend>
+            <p className="champ__aide">{t('enfant.cycleAide')}</p>
+            <ChoixSimple
               id="assistant-cycle"
-              value={enfant.cycle}
-              onChange={(e) => modifierEnfant(enfant.id, { cycle: e.target.value as Cycle })}
-            >
-              {CYCLES.map((c) => (
-                <option key={c} value={c}>
-                  {t(`cycles.${c}`)}
-                </option>
-              ))}
-            </select>
-          </div>
+              options={cycles}
+              valeur={enfant.cycle}
+              onChoisir={(cycle) => modifierEnfant(enfant.id, { cycle })}
+            />
+          </fieldset>
 
           <div className="encart encart--info" aria-live="polite">
             <div className="encart__titre">{t('enfant.scolariseA', { site: site.nom })}</div>
-            {t('enfant.cycleAide')}
+            {t('assistant.enregistre')}
           </div>
         </section>
       ),
@@ -116,7 +105,9 @@ export function AssistantEnfant() {
     //    façon de faire vérifier une adresse par quelqu'un qui connaît son village.
     {
       cle: 'adresse',
+      titre: t('assistant.titreAdresse', { prenom }),
       pretePourLaSuite: foyer.adresse !== null,
+      obstacle: t('assistant.obstacleAdresse'),
       contenu: (
         <section className="carte pile">
           {adressePartagee ? (
@@ -154,7 +145,7 @@ export function AssistantEnfant() {
               {t('enfant.aPiedDetail', {
                 minutes: ctx.temps,
                 site: site.nom,
-                prenom: enfant.prenom,
+                prenom,
               })}
             </div>
           )}
@@ -166,144 +157,128 @@ export function AssistantEnfant() {
       ),
     },
 
-    // 3. Le bus.
+    // 3, 4, 5. La journée, dans l'ordre où elle se vit. Chaque écran pose une seule
+    //    question et montre aussitôt les heures qu'elle produit.
     {
-      cle: 'bus',
+      cle: 'matin',
+      titre: t('assistant.titreMatin'),
       contenu: (
         <div className="carte">
-          <SectionBus
-            enfant={enfant}
-            onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
-            onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
-          />
+          <SectionMatin enfant={enfant} />
         </div>
       ),
     },
-
-    // 4. Le Dillendapp. Les deux cases sont posées ici, en tête de l'écran qu'elles
-    //    commandent : celle du hors-midi doit rester atteignable même quand l'écran
-    //    des horaires est masqué.
     {
       cle: 'midi',
-      contenu: (
-        <div className="carte pile">
-          <CasesPeriscolaire
-            enfant={enfant}
-            onPeriscolaireMidi={(inscrit) => definirPeriscolaireMidi(enfant.id, inscrit)}
-            onPeriscolaireHorsMidi={(inscrit) => definirPeriscolaireHorsMidi(enfant.id, inscrit)}
-          />
-          <SectionRepas
-            enfant={enfant}
-            onRepas={(jour, repas) => definirRepas(enfant.id, jour, repas)}
-            onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
-          />
-        </div>
-      ),
-    },
-
-    // 5. Les heures de présence. Sautée si la case hors-midi reste décochée : il n'y
-    //    aurait rien à y régler.
-    ...(periscolaireHorsMidi
-      ? [
-          {
-            cle: 'periscolaire',
-            contenu: (
-              <div className="carte">
-                <HorairesPeriscolaire
-                  enfant={enfant}
-                  ctx={ctx}
-                  onDillendappDepuis={(jour, heure) =>
-                    definirDillendappDepuis(enfant.id, jour, heure)
-                  }
-                  onDillendappJusqua={(jour, heure) =>
-                    definirDillendappJusqua(enfant.id, jour, heure)
-                  }
-                />
-              </div>
-            ),
-          } satisfies Etape,
-        ]
-      : []),
-
-    // 6. Les adresses particulières. La question se pose pour bien des familles — un
-    //    mardi chez les grands-parents, un jeudi chez la nounou — et l'assistant est le
-    //    seul endroit où on la POSE ; ailleurs, il faut penser à aller la chercher.
-    {
-      cle: 'adresses',
+      titre: t('assistant.titreMidi'),
       contenu: (
         <div className="carte">
-          <SectionAdresses
-            enfant={enfant}
-            onAdresseJour={(jour, sens, adresse) =>
-              definirAdresseJour(enfant.id, jour, sens, adresse)
-            }
-          />
+          <SectionMidi enfant={enfant} />
+        </div>
+      ),
+    },
+    {
+      cle: 'soir',
+      titre: t('assistant.titreSoir'),
+      contenu: (
+        <div className="carte">
+          <SectionSoir enfant={enfant} />
         </div>
       ),
     },
 
-    // 7. Le résultat. La seule étape qui ne demande rien : elle rend compte, trajets
-    //    manquants compris. Agenda, impression et partage sont sur la fiche, au clic
-    //    suivant : les répéter ici ferait doublon.
+    // 6. Le résultat. La seule étape qui ne demande rien : elle rend compte de ce que
+    //    le parent a répondu, PUIS de ce que l'application en tire. Le récapitulatif
+    //    des réponses est le seul endroit où l'on peut vérifier « j'ai bien dit qu'il
+    //    mange à la maison le mercredi » sans relire cinq écrans.
     {
       cle: 'recapitulatif',
-      contenu: ctx ? (
-        <div className="pile">
-          {semaineEnfant(ctx).map((journee) => (
-            <section className="carte pile pile--serre" key={journee.jour}>
-              <div className="rangee rangee--espacee">
-                <h3 className="titre-carte">{t(`jours.${journee.jour}`)}</h3>
-                <span className="rangee">
-                  {periscolaireMidi && (
-                    <span className="etiquette">
-                      {t(`repas.${enfant.repas[journee.jour]}Court`)}
-                    </span>
+      titre: t('assistant.titreRecapitulatif', { prenom }),
+      contenu: (
+        <div className="pile pile--large">
+          <section className="pile pile--serre">
+            <h3 className="titre-carte">{t('recapitulatif.reponses')}</h3>
+            {semaineReglee(enfant).map((journee) => (
+              <div className="carte pile pile--serre" key={journee.jour}>
+                <h4 className="titre-carte">{t(`jours.${journee.jour}`)}</h4>
+                <dl className="recapitulatif">
+                  <dt>{t('moments.matin')}</dt>
+                  <dd>
+                    {t(`matin.${journee.matin}Court`)}
+                    {journee.heureMatin && ` · ${journee.heureMatin}`}
+                    {journee.adresses.matin && ` · ${journee.adresses.matin}`}
+                  </dd>
+
+                  {journee.midi && (
+                    <>
+                      <dt>{t('moments.midi')}</dt>
+                      <dd>
+                        {t(`midi.${journee.midi}Court`)}
+                        {journee.adresses.midi && ` · ${journee.adresses.midi}`}
+                      </dd>
+                    </>
                   )}
-                  {(enfant.bus?.[journee.jour] ?? 'aller-retour') !== 'aller-retour' && (
-                    <span className="etiquette">
-                      {t(`bus.${enfant.bus?.[journee.jour] ?? 'aller-retour'}Court`)}
-                    </span>
-                  )}
-                </span>
+
+                  <dt>{t('moments.soir')}</dt>
+                  <dd>
+                    {t(`soir.${journee.soir}Court`)}
+                    {journee.heureSoir && ` · ${journee.heureSoir}`}
+                    {journee.adresses.soir && ` · ${journee.adresses.soir}`}
+                  </dd>
+                </dl>
               </div>
-              {(enfant.bus?.[journee.jour] ?? 'aller-retour') === 'aucun' ? (
-                <p className="champ__aide">{t('bus.sansBus')}</p>
-              ) : (
-                <JourneeTrajets journee={journee} />
-              )}
-            </section>
-          ))}
+            ))}
+
+            <div className="rangee">
+              {(['matin', 'midi', 'soir'] as const).map((moment) => (
+                <button
+                  key={moment}
+                  type="button"
+                  className="bouton bouton--discret"
+                  onClick={() => setIndice(ETAPE_DU_MOMENT[moment])}
+                >
+                  {t('recapitulatif.modifier', { moment: t(`moments.${moment}`) })}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="pile pile--serre">
+            <h3 className="titre-carte">{t('recapitulatif.semaine')}</h3>
+            {ctx ? (
+              semaineEnfant(ctx).map((journee) => (
+                <div className="carte pile pile--serre" key={journee.jour}>
+                  <h4 className="titre-carte">{t(`jours.${journee.jour}`)}</h4>
+                  <JourneeTrajets journee={journee} />
+                </div>
+              ))
+            ) : (
+              <div className="encart encart--alerte">{t('enfant.aucunArret')}</div>
+            )}
+          </section>
+
+          <p className="champ__aide">
+            <Link to="/configurer">{t('assistant.reglageFin')}</Link>
+          </p>
         </div>
-      ) : (
-        <div className="encart encart--alerte">{t('enfant.aucunArret')}</div>
       ),
     },
   ]
 
   return (
-    <>
-      <p className="champ__aide">
-        <Link to="/configurer">{t('assistant.reglageFin')}</Link>
-      </p>
-
-      <Assistant
-        etapes={etapes}
-        // L'étape des horaires disparaît quand la case est décochée : l'indice courant
-        // doit suivre, sinon le parent se retrouve devant un écran vide. Le total, lui,
-        // reste celui de l'assistant complet : voir la prop `total`.
-        indice={Math.min(indice, etapes.length - 1)}
-        onIndice={setIndice}
-        total={ETAPES_MAX}
-        fin={
-          <button
-            type="button"
-            className="bouton bouton--primaire"
-            onClick={() => naviguer(`/enfant/${enfant.id}`)}
-          >
-            {t('assistant.terminer')}
-          </button>
-        }
-      />
-    </>
+    <Assistant
+      etapes={etapes}
+      indice={Math.min(indice, etapes.length - 1)}
+      onIndice={setIndice}
+      fin={
+        <button
+          type="button"
+          className="bouton bouton--primaire"
+          onClick={() => naviguer(`/enfant/${enfant.id}`)}
+        >
+          {t('assistant.terminer')}
+        </button>
+      }
+    />
   )
 }

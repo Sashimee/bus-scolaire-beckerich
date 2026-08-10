@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from '../composants/ChampAdresse'
-import { GrilleSemaine } from '../composants/GrilleSemaine'
+import { MomentsSemaine } from '../composants/Moments'
 import { siteDuCycle } from '../lib/donnees'
 import type { Cycle } from '../lib/types'
 
@@ -12,24 +12,8 @@ const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 /** Saisie et modification de l'adresse et des enfants. Sert d'accueil au premier lancement. */
 export function Configurer() {
   const { t } = useT()
-  const {
-    foyer,
-    contextes,
-    definirAdresse,
-    ajouterEnfant,
-    modifierEnfant,
-    definirRepas,
-    definirRepasSemaine,
-    definirBus,
-    definirBusSemaine,
-    definirPeriscolaireMidi,
-    definirPeriscolaireHorsMidi,
-    definirDillendappDepuis,
-    definirDillendappJusqua,
-    definirAdresseJour,
-    supprimerEnfant,
-    configure,
-  } = useFoyer()
+  const { foyer, definirAdresse, ajouterEnfant, modifierEnfant, supprimerEnfant, configure } =
+    useFoyer()
 
   const naviguer = useNavigate()
   const [prenom, setPrenom] = useState('')
@@ -49,7 +33,7 @@ export function Configurer() {
    *
    * Un enfant parti de zéro n'a que son prénom : l'assistant enchaîne sur les questions
    * qui manquent. Un enfant calqué sur son aîné, lui, est déjà complet — lui faire
-   * reparcourir sept écrans qui ne demandent rien de nouveau ferait perdre du temps
+   * reparcourir six écrans qui ne demandent rien de nouveau ferait perdre du temps
    * pour rien. On l'envoie donc sur sa fiche, qui montre aussitôt sa semaine ; la
    * fiche porte déjà un lien vers l'assistant pour qui veut ajuster.
    */
@@ -128,25 +112,7 @@ export function Configurer() {
               {t('enfant.cycleAide')}
             </p>
 
-            <GrilleSemaine
-              enfant={enfant}
-              ctx={contextes.get(enfant.id) ?? null}
-              onRepas={(jour, repas) => definirRepas(enfant.id, jour, repas)}
-              onRepasSemaine={(repas) => definirRepasSemaine(enfant.id, repas)}
-              onBus={(jour, usage) => definirBus(enfant.id, jour, usage)}
-              onBusSemaine={(usage) => definirBusSemaine(enfant.id, usage)}
-              onPeriscolaireMidi={(inscrit) => definirPeriscolaireMidi(enfant.id, inscrit)}
-              onPeriscolaireHorsMidi={(inscrit) => definirPeriscolaireHorsMidi(enfant.id, inscrit)}
-              onDillendappDepuis={(jour, heure) =>
-                definirDillendappDepuis(enfant.id, jour, heure)
-              }
-              onDillendappJusqua={(jour, heure) =>
-                definirDillendappJusqua(enfant.id, jour, heure)
-              }
-              onAdresseJour={(jour, sens, adresse) =>
-                definirAdresseJour(enfant.id, jour, sens, adresse)
-              }
-            />
+            <MomentsSemaine enfant={enfant} />
 
             {/* La semaine de l'enfant, depuis sa fiche de réglage : c'est là qu'on
                 vérifie ce qu'un changement de cycle ou de repas a produit, et c'est le

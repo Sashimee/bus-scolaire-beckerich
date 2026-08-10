@@ -42,13 +42,7 @@
   },
   "assistant": {
     "progression": "Etapa {etape} de {total}",
-    "enfant": "Quem é esta criança?",
-    "adresse": "De onde parte de manhã?",
-    "bus": "Anda de autocarro?",
-    "midi": "Onde almoça?",
-    "periscolaire": "A que horas está no Dillendapp?",
-    "recapitulatif": "Eis a sua semana",
-    "terminer": "Terminado",
+    "terminer": "Terminei",
     "reglageFin": "Definir tudo num só ecrã",
     "reprendre": "Configurar passo a passo",
     "situation": "O que aconteceu?",
@@ -56,7 +50,79 @@
     "quand": "Quando?",
     "message": "O que dizer aos pais?",
     "apercu": "Verifique antes de publicar",
-    "adresses": "Parte sempre de sua casa?"
+    "etapes": "Etapas do assistente",
+    "allerA": "Ir para a etapa {numero}: {titre}",
+    "enregistre": "As suas respostas são guardadas à medida, apenas neste aparelho. Pode parar e voltar mais tarde.",
+    "titreEnfant": "Quem é esta criança?",
+    "titreAdresse": "Onde mora {prenom}?",
+    "titreMatin": "De manhã",
+    "titreMidi": "Ao meio-dia",
+    "titreSoir": "Depois das aulas",
+    "titreRecapitulatif": "A semana de {prenom}",
+    "obstaclePrenom": "Indique primeiro o nome da criança.",
+    "obstacleAdresse": "Escolha primeiro a sua morada: sem ela não é possível calcular nenhuma paragem."
+  },
+  "moments": {
+    "matin": "De manhã",
+    "midi": "Ao meio-dia",
+    "soir": "Depois das aulas",
+    "aPiedAide": "A paragem mais próxima de sua casa é a da escola: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui."
+  },
+  "matin": {
+    "question": "De manhã, como vai {prenom} para a escola?",
+    "bus": "De autocarro",
+    "busCourt": "Autocarro",
+    "busAide": "A pé até à paragem mais próxima de sua casa, depois de autocarro até à escola.",
+    "busAideArret": "Partida da paragem {arret}, a pé desde sua casa.",
+    "voiture": "Levo-a eu próprio à escola",
+    "voitureCourt": "Carro",
+    "voitureAide": "Nesse dia não será mostrada nenhuma viagem de autocarro para a escola — nem de manhã, nem depois do almoço.",
+    "relais": "Levo-a primeiro à casa de acolhimento",
+    "relaisCourt": "Casa de acolhimento",
+    "relaisAide": "Deixa-a lá antes das aulas ({relais}); depois é o autocarro que a leva à escola."
+  },
+  "midi": {
+    "question": "Ao meio-dia, onde almoça {prenom}?",
+    "maison": "Em casa",
+    "maisonCourt": "Casa",
+    "maisonAide": "Regresso a casa de autocarro ao meio-dia e volta às aulas para as {heure}.",
+    "relais": "Na casa de acolhimento",
+    "relaisCourt": "Casa de acolhimento",
+    "relaisAide": "Refeição no local ({relais}): sem regresso a casa ao meio-dia.",
+    "sansApresMidi": "{jours}: as aulas terminam às {heure} e não há almoço a definir. Esses dias definem-se na etapa seguinte."
+  },
+  "soir": {
+    "question": "Depois das aulas, para onde vai {prenom}?",
+    "bus": "Para casa, de autocarro",
+    "busCourt": "Autocarro",
+    "busAide": "Regresso de autocarro até à paragem mais próxima de sua casa.",
+    "voiture": "Vou esperá-la à saída da escola",
+    "voitureCourt": "Carro",
+    "voitureAide": "Nesse dia não será mostrado nenhum autocarro de regresso.",
+    "relais": "Fica na casa de acolhimento até eu chegar",
+    "relaisCourt": "Casa de acolhimento",
+    "relaisAide": "O autocarro leva-a para lá depois das aulas ({relais}) e você vai buscá-la."
+  },
+  "semaine": {
+    "detailler": "Não é igual todos os dias",
+    "touteLaSemaine": "Toda a semana"
+  },
+  "heure": {
+    "matin": "Hora de chegada à casa de acolhimento",
+    "soir": "Hora a que a vai buscar",
+    "detailler": "Não é à mesma hora todos os dias",
+    "pourJour": "Hora de {jour}"
+  },
+  "apercu": {
+    "titre": "O que isto dá",
+    "aide": "Horas do plano oficial, recalculadas a cada resposta. Não são garantidas pelo município.",
+    "manquant": "Sem autocarro",
+    "rien": "Nada nesse momento"
+  },
+  "recapitulatif": {
+    "reponses": "O que indicou",
+    "semaine": "As deslocações que daí resultam",
+    "modifier": "Alterar: {moment}"
   },
   "adresse": {
     "label": "Morada de residência",
@@ -75,25 +141,25 @@
     "partageeFratrie": "É a morada do agregado: alterá-la aqui alterá-la-ia também para os seus outros filhos.",
     "modifierPourTous": "Alterar a morada do agregado"
   },
-  "adresseJour": {
-    "titre": "Endereços especiais",
-    "aide": "Por defeito, a criança parte da sua casa e regressa a ela. Indique aqui os dias em que não é o caso — em casa dos avós, da ama. Cada momento do dia configura-se separadamente.",
-    "domicile": "Morada",
-    "matin": "Parte de manhã de",
-    "soir": "Regressa à noite a",
-    "midi": "Almoça em",
-    "joursDerogatoires": "{nombre} dia(s) à parte",
-    "auDillendapp": {
-      "matin": "Levada ao Dillendapp nessa manhã: não parte de mais nenhuma morada.",
-      "midi": "Almoça no Dillendapp nesse dia.",
-      "soir": "A ir buscar ao Dillendapp nesse fim de dia: o autocarro não a leva a mais lado nenhum."
-    }
+  "adresseMoment": {
+    "matinDefaut": "Partida de sua casa, todos os dias.",
+    "matinOuvrir": "Em alguns dias parte de outro sítio",
+    "matinTitre": "Morada de partida, dia a dia",
+    "matinAide": "Deixe em branco os dias em que a criança parte de sua casa. Em casa dos avós, da ama: indique a morada, a paragem é recalculada.",
+    "midiDefaut": "Almoço em sua casa.",
+    "midiOuvrir": "Em alguns dias almoça noutro sítio",
+    "midiTitre": "Morada do almoço, dia a dia",
+    "midiAide": "Deixe em branco os dias em que a criança almoça em sua casa.",
+    "soirDefaut": "Regresso a sua casa, todos os dias.",
+    "soirOuvrir": "Em alguns dias regressa a outro sítio",
+    "soirTitre": "Morada de regresso, dia a dia",
+    "soirAide": "Deixe em branco os dias em que a criança regressa a sua casa."
   },
   "enfant": {
     "prenom": "Nome próprio",
     "prenomPlaceholder": "Nome da criança",
     "cycle": "Ciclo",
-    "cycleAide": "O estabelecimento decorre do ciclo. Altere o ciclo no início do ano letivo: todo o plano se atualiza.",
+    "cycleAide": "O ciclo determina a escola, a paragem e os horários. Em caso de dúvida, vale o ciclo indicado na caderneta.",
     "ajouter": "Adicionar uma criança",
     "supprimer": "Eliminar",
     "supprimerConfirmation": "Eliminar {prenom}?",
@@ -113,38 +179,21 @@
     "depuisZero": "Começar do zero",
     "calquerSurAide": "Almoço, autocarro, Dillendapp e moradas particulares são retomados. Tudo continua alterável no passo seguinte, e os horários ajustam-se ao ciclo escolhido.",
     "repriseTitre": "Configuração retomada de {prenom}",
-    "repriseDetail": "Almoço, autocarro, Dillendapp e moradas particulares são os mesmos. O ciclo, esse, muda a escola, a paragem e os horários possíveis: verifique a semana abaixo, e as horas no Dillendapp se tiveram de ser ajustadas."
+    "repriseDetail": "Almoço, autocarro, Dillendapp e moradas particulares são os mesmos. O ciclo, esse, muda a escola, a paragem e os horários possíveis: verifique a semana abaixo, e as horas no Dillendapp se tiveram de ser ajustadas.",
+    "cycleQuestion": "Em que ciclo está esta criança?"
   },
   "repas": {
-    "titre": "Almoço",
-    "aide": "Configurável dia a dia: uma criança pode almoçar no Dillendapp à segunda-feira e regressar a casa à terça.",
-    "maison": "Volta para almoçar",
     "maisonCourt": "Casa",
-    "dillendapp": "Almoça no Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Configurar toda a semana",
-    "sansCoursApresMidi": "Sem aulas à tarde",
-    "sansPeriscolaire": "Esta criança vem almoçar a casa todos os dias. Assinale «Almoça no Dillendapp» se por vezes aí faz a refeição do meio-dia."
+    "sansCoursApresMidi": "Sem aulas à tarde"
   },
   "dillendapp": {
     "titre": "Presença no Dillendapp",
-    "jusqua": "Fica até",
     "repartEnBus": "Regressa de autocarro",
     "aRecuperer": "A ir buscar ao Dillendapp",
     "recuperation": "A ir buscar ao Dillendapp às {heure}.",
-    "depuis": "Chega a partir das",
     "aDeposer": "A levar ao Dillendapp",
     "depose": "A levar ao Dillendapp às {heure}.",
-    "inscriptionMidi": "Almoça no Dillendapp",
-    "inscriptionMidiAide": "Assinale se a criança aí faz a refeição do meio-dia, nem que seja um dia por semana.",
-    "inscriptionHorsMidi": "No Dillendapp antes das aulas ou depois da escola",
-    "inscriptionHorsMidiAide": "Assinale se a leva lá de manhã, ou se a vai buscar ao fim do dia. Configura-se independentemente do almoço.",
-    "blocMatin": "De manhã, antes das aulas",
-    "blocMatinAide": "É você que leva a criança à casa de acolhimento: nenhum autocarro parte de sua casa nessas manhãs. Depois é o autocarro que a leva às aulas.",
-    "blocSoir": "Ao fim do dia, depois da escola",
-    "blocSoirAide": "A criança fica na casa de acolhimento depois das aulas: o autocarro deixa-a lá em vez de a levar a casa, e é você que a vai buscar.",
-    "deposeCase": "Levo-a nesse dia",
-    "recupereCase": "Vou buscá-la nesse dia",
     "bornes": "Entre {min} e {max}, conforme o autocarro do seu ciclo",
     "midiObligatoire": "Nesse dia não há aulas à tarde: ficar no Dillendapp implica almoçar lá. O almoço foi configurado em conformidade.",
     "transportTitre": "Não pode ir buscá-lo?",
@@ -152,14 +201,6 @@
     "transportLien": "Ver {nom}"
   },
   "bus": {
-    "titre": "Autocarro",
-    "aide": "Se em alguns dias leva ou vai buscar o seu filho, indique-o: a aplicação mostrará apenas as deslocações que ele faz realmente.",
-    "pourJour": "Utilização do autocarro à {jour}",
-    "touteLaSemaine": "Configurar toda a semana",
-    "aller-retour": "Ida e volta",
-    "aller": "Apenas ida",
-    "retour": "Apenas volta",
-    "aucun": "Sem autocarro",
     "aller-retourCourt": "Ida/volta",
     "allerCourt": "Ida",
     "retourCourt": "Volta",
@@ -171,7 +212,12 @@
     "c1": "Ciclo 1",
     "c2": "Ciclo 2",
     "c3": "Ciclo 3",
-    "c4": "Ciclo 4"
+    "c4": "Ciclo 4",
+    "precoceAges": "3 anos",
+    "c1Ages": "4 a 5 anos",
+    "c2Ages": "6 a 7 anos",
+    "c3Ages": "8 a 9 anos",
+    "c4Ages": "10 a 11 anos"
   },
   "jours": {
     "lundi": "Segunda-feira",
@@ -740,7 +786,8 @@
       "retrait": "Retirada",
       "horaires": "Horários",
       "traductions": "Textos"
-    }
+    },
+    "messageObligatoire": "Escreva primeiro a mensagem que os pais vão receber."
   },
   "adminArrets": {
     "titre": "Posição das paragens",

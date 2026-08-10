@@ -42,13 +42,7 @@
   },
   "assistant": {
     "progression": "Étape {etape} sur {total}",
-    "enfant": "Qui est cet enfant ?",
-    "adresse": "D'où part-il le matin ?",
-    "bus": "Prend-il le bus ?",
-    "midi": "Où déjeune-t-il ?",
-    "periscolaire": "À quelles heures est-il au Dillendapp ?",
-    "recapitulatif": "Voici sa semaine",
-    "terminer": "Terminé",
+    "terminer": "J'ai fini",
     "reglageFin": "Tout régler d'un seul écran",
     "reprendre": "Configurer pas à pas",
     "situation": "Que se passe-t-il ?",
@@ -56,7 +50,79 @@
     "quand": "Quand ?",
     "message": "Que dire aux parents ?",
     "apercu": "Vérifiez avant de publier",
-    "adresses": "Part-il toujours de chez vous ?"
+    "etapes": "Étapes de l'assistant",
+    "allerA": "Aller à l'étape {numero} : {titre}",
+    "enregistre": "Vos réponses sont enregistrées au fur et à mesure, sur cet appareil seulement. Vous pouvez vous arrêter et reprendre plus tard.",
+    "titreEnfant": "Qui est cet enfant ?",
+    "titreAdresse": "Où habite {prenom} ?",
+    "titreMatin": "Le matin",
+    "titreMidi": "Le midi",
+    "titreSoir": "Après la classe",
+    "titreRecapitulatif": "La semaine de {prenom}",
+    "obstaclePrenom": "Indiquez d'abord le prénom de l'enfant.",
+    "obstacleAdresse": "Choisissez d'abord votre adresse : sans elle, aucun arrêt ne peut être calculé."
+  },
+  "moments": {
+    "matin": "Le matin",
+    "midi": "Le midi",
+    "soir": "Après la classe",
+    "aPiedAide": "L'arrêt le plus proche de chez vous est celui de l'école : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici."
+  },
+  "matin": {
+    "question": "Le matin, comment {prenom} se rend à l'école ?",
+    "bus": "En bus",
+    "busCourt": "Bus",
+    "busAide": "À pied jusqu'à l'arrêt le plus proche de chez vous, puis le bus jusqu'à l'école.",
+    "busAideArret": "Départ de l'arrêt {arret}, à pied depuis chez vous.",
+    "voiture": "Je l'emmène moi-même à l'école",
+    "voitureCourt": "Voiture",
+    "voitureAide": "Aucun trajet en bus vers l'école ne sera affiché ce jour-là — ni le matin, ni après le déjeuner.",
+    "relais": "Je l'emmène d'abord à la maison relais",
+    "relaisCourt": "Maison relais",
+    "relaisAide": "Vous l'y déposez avant la classe ({relais}) ; c'est ensuite le bus qui l'emmène à l'école."
+  },
+  "midi": {
+    "question": "Le midi, où déjeune {prenom} ?",
+    "maison": "À la maison",
+    "maisonCourt": "Maison",
+    "maisonAide": "Retour à midi en bus, puis retour en classe pour {heure}.",
+    "relais": "À la maison relais",
+    "relaisCourt": "Maison relais",
+    "relaisAide": "Repas sur place ({relais}) : aucun retour à la maison à midi.",
+    "sansApresMidi": "{jours} : la classe s'arrête à {heure} et il n'y a pas de déjeuner à régler. Ces journées-là se règlent à l'étape suivante."
+  },
+  "soir": {
+    "question": "Après la classe, où va {prenom} ?",
+    "bus": "À la maison, en bus",
+    "busCourt": "Bus",
+    "busAide": "Retour en bus jusqu'à l'arrêt le plus proche de chez vous.",
+    "voiture": "Je viens l'attendre à la sortie de l'école",
+    "voitureCourt": "Voiture",
+    "voitureAide": "Aucun bus de retour ne sera affiché ce jour-là.",
+    "relais": "À la maison relais, jusqu'à ce que je vienne",
+    "relaisCourt": "Maison relais",
+    "relaisAide": "Le bus l'y conduit après la classe ({relais}), et vous venez l'y chercher."
+  },
+  "semaine": {
+    "detailler": "Ce n'est pas pareil tous les jours",
+    "touteLaSemaine": "Toute la semaine"
+  },
+  "heure": {
+    "matin": "Heure d'arrivée à la maison relais",
+    "soir": "Heure à laquelle vous venez l'y chercher",
+    "detailler": "Pas la même heure tous les jours",
+    "pourJour": "Heure du {jour}"
+  },
+  "apercu": {
+    "titre": "Ce que ça donne",
+    "aide": "Heures du plan officiel, recalculées à chaque réponse. Elles ne sont pas garanties par la commune.",
+    "manquant": "Aucun bus",
+    "rien": "Rien à ce moment-là"
+  },
+  "recapitulatif": {
+    "reponses": "Ce que vous avez indiqué",
+    "semaine": "Les trajets qui en découlent",
+    "modifier": "Modifier : {moment}"
   },
   "adresse": {
     "label": "Adresse du domicile",
@@ -75,25 +141,25 @@
     "partageeFratrie": "C'est l'adresse du foyer : la changer ici la changerait aussi pour vos autres enfants.",
     "modifierPourTous": "Modifier l'adresse du foyer"
   },
-  "adresseJour": {
-    "titre": "Adresses particulières",
-    "aide": "Par défaut, l'enfant part de votre domicile et y revient. Indiquez ici les jours où ce n'est pas le cas — chez les grands-parents, chez la nounou. Chaque moment de la journée se règle séparément.",
-    "domicile": "Domicile",
-    "matin": "Part le matin de",
-    "soir": "Revient le soir à",
-    "midi": "Déjeune à",
-    "joursDerogatoires": "{nombre} jour(s) à part",
-    "auDillendapp": {
-      "matin": "Déposé au Dillendapp ce matin-là : il ne part d'aucune autre adresse.",
-      "midi": "Déjeune au Dillendapp ce jour-là.",
-      "soir": "À récupérer au Dillendapp ce soir-là : le bus ne le ramène nulle part ailleurs."
-    }
+  "adresseMoment": {
+    "matinDefaut": "Départ de votre domicile, tous les jours.",
+    "matinOuvrir": "Certains jours, le départ est ailleurs",
+    "matinTitre": "Adresse de départ, jour par jour",
+    "matinAide": "Laissez vide les jours où l'enfant part de votre domicile. Chez les grands-parents, chez la nounou : indiquez l'adresse, l'arrêt est recalculé.",
+    "midiDefaut": "Déjeuner à votre domicile.",
+    "midiOuvrir": "Certains jours, le déjeuner est ailleurs",
+    "midiTitre": "Adresse du déjeuner, jour par jour",
+    "midiAide": "Laissez vide les jours où l'enfant déjeune à votre domicile.",
+    "soirDefaut": "Retour à votre domicile, tous les jours.",
+    "soirOuvrir": "Certains jours, le retour est ailleurs",
+    "soirTitre": "Adresse de retour, jour par jour",
+    "soirAide": "Laissez vide les jours où l'enfant revient à votre domicile."
   },
   "enfant": {
     "prenom": "Prénom",
     "prenomPlaceholder": "Prénom de l'enfant",
     "cycle": "Cycle",
-    "cycleAide": "Le site scolaire est déduit du cycle. Changez le cycle à la rentrée : tout le plan se met à jour.",
+    "cycleAide": "Le cycle décide de l'école, de l'arrêt et des horaires. En cas de doute, c'est celui inscrit sur le bulletin qui fait foi.",
     "ajouter": "Ajouter un enfant",
     "supprimer": "Supprimer",
     "supprimerConfirmation": "Supprimer {prenom} ?",
@@ -113,38 +179,21 @@
     "depuisZero": "Repartir de zéro",
     "calquerSurAide": "Repas, bus, Dillendapp et adresses particulières sont repris. Tout reste modifiable à l'étape suivante, et les heures s'ajustent au cycle choisi.",
     "repriseTitre": "Configuration reprise de {prenom}",
-    "repriseDetail": "Repas, bus, Dillendapp et adresses particulières sont les mêmes. Le cycle, lui, change l'école, l'arrêt et les horaires possibles : vérifiez la semaine ci-dessous, et les heures au Dillendapp si elles ont dû être ajustées."
+    "repriseDetail": "Repas, bus, Dillendapp et adresses particulières sont les mêmes. Le cycle, lui, change l'école, l'arrêt et les horaires possibles : vérifiez la semaine ci-dessous, et les heures au Dillendapp si elles ont dû être ajustées.",
+    "cycleQuestion": "Dans quel cycle est cet enfant ?"
   },
   "repas": {
-    "titre": "Repas de midi",
-    "aide": "Réglable jour par jour : un enfant peut manger au Dillendapp le lundi et rentrer le mardi.",
-    "maison": "Rentre manger",
     "maisonCourt": "Maison",
-    "dillendapp": "Mange au Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Régler toute la semaine",
-    "sansCoursApresMidi": "Pas de cours l'après-midi",
-    "sansPeriscolaire": "Cet enfant rentre manger tous les jours. Cochez « Déjeune au Dillendapp » s'il y prend parfois son repas de midi."
+    "sansCoursApresMidi": "Pas de cours l'après-midi"
   },
   "dillendapp": {
     "titre": "Présence au Dillendapp",
-    "jusqua": "Reste jusqu'à",
     "repartEnBus": "Repart en bus",
     "aRecuperer": "À récupérer au Dillendapp",
     "recuperation": "À récupérer au Dillendapp à {heure}.",
-    "depuis": "Arrive à partir de",
     "aDeposer": "À déposer au Dillendapp",
     "depose": "À déposer au Dillendapp à {heure}.",
-    "inscriptionMidi": "Déjeune au Dillendapp",
-    "inscriptionMidiAide": "Cochez si l'enfant y prend son repas de midi, ne serait-ce qu'un jour par semaine.",
-    "inscriptionHorsMidi": "Au Dillendapp avant la classe ou après l'école",
-    "inscriptionHorsMidiAide": "Cochez si vous l'y déposez le matin, ou si vous venez l'y chercher en fin de journée. Cela se règle indépendamment du repas de midi.",
-    "blocMatin": "Le matin, avant la classe",
-    "blocMatinAide": "C'est vous qui déposez l'enfant à la maison relais : aucun bus ne part de chez vous ces matins-là. C'est ensuite le bus qui le conduit en classe.",
-    "blocSoir": "Le soir, après l'école",
-    "blocSoirAide": "L'enfant reste à la maison relais après la classe : le bus l'y dépose au lieu de le ramener chez vous, et c'est vous qui venez l'y chercher.",
-    "deposeCase": "Je le dépose ce jour-là",
-    "recupereCase": "Je viens le chercher ce jour-là",
     "bornes": "Entre {min} et {max}, selon le bus de son cycle",
     "midiObligatoire": "Ce jour-là, il n'y a pas cours l'après-midi : rester au Dillendapp suppose d'y déjeuner. Le repas de midi a été réglé en conséquence.",
     "transportTitre": "Vous ne pouvez pas venir le chercher ?",
@@ -152,14 +201,6 @@
     "transportLien": "Voir {nom}"
   },
   "bus": {
-    "titre": "Bus",
-    "aide": "Si vous déposez ou récupérez votre enfant vous-même certains jours, indiquez-le : l'application n'affichera que les trajets qu'il emprunte réellement.",
-    "pourJour": "Usage du bus le {jour}",
-    "touteLaSemaine": "Régler toute la semaine",
-    "aller-retour": "Aller et retour",
-    "aller": "Aller seulement",
-    "retour": "Retour seulement",
-    "aucun": "Pas de bus",
     "aller-retourCourt": "Aller-retour",
     "allerCourt": "Aller",
     "retourCourt": "Retour",
@@ -171,7 +212,12 @@
     "c1": "Cycle 1",
     "c2": "Cycle 2",
     "c3": "Cycle 3",
-    "c4": "Cycle 4"
+    "c4": "Cycle 4",
+    "precoceAges": "3 ans",
+    "c1Ages": "4 à 5 ans",
+    "c2Ages": "6 à 7 ans",
+    "c3Ages": "8 à 9 ans",
+    "c4Ages": "10 à 11 ans"
   },
   "jours": {
     "lundi": "Lundi",
@@ -740,7 +786,8 @@
       "retrait": "Retrait",
       "horaires": "Horaires",
       "traductions": "Textes"
-    }
+    },
+    "messageObligatoire": "Écrivez d'abord le message que les parents recevront."
   },
   "adminArrets": {
     "titre": "Position des arrêts",

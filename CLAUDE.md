@@ -35,7 +35,7 @@ la commune ni avec l'école**.
 
 | Chemin | Rôle |
 | --- | --- |
-| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
+| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `moments.ts` (la journée telle qu'un parent la décrit ↔ les champs du stockage), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
 | `src/composants/`, `src/pages/` | Affichage uniquement. Aucune règle métier. |
 | `src/data/` | Toutes les données : plan de bus, arrêts, écoles, vacances, adresses. |
 | `src/i18n/` | Dictionnaires de traduction. |

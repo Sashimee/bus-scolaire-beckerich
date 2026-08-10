@@ -42,13 +42,7 @@
   },
   "assistant": {
     "progression": "Step {etape} of {total}",
-    "enfant": "Who is this child?",
-    "adresse": "Where do they leave from in the morning?",
-    "bus": "Do they take the bus?",
-    "midi": "Where do they have lunch?",
-    "periscolaire": "What times are they at the Dillendapp?",
-    "recapitulatif": "Here is their week",
-    "terminer": "Done",
+    "terminer": "I’m done",
     "reglageFin": "Set everything on one screen",
     "reprendre": "Set up step by step",
     "situation": "What happened?",
@@ -56,7 +50,79 @@
     "quand": "When?",
     "message": "What should parents know?",
     "apercu": "Check before publishing",
-    "adresses": "Do they always leave from your home?"
+    "etapes": "Assistant steps",
+    "allerA": "Go to step {numero}: {titre}",
+    "enregistre": "Your answers are saved as you go, on this device only. You can stop and come back later.",
+    "titreEnfant": "Who is this child?",
+    "titreAdresse": "Where does {prenom} live?",
+    "titreMatin": "The morning",
+    "titreMidi": "Lunchtime",
+    "titreSoir": "After class",
+    "titreRecapitulatif": "{prenom}’s week",
+    "obstaclePrenom": "Enter the child’s first name first.",
+    "obstacleAdresse": "Choose your address first: without it, no stop can be worked out."
+  },
+  "moments": {
+    "matin": "The morning",
+    "midi": "Lunchtime",
+    "soir": "After class",
+    "aPiedAide": "The stop nearest your home is the school’s own: no bus journey is planned, so there is nothing to set here."
+  },
+  "matin": {
+    "question": "How does {prenom} get to school in the morning?",
+    "bus": "By bus",
+    "busCourt": "Bus",
+    "busAide": "On foot to the stop nearest your home, then by bus to school.",
+    "busAideArret": "From the {arret} stop, on foot from your home.",
+    "voiture": "I take them to school myself",
+    "voitureCourt": "Car",
+    "voitureAide": "No bus journey to school will be shown that day — neither in the morning nor after lunch.",
+    "relais": "I take them to the after-school centre first",
+    "relaisCourt": "After-school centre",
+    "relaisAide": "You drop them there before class ({relais}); the bus then takes them to school."
+  },
+  "midi": {
+    "question": "Where does {prenom} have lunch?",
+    "maison": "At home",
+    "maisonCourt": "Home",
+    "maisonAide": "Bus home at midday, then back to class for {heure}.",
+    "relais": "At the after-school centre",
+    "relaisCourt": "After-school centre",
+    "relaisAide": "Lunch on site ({relais}): no trip home at midday.",
+    "sansApresMidi": "{jours}: class ends at {heure} and there is no lunch to set. Those days are handled in the next step."
+  },
+  "soir": {
+    "question": "Where does {prenom} go after class?",
+    "bus": "Home, by bus",
+    "busCourt": "Bus",
+    "busAide": "Bus home to the stop nearest you.",
+    "voiture": "I collect them at the school gate",
+    "voitureCourt": "Car",
+    "voitureAide": "No return bus will be shown that day.",
+    "relais": "Stays at the after-school centre until I come",
+    "relaisCourt": "After-school centre",
+    "relaisAide": "The bus takes them there after class ({relais}), and you collect them there."
+  },
+  "semaine": {
+    "detailler": "It’s not the same every day",
+    "touteLaSemaine": "The whole week"
+  },
+  "heure": {
+    "matin": "Arrival time at the after-school centre",
+    "soir": "Time you collect them",
+    "detailler": "Not the same time every day",
+    "pourJour": "Time on {jour}"
+  },
+  "apercu": {
+    "titre": "What this gives",
+    "aide": "Times from the official plan, recalculated with every answer. They are not guaranteed by the commune.",
+    "manquant": "No bus",
+    "rien": "Nothing at that time"
+  },
+  "recapitulatif": {
+    "reponses": "What you told us",
+    "semaine": "The journeys this produces",
+    "modifier": "Change: {moment}"
   },
   "adresse": {
     "label": "Home address",
@@ -75,25 +141,25 @@
     "partageeFratrie": "This is the household address: changing it here would change it for your other children too.",
     "modifierPourTous": "Change the household address"
   },
-  "adresseJour": {
-    "titre": "Special addresses",
-    "aide": "By default the child leaves from your home and returns there. List here the days when that is not the case — at their grandparents’, at the childminder’s. Each moment of the day is set separately.",
-    "domicile": "Home",
-    "matin": "Leaves in the morning from",
-    "soir": "Returns in the evening to",
-    "midi": "Has lunch at",
-    "joursDerogatoires": "{nombre} day(s) apart",
-    "auDillendapp": {
-      "matin": "Dropped off at the Dillendapp that morning: they do not leave from any other address.",
-      "midi": "Has lunch at the Dillendapp that day.",
-      "soir": "To be collected at the Dillendapp that evening: the bus takes them nowhere else."
-    }
+  "adresseMoment": {
+    "matinDefaut": "Leaving from your home, every day.",
+    "matinOuvrir": "On some days they leave from elsewhere",
+    "matinTitre": "Departure address, day by day",
+    "matinAide": "Leave blank the days when the child leaves from your home. At their grandparents’, at the childminder’s: give the address and the stop is recalculated.",
+    "midiDefaut": "Lunch at your home.",
+    "midiOuvrir": "On some days they eat elsewhere",
+    "midiTitre": "Lunch address, day by day",
+    "midiAide": "Leave blank the days when the child has lunch at your home.",
+    "soirDefaut": "Returning to your home, every day.",
+    "soirOuvrir": "On some days they return elsewhere",
+    "soirTitre": "Return address, day by day",
+    "soirAide": "Leave blank the days when the child returns to your home."
   },
   "enfant": {
     "prenom": "First name",
     "prenomPlaceholder": "Child's first name",
     "cycle": "Cycle",
-    "cycleAide": "The school site follows from the cycle. Change the cycle at the start of the school year and the whole plan updates itself.",
+    "cycleAide": "The cycle determines the school, the stop and the times. If in doubt, the cycle on the school report is the one that counts.",
     "ajouter": "Add a child",
     "supprimer": "Delete",
     "supprimerConfirmation": "Delete {prenom}?",
@@ -113,38 +179,21 @@
     "depuisZero": "Start from scratch",
     "calquerSurAide": "Lunch, bus, Dillendapp and special addresses are carried over. Everything stays editable in the next step, and times adjust to the chosen cycle.",
     "repriseTitre": "Setup carried over from {prenom}",
-    "repriseDetail": "Lunch, bus, Dillendapp and special addresses are the same. The cycle, however, changes the school, the stop and the possible times: check the week below, and the Dillendapp times if they had to be adjusted."
+    "repriseDetail": "Lunch, bus, Dillendapp and special addresses are the same. The cycle, however, changes the school, the stop and the possible times: check the week below, and the Dillendapp times if they had to be adjusted.",
+    "cycleQuestion": "Which cycle is this child in?"
   },
   "repas": {
-    "titre": "Lunch",
-    "aide": "Set day by day: a child can eat at the Dillendapp on Monday and come home on Tuesday.",
-    "maison": "Comes home for lunch",
     "maisonCourt": "Home",
-    "dillendapp": "Eats at the Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Set the whole week",
-    "sansCoursApresMidi": "No afternoon classes",
-    "sansPeriscolaire": "This child comes home for lunch every day. Tick “Has lunch at the Dillendapp” if they sometimes eat there."
+    "sansCoursApresMidi": "No afternoon classes"
   },
   "dillendapp": {
     "titre": "Time at the Dillendapp",
-    "jusqua": "Stays until",
     "repartEnBus": "Takes the bus home",
     "aRecuperer": "To collect from the Dillendapp",
     "recuperation": "To collect from the Dillendapp at {heure}.",
-    "depuis": "Arrives from",
     "aDeposer": "To drop off at the Dillendapp",
     "depose": "To drop off at the Dillendapp at {heure}.",
-    "inscriptionMidi": "Has lunch at the Dillendapp",
-    "inscriptionMidiAide": "Tick this if the child eats lunch there, even just one day a week.",
-    "inscriptionHorsMidi": "At the Dillendapp before class or after school",
-    "inscriptionHorsMidiAide": "Tick this if you drop them off in the morning, or pick them up at the end of the day. This is set independently of lunch.",
-    "blocMatin": "In the morning, before class",
-    "blocMatinAide": "You drop the child off at the after-school centre yourself: no bus leaves from your home on those mornings. The bus then takes them to class.",
-    "blocSoir": "In the evening, after school",
-    "blocSoirAide": "The child stays at the after-school centre after class: the bus drops them there instead of bringing them home, and you collect them there.",
-    "deposeCase": "I drop them off that day",
-    "recupereCase": "I collect them that day",
     "bornes": "Between {min} and {max}, depending on their cycle’s bus",
     "midiObligatoire": "There are no afternoon classes that day: staying at the Dillendapp means having lunch there. Lunch has been set accordingly.",
     "transportTitre": "Can't come and collect them?",
@@ -152,14 +201,6 @@
     "transportLien": "See {nom}"
   },
   "bus": {
-    "titre": "Bus",
-    "aide": "If you drop off or pick up your child yourself on some days, say so here: the app will then only show the journeys they actually take.",
-    "pourJour": "Bus use on {jour}",
-    "touteLaSemaine": "Set the whole week",
-    "aller-retour": "There and back",
-    "aller": "Outward only",
-    "retour": "Return only",
-    "aucun": "No bus",
     "aller-retourCourt": "Both ways",
     "allerCourt": "Outward",
     "retourCourt": "Return",
@@ -171,7 +212,12 @@
     "c1": "Cycle 1",
     "c2": "Cycle 2",
     "c3": "Cycle 3",
-    "c4": "Cycle 4"
+    "c4": "Cycle 4",
+    "precoceAges": "3 years old",
+    "c1Ages": "4 to 5 years old",
+    "c2Ages": "6 to 7 years old",
+    "c3Ages": "8 to 9 years old",
+    "c4Ages": "10 to 11 years old"
   },
   "jours": {
     "lundi": "Monday",
@@ -740,7 +786,8 @@
       "retrait": "Withdrawn",
       "horaires": "Timetable",
       "traductions": "Wording"
-    }
+    },
+    "messageObligatoire": "Write the message parents will receive first."
   },
   "adminArrets": {
     "titre": "Stop positions",

@@ -901,6 +901,17 @@
     padding: 0;
   }
 
+  /*
+   * La question elle-même, et non le libellé d'un champ. Elle porte l'écran : à la
+   * taille d'un libellé ordinaire, elle se lisait comme l'étiquette de la première
+   * option, et le parent croyait devoir répondre à autre chose.
+   */
+  .legende--question {
+    font-size: var(--texte-xl);
+    font-weight: 700;
+    color: var(--encre);
+  }
+
   /* --- Autocomplétion d'adresse ----------------------------------------------- */
   .suggestions {
     list-style: none;
@@ -1025,26 +1036,155 @@
 
   /*
    * Progression de l'assistant : une barre par étape, remplie jusqu'à l'étape
-   * courante. Purement décorative — le compte « étape 2 sur 6 » l'accompagne en
-   * toutes lettres, et c'est lui que lisent les lecteurs d'écran.
+   * courante — et cliquable. Revenir sur une réponse déjà donnée est le geste le plus
+   * fréquent d'un assistant ; il ne se faisait qu'en reculant écran par écran.
+   *
+   * Les étapes se replient sur deux rangées plutôt que de se resserrer sous 44 px :
+   * une cible tactile ne se négocie pas contre une ligne plus jolie.
    */
   .progression {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--espace-1);
   }
 
+  .progression > li {
+    flex: 1 1 var(--cible);
+    display: flex;
+  }
+
   .progression__pas {
-    flex: 1 1 0;
+    flex: 1 1 auto;
+    min-inline-size: var(--cible);
+    min-block-size: var(--cible);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espace-1);
+    padding: 0 var(--espace-1);
+    border: 0;
+    background: none;
+    border-radius: var(--rayon-s);
+    color: var(--encre-douce);
+    font-size: var(--texte-xs);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  /* Le repère de progression proprement dit, au-dessus du numéro. */
+  .progression__pas::before {
+    content: '';
+    align-self: stretch;
     block-size: 4px;
     border-radius: 999px;
     background: var(--bord);
   }
 
-  .progression__pas--fait {
+  .progression__pas--fait::before {
     background: var(--accent);
+  }
+
+  .progression__pas[aria-current='step'] {
+    color: var(--encre);
+  }
+
+  .progression__pas:not(:disabled):hover {
+    background: var(--surface);
+    color: var(--encre);
+  }
+
+  .progression__pas:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  /*
+   * --- Réponses en cartes ------------------------------------------------------
+   *
+   * Une liste déroulante cache ses options tant qu'on ne l'ouvre pas : il faut deviner
+   * qu'il y a un choix, puis comparer les réponses de mémoire. Posées à plat, chacune
+   * avec sa conséquence écrite dessous, elles se lisent d'un coup d'œil — et la cible
+   * tactile devient la carte entière au lieu du seul bouton radio.
+   */
+  .choix {
+    display: grid;
+    gap: var(--espace-2);
+  }
+
+  .choix__option {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--espace-3);
+    min-block-size: var(--cible);
+    padding: var(--espace-3);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-m);
+    background: var(--fond-creux);
+    cursor: pointer;
+    transition:
+      background 0.16s var(--sortie),
+      border-color 0.16s var(--sortie);
+  }
+
+  .choix__option:hover {
+    background: var(--surface-haute);
+  }
+
+  .choix__option:has(input:checked) {
+    background: var(--surface-accent);
+    border-color: var(--bord-accent);
+    box-shadow: inset 0 0 0 var(--trait) var(--bord-accent);
+  }
+
+  .choix__option input[type='radio'] {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    margin-block-start: 0.1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .choix__texte {
+    display: grid;
+    gap: var(--espace-1);
+  }
+
+  .choix__libelle {
+    font-size: var(--texte-l);
+    font-weight: 600;
+  }
+
+  .choix__option:has(input:checked) .choix__libelle {
+    font-weight: 700;
+  }
+
+  /*
+   * Récapitulatif d'une journée : le moment à gauche, la réponse à droite. C'est le
+   * seul endroit où l'on vérifie « j'ai bien dit qu'il mange à la maison le mercredi »
+   * sans relire cinq écrans.
+   */
+  .recapitulatif {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--espace-1) var(--espace-3);
+    margin: 0;
+  }
+
+  .recapitulatif dt {
+    color: var(--encre-douce);
+    font-size: var(--texte-s);
+  }
+
+  .recapitulatif dd {
+    margin: 0;
+    font-size: var(--texte-m);
+    font-weight: 600;
   }
 
   /* Case à cocher lisible, avec sa cible tactile et son aide sous le libellé. */
@@ -1483,6 +1623,16 @@
    * DILLENDAPP » en petites capitales espacées se lit deux fois plus lentement qu'en
    * bas de casse.
    */
+  /*
+   * Une étiquette qui peut passer à la ligne. « À déposer au Dillendapp · 07:00 » en
+   * capitales espacées mesure 230 px insécables : dans une colonne de 330, elle
+   * poussait toute la page hors de l'écran sans qu'aucun élément ne paraisse trop
+   * large — c'est la largeur minimale du texte qui débordait, pas sa boîte.
+   */
+  .etiquette--souple {
+    white-space: normal;
+  }
+
   .etiquette--heure {
     font-family: var(--police-chiffres);
     font-size: var(--texte-s);

@@ -42,13 +42,7 @@
   },
   "assistant": {
     "progression": "Schrëtt {etape} vu {total}",
-    "enfant": "Wien ass dëst Kand?",
-    "adresse": "Vu wou fiert et moies fort?",
-    "bus": "Hëlt et de Bus?",
-    "midi": "Wou ësst et mëttes?",
-    "periscolaire": "Zu wéi engen Zäiten ass et am Dillendapp?",
-    "recapitulatif": "Dat ass seng Woch",
-    "terminer": "Fäerdeg",
+    "terminer": "Ech si fäerdeg",
     "reglageFin": "Alles op enger Säit astellen",
     "reprendre": "Schrëtt fir Schrëtt astellen",
     "situation": "Wat ass geschitt?",
@@ -56,7 +50,79 @@
     "quand": "Wéini?",
     "message": "Wat solle d'Elteren erfueren?",
     "apercu": "Virum Publizéiere nokucken",
-    "adresses": "Fiert et ëmmer vun doheem fort?"
+    "etapes": "Schrëtt vum Assistent",
+    "allerA": "Op Schrëtt {numero}: {titre}",
+    "enregistre": "Är Äntwerte ginn lafend gespäichert, nëmmen op dësem Apparat. Dir kënnt ophalen a méi spéit weiderfueren.",
+    "titreEnfant": "Wien ass dëst Kand?",
+    "titreAdresse": "Wou wunnt {prenom}?",
+    "titreMatin": "De Moien",
+    "titreMidi": "De Mëtteg",
+    "titreSoir": "Nom Cours",
+    "titreRecapitulatif": "D'Woch vum {prenom}",
+    "obstaclePrenom": "Gitt fir d'éischt de Virnumm vum Kand un.",
+    "obstacleAdresse": "Wielt fir d'éischt Är Adress: ouni si kann keng Statioun berechent ginn."
+  },
+  "moments": {
+    "matin": "De Moien",
+    "midi": "De Mëtteg",
+    "soir": "Nom Cours",
+    "aPiedAide": "Déi nooste Statioun ass déi vun der Schoul: et ass keng Busfaart virgesinn, hei ass also näischt anzestellen."
+  },
+  "matin": {
+    "question": "Wéi kënnt {prenom} moies an d'Schoul?",
+    "bus": "Mam Bus",
+    "busCourt": "Bus",
+    "busAide": "Zu Fouss bis bei déi nooste Statioun, dann mam Bus an d'Schoul.",
+    "busAideArret": "Vun der Statioun {arret} un, zu Fouss vun doheem.",
+    "voiture": "Ech bréngen et selwer an d'Schoul",
+    "voitureCourt": "Auto",
+    "voitureAide": "Deen Dag gëtt keng Busfaart an d'Schoul ugewisen — weder moies nach nom Mëttegiessen.",
+    "relais": "Ech bréngen et fir d'éischt an d'Maison Relais",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "Dir bréngt et virum Cours dohinner ({relais}); duerno bréngt de Bus et an d'Schoul."
+  },
+  "midi": {
+    "question": "Wou ësst {prenom} mëttes?",
+    "maison": "Doheem",
+    "maisonCourt": "Doheem",
+    "maisonAide": "Mëttes mam Bus heem, duerno zréck an d'Klass fir {heure}.",
+    "relais": "An der Maison Relais",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "Iessen op der Plaz ({relais}): mëttes keng Faart heem.",
+    "sansApresMidi": "{jours}: de Cours hält um {heure} op, et ass kee Mëttegiessen anzestellen. Déi Deeg ginn am nächste Schrëtt geregelt."
+  },
+  "soir": {
+    "question": "Wou geet {prenom} nom Cours hin?",
+    "bus": "Heem, mam Bus",
+    "busCourt": "Bus",
+    "busAide": "Zréck mam Bus bis bei déi nooste Statioun.",
+    "voiture": "Ech kommen et an der Schoul sichen",
+    "voitureCourt": "Auto",
+    "voitureAide": "Deen Dag gëtt keng Réckfaart mam Bus ugewisen.",
+    "relais": "An d'Maison Relais, bis ech kommen",
+    "relaisCourt": "Maison Relais",
+    "relaisAide": "De Bus bréngt et nom Cours dohinner ({relais}), an Dir kommt et do sichen."
+  },
+  "semaine": {
+    "detailler": "Net all Dag d'selwecht",
+    "touteLaSemaine": "Ganz Woch"
+  },
+  "heure": {
+    "matin": "Ukunftszäit an der Maison Relais",
+    "soir": "Zäit, wou Dir et sichen kommt",
+    "detailler": "Net all Dag zur selwechter Zäit",
+    "pourJour": "Zäit {jour}"
+  },
+  "apercu": {
+    "titre": "Dat kënnt dobäi eraus",
+    "aide": "Zäite vum offizielle Plang, bei all Äntwert nei berechent. Si sinn net vun der Gemeng garantéiert.",
+    "manquant": "Kee Bus",
+    "rien": "Zu deem Moment näischt"
+  },
+  "recapitulatif": {
+    "reponses": "Wat Dir uginn hutt",
+    "semaine": "D'Faarten, déi doraus erginn",
+    "modifier": "Änneren: {moment}"
   },
   "adresse": {
     "label": "Wunnadress",
@@ -75,25 +141,25 @@
     "partageeFratrie": "Dat ass d’Adress vum Stot: se hei z’änneren géif se och fir Är aner Kanner änneren.",
     "modifierPourTous": "Adress vum Stot änneren"
   },
-  "adresseJour": {
-    "titre": "Besonnesch Adressen",
-    "aide": "Standardméisseg fiert d’Kand vun Ärem Wunnsëtz fort a kënnt do zréck. Gitt hei d’Deeg un, wou dat net de Fall ass — bei de Grousselteren, bei der Nounou. All Moment vum Dag gëtt getrennt agestallt.",
-    "domicile": "Doheem",
-    "matin": "Fiert moies fort vun",
-    "soir": "Kënnt owes zréck op",
-    "midi": "Ësst mëttes bei",
-    "joursDerogatoires": "{nombre} Dag/Deeg anescht",
-    "auDillendapp": {
-      "matin": "Dee Moie an den Dillendapp bruecht: et fiert vu kenger anerer Adress fort.",
-      "midi": "Ësst deen Dag am Dillendapp.",
-      "soir": "Deen Owend am Dillendapp ofzehuelen: de Bus bréngt et néierens anescht hin."
-    }
+  "adresseMoment": {
+    "matinDefaut": "Offaart vun Ärem Wunnsëtz, all Dag.",
+    "matinOuvrir": "Un e puer Deeg ass de Startpunkt en aneren",
+    "matinTitre": "Startadress, Dag fir Dag",
+    "matinAide": "Loosst d'Deeg eidel, wou d'Kand vun Ärem Wunnsëtz fortfiert. Bei de Grousselteren, bei der Nounou: gitt d'Adress un, d'Statioun gëtt nei berechent.",
+    "midiDefaut": "Mëttegiessen bei Iech doheem.",
+    "midiOuvrir": "Un e puer Deeg ësst et anzwousch anescht",
+    "midiTitre": "Adress vum Mëttegiessen, Dag fir Dag",
+    "midiAide": "Loosst d'Deeg eidel, wou d'Kand bei Iech doheem ësst.",
+    "soirDefaut": "Zréck op Äre Wunnsëtz, all Dag.",
+    "soirOuvrir": "Un e puer Deeg ass d'Zil en anert",
+    "soirTitre": "Réckadress, Dag fir Dag",
+    "soirAide": "Loosst d'Deeg eidel, wou d'Kand bei Iech zréckkënnt."
   },
   "enfant": {
     "prenom": "Virnumm",
     "prenomPlaceholder": "Virnumm vum Kand",
     "cycle": "Cycle",
-    "cycleAide": "De Schoulstanduert ergëtt sech aus dem Cycle. Ännert de Cycle bei der Rentrée: de ganze Plang passt sech un.",
+    "cycleAide": "De Cycle bestëmmt d'Schoul, d'Statioun an d'Zäiten. Am Zweiwel gëllt dee Cycle, deen um Bulletin steet.",
     "ajouter": "Kand derbäisetzen",
     "supprimer": "Läschen",
     "supprimerConfirmation": "{prenom} läschen?",
@@ -113,38 +179,21 @@
     "depuisZero": "Bei null ufänken",
     "calquerSurAide": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse ginn iwwerholl. Alles bleift am nächste Schrëtt änderbar, an d'Auerzäite passe sech dem gewielte Cycle un.",
     "repriseTitre": "Astellunge vu {prenom} iwwerholl",
-    "repriseDetail": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse sinn déiselwecht. De Cycle ännert dogéint d'Schoul, den Arrêt an déi méiglech Auerzäiten: kuckt d'Woch hei ënnen no, an d'Dillendapp-Zäiten, wa se ugepasst goufen."
+    "repriseDetail": "Mëttegiessen, Bus, Dillendapp a besonnesch Adresse sinn déiselwecht. De Cycle ännert dogéint d'Schoul, den Arrêt an déi méiglech Auerzäiten: kuckt d'Woch hei ënnen no, an d'Dillendapp-Zäiten, wa se ugepasst goufen.",
+    "cycleQuestion": "An wéi engem Cycle ass dëst Kand?"
   },
   "repas": {
-    "titre": "Mëttegiessen",
-    "aide": "Dag fir Dag astellbar: e Kand kann méindes am Dillendapp iessen an dënschdes heemfueren.",
-    "maison": "Fiert heem iessen",
     "maisonCourt": "Doheem",
-    "dillendapp": "Ësst am Dillendapp",
     "dillendappCourt": "Dillendapp",
-    "touteLaSemaine": "Ganz Woch astellen",
-    "sansCoursApresMidi": "Kee Cours nomëttes",
-    "sansPeriscolaire": "Dëst Kand ësst all Dag doheem. Kräizt « Ësst mëttes am Dillendapp » un, wann et do heiansdo säi Mëttegiessen hëlt."
+    "sansCoursApresMidi": "Kee Cours nomëttes"
   },
   "dillendapp": {
     "titre": "Präsenz am Dillendapp",
-    "jusqua": "Bleift bis",
     "repartEnBus": "Fiert mam Bus",
     "aRecuperer": "Am Dillendapp ofzehuelen",
     "recuperation": "Um {heure} am Dillendapp ofzehuelen.",
-    "depuis": "Kënnt un ab",
     "aDeposer": "An den Dillendapp bréngen",
     "depose": "Um {heure} an den Dillendapp bréngen.",
-    "inscriptionMidi": "Ësst mëttes am Dillendapp",
-    "inscriptionMidiAide": "Ukräizen, wann d’Kand do säi Mëttegiessen hëlt, och wann et nëmmen een Dag d’Woch ass.",
-    "inscriptionHorsMidi": "Am Dillendapp virun der Klass oder no der Schoul",
-    "inscriptionHorsMidiAide": "Ukräizen, wann Dir et moies dohinner bréngt, oder wann Dir et owes do sichen kommt. Dat gëtt onofhängeg vum Mëttegiessen agestallt.",
-    "blocMatin": "Moies, virun der Klass",
-    "blocMatinAide": "Dir bréngt d’Kand selwer an d’Maison Relais: déi Moiessen fiert kee Bus bei Iech fort. Duerno bréngt de Bus et an d’Klass.",
-    "blocSoir": "Owes, no der Schoul",
-    "blocSoirAide": "D’Kand bleift nom Cours an der Maison Relais: de Bus setzt et do of, amplaz et heem ze bréngen, an Dir kommt et do sichen.",
-    "deposeCase": "Ech bréngen et deen Dag",
-    "recupereCase": "Ech kommen et deen Dag sichen",
     "bornes": "Tëscht {min} an {max}, jee no Bus vu sengem Cycle",
     "midiObligatoire": "Deen Dag ass kee Cours nomëttes: am Dillendapp ze bleiwen heescht, do ze iessen. D’Mëttegiessen gouf deementspriechend agestallt.",
     "transportTitre": "Kënnt Dir et net sichen?",
@@ -152,14 +201,6 @@
     "transportLien": "{nom} kucken"
   },
   "bus": {
-    "titre": "Bus",
-    "aide": "Wann Dir Äert Kand un e puer Deeg selwer bréngt oder ofhëlt, gitt et hei un: d'App weist dann nëmmen d'Fahrten, déi et wierklech hëlt.",
-    "pourJour": "Busnotzung {jour}",
-    "touteLaSemaine": "Ganz Woch astellen",
-    "aller-retour": "Hin an zréck",
-    "aller": "Nëmmen hin",
-    "retour": "Nëmmen zréck",
-    "aucun": "Kee Bus",
     "aller-retourCourt": "Hin/zréck",
     "allerCourt": "Hin",
     "retourCourt": "Zréck",
@@ -171,7 +212,12 @@
     "c1": "Cycle 1",
     "c2": "Cycle 2",
     "c3": "Cycle 3",
-    "c4": "Cycle 4"
+    "c4": "Cycle 4",
+    "precoceAges": "3 Joer",
+    "c1Ages": "4 bis 5 Joer",
+    "c2Ages": "6 bis 7 Joer",
+    "c3Ages": "8 bis 9 Joer",
+    "c4Ages": "10 bis 11 Joer"
   },
   "jours": {
     "lundi": "Méindeg",
@@ -740,7 +786,8 @@
       "retrait": "Réckzuch",
       "horaires": "Fahrplang",
       "traductions": "Texter"
-    }
+    },
+    "messageObligatoire": "Schreift fir d'éischt d'Noriicht, déi d'Elteren kréien."
   },
   "adminArrets": {
     "titre": "Positioun vun de Statiounen",

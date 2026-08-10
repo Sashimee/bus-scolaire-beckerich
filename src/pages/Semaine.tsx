@@ -7,7 +7,8 @@ import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { FicheImprimable } from '../composants/FicheImprimable'
 import { datesDeLaSemaine } from '../lib/calendrier'
-import { semaineEnfant } from '../lib/plan'
+import { coursApresMidi, semaineEnfant } from '../lib/plan'
+import { matinDuJour, midiDuJour, soirDuJour } from '../lib/moments'
 import { distanceLisible, nomArret } from '../lib/affichage'
 import { siteDuCycle, transportALaDemande } from '../lib/donnees'
 import { JOURS } from '../lib/types'
@@ -148,12 +149,12 @@ export function Semaine() {
                 <span className="texte-fort">{t(`jours.${jour}`)}</span>
                 <span className="rangee">
                   {depose && (
-                    <span className="etiquette">
+                    <span className="etiquette etiquette--souple">
                       {t('dillendapp.aDeposer')} · {depose}
                     </span>
                   )}
                   {recuperation && (
-                    <span className="etiquette">
+                    <span className="etiquette etiquette--souple">
                       {t('dillendapp.aRecuperer')} · {recuperation}
                     </span>
                   )}
@@ -185,14 +186,23 @@ export function Semaine() {
         const journee = semaine.find((j) => j.jour === jour)!
         return (
           <section className="carte pile pile--serre" key={jour}>
+            {/*
+                Ce qui distingue ce jour-là des autres, dans les mots mêmes de
+                l'assistant. Une étiquette par moment qui s'écarte du cas courant —
+                bus, repas à la maison, bus — et rien quand la journée est ordinaire :
+                cinq badges identiques cinq jours de suite n'apprenaient rien.
+            */}
             <div className="rangee rangee--espacee">
               <h3 className="titre-carte">{t(`jours.${jour}`)}</h3>
               <span className="rangee">
-                <span className="etiquette">{t(`repas.${enfant.repas[jour]}Court`)}</span>
-                {(enfant.bus?.[jour] ?? 'aller-retour') !== 'aller-retour' && (
-                  <span className="etiquette">
-                    {t(`bus.${enfant.bus?.[jour] ?? 'aller-retour'}Court`)}
-                  </span>
+                {matinDuJour(enfant, jour) !== 'bus' && (
+                  <span className="etiquette">{t(`matin.${matinDuJour(enfant, jour)}Court`)}</span>
+                )}
+                {coursApresMidi(jour) && midiDuJour(enfant, jour) !== 'maison' && (
+                  <span className="etiquette">{t(`midi.${midiDuJour(enfant, jour)}Court`)}</span>
+                )}
+                {soirDuJour(enfant, jour) !== 'bus' && (
+                  <span className="etiquette">{t(`soir.${soirDuJour(enfant, jour)}Court`)}</span>
                 )}
               </span>
             </div>

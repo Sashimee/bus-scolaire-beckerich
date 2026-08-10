@@ -16,7 +16,7 @@ principes du projet : aucune donnée personnelle ne quitte l'appareil, et l'appl
 ce qu'elle ne sait pas plutôt que de deviner.
 
 Le travail est découpé en lots indépendants, lançables un par un — 13 à l'origine,
-17 depuis les retours d'usage. Chaque lot est autonome : il compile, passe les tests et
+20 depuis les retours d'usage. Chaque lot est autonome : il compile, passe les tests et
 peut être déployé seul. Les dépendances entre lots sont indiquées explicitement.
 
 ### Décisions déjà prises
@@ -67,6 +67,8 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R28~~ | 19 | ~~Le pied de page collé en bas n'a pas été vu sur iPhone.~~ **Levée le 2026-08-10** : vérifié sous Safari iOS par l'auteur, avec le reste des écrans du lot. |
 | ~~R29~~ | 19 | ~~La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.~~ **Levée le 2026-08-10** : la feuille est sortie sur une seule page — le conteneur souple et la hauteur minimale en hauteur de fenêtre n'ont ajouté aucune feuille. Le débordement constaté le même jour avait une tout autre cause, voir R1. |
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
+| R33 | 20 | **Aucun parent n'a parcouru le nouvel assistant.** La refonte répond à un défaut d'usage réel, mais elle n'a été éprouvée que par les tests et la mesure DOM. Le pari central — qu'une question par moment de la journée se comprenne mieux que cinq grilles par champ — ne se vérifie qu'en regardant quelqu'un s'en servir sans aide. | Faire configurer un enfant, de bout en bout, par un parent qui ne connaît pas l'application, sans commenter. Noter chaque endroit où il hésite. |
+| R34 | 20 | **Les réponses en cartes reposent sur `:has()`.** L'état coché se voit à trois signes : le bouton radio lui-même, le fond teinté et la bordure d'accent. Les deux derniers viennent de `.choix__option:has(input:checked)`. Sur un moteur sans `:has()`, seul le bouton radio distinguerait la réponse retenue — lisible, mais bien plus discret que prévu. Safari le gère depuis 15.4, Chrome depuis 105 ; aucune vérification n'a été faite sur un moteur plus ancien. | Ouvrir l'assistant sur le plus vieil appareil accessible et vérifier que la carte cochée est teintée. À défaut, ajouter un repli sur le sélecteur frère `input:checked + .choix__texte`. |
 | R32 | 19 | **Un débordement de la feuille du foyer ne se voit pas.** WebKit a coupé le vendredi au bas de la page en annonçant « Page 1 sur 1 » : un contenu trop haut n'y produit pas une seconde feuille mais une troncature silencieuse. Le banc mesure désormais 222 mm pour un foyer réel et 236 mm pour le pire cas, sur 273 — la marge est confortable, mais rien dans l'application ne préviendra si elle est un jour reprise. | Rien à faire tant que la marge tient. Si la feuille se charge encore (une sixième langue, un plan plus dense), remesurer au banc **avant** d'imprimer : la feuille, elle, ne se plaindra pas. |
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
@@ -1760,6 +1762,99 @@ Voir R20, rayée.
 > utiles. Colonnes vérifiées à 22 / 54,6 / 54,6 / 54,6 mm.
 
 *Dépend des lots 7 et 18. Lève R25 et R29, rouvre R1 avec sa cause, ouvre R32.*
+
+---
+
+## Lot 20 — Les réglages d'un enfant, refaits autour de sa journée (2026-08-10)
+
+> **Fait le 2026-08-10.** Demande de l'auteur après usage : l'assistant n'était pas
+> intuitif. Le diagnostic n'était pas cosmétique — l'assistant demandait au parent de
+> **penser comme le stockage**.
+>
+> Sept écrans organisés par CHAMP : le prénom, l'adresse, l'usage du bus (quatre valeurs
+> dans une liste déroulante, cinq jours), deux cases d'inscription au Dillendapp posées
+> au-dessus d'une grille de repas, dix cases et dix champs d'heure, puis quinze champs
+> d'adresse dépliés d'office. Une même situation réelle — « je le dépose à la maison
+> relais le matin » — se déclarait à trois endroits sans rapport visible : une case, une
+> heure, et un usage du bus qu'il fallait penser à réduire. Rien ne disait qu'ils
+> parlaient de la même chose, et rien ne montrait ce que la réponse produisait avant le
+> septième écran.
+>
+> **Six écrans, organisés par MOMENT de la journée** : qui est-ce, où habite-t-il, le
+> matin, le midi, après la classe, la semaine obtenue. Trois questions, trois réponses,
+> dans les mots d'un parent :
+>
+> | Moment | Réponses proposées |
+> | --- | --- |
+> | Le matin | en bus · je l'emmène à l'école · je l'emmène d'abord à la maison relais |
+> | Le midi | à la maison · à la maison relais |
+> | Après la classe | à la maison en bus · je viens l'attendre · à la maison relais |
+>
+> Écarts et décisions :
+>
+> - **`src/lib/moments.ts`, nouveau module pur et testé.** Il traduit dans les deux sens
+>   entre une réponse de parent et les champs du stockage (`bus`, `repas`,
+>   `dillendappDepuis`, `dillendappJusqua`, `adresses`), et ferme les contradictions.
+>   C'est le seul endroit où la traduction se fait : les écrans posent une question et
+>   écrivent une réponse, ils ne composent plus trois réglages pour exprimer une
+>   situation. `sansAdresse` a quitté `etat.tsx` pour y vivre, et `etat.tsx` n'expose
+>   plus que `definirMatin`, `definirMidi`, `definirSoir` et les deux heures — huit
+>   actions de champ ont disparu.
+> - **Les deux cases d'inscription au Dillendapp ne se cochent plus : elles se déduisent.**
+>   `periscolaireMidi` et `periscolaireHorsMidi` restent enregistrés — `deduireInscriptions`
+>   et les liens de partage les lisent — mais sont recalculés à chaque écriture depuis ce
+>   que le parent a réellement décrit. Un parent pouvait être « inscrit » sans y déjeuner
+>   un seul jour.
+> - **La question du midi ne se pose que les jours avec cours l'après-midi.** Les autres,
+>   la classe s'arrête à 11:45 : le repas n'est plus une étape de la journée mais sa fin,
+>   et c'est la question du soir qui le règle — répondre à la fois « mange à la maison »
+>   et « reste à la maison relais » un mardi n'a jamais eu de sens. L'écran du midi le dit
+>   au lieu de laisser croire à un oubli.
+> - **La grille des cinq jours ne s'affiche plus par défaut.** Une seule réponse, en
+>   grand ; « Ce n'est pas pareil tous les jours » ouvre la grille. Une semaine déjà
+>   irrégulière l'ouvre d'elle-même — repliée, la réponse affichée en gros mentirait
+>   quatre jours sur cinq. Même principe pour les heures de présence, une pour la semaine
+>   au lieu de dix champs.
+> - **Les adresses dérogatoires sont réparties dans les trois moments**, repliées, et
+>   proposées seulement les jours où elles veulent dire quelque chose. Elles formaient un
+>   écran de quinze champs sans rapport visible avec le reste.
+> - **Un aperçu sous chaque question** : les heures réelles du plan, jour par jour,
+>   recalculées à la seconde où l'on répond, avec les déplacements que le plan ne couvre
+>   pas. Le parent réglait à l'aveugle et n'apprenait qu'au bout de l'assistant si son
+>   enfant avait un bus.
+> - **Les étapes sont fixes et cliquables.** Aucune ne se dérobe plus selon les réponses
+>   — la prop `total` de la coquille, qui compensait l'étape fuyante du lot 14, a
+>   disparu. Un bouton grisé porte désormais la phrase qui dit ce qui manque.
+> - **`/configurer` empile les mêmes trois sections.** Une seule définition, comme au
+>   lot 5 : aucune dérive possible entre le réglage guidé et le réglage fin.
+>   `GrilleSemaine.tsx` est remplacé par `Moments.tsx` et `ChoixSemaine.tsx`.
+> - **Les listes déroulantes cèdent la place à des cartes-réponses.** Un `select` cache
+>   ses options tant qu'on ne l'ouvre pas ; posées à plat avec leur conséquence écrite
+>   dessous, elles se lisent d'un coup d'œil, et la cible tactile devient la carte entière.
+>   Le cycle se choisit de la même façon, avec l'âge et l'école en dessous.
+> - **La fiche de l'enfant parle la même langue** : une étiquette par moment qui s'écarte
+>   du cas courant, au lieu d'un badge de repas répété cinq fois.
+> - **Écart assumé** : `UsageBus` n'a pas été étendu. « Je l'emmène le matin » retire donc
+>   aussi le retour en classe de 14:00, faute d'un modèle qui distingue les deux allers.
+>   Ce n'est pas nouveau, mais la réponse est maintenant en tête d'écran : la conséquence
+>   est écrite en toutes lettres sous l'option, ce qui est le seul remède sans changer le
+>   modèle et le format des liens de partage.
+> - **Défaut trouvé et corrigé à la mesure** : « À DÉPOSER AU DILLENDAPP · 07:00 » en
+>   capitales espacées mesure 230 px insécables. Dans une colonne de 330, cela poussait
+>   toute la page hors de l'écran — sans qu'aucun élément ne paraisse trop large, puisque
+>   c'est la largeur *minimale* du texte qui débordait. D'où `.etiquette--souple`.
+>
+> Vérifié : 396 tests (dont 13 nouveaux sur `moments.ts`, qui éprouve chaque situation
+> deux fois — telle que l'écran la relit et telle que `plan.ts` la calcule — et 11 sur
+> l'assistant monté en entier) ; mesures DOM à 386 px sur les six étapes, sur la grille
+> jour par jour dépliée, sur le bloc d'adresses ouvert, sur `/configurer` déplié et sur
+> la fiche : aucun débordement, aucune cible sous 44 px hors contrôles Leaflet.
+> Contraste de l'encre douce sur une carte-réponse cochée calculé sur la composition
+> réelle : 5,70:1 en clair, 5,67:1 en sombre.
+>
+> **Réserves** : R33, R34.
+
+*Dépend des lots 4, 5 et 14, qu'il remplace pour la partie « réglages d'un enfant ».*
 
 ---
 
