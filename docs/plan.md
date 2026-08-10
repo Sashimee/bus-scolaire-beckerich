@@ -71,12 +71,24 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
-### Mise en service, non faite
+### Mise en service — faite
 
-L'espace commune est écrit mais **pas activé**. Tant que `SECRET_SESSION` est absent,
-les routes `/commune/*` répondent 503 et `/commune` affiche « non activé » — ce qui est
-le comportement voulu, mais signifie que les lots 8 et 9 ne rendent aucun service pour
-l'instant.
+Tout est en service. **Vérifié le 2026-08-10** sur `/sante` du Worker déployé :
+
+```
+{"ok":true,"oauth":true,"push":true,"commune":true,"google":true,
+ "depot":{"urgences":"ok","traductions":"ok"},"rappels":true}
+```
+
+L'espace commune a été exercé de bout en bout par l'auteur : connexion par code d'agent,
+assistant de publication, alerte réellement publiée. `VITE_URL_WORKER` et
+`VITE_ID_CLIENT_GOOGLE` sont posés en variables de dépôt et passés à la construction —
+la CSP de la page publiée porte bien l'origine du Worker, ce qui le prouve de l'extérieur.
+
+Cette section a annoncé le contraire pendant deux jours après l'activation : **un plan
+qui décrit l'état d'un service doit se relire quand cet état change**, sinon il fait
+rouvrir un chantier terminé. Ce qui suit ne sert donc qu'à refaire la mise en service,
+sur un autre compte ou après une remise à zéro :
 
 ```bash
 cd worker
@@ -86,9 +98,6 @@ npx wrangler deploy
 ./creer-agent.sh "Prénom Nom" "service"
 curl https://<worker>/sante              # doit renvoyer "commune": true
 ```
-
-Il faut aussi que `VITE_URL_WORKER` soit défini à la construction, sans quoi l'espace
-commune reste invisible côté navigateur.
 
 ---
 
@@ -1025,7 +1034,9 @@ des liens malformés), puis vérification manuelle qu'un lien de partage trafiqu
 
 ## Lot 13 — Intégration Google Agenda (activable)
 
-> **Fait le 2026-08-08, mais INACTIF.** `src/lib/agenda/google.ts` livré : OAuth PKCE
+> **Fait le 2026-08-08. Actif depuis le 2026-08-10** : l'ID client est posé, la portée
+> déclarée, et l'auteur a écrit ses rendez-vous dans un vrai Google Agenda — voir le
+> correctif du 2026-08-10 sur la session. `src/lib/agenda/google.ts` livré : OAuth PKCE
 > dans l'onglet, portée `calendar.app.created`, un agenda dédié par enfant,
 > identifiants d'événements stables pour que la resynchronisation remplace au lieu de
 > dupliquer. Le bloc n'apparaît dans `/agenda` que si `VITE_ID_CLIENT_GOOGLE` est
