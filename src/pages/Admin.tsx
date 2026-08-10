@@ -15,6 +15,7 @@ import {
   verifierAcces,
   type Identite,
 } from '../lib/github'
+import { definirSimulationActive, simulationActive } from '../lib/simulation'
 import { nouvelIdentifiant, type Gravite, type Perturbation, type TypePerturbation } from '../lib/urgences'
 import { URL_WORKER, connexionGithubConfiguree, lienEditeurGithub } from '../config'
 import { AdminArrets } from '../composants/AdminArrets'
@@ -42,6 +43,40 @@ const ecrireJeton = (j: string | null) => {
   } catch {
     /* stockage indisponible : la session ne survivra pas au rechargement */
   }
+}
+
+/**
+ * Le mode « date simulée », pour vérifier l'écran d'accueil un autre jour que celui-ci.
+ *
+ * Il est ici et nulle part ailleurs : `/admin` n'est pas un verrou, mais c'est la page
+ * qu'un parent n'ouvre pas. La case n'engage rien d'autre que l'affichage du sélecteur
+ * sur la page « Aujourd'hui », sur ce seul appareil — aucun calcul n'en dépend tant
+ * qu'aucune date n'y est saisie.
+ */
+function SimulationDate() {
+  const { t } = useT()
+  const [active, setActive] = useState(simulationActive)
+
+  return (
+    <section className="carte pile pile--serre">
+      <h3 className="titre-carte">{t('simulation.titre')}</h3>
+      <label className="case" htmlFor="simulation">
+        <input
+          id="simulation"
+          type="checkbox"
+          checked={active}
+          onChange={(e) => {
+            definirSimulationActive(e.target.checked)
+            setActive(e.target.checked)
+          }}
+        />
+        <span>
+          <span className="texte-fort">{t('simulation.activer')}</span>
+          <span className="champ__aide">{t('simulation.activerAide')}</span>
+        </span>
+      </label>
+    </section>
+  )
 }
 
 export function Admin() {
@@ -220,6 +255,9 @@ export function Admin() {
         <a className="bouton bouton--discret" href={lienEditeurGithub()} target="_blank" rel="noopener noreferrer">
           {t('admin.editerSurGithub')}
         </a>
+
+        {/* Sans connexion : la mise au point de l'affichage ne touche à rien de publié. */}
+        <SimulationDate />
       </div>
     )
   }
@@ -523,6 +561,8 @@ export function Admin() {
         {t('admin.editerSurGithub')}
       </a>
       <p className="champ__aide">{langue === 'fr' ? '' : t('admin.messageLangue')}</p>
+
+      <SimulationDate />
     </div>
   )
 }

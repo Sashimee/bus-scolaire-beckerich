@@ -227,7 +227,9 @@
     "raisonWeekend": "Et ass Weekend.",
     "raisonVacances": "Vakanz: {periode}.",
     "raisonFerie": "Feierdag: {jour}.",
-    "raisonInconnue": "De Schoulkalenner vun dësem Joer ass an der App nach net hannerluecht. Kuckt w.e.g. den offizielle Kalenner."
+    "raisonInconnue": "De Schoulkalenner vun dësem Joer ass an der App nach net hannerluecht. Kuckt w.e.g. den offizielle Kalenner.",
+    "horaireDuJour": "Ziichte vum Dag",
+    "aucunTrajet": "Keng Fahrt virgesinn."
   },
   "vacances": {
     "toussaint": "Allerhellegevakanz",
@@ -268,12 +270,12 @@
   },
   "calendrier": {
     "titre": "An e Kalenner derbäisetzen",
-    "ics": "Fir mäi Kalenner eroflueden (.ics)",
     "icsAide": "Funktionéiert mat Google Kalenner, Apple Kalenner an Outlook. D'Schoulvakanze sinn scho erausgeholl.",
     "tousLesEnfants": "All Kanner",
     "nomFoyer": "Schoulbus — d'Famill",
     "tousLesEnfantsAide": "Eng eenzeg Datei fir all Geschwëster: ee Kalenner amplaz dräi.",
-    "commentImporter": "Wéi setzen ech en a mäi Kalenner?"
+    "telechargerTitre": "Datei eroflueden",
+    "icsEnfant": "Fir {prenom} eroflueden"
   },
   "agenda": {
     "titre": "Auerzäiten an de Kalenner setzen",
@@ -319,7 +321,7 @@
     "googleErreur": "D'Synchronisatioun ass feelgeschloen. Verbannt de Kont nei a probéiert nach eng Kéier.",
     "googleConnexionEchec": "D'Verbindung mat Google ass feelgeschloen. D'Detail hei ënnen kënnt vu Google; mellt et, wann Dir näischt domat ufänke kënnt.",
     "icsTitre": "Oder d'Datei eemol importéieren",
-    "icsIntro": "Ouni Kontverbindung: Dir luet eng Datei vun der Fiche vum Kand erof a maacht se an Ärem Kalenner op. Funktionéiert iwwerall, muss awer bei Ännerunge widderholl ginn.",
+    "icsIntro": "Ouni Kontverbindung: Dir luet d'Datei hei drënner erof a maacht se an Ärem Kalenner op. Funktionéiert iwwerall, muss awer bei Ännerunge widderholl ginn.",
     "lienDepuisFiche": "Kalenner: Google, Apple, Outlook",
     "googleEcritureEchec": "D'Schreiwen an de Google Kalenner gouf refuséiert. Dir bleift verbonnen: d'Detail hei ënnen kënnt vu Google a seet, wat blockéiert.",
     "icsTitreSeul": "D'Datei an Äre Kalenner importéieren",
@@ -372,7 +374,8 @@
     "donnees": "Meng Donnéeën",
     "effacer": "All meng Donnéeë läschen",
     "effacerConfirmation": "Adress, Kanner an Astellungen op dësem Apparat läschen?",
-    "efface": "Donnéeë geläscht."
+    "efface": "Donnéeë geläscht.",
+    "mesEnfants": "Meng Adress a meng Kanner"
   },
   "plan": {
     "titre": "Offizielle Plang",
@@ -485,9 +488,7 @@
     "reprendreComment": "Kopéiert dëse Link oder weist de QR-Code VIRUN der Installatioun, a maacht en duerno an der App op: si bitt un, Är Astellungen ze iwwerhuelen. Ënner Android an um Computer wanderen d'Donnéeë vun eleng mat."
   },
   "maj": {
-    "disponible": "Eng nei Versioun ass verfügbar.",
     "miseAJour": "Nei Versioun — gëtt aktualiséiert…",
-    "recharger": "Nei lueden",
     "version": "Versioun {version}",
     "horsLigne": "Offline — d'Ziichte bleiwen ofrufbar."
   },
@@ -838,5 +839,14 @@
     "lienDepuisReglages": "Wien huet dës Applikatioun gemaach?",
     "lectureEchec": "De Merci konnt net aus dem Repository gelies ginn. Lued d'Säit nei.",
     "conflit": "Een huet de Merci an der Tëschenzäit publizéiert. Lued d'Säit nei: Är Ännerunge sinn net gespäichert, mä déi vum aneren och net iwwerschriwwen."
+  },
+  "simulation": {
+    "titre": "Datum simuléieren",
+    "activer": "En anert Datum simuléieren",
+    "activerAide": "Weist op der Säit „Haut“ e Feld fir en Datum, fir de Bildschierm un engem Vakanzendag oder zur Offahrtszäit ze kontrolléieren. Lokal Astellung, nëmmen op dësem Apparat.",
+    "date": "Simuléiert Datum an Auerzäit",
+    "aide": "Eidel loossen, fir op déi richteg Auerzäit zréckzekommen.",
+    "reinitialiser": "Zréck op elo",
+    "avertissement": "Simuléiert Datum: dëse Bildschierm weist net déi richteg Auerzäit."
   }
 }

@@ -4,6 +4,7 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { estAppareilIOS } from '../installation-contexte'
 import { DemoAgenda } from '../composants/installation/DemoAgenda'
+import { TelechargementIcs } from '../composants/TelechargementIcs'
 import { evenementsEnfant } from '../lib/agenda'
 import {
   chargerJeton,
@@ -244,6 +245,12 @@ export function Agenda() {
           {t(googleConfigure() ? 'agenda.icsTitre' : 'agenda.icsTitreSeul')}
         </h3>
         <p className="champ__aide">{t('agenda.icsIntro')}</p>
+
+        {/* Le fichier d'abord, la marche à suivre ensuite : les étapes ci-dessous
+            parlent d'un fichier téléchargé, il faut donc pouvoir l'avoir sous la main
+            avant de les lire. */}
+        <TelechargementIcs />
+
         <span className="etiquette">{t('installer.detecte')}</span>
         <Procedure cle={plateforme} principal />
       </section>

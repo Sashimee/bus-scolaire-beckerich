@@ -227,7 +227,9 @@
     "raisonWeekend": "C'est le week-end.",
     "raisonVacances": "Vacances : {periode}.",
     "raisonFerie": "Jour férié : {jour}.",
-    "raisonInconnue": "Le calendrier scolaire de cette année n'est pas encore renseigné dans l'application. Vérifiez le calendrier officiel."
+    "raisonInconnue": "Le calendrier scolaire de cette année n'est pas encore renseigné dans l'application. Vérifiez le calendrier officiel.",
+    "horaireDuJour": "Horaires du jour",
+    "aucunTrajet": "Aucun trajet prévu."
   },
   "vacances": {
     "toussaint": "congé de la Toussaint",
@@ -268,12 +270,12 @@
   },
   "calendrier": {
     "titre": "Ajouter à un agenda",
-    "ics": "Télécharger pour mon agenda (.ics)",
     "icsAide": "Fonctionne avec Google Agenda, Apple Calendrier et Outlook. Les vacances scolaires sont déjà exclues.",
     "tousLesEnfants": "Tous les enfants",
     "nomFoyer": "Bus scolaire — la famille",
     "tousLesEnfantsAide": "Un seul fichier pour toute la fratrie : un calendrier à gérer, pas trois.",
-    "commentImporter": "Comment l'ajouter à mon agenda ?"
+    "telechargerTitre": "Télécharger le fichier",
+    "icsEnfant": "Télécharger pour {prenom}"
   },
   "agenda": {
     "titre": "Ajouter les horaires à votre agenda",
@@ -319,7 +321,7 @@
     "googleErreur": "La synchronisation a échoué. Reconnectez votre compte et réessayez.",
     "googleConnexionEchec": "La connexion à Google a échoué. Le détail ci-dessous vient de Google ; signalez-le si vous ne savez pas quoi en faire.",
     "icsTitre": "Ou importer le fichier une fois",
-    "icsIntro": "Sans connexion à un compte : vous téléchargez un fichier depuis la fiche de l'enfant et vous l'ouvrez dans votre agenda. Fonctionne partout, mais à refaire si les horaires changent.",
+    "icsIntro": "Sans connexion à un compte : vous téléchargez le fichier ci-dessous et vous l'ouvrez dans votre agenda. Fonctionne partout, mais à refaire si les horaires changent.",
     "lienDepuisFiche": "Agenda : Google, Apple, Outlook",
     "googleEcritureEchec": "L'écriture dans Google Agenda a été refusée. Vous restez connecté : le détail ci-dessous vient de Google et dit ce qui bloque.",
     "icsTitreSeul": "Importer le fichier dans votre agenda",
@@ -372,7 +374,8 @@
     "donnees": "Mes données",
     "effacer": "Effacer toutes mes données",
     "effacerConfirmation": "Effacer l'adresse, les enfants et les préférences enregistrés sur cet appareil ?",
-    "efface": "Données effacées."
+    "efface": "Données effacées.",
+    "mesEnfants": "Mon adresse et mes enfants"
   },
   "plan": {
     "titre": "Plan officiel",
@@ -485,9 +488,7 @@
     "reprendreComment": "Copiez ce lien ou affichez le QR code AVANT d'installer, puis ouvrez-le une fois dans l'application : elle vous proposera de reprendre votre configuration. Sur Android et sur ordinateur, les données suivent toutes seules."
   },
   "maj": {
-    "disponible": "Une nouvelle version est disponible.",
     "miseAJour": "Nouvelle version — mise à jour…",
-    "recharger": "Recharger",
     "version": "Version {version}",
     "horsLigne": "Hors ligne — les horaires restent consultables."
   },
@@ -838,5 +839,14 @@
     "lienDepuisReglages": "Qui a fait cette application ?",
     "lectureEchec": "Les crédits n'ont pas pu être lus depuis le dépôt. Rechargez la page.",
     "conflit": "Quelqu'un a publié les crédits entre-temps. Rechargez la page : vos modifications ne sont pas enregistrées, mais celles de l'autre ne sont pas écrasées non plus."
+  },
+  "simulation": {
+    "titre": "Simulation de date",
+    "activer": "Simuler une autre date",
+    "activerAide": "Affiche un sélecteur de date sur la page « Aujourd'hui », pour vérifier l'écran un jour de vacances ou à l'heure d'un bus. Réglage local, sur cet appareil seulement.",
+    "date": "Date et heure simulées",
+    "aide": "Laissez vide pour revenir à l'heure réelle.",
+    "reinitialiser": "Revenir à maintenant",
+    "avertissement": "Date simulée : cet écran ne montre pas l'heure réelle."
   }
 }

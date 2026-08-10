@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { FicheFoyer } from '../composants/FicheFoyer'
@@ -8,14 +9,23 @@ import { enMinutes, trajetsDuJour } from '../lib/plan'
 import { distanceLisible, nomArret, sensTrajet } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
 import {
+  dateSimulee,
+  definirValeurSimulee,
+  maintenantSimule,
+  simulationActive,
+  valeurSimulee,
+} from '../lib/simulation'
+import {
   heureArriveeEffective,
   heureEffective,
   perturbationsDuJour,
   perturbationsDuTrajet,
   type Perturbation,
 } from '../lib/urgences'
+import type { EtatJour } from '../lib/calendrier'
 import type { ContexteEnfant } from '../lib/plan'
 import type { Trajet } from '../lib/types'
+import type { Traduction } from '../i18n'
 
 /**
  * L'heure que le parent doit retenir d'un trajet.
@@ -45,15 +55,13 @@ interface Etape {
 }
 
 /**
- * Les trajets qui restent à venir aujourd'hui, dans l'ordre.
+ * Les trajets du jour qui concernent le parent, dans l'ordre.
  *
  * Un trajet annulé disparaît de la liste : afficher l'heure d'un bus qui ne passera pas
  * est pire que ne rien afficher, et le bandeau de perturbation en tête de page dit déjà
  * ce qui se passe.
  */
-function etapesRestantes(trajets: Trajet[], perturbations: Perturbation[], maintenant: Date): Etape[] {
-  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
-
+function etapesDuJour(trajets: Trajet[], perturbations: Perturbation[]): Etape[] {
   return trajets
     .filter((x) => x.concerneParent)
     .flatMap((trajet) => {
@@ -63,11 +71,24 @@ function etapesRestantes(trajets: Trajet[], perturbations: Perturbation[], maint
       const heure = heureUtile(trajet)
       const effective = heureUtileEffective(trajet, concernees) ?? heure
       if (heure === null || effective === null) return []
-
-      const h = enMinutes(effective)
-      if (h === null || h < minutes) return []
       return [{ trajet, heure, effective }]
     })
+}
+
+/** Ce qui reste à venir : tout ce dont l'heure n'est pas encore passée. */
+function restantes(etapes: Etape[], maintenant: Date): Etape[] {
+  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
+  return etapes.filter((e) => (enMinutes(e.effective) ?? 0) >= minutes)
+}
+
+/** Pourquoi il n'y a pas école, en une phrase. */
+function raisonSansEcole(etat: EtatJour, t: Traduction['t']): string {
+  if (etat.raison === 'vacances') {
+    return t('aujourdhui.raisonVacances', { periode: t(`vacances.${etat.id}`) })
+  }
+  if (etat.raison === 'ferie') return t('aujourdhui.raisonFerie', { jour: t(`feries.${etat.id}`) })
+  if (etat.raison === 'annee-inconnue') return t('aujourdhui.raisonInconnue')
+  return t('aujourdhui.raisonWeekend')
 }
 
 /**
@@ -98,19 +119,98 @@ function ProchainDepart({ etape, minutesAvant }: { etape: Etape; minutesAvant: n
   )
 }
 
-function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Date }) {
+/**
+ * L'horaire du jour, sous la carte de l'enfant.
+ *
+ * Il y est TOUJOURS, et c'est le point : le prochain départ répond à « quand faut-il
+ * partir ? », mais pas à « et ensuite ? ». Ces heures-là se lisaient auparavant en
+ * ouvrant la fiche de la semaine, ou pas du tout les jours sans école — où l'écran ne
+ * montrait plus rien.
+ *
+ * Sans école, la tuile ne disparaît donc pas : elle s'éteint, et la raison vient
+ * s'incruster par-dessus. Le parent voit du même coup ce qui aurait eu lieu et pourquoi
+ * cela n'a pas lieu, là où le message logeait auparavant en tête de page, loin de
+ * l'enfant qu'il concernait.
+ */
+function HoraireDuJour({
+  etapes,
+  maintenant,
+  ecole,
+  raison,
+}: {
+  etapes: Etape[]
+  maintenant: Date
+  ecole: boolean
+  raison: string
+}) {
+  const { t } = useT()
+  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
+
+  return (
+    <div className={`sous-tuile${ecole ? '' : ' sous-tuile--eteinte'}`}>
+      {/*
+          L'incrustation vient AVANT les horaires dans le document, alors qu'elle se
+          pose par-dessus à l'écran : à la lecture vocale, « pas d'école aujourd'hui »
+          doit précéder les heures qu'elle annule, et non les suivre.
+      */}
+      {!ecole && (
+        <div className="sous-tuile__incrustation">
+          <strong className="sous-tuile__mention">{t('aujourdhui.pasEcole')}</strong>
+          <span className="sous-tuile__raison">{raison}</span>
+        </div>
+      )}
+
+      <div className="sous-tuile__contenu">
+        <span className="sous-tuile__titre">{t('aujourdhui.horaireDuJour')}</span>
+        {etapes.length === 0 ? (
+          <p className="champ__aide">{t('aujourdhui.aucunTrajet')}</p>
+        ) : (
+          <ul className="liste-nue sous-tuile__liste">
+            {etapes.map((e, i) => (
+              <li
+                className={`sous-tuile__ligne${
+                  ecole && (enMinutes(e.effective) ?? 0) < minutes ? ' sous-tuile__ligne--passee' : ''
+                }`}
+                key={`${e.trajet.type}-${i}`}
+              >
+                <span className="sous-tuile__heure">{e.effective}</span>
+                <span>{t(`trajets.${e.trajet.type}`)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function CarteEnfant({
+  ctx,
+  maintenant,
+  ecole,
+  raison,
+}: {
+  ctx: ContexteEnfant
+  maintenant: Date
+  ecole: boolean
+  raison: string
+}) {
   const { t } = useT()
   const { urgences } = useUrgences()
   const jour = jourDeSemaine(maintenant)
   const journee = jour ? trajetsDuJour(ctx, jour) : null
 
   const perturbations = perturbationsDuJour(urgences, maintenant)
-  const restantes = journee ? etapesRestantes(journee.trajets, perturbations, maintenant) : []
-  const [suivante, ...suivantes] = restantes
+  const etapes = journee ? etapesDuJour(journee.trajets, perturbations) : []
+  const [suivante] = ecole ? restantes(etapes, maintenant) : []
 
   const minutesAvant = suivante
     ? enMinutes(suivante.effective)! - (maintenant.getHours() * 60 + maintenant.getMinutes()) - ctx.temps
     : 0
+
+  // Un enfant qui va à pied n'a pas d'horaire : sa tuile n'aurait rien à éteindre les
+  // jours d'école. Elle reparaît sans école, pour porter la raison comme les autres.
+  const montrerHoraire = !ctx.marcheDirecte || !ecole
 
   return (
     <article className="carte pile pile--serre">
@@ -132,18 +232,17 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
         </p>
       ) : (
         <>
-          {suivante ? (
-            <>
-              <ProchainDepart etape={suivante} minutesAvant={minutesAvant} />
-              <p>{t(`trajets.${suivante.trajet.type}`)}</p>
-            </>
-          ) : (
-            jour && (
+          {ecole &&
+            (suivante ? (
+              <>
+                <ProchainDepart etape={suivante} minutesAvant={minutesAvant} />
+                <p>{t(`trajets.${suivante.trajet.type}`)}</p>
+              </>
+            ) : (
               <div className="rangee">
                 <span className="etiquette etiquette--succes">{t('aujourdhui.plusDeBus')}</span>
               </div>
-            )
-          )}
+            ))}
 
           <p>
             <strong>{nomArret(ctx.arretDomicile, t)}</strong>{' '}
@@ -156,18 +255,11 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
           {ctx.arretDomicile.precision === 'approximative' && (
             <p className="champ__aide">⚠ {t('arrets.precisionApproximative')}</p>
           )}
-
-          {/* Le reste de la journée : présent, mais sans jamais concurrencer l'heure. */}
-          {suivantes.length > 0 && (
-            <ul className="puces-trajets liste-nue">
-              {suivantes.map((e, i) => (
-                <li className="etiquette etiquette--heure" key={`${e.trajet.type}-${i}`}>
-                  {e.effective} {t(`trajets.${e.trajet.type}`)}
-                </li>
-              ))}
-            </ul>
-          )}
         </>
+      )}
+
+      {montrerHoraire && (
+        <HoraireDuJour etapes={etapes} maintenant={maintenant} ecole={ecole} raison={raison} />
       )}
 
       <Link to={`/enfant/${ctx.enfant.id}`} className="bouton">
@@ -177,11 +269,53 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
   )
 }
 
+/**
+ * Le sélecteur de date de mise au point, activé depuis `/admin`.
+ *
+ * Il ne se montre à personne d'autre : sans la case cochée sur cet appareil, ce bloc
+ * n'existe pas. Le rappel « date simulée » l'accompagne toujours — un écran qui ment sur
+ * l'heure sans le dire est le meilleur moyen de croire à une panne.
+ */
+function SelecteurDate({ valeur, onChanger }: { valeur: string; onChanger: (v: string) => void }) {
+  const { t } = useT()
+  return (
+    <section className="carte carte--accent pile pile--serre sans-impression">
+      <h3 className="titre-carte">{t('simulation.titre')}</h3>
+      <div className="champ">
+        <label htmlFor="date-simulee">{t('simulation.date')}</label>
+        <input
+          id="date-simulee"
+          type="datetime-local"
+          value={valeur}
+          onChange={(e) => onChanger(e.target.value)}
+        />
+      </div>
+      <p className="champ__aide">{t('simulation.aide')}</p>
+      {valeur && (
+        <button type="button" className="bouton bouton--discret" onClick={() => onChanger('')}>
+          {t('simulation.reinitialiser')}
+        </button>
+      )}
+    </section>
+  )
+}
+
 export function Accueil() {
   const { t } = useT()
   const { foyer, contextes, configure } = useFoyer()
-  const maintenant = new Date()
+  // Le champ de simulation est la source de l'heure quand il est rempli : l'écran
+  // entier doit se recalculer à chaque frappe, d'où l'état plutôt qu'une simple lecture.
+  const [simulation, setSimulation] = useState(valeurSimulee)
+  const simulable = simulationActive()
+
+  const changerSimulation = (v: string) => {
+    definirValeurSimulee(v)
+    setSimulation(v)
+  }
+
+  const maintenant = simulable ? maintenantSimule() : new Date()
   const etat = etatDuJour(maintenant)
+  const raison = raisonSansEcole(etat, t)
 
   if (!configure) {
     return (
@@ -207,48 +341,29 @@ export function Accueil() {
       <section className="pile">
         <h2>{t('aujourdhui.titre')}</h2>
 
-        {!etat.ecole && (
-          <div className="encart encart--info">
-            <div className="encart__titre">{t('aujourdhui.pasEcole')}</div>
-            {etat.raison === 'weekend' && t('aujourdhui.raisonWeekend')}
-            {etat.raison === 'vacances' &&
-              t('aujourdhui.raisonVacances', { periode: t(`vacances.${etat.id}`) })}
-            {etat.raison === 'ferie' &&
-              t('aujourdhui.raisonFerie', { jour: t(`feries.${etat.id}`) })}
-            {etat.raison === 'annee-inconnue' && t('aujourdhui.raisonInconnue')}
-          </div>
+        {simulable && <SelecteurDate valeur={simulation} onChanger={changerSimulation} />}
+        {simulable && dateSimulee() && (
+          <div className="encart encart--attention">{t('simulation.avertissement')}</div>
         )}
 
-        {etat.ecole && (
-          <div className="grille-enfants">
-            {foyer.enfants.map((e) => {
-              const ctx = contextes.get(e.id)
-              return ctx ? (
-                <CarteEnfant key={e.id} ctx={ctx} maintenant={maintenant} />
-              ) : (
-                <div className="carte encart--alerte" key={e.id}>
-                  <strong>{e.prenom}</strong> — {t('enfant.aucunArret')}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {!etat.ecole &&
-          foyer.enfants.map((e) => {
+        <div className="grille-enfants">
+          {foyer.enfants.map((e) => {
             const ctx = contextes.get(e.id)
             return ctx ? (
-              <article className="carte rangee rangee--espacee" key={e.id}>
-                <span>
-                  <strong>{e.prenom}</strong>{' '}
-                  <span className="champ__aide">{t(`cycles.${e.cycle}`)}</span>
-                </span>
-                <Link to={`/enfant/${e.id}`} className="bouton bouton--discret">
-                  {t('enfant.voirSemaine')}
-                </Link>
-              </article>
-            ) : null
+              <CarteEnfant
+                key={e.id}
+                ctx={ctx}
+                maintenant={maintenant}
+                ecole={etat.ecole}
+                raison={raison}
+              />
+            ) : (
+              <div className="carte encart--alerte" key={e.id}>
+                <strong>{e.prenom}</strong> — {t('enfant.aucunArret')}
+              </div>
+            )
           })}
+        </div>
 
         {calcules.length > 1 && (
           <section className="pile pile--serre sans-impression">

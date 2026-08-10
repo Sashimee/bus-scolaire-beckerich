@@ -227,7 +227,9 @@
     "raisonWeekend": "É fim de semana.",
     "raisonVacances": "Férias: {periode}.",
     "raisonFerie": "Feriado: {jour}.",
-    "raisonInconnue": "O calendário escolar deste ano ainda não está registado na aplicação. Consulte o calendário oficial."
+    "raisonInconnue": "O calendário escolar deste ano ainda não está registado na aplicação. Consulte o calendário oficial.",
+    "horaireDuJour": "Horários do dia",
+    "aucunTrajet": "Nenhuma viagem prevista."
   },
   "vacances": {
     "toussaint": "férias de Todos os Santos",
@@ -268,12 +270,12 @@
   },
   "calendrier": {
     "titre": "Adicionar a um calendário",
-    "ics": "Transferir para o meu calendário (.ics)",
     "icsAide": "Funciona com o Google Agenda, o Calendário Apple e o Outlook. As férias escolares já estão excluídas.",
     "tousLesEnfants": "Todas as crianças",
     "nomFoyer": "Autocarro escolar — a família",
     "tousLesEnfantsAide": "Um único ficheiro para todos os irmãos: um calendário em vez de três.",
-    "commentImporter": "Como o adiciono ao meu calendário?"
+    "telechargerTitre": "Transferir o ficheiro",
+    "icsEnfant": "Transferir para {prenom}"
   },
   "agenda": {
     "titre": "Adicionar os horários à sua agenda",
@@ -319,7 +321,7 @@
     "googleErreur": "A sincronização falhou. Volte a ligar a conta e tente de novo.",
     "googleConnexionEchec": "A ligação ao Google falhou. O detalhe abaixo vem do Google; comunique-o se não souber o que fazer com ele.",
     "icsTitre": "Ou importar o ficheiro uma vez",
-    "icsIntro": "Sem ligar nenhuma conta: descarrega um ficheiro a partir da ficha da criança e abre-o na sua agenda. Funciona em todo o lado, mas há que repetir se os horários mudarem.",
+    "icsIntro": "Sem ligar nenhuma conta: descarrega o ficheiro abaixo e abre-o na sua agenda. Funciona em todo o lado, mas há que repetir se os horários mudarem.",
     "lienDepuisFiche": "Agenda: Google, Apple, Outlook",
     "googleEcritureEchec": "A escrita na Agenda Google foi recusada. Continua ligado: o detalhe abaixo vem do Google e indica o que bloqueia.",
     "icsTitreSeul": "Importar o ficheiro na sua agenda",
@@ -372,7 +374,8 @@
     "donnees": "Os meus dados",
     "effacer": "Apagar todos os meus dados",
     "effacerConfirmation": "Apagar a morada, as crianças e as preferências guardadas neste dispositivo?",
-    "efface": "Dados apagados."
+    "efface": "Dados apagados.",
+    "mesEnfants": "A minha morada e os meus filhos"
   },
   "plan": {
     "titre": "Plano oficial",
@@ -485,9 +488,7 @@
     "reprendreComment": "Copie esta ligação ou mostre o código QR ANTES de instalar, e abra-o depois na aplicação: ela proporá retomar a sua configuração. No Android e no computador, os dados seguem sozinhos."
   },
   "maj": {
-    "disponible": "Está disponível uma nova versão.",
     "miseAJour": "Nova versão — a atualizar…",
-    "recharger": "Recarregar",
     "version": "Versão {version}",
     "horsLigne": "Sem rede — os horários continuam consultáveis."
   },
@@ -838,5 +839,14 @@
     "lienDepuisReglages": "Quem fez esta aplicação?",
     "lectureEchec": "Não foi possível ler os créditos a partir do repositório. Recarregue a página.",
     "conflit": "Alguém publicou os créditos entretanto. Recarregue a página: as suas alterações não ficaram guardadas, mas as do outro também não foram substituídas."
+  },
+  "simulation": {
+    "titre": "Simulação de data",
+    "activer": "Simular outra data",
+    "activerAide": "Mostra um seletor de data na página «Hoje», para verificar o ecrã num dia de férias ou à hora de um autocarro. Definição local, apenas neste aparelho.",
+    "date": "Data e hora simuladas",
+    "aide": "Deixe vazio para voltar à hora real.",
+    "reinitialiser": "Voltar a agora",
+    "avertissement": "Data simulada: este ecrã não mostra a hora real."
   }
 }

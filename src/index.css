@@ -387,9 +387,27 @@
 }
 
 @layer layout {
+  /*
+   * La coquille occupe au moins la hauteur de l'écran, et la page occupe ce qui reste
+   * une fois l'en-tête et les bandeaux servis. Sans cela, le pied de page d'un écran
+   * court — « Limites », un foyer d'un seul enfant — remontait se coller sous le
+   * contenu, au milieu de la vitre, là où il se lit comme une note perdue plutôt que
+   * comme la fin du document.
+   */
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100dvh;
+  }
+
   .page {
     max-inline-size: var(--largeur);
     margin-inline: auto;
+    inline-size: 100%;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espace-6);
     padding: var(--gouttiere);
     /*
      * La navigation basse ne touche plus le bord : elle flotte à `--espace-2` du bas.
@@ -562,7 +580,9 @@
 
   .pied {
     border-block-start: var(--trait) solid var(--bord);
-    margin-block-start: var(--espace-6);
+    /* Poussé en bas de la page quand le contenu ne la remplit pas. L'écart minimal
+       avec le contenu vient du `gap` de `.page`, que cette marge ne peut pas porter. */
+    margin-block-start: auto;
     padding-block: var(--espace-5) var(--espace-4);
     color: var(--encre-douce);
     font-size: var(--texte-s);
@@ -1227,11 +1247,110 @@
     animation: souffle 1.8s var(--sortie) infinite;
   }
 
-  /* Les trajets restants de la journée, en puces : présents, mais sans poids. */
-  .puces-trajets {
+  /*
+   * --- La tuile d'horaire, sous la carte d'un enfant --------------------------------
+   *
+   * Un creux dans la vitre, et non une seconde carte : ce sont les heures de la
+   * journée, elles complètent le prochain départ et ne doivent jamais lui disputer le
+   * regard. D'où le fond en retrait, le filet léger et les chiffres au corps du texte.
+   *
+   * Les jours sans école, la tuile ne disparaît pas : elle s'éteint sous un voile, et
+   * la raison s'incruste par-dessus.
+   *
+   * Les deux couches sont empilées dans une même cellule de grille, et non posées en
+   * `position: absolute` : la tuile prend ainsi la hauteur de la plus haute des deux.
+   * Un samedi, l'horaire est vide et se résume à une ligne — le message et sa raison,
+   * eux, en font trois sur un téléphone, et débordaient de la vitre.
+   */
+  .sous-tuile {
+    display: grid;
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-m);
+    background: var(--fond-creux);
+    padding: var(--espace-3);
+  }
+
+  .sous-tuile > * {
+    grid-area: 1 / 1;
+  }
+
+  .sous-tuile__contenu {
+    display: grid;
+    /* `start` : quand c'est l'incrustation qui donne sa hauteur à la tuile, les heures
+       restent groupées en haut au lieu de s'écarter pour occuper la place. */
+    align-content: start;
+    gap: var(--espace-1);
+  }
+
+  .sous-tuile__titre {
+    font-size: var(--texte-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
+  }
+
+  .sous-tuile__liste {
+    display: grid;
+    gap: var(--espace-1);
+  }
+
+  .sous-tuile__ligne {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--espace-2);
+    align-items: baseline;
+    gap: var(--espace-3);
+    font-size: var(--texte-m);
+  }
+
+  .sous-tuile__heure {
+    font-family: var(--police-chiffres);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Une heure passée reste lisible : elle sert encore à se repérer dans la journée. */
+  .sous-tuile__ligne--passee {
+    color: var(--encre-douce);
+    text-decoration: line-through;
+    text-decoration-thickness: var(--trait);
+  }
+
+  /*
+   * Le contenu éteint garde sa place — c'est lui qui donne sa hauteur à la tuile et
+   * montre ce qui aurait eu lieu. Il passe sous le seuil de lisibilité à dessein :
+   * l'incrustation porte le message, et `aria-hidden` n'a pas lieu d'être puisque les
+   * heures restent justes, seulement sans objet ce jour-là.
+   */
+  .sous-tuile--eteinte .sous-tuile__contenu {
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+
+  .sous-tuile__incrustation {
+    /* Le voile va jusqu'au bord de la vitre : il doit couvrir le rembourrage aussi. */
+    margin: calc(var(--espace-3) * -1);
+    border-radius: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espace-1);
+    padding: var(--espace-2) var(--espace-3);
+    text-align: center;
+    background: color-mix(in oklab, var(--fond) 55%, transparent);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  .sous-tuile__mention {
+    font-size: var(--texte-l);
+    font-weight: 650;
+  }
+
+  .sous-tuile__raison {
+    font-size: var(--texte-s);
+    color: var(--encre-douce);
   }
 
   /* --- Trajets ---------------------------------------------------------------- */
@@ -2063,7 +2182,19 @@
       line-height: 1.35;
     }
 
+    /*
+     * La coquille redevient un simple flux. À l'écran, `#root` fait au moins la
+     * hauteur de la fenêtre et `.page` est une colonne souple, pour que le pied de page
+     * tombe en bas ; sur papier, une hauteur minimale exprimée en hauteur de fenêtre et
+     * un conteneur souple sont deux façons de gagner une seconde feuille pour rien.
+     */
+    #root {
+      display: block;
+      min-block-size: 0;
+    }
+
     .page {
+      display: block;
       max-inline-size: none;
       padding: 0;
     }

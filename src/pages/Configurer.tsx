@@ -148,6 +148,18 @@ export function Configurer() {
               }
             />
 
+            {/* La semaine de l'enfant, depuis sa fiche de réglage : c'est là qu'on
+                vérifie ce qu'un changement de cycle ou de repas a produit, et c'est le
+                seul endroit qui donne l'horaire calculé. */}
+            <div className="rangee">
+              <Link to={`/enfant/${enfant.id}`} className="bouton bouton--primaire">
+                {t('enfant.voirSemaine')}
+              </Link>
+              <Link to={`/enfant/${enfant.id}/assistant`} className="bouton bouton--discret">
+                {t('assistant.reprendre')}
+              </Link>
+            </div>
+
             <div className="rangee">
               <button
                 type="button"
@@ -160,9 +172,6 @@ export function Configurer() {
               >
                 {t('enfant.supprimer')}
               </button>
-              <Link to={`/enfant/${enfant.id}/assistant`} className="bouton bouton--discret">
-                {t('assistant.reprendre')}
-              </Link>
             </div>
             </div>
           </details>

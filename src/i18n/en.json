@@ -227,7 +227,9 @@
     "raisonWeekend": "It's the weekend.",
     "raisonVacances": "Holidays: {periode}.",
     "raisonFerie": "Public holiday: {jour}.",
-    "raisonInconnue": "This year's school calendar is not yet recorded in the app. Please check the official calendar."
+    "raisonInconnue": "This year's school calendar is not yet recorded in the app. Please check the official calendar.",
+    "horaireDuJour": "Today's times",
+    "aucunTrajet": "No trip scheduled."
   },
   "vacances": {
     "toussaint": "All Saints' break",
@@ -268,12 +270,12 @@
   },
   "calendrier": {
     "titre": "Add to a calendar",
-    "ics": "Download for my calendar (.ics)",
     "icsAide": "Works with Google Calendar, Apple Calendar and Outlook. School holidays are already excluded.",
     "tousLesEnfants": "All children",
     "nomFoyer": "School bus — the family",
     "tousLesEnfantsAide": "A single file for all the siblings: one calendar instead of three.",
-    "commentImporter": "How do I add it to my calendar?"
+    "telechargerTitre": "Download the file",
+    "icsEnfant": "Download for {prenom}"
   },
   "agenda": {
     "titre": "Add the timetable to your calendar",
@@ -319,7 +321,7 @@
     "googleErreur": "Synchronisation failed. Reconnect your account and try again.",
     "googleConnexionEchec": "Connecting to Google failed. The detail below comes from Google; report it if it means nothing to you.",
     "icsTitre": "Or import the file once",
-    "icsIntro": "No account to connect: you download a file from the child's sheet and open it in your calendar. Works everywhere, but must be redone if timetables change.",
+    "icsIntro": "No account to connect: you download the file below and open it in your calendar. Works everywhere, but must be redone if timetables change.",
     "lienDepuisFiche": "Calendar: Google, Apple, Outlook",
     "googleEcritureEchec": "Writing to Google Calendar was refused. You stay connected: the detail below comes from Google and says what is blocking.",
     "icsTitreSeul": "Import the file into your calendar",
@@ -372,7 +374,8 @@
     "donnees": "My data",
     "effacer": "Erase all my data",
     "effacerConfirmation": "Erase the address, children and preferences saved on this device?",
-    "efface": "Data erased."
+    "efface": "Data erased.",
+    "mesEnfants": "My address and my children"
   },
   "plan": {
     "titre": "Official plan",
@@ -485,9 +488,7 @@
     "reprendreComment": "Copy this link or show the QR code BEFORE installing, then open it once inside the app: it will offer to take over your setup. On Android and desktop, the data follows on its own."
   },
   "maj": {
-    "disponible": "A new version is available.",
     "miseAJour": "New version — updating…",
-    "recharger": "Reload",
     "version": "Version {version}",
     "horsLigne": "Offline — the timetables remain available."
   },
@@ -838,5 +839,14 @@
     "lienDepuisReglages": "Who made this app?",
     "lectureEchec": "The credits could not be read from the repository. Reload the page.",
     "conflit": "Someone published the credits in the meantime. Reload the page: your changes are not saved, but neither were theirs overwritten."
+  },
+  "simulation": {
+    "titre": "Date simulation",
+    "activer": "Simulate another date",
+    "activerAide": "Shows a date picker on the “Today” page, to check the screen on a holiday or at a bus time. Local setting, on this device only.",
+    "date": "Simulated date and time",
+    "aide": "Leave empty to return to the real time.",
+    "reinitialiser": "Back to now",
+    "avertissement": "Simulated date: this screen does not show the real time."
   }
 }

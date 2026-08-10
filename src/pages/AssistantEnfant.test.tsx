@@ -192,10 +192,13 @@ describe('contradictions entre réglages', () => {
 
 describe('fin de l’assistant', () => {
   it('ne répète pas les actions de la fiche', () => {
-    // Agenda, impression et copie du lien sont sur `/enfant/:id`, au clic suivant.
+    // L'impression est sur `/enfant/:id`, le fichier d'agenda sur `/agenda` et la copie
+    // du lien sur `/reglages` : aucune de ces actions n'a sa place ici.
     monter({ adresse: HOVELANGE, enfants: [enfant('a', 'Léa')] }, 'a')
     allerA(fr.assistant.recapitulatif)
-    expect(screen.queryByRole('button', { name: fr.calendrier.ics })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: fr.calendrier.icsEnfant.replace('{prenom}', 'Léa') }),
+    ).toBeNull()
     expect(screen.queryByRole('button', { name: fr.partage.copier })).toBeNull()
     expect(screen.queryByRole('button', { name: fr.impression.bouton })).toBeNull()
     expect(screen.getByRole('button', { name: fr.assistant.terminer })).toBeDefined()

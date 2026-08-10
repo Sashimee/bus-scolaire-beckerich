@@ -4,7 +4,6 @@ import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import { useFoyer, type Theme } from '../etat'
 import { lienPartage } from '../lib/partage'
 import { toutEffacer } from '../lib/stockage'
-import { siteDuCycle } from '../lib/donnees'
 import { sourceAdresses } from '../lib/adresses'
 import { Notifications } from '../composants/Notifications'
 import { FicheFoyer } from '../composants/FicheFoyer'
@@ -79,34 +78,18 @@ export function Reglages() {
         </div>
       </section>
 
+      {/*
+          L'adresse, et le chemin vers les enfants — pas les enfants eux-mêmes.
+          Cette page les listait une deuxième fois, avec un lien vers leur semaine :
+          deux endroits pour la même chose, dont un seul sait les modifier. Ils vivent
+          désormais sur la seule page qui les règle.
+      */}
       <section className="carte pile pile--serre">
-        <h3 className="titre-carte">{t('onboarding.etapeEnfants')}</h3>
+        <h3 className="titre-carte">{t('onboarding.etapeAdresse')}</h3>
         <p className="champ__aide">{foyer.adresse?.libelle ?? '—'}</p>
 
-        {/* Un compte d'enfants ne dit rien : le parent vient ici pour reconnaître le
-            sien et corriger son cycle ou son école. */}
-        {foyer.enfants.length === 0 ? (
-          <p className="champ__aide">{t('enfant.aucun')}</p>
-        ) : (
-          <ul className="liste-nue pile pile--serre">
-            {foyer.enfants.map((enfant) => (
-              <li className="rangee rangee--espacee" key={enfant.id}>
-                <span>
-                  <strong>{enfant.prenom}</strong>{' '}
-                  <span className="champ__aide">
-                    {t(`cycles.${enfant.cycle}`)} · {siteDuCycle(enfant.cycle).nom}
-                  </span>
-                </span>
-                <Link to={`/enfant/${enfant.id}`} className="bouton bouton--discret">
-                  {t('enfant.voirSemaine')}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-
         <Link to="/configurer" className="bouton">
-          {t('commun.modifier')}
+          {t('reglages.mesEnfants')}
         </Link>
 
         {calcules.length > 0 && (

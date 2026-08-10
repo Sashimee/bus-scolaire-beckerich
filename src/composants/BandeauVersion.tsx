@@ -32,10 +32,11 @@ function memoriserTentative(version: string) {
  * interroge donc `version.json` régulièrement et on recharge sans rien demander : un
  * bouton « Recharger » suppose que le parent comprenne l'enjeu, ce qui est déjà trop.
  *
- * Deux exceptions, où le bouton manuel réapparaît : une saisie en cours (voir
- * `rechargement-contexte`), et un rechargement déjà tenté en vain pour cette même
- * version — sans quoi un déploiement incohérent enfermerait l'application dans une
- * boucle de rechargements.
+ * Deux exceptions, où le rechargement est simplement remis à plus tard : une saisie en
+ * cours (voir `rechargement-contexte`), et un rechargement déjà tenté en vain pour cette
+ * même version — sans quoi un déploiement incohérent enfermerait l'application dans une
+ * boucle de rechargements. Dans les deux cas l'écran ne réclame rien : il n'y a rien à
+ * décider, la mise à jour se fera d'elle-même à l'ouverture suivante.
  */
 export function BandeauVersion() {
   const { t } = useT()
@@ -109,21 +110,15 @@ export function BandeauVersion() {
     return () => clearTimeout(id)
   }, [nouvelle, bloque])
 
-  if (nouvelle) {
+  // Seule la mise à jour en cours s'annonce, le temps qu'elle se fasse. Il n'y a plus
+  // de bandeau « une nouvelle version est disponible » avec son bouton : demander au
+  // parent de recharger, c'est lui demander de trancher une question qui ne le regarde
+  // pas. Quand le rechargement ne peut pas se faire — saisie en cours, tentative déjà
+  // vaine — on ne dit donc rien : il se fera à la prochaine ouverture.
+  if (nouvelle && rechargeEnCours) {
     return (
       <div className="bandeau" role="status">
-        <div className="bandeau__interne">
-          <span>{rechargeEnCours ? t('maj.miseAJour') : t('maj.disponible')}</span>
-          {!rechargeEnCours && (
-            <button
-              type="button"
-              className="bouton bouton--primaire"
-              onClick={() => window.location.reload()}
-            >
-              {t('maj.recharger')}
-            </button>
-          )}
-        </div>
+        <div className="bandeau__interne">{t('maj.miseAJour')}</div>
       </div>
     )
   }

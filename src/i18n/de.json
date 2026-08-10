@@ -227,7 +227,9 @@
     "raisonWeekend": "Es ist Wochenende.",
     "raisonVacances": "Ferien: {periode}.",
     "raisonFerie": "Feiertag: {jour}.",
-    "raisonInconnue": "Der Schulkalender dieses Jahres ist in der App noch nicht hinterlegt. Bitte prüfen Sie den offiziellen Kalender."
+    "raisonInconnue": "Der Schulkalender dieses Jahres ist in der App noch nicht hinterlegt. Bitte prüfen Sie den offiziellen Kalender.",
+    "horaireDuJour": "Fahrzeiten des Tages",
+    "aucunTrajet": "Keine Fahrt vorgesehen."
   },
   "vacances": {
     "toussaint": "Allerheiligenferien",
@@ -268,12 +270,12 @@
   },
   "calendrier": {
     "titre": "Zum Kalender hinzufügen",
-    "ics": "Für meinen Kalender herunterladen (.ics)",
     "icsAide": "Funktioniert mit Google Kalender, Apple Kalender und Outlook. Die Schulferien sind bereits ausgenommen.",
     "tousLesEnfants": "Alle Kinder",
     "nomFoyer": "Schulbus — die Familie",
     "tousLesEnfantsAide": "Eine einzige Datei für alle Geschwister: ein Kalender statt drei.",
-    "commentImporter": "Wie füge ich ihn meinem Kalender hinzu?"
+    "telechargerTitre": "Datei herunterladen",
+    "icsEnfant": "Für {prenom} herunterladen"
   },
   "agenda": {
     "titre": "Fahrzeiten zum Kalender hinzufügen",
@@ -319,7 +321,7 @@
     "googleErreur": "Die Synchronisierung ist fehlgeschlagen. Konto erneut verbinden und nochmals versuchen.",
     "googleConnexionEchec": "Die Verbindung zu Google ist fehlgeschlagen. Das Detail unten stammt von Google; melden Sie es, wenn Sie damit nichts anfangen können.",
     "icsTitre": "Oder die Datei einmalig importieren",
-    "icsIntro": "Ohne Kontoverbindung: Sie laden eine Datei aus der Übersicht des Kindes herunter und öffnen sie in Ihrem Kalender. Funktioniert überall, muss aber bei Fahrplanänderungen wiederholt werden.",
+    "icsIntro": "Ohne Kontoverbindung: Sie laden die Datei unten herunter und öffnen sie in Ihrem Kalender. Funktioniert überall, muss aber bei Fahrplanänderungen wiederholt werden.",
     "lienDepuisFiche": "Kalender: Google, Apple, Outlook",
     "googleEcritureEchec": "Das Schreiben in Google Kalender wurde abgelehnt. Sie bleiben verbunden: das Detail unten stammt von Google und nennt die Ursache.",
     "icsTitreSeul": "Die Datei in Ihren Kalender importieren",
@@ -372,7 +374,8 @@
     "donnees": "Meine Daten",
     "effacer": "Alle meine Daten löschen",
     "effacerConfirmation": "Adresse, Kinder und Einstellungen auf diesem Gerät löschen?",
-    "efface": "Daten gelöscht."
+    "efface": "Daten gelöscht.",
+    "mesEnfants": "Meine Adresse und meine Kinder"
   },
   "plan": {
     "titre": "Offizieller Plan",
@@ -485,9 +488,7 @@
     "reprendreComment": "Kopieren Sie diesen Link oder zeigen Sie den QR-Code VOR der Installation an, und öffnen Sie ihn dann in der App: sie bietet an, Ihre Einstellungen zu übernehmen. Unter Android und am Rechner wandern die Daten von allein mit."
   },
   "maj": {
-    "disponible": "Eine neue Version ist verfügbar.",
     "miseAJour": "Neue Version — wird aktualisiert…",
-    "recharger": "Neu laden",
     "version": "Version {version}",
     "horsLigne": "Offline — die Fahrzeiten bleiben abrufbar."
   },
@@ -838,5 +839,14 @@
     "lienDepuisReglages": "Wer hat diese Anwendung gemacht?",
     "lectureEchec": "Die Danksagung konnte nicht aus dem Repository gelesen werden. Laden Sie die Seite neu.",
     "conflit": "Jemand hat die Danksagung inzwischen veröffentlicht. Laden Sie die Seite neu: Ihre Änderungen sind nicht gespeichert, die des anderen aber auch nicht überschrieben."
+  },
+  "simulation": {
+    "titre": "Datum simulieren",
+    "activer": "Ein anderes Datum simulieren",
+    "activerAide": "Zeigt auf der Seite „Heute“ ein Datumsfeld an, um den Bildschirm an einem Ferientag oder zur Abfahrtszeit zu prüfen. Lokale Einstellung, nur auf diesem Gerät.",
+    "date": "Simuliertes Datum und Uhrzeit",
+    "aide": "Leer lassen, um zur echten Uhrzeit zurückzukehren.",
+    "reinitialiser": "Zurück zu jetzt",
+    "avertissement": "Simuliertes Datum: Dieser Bildschirm zeigt nicht die echte Uhrzeit."
   }
 }

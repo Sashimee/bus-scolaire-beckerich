@@ -6,7 +6,6 @@ import { useInstallation } from '../installation-contexte'
 import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { FicheImprimable } from '../composants/FicheImprimable'
-import { ActionsEnfant } from '../composants/ActionsEnfant'
 import { datesDeLaSemaine } from '../lib/calendrier'
 import { semaineEnfant } from '../lib/plan'
 import { distanceLisible, nomArret } from '../lib/affichage'
@@ -77,6 +76,18 @@ export function Semaine() {
           {t('enfant.scolariseA', { site: siteDuCycle(enfant.cycle).nom })}
         </p>
       </header>
+
+      {/*
+          L'agenda, en haut ET en bas. C'est le geste qui dispense de revenir sur cette
+          page : celui qui y pense le fait en arrivant, celui qui a d'abord lu sa semaine
+          le trouve en repartant. Un lien discret en pied de page ne se voyait ni dans un
+          cas ni dans l'autre.
+      */}
+      {!aPied && (
+        <Link to="/agenda" className="bouton bouton--primaire sans-impression">
+          {t('agenda.lienDepuisFiche')}
+        </Link>
+      )}
 
       {aPied ? (
         <section className="carte pile pile--serre">
@@ -206,15 +217,23 @@ export function Semaine() {
         </div>
       )}
 
+      {/*
+          Ce qu'on emporte de cette page, et rien d'autre : la feuille pour le frigo et
+          l'agenda du téléphone. Le réglage des repas et l'assistant vivent sur la page
+          des enfants, d'où ils se règlent ; le lien de partage, sur les réglages, avec
+          la mention de confidentialité qui doit l'accompagner.
+      */}
       <section className="pile pile--serre sans-impression">
         <h3 className="titre-carte">{aPied ? t('impression.titre') : t('calendrier.titre')}</h3>
-        <ActionsEnfant ctx={ctx} />
-        <Link to={`/enfant/${enfant.id}/assistant`} className="bouton">
-          {t('assistant.reprendre')}
-        </Link>
-        <Link to="/configurer" className="bouton bouton--discret">
-          {t('repas.titre')}
-        </Link>
+        {!aPied && (
+          <Link to="/agenda" className="bouton bouton--primaire">
+            {t('agenda.lienDepuisFiche')}
+          </Link>
+        )}
+        <button type="button" className="bouton" onClick={() => window.print()}>
+          {t('impression.bouton')}
+        </button>
+        <p className="champ__aide">{t('impression.aide')}</p>
       </section>
     </div>
     </>

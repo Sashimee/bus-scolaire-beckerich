@@ -64,6 +64,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R25 | 18 | **La couche `impression` n'a toujours pas été vue sur papier** — même réserve qu'au lot 2, aggravée : le thème repose désormais sur un dégradé, des voiles translucides et des `backdrop-filter`. Tout est neutralisé dans `@media print` (jetons repassés en opaque, `backdrop-filter` et `box-shadow` coupés partout par un `!important`), et les variables ont été recroisées une à une, mais **aucune feuille n'est sortie d'une imprimante**. Un voile translucide qui survivrait sortirait en gris moucheté. | Un `Cmd+P` sur `/` avec deux enfants, et un sur une fiche enfant. À faire avant de lever R1, qui porte sur la même feuille. |
 | R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
 | R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
+| R28 | 19 | **Le pied de page collé en bas n'a pas été vu sur iPhone.** `#root` fait au moins `100dvh` et `.page` est devenue une colonne souple : mesuré dans Chrome (pied à 297 px du dernier bloc sur `/independance`, écart de 32 px inchangé sur une page longue), jamais sur Safari iOS, où `dvh` se recalcule au repli de la barre d'adresse et où le rail de navigation flotte au-dessus. Le pire cas serait un pied qui glisse sous le rail. | Ouvrir `/independance` et `/credits` sur l'iPhone, faire défiler jusqu'en bas, vérifier que les quatre liens du pied restent atteignables au pouce. |
+| R29 | 19 | **La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.** La couche `impression` remet `#root` et `.page` en `display: block` et annule la hauteur minimale — précisément les deux réglages qui avaient allongé la feuille au correctif du 2026-08-09 — et `src/impression.test.ts` passe, mais **aucune page n'est sortie**. Même terrain que R1 et R25. | À joindre au prochain `Cmd+P` : si la fiche du foyer gagne une seconde feuille, c'est ici qu'il faut regarder d'abord. |
+| R30 | 19 | **Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.** Le bandeau qui demandait de recharger a disparu ; il ne reste que le message affiché pendant les deux secondes qui précèdent le rechargement automatique. Ce chemin demande deux déploiements successifs dans un onglet resté ouvert : il n'a été relu que dans le code. Les deux cas où le rechargement est simplement remis à plus tard — saisie en cours, tentative déjà vaine — n'affichent désormais plus rien du tout. | Déployer deux fois, laisser un onglet ouvert entre les deux, vérifier que la page se remet à jour seule et qu'aucun bouton n'apparaît. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
 ### Mise en service, non faite
@@ -1582,6 +1585,80 @@ Voir R20, rayée.
 > cachait la suivante.
 
 *Dépend du lot 8.*
+
+---
+
+## Lot 19 — Retours d'usage sur l'interface (2026-08-10)
+
+> **Fait le 2026-08-10.** Huit corrections demandées après usage réel, sans rapport les
+> unes avec les autres sinon qu'elles portent toutes sur ce que l'écran montre et sur ce
+> qu'il demande.
+>
+> **La mise à jour ne se négocie plus.** Le bandeau « une nouvelle version est
+> disponible » et son bouton « Recharger » ont disparu ; il ne reste que le message des
+> deux secondes qui précèdent le rechargement automatique. Demander au parent de
+> recharger, c'est lui demander de trancher une question qui ne le regarde pas. Quand le
+> rechargement est empêché — saisie en cours dans `/admin` ou `/commune`, tentative déjà
+> vaine pour cette version — l'écran ne dit plus rien : la mise à jour se fera à
+> l'ouverture suivante. Clés `maj.disponible` et `maj.recharger` retirées des cinq
+> dictionnaires.
+>
+> **L'horaire du jour est toujours là.** Chaque carte d'enfant porte désormais une
+> sous-tuile qui liste les trajets de la journée, heures passées barrées. Le prochain
+> départ répond à « quand faut-il partir ? » ; il ne disait rien de la suite, qu'il
+> fallait aller chercher dans la fiche de la semaine. Les jours sans école, la tuile ne
+> disparaît pas : elle s'éteint, et « pas d'école aujourd'hui » vient s'incruster
+> par-dessus avec sa raison. Le message quittait le haut de la page, où il était loin de
+> l'enfant qu'il concernait, et où il faisait disparaître les cartes entières.
+>
+> L'incrustation est **avant** l'horaire dans le document, alors qu'elle se pose
+> par-dessus à l'écran : à la lecture vocale, le motif doit précéder les heures qu'il
+> annule. Les deux couches sont empilées dans une même cellule de grille et non posées
+> en `position: absolute`, pour que la tuile prenne la hauteur de la plus haute — un
+> samedi, l'horaire est vide et tient sur une ligne quand le motif en fait trois. Les
+> quatre couples encre/fond de l'incrustation ont été recalculés sur la composition
+> réelle (voile à 55 % de `--fond` sur le contenu éteint) : 5,13:1 au pire cas, en
+> thème clair.
+>
+> **Le pied de page tombe en bas.** `#root` fait au moins la hauteur de la fenêtre,
+> `.page` est une colonne souple, le pied porte `margin-block-start: auto`. L'écart
+> minimal avec le contenu vient du `gap` de `.page` — une marge ne peut pas le porter en
+> même temps que l'auto. La couche `impression` remet les deux en flux normal : une
+> hauteur minimale exprimée en hauteur de fenêtre est une façon connue de gagner une
+> feuille pour rien (voir R29).
+>
+> **Chaque action est là où elle se comprend.** Le fichier `.ics` se télécharge
+> désormais sur `/agenda`, au-dessus de la marche à suivre qui explique quoi en faire —
+> il vivait au bas de la fiche d'un enfant, à un écran de distance, et l'on repartait
+> avec un fichier sans savoir où le mettre. Un bouton par enfant, plus le fichier de la
+> fratrie. La fiche de la semaine, elle, ne garde que l'impression et **deux** entrées
+> vers `/agenda`, en haut et en bas : le réglage des repas et l'assistant sont partis sur
+> la page des enfants, d'où ils se règlent, et la copie du lien sur les réglages, avec la
+> mention de confidentialité qui doit l'accompagner. `ActionsEnfant` disparaît, remplacé
+> par `TelechargementIcs`.
+>
+> **Les enfants ne sont plus listés à deux endroits.** `/reglages` les énumérait une
+> seconde fois avec un lien vers leur semaine, sans savoir les modifier ; il ne reste que
+> l'adresse et le chemin vers `/configurer`, où chaque enfant porte maintenant son propre
+> bouton « voir la semaine ».
+>
+> **Une date simulable, pour la mise au point.** Une case dans `/admin` fait apparaître
+> un sélecteur de date et d'heure sur la page « Aujourd'hui ». Rien ne se vérifie aussi
+> mal qu'un écran qui dépend de l'heure : « pas d'école aujourd'hui », le prochain
+> départ, le passage au trajet suivant ne se montrent que le jour et à la minute où ils
+> tombent. Le réglage vit dans `localStorage`, sur le seul appareil ; décocher la case
+> oublie la date, sans quoi elle ressortirait à la prochaine activation sans qu'on sache
+> d'où elle vient. `src/lib/simulation.ts`, 5 tests — dont la lecture du champ comme date
+> **locale**, l'erreur que l'outil est censé traquer.
+>
+> **Vérifié à la mesure** (Chrome, DOM, aucune capture) : tuile éteinte et incrustée un
+> jour de vacances, tuile allumée avec deux heures barrées à 12:30 un mardi, prochain
+> départ à 07:00, aucun débordement à 320 px de large, incrustation contenue dans la
+> tuile y compris avec le motif le plus long (« année inconnue »), pied de page à 297 px
+> du dernier bloc sur une page courte et à 32 px sur une page longue, case d'`/admin` qui
+> écrit et efface bien ses deux clés.
+
+*Dépend des lots 2, 12, 13 et 18. Réserves R28, R29, R30.*
 
 ---
 
