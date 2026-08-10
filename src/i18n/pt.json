@@ -467,7 +467,7 @@
     "adressesTitre": "Os endereços por dia só funcionam dentro da comuna",
     "adressesCorps": "Pode indicar, para um determinado dia, um endereço de partida ou de chegada diferente da sua morada. A pesquisa de endereços conhece, no entanto, apenas a comuna de Beckerich: para um local fora dela, indique diretamente a paragem utilizada, em vez de deixar o site adivinhar.",
     "donneesTitre": "Os seus dados ficam consigo",
-    "donneesCorps": "A morada e os nomes são guardados apenas no seu dispositivo. Não há conta, nem servidor, nem medição de audiência. As análises Goat Counter são ativadas via o script instalado. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar.",
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu aparelho: sem conta, sem servidor que os receba. Um contador de visitas (GoatCounter) recebe a página consultada e mais nada — nem cookie, nem qualquer dos dados que introduziu. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar.",
     "notificationsTitre": "Notificações",
     "notificationsCorps": "Avisam de um cancelamento ou de um atraso, mas nada garante que cheguem: telemóvel desligado, Não incomodar, avaria do serviço de notificações. Uma aplicação web também não pode declarar-se prioritária por si própria. A escola e o município continuam a ser a via oficial de informação; esta aplicação não os substitui."
   },

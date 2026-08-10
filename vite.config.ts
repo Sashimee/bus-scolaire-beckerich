@@ -16,6 +16,16 @@ const version = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
 const dateBuild = new Date().toISOString()
 
 /**
+ * Où le compteur de visites dépose ses relevés.
+ *
+ * Ce n'est PAS l'hôte qui sert son script : `count.js` vient de la CDN `gc.zgo.at`,
+ * mais il compte vers le sous-domaine du site. Confondre les deux — ce qui a été fait
+ * au lot 11 — laisse le script se charger sans qu'aucune visite n'arrive jamais.
+ * Doit rester d'accord avec l'attribut `data-goatcounter` d'`index.html`.
+ */
+const ORIGINE_MESURE = 'https://bus.goatcounter.com'
+
+/**
  * Politique de sécurité du contenu, posée en balise `<meta>`.
  *
  * GitHub Pages ne permet pas de définir d'en-tête HTTP : la balise est le seul moyen.
@@ -34,7 +44,11 @@ function politiqueSecurite(urlWorker: string): string {
     "default-src 'self'",
     "script-src 'self' https://gc.zgo.at",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https://*.tile.openstreetmap.org",
+    // `count.js` compte d'abord par `navigator.sendBeacon` (donc `connect-src`), et
+    // retombe sur une image d'un pixel quand celui-ci échoue — un navigateur sans
+    // `sendBeacon`, ou une extension qui le neutralise. Les deux directives doivent
+    // donc ouvrir la même origine, sans quoi le repli est muet lui aussi.
+    `img-src 'self' data: https://*.tile.openstreetmap.org ${ORIGINE_MESURE}`,
     // `api.github.com` : TOUT `/admin` passe par là — vérification du jeton, lecture et
     // écriture des urgences, du plan, des textes et des crédits. Son absence rendait la
     // page inutilisable en production sans qu'aucun test ne le voie : `/admin` exige une
@@ -45,7 +59,7 @@ function politiqueSecurite(urlWorker: string): string {
     // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
     // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
     // alors que l'ID client peut être posé sans reconstruire cette liste.
-    `connect-src 'self' https://gc.zgo.at https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
+    `connect-src 'self' ${ORIGINE_MESURE} https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
     // L'écran de consentement Google est une navigation, pas une inclusion : seule
     // `form-action` doit s'ouvrir, et uniquement vers Google.
     "form-action 'self' https://accounts.google.com",

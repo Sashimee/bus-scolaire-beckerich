@@ -467,7 +467,7 @@
     "adressesTitre": "Adresse pro Dag funktionéieren nëmmen an der Gemeng",
     "adressesCorps": "Dir kënnt fir e bestëmmten Dag eng aner Ufanks- oder Ukunftsadress wéi Äre Wunnsëtz uginn. D'Adressiche kennt awer nëmmen d'Gemeng Biekerech: fir e Plaz baussent der Gemeng gitt direkt den Arrêt un, deen Dir benotzt, amplaz d'Säit roden ze loossen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
-    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert. Et gëtt kee Konto, kee Server a keng Reeschwäitemiessung. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Eenzeg Ausnam: wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparatkennung fir d'Dauer vum Abonnement op engem Server gespäichert, a beim Ausschalten erëm geläscht.",
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert: kee Konto, kee Server, deen se kritt. E Besucherzieler (GoatCounter) kritt déi opgeruff Säit an soss näischt — kee Cookie a keng vun de Donnéeën, déi Dir aginn hutt. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparat-Kennung fir d'Dauer vum Abonnement op engem Server gespäichert a beim Ausschalte geläscht.",
     "notificationsTitre": "Notifikatiounen",
     "notificationsCorps": "Si mellen eng Annulatioun oder e Retard, mä näischt garantéiert, datt se ukommen: Telefon aus, Net stéieren, Panne beim Push-Déngscht. Eng Web-Applikatioun kann sech och net selwer als prioritär deklaréieren. D'Schoul an d'Gemeng bleiwen den offiziellen Informatiounswee; dës Applikatioun ersetzt se net."
   },

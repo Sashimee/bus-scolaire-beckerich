@@ -467,7 +467,7 @@
     "adressesTitre": "Per-day addresses only work inside the municipality",
     "adressesCorps": "For a given day you can set a departure or arrival address other than your home. The address search, however, only knows the municipality of Beckerich: for a place outside it, name the stop used directly rather than letting the site guess.",
     "donneesTitre": "Your data stays with you",
-    "donneesCorps": "The address and first names are stored on your device only. There is no account, no server and no analytics. Goat Counter analytics are enabled via the installed script. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off.",
+    "donneesCorps": "The address and first names are stored on your device only: no account, no server that receives them. A visit counter (GoatCounter) receives the page you opened and nothing else — no cookie, and none of the data you entered. A share link carries the data in its fragment, which the server never receives. If you turn on notifications, an anonymous device identifier is stored on a server for as long as the subscription lasts, and deleted as soon as you turn them off.",
     "notificationsTitre": "Notifications",
     "notificationsCorps": "They warn of a cancellation or a delay, but nothing guarantees they arrive: phone off, Do Not Disturb, push service outage. Nor can a web app mark itself as priority. The school and the municipality remain the official channel; this app does not replace them."
   },

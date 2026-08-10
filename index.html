@@ -17,7 +17,12 @@
     <link rel="apple-touch-icon" href="./icones/icone-192.png" />
     <!-- Le site n'est pas destiné à concurrencer la page officielle de la commune. -->
     <meta name="robots" content="noindex" />
-  <script data-goatcounter="https://bus.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <!--
+      Compteur de visites. Le script vient de la CDN, les relevés partent vers le
+      sous-domaine ci-dessous : ce sont deux origines distinctes, et la CSP doit ouvrir
+      la seconde en `img-src` ET `connect-src` (voir `ORIGINE_MESURE` dans vite.config.ts).
+    -->
+    <script data-goatcounter="https://bus.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
   <body>
     <div id="root"></div>
