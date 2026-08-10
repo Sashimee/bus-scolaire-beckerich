@@ -328,7 +328,9 @@
     "googlePorteeAbsente": "Google hat die Verbindung akzeptiert, aber ohne Kalenderzugriff. Die Berechtigung „calendar.app.created“ muss auf dem Zustimmungsbildschirm des Google-Projekts eingetragen sein. Danach den Zugriff der App im Google-Konto entziehen und sich hier neu verbinden.",
     "googlePorteeTitre": "Der Kalenderzugriff wurde nicht erteilt",
     "googleSessionTitre": "Die Verbindung zu Google gilt nicht mehr",
-    "googleSessionExpiree": "Google hat die Berechtigung dieser Sitzung abgelehnt: Sie ist abgelaufen, oder der Zugriff der App wurde im Google-Konto entzogen. Verbinden Sie sich unten erneut — es geht nichts verloren."
+    "googleSessionExpiree": "Google hat die Berechtigung dieser Sitzung abgelehnt: Sie ist abgelaufen, oder der Zugriff der App wurde im Google-Konto entzogen. Verbinden Sie sich unten erneut — es geht nichts verloren.",
+    "googleEchecsTitre": "Nicht alle Termine sind angekommen",
+    "googleEchecs": "{nombre} Termine wurden von Google abgelehnt; die übrigen stehen im Kalender. Starten Sie die Aktualisierung erneut und melden Sie es, wenn die Zahl gleich bleibt."
   },
   "partage": {
     "titre": "Diese Konfiguration teilen",

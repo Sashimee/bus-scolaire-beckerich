@@ -77,6 +77,15 @@ function BlocGoogle() {
   const [occupe, setOccupe] = useState(false)
   const [resultat, setResultat] = useState<string | null>(null)
   /**
+   * Les rendez-vous que Google a refusés un par un.
+   *
+   * `synchroniserEnfant` les comptait déjà ; la page ne lisait que `ecrits`. Un
+   * événement rejeté pour lui-même — corps refusé, quota — se soldait donc par un
+   * compte rendu qui n'en disait rien : sans conséquence tant que rien n'échoue,
+   * trompeur le jour où quelque chose échoue.
+   */
+  const [echecs, setEchecs] = useState(0)
+  /**
    * Ce qui a échoué : la connexion, ou l'écriture dans l'agenda.
    *
    * Les deux allumaient le même drapeau. Une synchronisation refusée s'annonçait donc
@@ -129,6 +138,7 @@ function BlocGoogle() {
     setOccupe(true)
     setErreur(null)
     setResultat(null)
+    setEchecs(0)
     try {
       const options = {
         libelleTrajet: (trajet: { type: string }) => t(`trajets.${trajet.type}`),
@@ -141,11 +151,14 @@ function BlocGoogle() {
       // plutôt que d'aller échouer en 401 au milieu de l'écriture.
       const actif = (await jetonValide()) ?? jeton
       let total = 0
+      let refuses = 0
       for (const ctx of enfants) {
         const r = await synchroniserEnfant(actif, ctx.enfant.prenom, evenementsEnfant(ctx, options))
         total += r.ecrits
+        refuses += r.echecs
       }
       setResultat(t('agenda.googleFait', { nombre: total, enfants: enfants.length }))
+      setEchecs(refuses)
     } catch (e) {
       // On ne jette le jeton que s'il est VRAIMENT refusé. Le jeter à la moindre
       // erreur ramenait le bouton « Connecter » après une portée manquante ou une API
@@ -198,6 +211,15 @@ function BlocGoogle() {
         </div>
       )}
       {!erreur && resultat && <div className="encart encart--info">{resultat}</div>}
+
+      {/* Une synchronisation à moitié passée n'est pas une réussite : elle se dit à
+          part, et sur le ton de l'avertissement. */}
+      {!erreur && echecs > 0 && (
+        <div className="encart encart--attention">
+          <div className="encart__titre">{t('agenda.googleEchecsTitre')}</div>
+          <p>{t('agenda.googleEchecs', { nombre: echecs })}</p>
+        </div>
+      )}
 
       {jeton ? (
         <>

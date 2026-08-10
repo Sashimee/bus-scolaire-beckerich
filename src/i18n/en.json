@@ -328,7 +328,9 @@
     "googlePorteeAbsente": "Google accepted the connection, but without granting calendar access. The «calendar.app.created» permission must be declared on the Google project's consent screen. Once added, remove the app's access from your Google account, then connect again here.",
     "googlePorteeTitre": "Calendar access was not granted",
     "googleSessionTitre": "The Google connection is no longer valid",
-    "googleSessionExpiree": "Google refused this session's authorisation: it has expired, or the app's access was removed from your Google account. Connect again below — nothing is lost."
+    "googleSessionExpiree": "Google refused this session's authorisation: it has expired, or the app's access was removed from your Google account. Connect again below — nothing is lost.",
+    "googleEchecsTitre": "Not every appointment got through",
+    "googleEchecs": "{nombre} appointments were refused by Google; the rest are in the calendar. Run the update again, and report it if the count does not change."
   },
   "partage": {
     "titre": "Share this setup",

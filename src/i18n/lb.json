@@ -328,7 +328,9 @@
     "googlePorteeAbsente": "Google huet d'Verbindung ugeholl, mä ouni Zougrëff op de Kalenner. D'Berechtegung « calendar.app.created » muss um Zoustëmmungsschirm vum Google-Projet androe sinn. Duerno den Zougrëff vun der App am Google-Kont ewechhuelen a sech hei nei verbannen.",
     "googlePorteeTitre": "Den Zougrëff op de Kalenner gouf net accordéiert",
     "googleSessionTitre": "D'Verbindung mat Google gëllt net méi",
-    "googleSessionExpiree": "Google huet d'Berechtegung vun dëser Sessioun refuséiert: si ass ofgelaf, oder den Zougrëff vun der App gouf am Google-Kont ewechgeholl. Verbannt Iech hei ënnen nei — et geet näischt verluer."
+    "googleSessionExpiree": "Google huet d'Berechtegung vun dëser Sessioun refuséiert: si ass ofgelaf, oder den Zougrëff vun der App gouf am Google-Kont ewechgeholl. Verbannt Iech hei ënnen nei — et geet näischt verluer.",
+    "googleEchecsTitre": "Net all Rendez-vouse sinn duerchkomm",
+    "googleEchecs": "{nombre} Rendez-vouse goufe vu Google refuséiert; déi aner stinn am Kalenner. Start d'Aktualiséierung nach eng Kéier, a mell et, wann d'Zuel d'selwecht bleift."
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

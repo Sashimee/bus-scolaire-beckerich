@@ -328,7 +328,9 @@
     "googlePorteeAbsente": "O Google aceitou a ligação, mas sem dar acesso à agenda. A permissão «calendar.app.created» tem de estar declarada no ecrã de consentimento do projeto Google. Depois de a acrescentar, retire o acesso da aplicação na sua conta Google e volte a ligar-se aqui.",
     "googlePorteeTitre": "O acesso à agenda não foi concedido",
     "googleSessionTitre": "A ligação ao Google já não é válida",
-    "googleSessionExpiree": "O Google recusou a autorização desta sessão: expirou, ou o acesso da aplicação foi retirado na sua conta Google. Volte a ligar-se abaixo — não se perde nada."
+    "googleSessionExpiree": "O Google recusou a autorização desta sessão: expirou, ou o acesso da aplicação foi retirado na sua conta Google. Volte a ligar-se abaixo — não se perde nada.",
+    "googleEchecsTitre": "Nem todos os compromissos passaram",
+    "googleEchecs": "{nombre} compromissos foram recusados pelo Google; os restantes estão na agenda. Volte a atualizar e comunique-o se o número não mudar."
   },
   "partage": {
     "titre": "Partilhar esta configuração",
