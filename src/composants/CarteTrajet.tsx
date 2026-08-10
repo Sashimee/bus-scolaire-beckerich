@@ -48,7 +48,7 @@ export function CarteTrajet({ depuis, vers }: Props) {
         // variable CSS. On la lit donc sur la racine, pour que le tracé suive le thème.
         const accent =
           getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() ||
-          '#82a9ff'
+          '#a9dcf5'
         L.polyline([domicile, arret], { color: accent, dashArray: '6 6' }).addTo(carte)
 
         carte.fitBounds(L.latLngBounds([domicile, arret]).pad(0.35))

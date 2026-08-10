@@ -50,6 +50,16 @@
 @layer tokens {
   :root {
     /*
+     * Deux familles, et rien d'autre. IBM Plex Sans porte le texte ; IBM Plex Mono ne
+     * sert qu'aux suites de caractères qu'on compare colonne par colonne — une heure,
+     * un code d'accès, une coordonnée. Les deux sont servies depuis le site, voir
+     * `polices.css`.
+     */
+    --police:
+      'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --police-chiffres: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /*
      * Échelle typographique modulaire. Le corps de texte est `--texte-l` (1rem) :
      * en dessous, on ne lit pas une heure de bus d'un coup d'œil sur un quai.
      */
@@ -60,6 +70,15 @@
     --texte-xl: 1.125rem; /* titre de carte, heure mise en avant */
     --texte-2xl: 1.375rem; /* titre de section */
     --texte-3xl: 1.75rem; /* titre de page */
+    --texte-4xl: 2.25rem; /* titre d'écran, sur les pages qui n'en portent qu'un */
+
+    /*
+     * L'heure du prochain départ. Elle ne fait pas partie de l'échelle : c'est le seul
+     * élément de l'application qu'on doit lire à bout de bras, un enfant sur un bras et
+     * le téléphone dans l'autre main. `clamp` la borne pour qu'elle ne déborde pas d'un
+     * écran de 320 px ni ne devienne grotesque sur un bureau.
+     */
+    --heure-geante: clamp(3rem, 15vw, 3.875rem);
 
     /* Espacement : une seule échelle, multiples de 4 px. */
     --espace-1: 0.25rem;
@@ -70,107 +89,162 @@
     --espace-6: 2rem;
     --espace-7: 3rem;
 
-    /* Trois rayons, trois ombres, trois épaisseurs. Pas davantage. */
-    --rayon-s: 8px;
-    --rayon-m: 12px;
-    --rayon-l: 20px;
-    --ombre-1: 0 1px 2px rgb(0 0 0 / 0.18);
+    /*
+     * Rayons et épaisseurs de trait. Les rayons se sont élargis
+     * avec la refonte : une surface de verre à angle vif se lit comme un défaut de
+     * rendu, pas comme une carte posée sur le fond.
+     */
+    --rayon-s: 12px;
+    --rayon-m: 16px;
+    --rayon-l: 24px;
+    /* `--lustre` porte l'ombre des surfaces posées ; il ne reste que deux ombres
+       portées, pour ce qui flotte au-dessus d'elles et pour ce qui bloque la page. */
     --ombre-2: 0 2px 6px -1px rgb(0 0 0 / 0.22), 0 8px 24px -14px rgb(0 0 0 / 0.4);
     --ombre-3: 0 4px 12px -2px rgb(0 0 0 / 0.28), 0 20px 48px -20px rgb(0 0 0 / 0.5);
     --trait: 1px;
     --trait-fort: 2px;
-    --trait-accent: 3px;
 
     /* Cible tactile minimale, imposée à tout élément interactif. */
     --cible: 44px;
+    /* Hauteur du rail de navigation flottant : la page réserve sa place en bas. */
+    --rail-hauteur: 60px;
 
     --gouttiere: var(--espace-4);
     --largeur: 46rem;
     /* La navigation bascule de bas en haut à 48rem. En dur dans les media queries,
        qui ne savent pas lire une variable. */
 
+    /* Le flou d'arrière-plan des surfaces de verre, en un seul endroit. */
+    --flou: blur(28px) saturate(140%);
+    --sortie: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ressort: cubic-bezier(0.34, 1.56, 0.64, 1);
+
     /*
-     * Palette sombre (défaut). Chaque encre a été vérifiée à un contraste ≥ 4.5:1
-     * sur les quatre fonds ci-dessous ; ne pas modifier une valeur sans refaire le
-     * calcul.
+     * Palette sombre (défaut).
+     *
+     * Les surfaces ne sont plus opaques : ce sont des voiles blancs posés sur un
+     * dégradé. Un couple encre/fond ne se vérifie donc plus sur une couleur unie mais
+     * sur la COMPOSITION réelle — arrêt du dégradé, halo décoratif, une ou deux
+     * couches de verre. Toutes les encres ci-dessous ont été mesurées ainsi, sur les
+     * 24 compositions possibles, et tiennent ≥ 4,58:1 (voir docs/plan.md, lot 18).
+     * Ne pas éclaircir un voile ni un arrêt du dégradé sans refaire le calcul :
+     * éclaircir le fond abaisse toutes les encres d'un coup.
      */
-    --fond: #14161f;
-    --fond-creux: #0f1118;
-    --surface: #1b1e2b;
-    --surface-haute: #242838;
-    --bord: #333a52;
-    --encre: #dfe3f2;
-    --encre-douce: #9aa3c2;
+    --degrade: radial-gradient(120% 80% at 15% 0%, #142b47 0%, #0e1a2e 45%, #080d19 100%);
+    --halo: rgb(47 127 184 / 0.1);
+    --fond: #0e1a2e; /* repli uni : barre système, impression, `color-scheme` */
+    --fond-creux: rgb(255 255 255 / 0.05); /* creux d'un champ, d'une puce */
+    --surface: rgb(255 255 255 / 0.07); /* le verre ordinaire */
+    --surface-haute: rgb(255 255 255 / 0.12); /* verre appuyé : survol, en-tête de tableau */
+    --surface-accent: rgb(169 220 245 / 0.1); /* verre teinté : ce qui appelle une décision */
+    --rail: rgb(255 255 255 / 0.12); /* la barre de navigation flottante */
 
-    --accent: #82a9ff;
-    --encre-sur-accent: #0d1017;
-    --accent-2: #c3a6f9; /* seul usage : distinguer une ligne de bus */
+    --bord: rgb(255 255 255 / 0.18);
+    --bord-accent: rgb(169 220 245 / 0.34);
+    /* L'arête de la vitre : un filet de lumière en haut, une ombre portée en dessous. */
+    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 18px 40px -24px rgb(0 0 0 / 0.8);
 
-    --danger: #ff90a5;
-    --attention: #f2b869;
-    --succes: #9bd97d;
-    --info: var(--accent);
+    --encre: #e9eff6;
+    --encre-douce: #c2cdda;
+
+    --accent: #a9dcf5;
+    --accent-2: #d5bdf7; /* seul usage : distinguer une ligne de bus */
+    /* Le bouton d'action : un galet clair, pas une pastille colorée. */
+    --plein: rgb(255 255 255 / 0.92);
+    --encre-sur-plein: #10233d;
+
+    --danger: #f4aab6;
+    --danger-fond: rgb(232 121 140 / 0.14);
+    --danger-bord: rgb(232 121 140 / 0.38);
+    --attention: #ecc386;
+    --attention-fond: rgb(224 169 90 / 0.14);
+    --attention-bord: rgb(224 169 90 / 0.38);
+    --succes: #b3d3ad;
+    --succes-fond: rgb(147 197 140 / 0.14);
+    --succes-bord: rgb(147 197 140 / 0.38);
+    --info-fond: var(--surface-accent);
+    --info-bord: var(--bord-accent);
 
     color-scheme: dark;
-  }
-
-  /*
-   * Les fonds et bordures sémantiques se déduisent de l'encre : une seule couleur à
-   * définir par famille, et les encarts restent cohérents dans les deux thèmes.
-   */
-  :root {
-    --danger-fond: color-mix(in oklab, var(--danger) 12%, var(--surface));
-    --danger-bord: color-mix(in oklab, var(--danger) 45%, var(--bord));
-    --attention-fond: color-mix(in oklab, var(--attention) 12%, var(--surface));
-    --attention-bord: color-mix(in oklab, var(--attention) 45%, var(--bord));
-    --succes-fond: color-mix(in oklab, var(--succes) 12%, var(--surface));
-    --succes-bord: color-mix(in oklab, var(--succes) 45%, var(--bord));
-    --info-fond: color-mix(in oklab, var(--info) 12%, var(--surface));
-    --info-bord: color-mix(in oklab, var(--info) 45%, var(--bord));
   }
 
   /*
    * Palette claire. Elle est écrite deux fois — sur le choix explicite et sur la
    * préférence système — parce qu'une media query ne peut pas figurer dans un
    * sélecteur : c'est la seule duplication acceptée de la couche `tokens`.
+   *
+   * Le principe s'inverse : les voiles sont blancs sur un fond gris-bleu, et le bouton
+   * d'action redevient sombre. La bordure, elle, ne peut pas rester blanche comme dans
+   * la maquette — un filet blanc sur un fond clair ne sépare rien. Elle passe à l'encre
+   * translucide, et c'est `--lustre` seul qui garde l'arête de verre.
    */
   :root[data-theme='clair'] {
-    --fond: #f4f6fb;
-    --fond-creux: #e8ebf4;
-    --surface: #ffffff;
-    --surface-haute: #f1f4fb;
-    --bord: #d2d7e6;
-    --encre: #171a26;
-    --encre-douce: #565e7d;
+    --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
+    --halo: rgb(47 127 184 / 0.05);
+    --fond: #e1e7ee;
+    --fond-creux: rgb(255 255 255 / 0.5);
+    --surface: rgb(255 255 255 / 0.55);
+    --surface-haute: rgb(255 255 255 / 0.75);
+    --surface-accent: rgb(157 196 232 / 0.38);
+    --rail: rgb(255 255 255 / 0.6);
 
-    --accent: #2946bd;
-    --encre-sur-accent: #ffffff;
-    --accent-2: #6a3fa8;
+    --bord: rgb(21 26 32 / 0.14);
+    --bord-accent: rgb(18 57 95 / 0.3);
+    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
 
-    --danger: #b0143a;
-    --attention: #7d5000;
-    --succes: #2c6b22;
+    --encre: #151a20;
+    --encre-douce: #4a5262;
+
+    --accent: #12395f;
+    --accent-2: #553094;
+    --plein: #12395f;
+    --encre-sur-plein: #eef2f7;
+
+    --danger: #8f1f2b;
+    --danger-fond: rgb(156 39 51 / 0.1);
+    --danger-bord: rgb(156 39 51 / 0.28);
+    --attention: #6b4300;
+    --attention-fond: rgb(125 80 0 / 0.1);
+    --attention-bord: rgb(125 80 0 / 0.28);
+    --succes: #215424;
+    --succes-fond: rgb(44 107 34 / 0.1);
+    --succes-bord: rgb(44 107 34 / 0.28);
 
     color-scheme: light;
   }
 
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='sombre']) {
-      --fond: #f4f6fb;
-      --fond-creux: #e8ebf4;
-      --surface: #ffffff;
-      --surface-haute: #f1f4fb;
-      --bord: #d2d7e6;
-      --encre: #171a26;
-      --encre-douce: #565e7d;
+      --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
+      --halo: rgb(47 127 184 / 0.05);
+      --fond: #e1e7ee;
+      --fond-creux: rgb(255 255 255 / 0.5);
+      --surface: rgb(255 255 255 / 0.55);
+      --surface-haute: rgb(255 255 255 / 0.75);
+      --surface-accent: rgb(157 196 232 / 0.38);
+      --rail: rgb(255 255 255 / 0.6);
 
-      --accent: #2946bd;
-      --encre-sur-accent: #ffffff;
-      --accent-2: #6a3fa8;
+      --bord: rgb(21 26 32 / 0.14);
+      --bord-accent: rgb(18 57 95 / 0.3);
+      --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
 
-      --danger: #b0143a;
-      --attention: #7d5000;
-      --succes: #2c6b22;
+      --encre: #151a20;
+      --encre-douce: #4a5262;
+
+      --accent: #12395f;
+      --accent-2: #553094;
+      --plein: #12395f;
+      --encre-sur-plein: #eef2f7;
+
+      --danger: #8f1f2b;
+      --danger-fond: rgb(156 39 51 / 0.1);
+      --danger-bord: rgb(156 39 51 / 0.28);
+      --attention: #6b4300;
+      --attention-fond: rgb(125 80 0 / 0.1);
+      --attention-bord: rgb(125 80 0 / 0.28);
+      --succes: #215424;
+      --succes-fond: rgb(44 107 34 / 0.1);
+      --succes-bord: rgb(44 107 34 / 0.28);
 
       color-scheme: light;
     }
@@ -182,24 +256,46 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /*
+   * Le fond : un dégradé, et deux halos posés par-dessus.
+   *
+   * Les halos sont des couches du `background` et non des éléments : une div décorative
+   * en `position: fixed` aurait demandé un `z-index` sur toute la coquille, et un
+   * pseudo-élément de `body` se serait glissé entre le fond et le contenu. Ici il n'y a
+   * rien à empiler et rien à masquer aux lecteurs d'écran.
+   *
+   * Le décor s'étale sur toute la hauteur du document et NON sur le seul cadre visible.
+   * `background-attachment: fixed` donnait le rendu de la maquette, mais il force le fond
+   * dans sa propre couche composée, à recomposer à chaque défilement — c'est une cause
+   * connue de saccade sur téléphone, et iOS l'ignore de toute façon. Étalé, le dégradé
+   * devient un lavis très lent : à l'œil, sur une page qui tient en deux ou trois écrans,
+   * la différence ne se voit pas.
+   */
   body {
-    background: var(--fond);
+    background:
+      radial-gradient(58% 40% at 88% 2%, var(--halo) 0%, transparent 70%),
+      radial-gradient(50% 36% at -8% 64%, var(--halo) 0%, transparent 70%), var(--degrade);
+    background-repeat: no-repeat;
+    background-color: var(--fond);
     color: var(--encre);
-    font-family:
-      system-ui,
-      -apple-system,
-      'Segoe UI',
-      sans-serif;
+    font-family: var(--police);
     font-size: var(--texte-l);
     line-height: 1.55;
     min-block-size: 100dvh;
   }
 
+  /*
+   * Les titres sont serrés et peu contrastés en graisse : à ces corps-là, c'est
+   * l'interlettrage négatif qui fait le titre, pas le gras.
+   */
   h2 {
-    font-size: var(--texte-2xl);
+    font-size: var(--texte-3xl);
+    font-weight: 600;
+    letter-spacing: -0.03em;
   }
   h3 {
     font-size: var(--texte-xl);
+    letter-spacing: -0.01em;
   }
   h4 {
     font-size: var(--texte-l);
@@ -216,10 +312,15 @@
     overflow-wrap: anywhere;
   }
 
-  /* Une heure se lit en colonne : sans chasse fixe, les chiffres dansent d'une ligne à l'autre. */
+  /*
+   * Une heure se lit en colonne : sans chasse fixe, les chiffres dansent d'une ligne à
+   * l'autre. IBM Plex Mono s'en charge partout où une heure paraît — `tabular-nums`
+   * reste pour les repères où la famille ne s'applique pas.
+   */
   time,
   .heure,
   .tabulaire {
+    font-family: var(--police-chiffres);
     font-variant-numeric: tabular-nums;
   }
 
@@ -227,6 +328,49 @@
     outline: var(--trait-fort) solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  /*
+   * Les mouvements de l'interface. Tous courts, tous jouables une seule fois : ce sont
+   * des indices de provenance — d'où vient cette carte, ce panneau —, pas un spectacle.
+   * La règle `prefers-reduced-motion` plus bas les ramène tous à zéro.
+   */
+  @keyframes monte {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @keyframes glisse {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+
+  /* Le point d'attente, quand il faut partir maintenant : une onde et un battement. */
+  @keyframes onde {
+    from {
+      transform: scale(0.6);
+      opacity: 0.7;
+    }
+    to {
+      transform: scale(1.9);
+      opacity: 0;
+    }
+  }
+
+  @keyframes souffle {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.06);
+      opacity: 1;
+    }
   }
 
   /* Le site doit rester lisible pour qui a désactivé les animations. */
@@ -247,8 +391,14 @@
     max-inline-size: var(--largeur);
     margin-inline: auto;
     padding: var(--gouttiere);
-    /* La navigation basse recouvre le bas de l'écran tant qu'on est sur téléphone. */
-    padding-block-end: calc(var(--espace-7) + var(--cible) + env(safe-area-inset-bottom));
+    /*
+     * La navigation basse ne touche plus le bord : elle flotte à `--espace-2` du bas.
+     * Le contenu doit dégager sa hauteur ET son décollement, sinon le dernier bouton
+     * d'une page se retrouve sous le rail.
+     */
+    padding-block-end: calc(
+      var(--espace-7) + var(--rail-hauteur) + var(--espace-2) + env(safe-area-inset-bottom)
+    );
     padding-inline-start: max(var(--gouttiere), env(safe-area-inset-left));
     padding-inline-end: max(var(--gouttiere), env(safe-area-inset-right));
   }
@@ -263,8 +413,9 @@
     position: sticky;
     inset-block-start: 0;
     z-index: 10;
-    background: color-mix(in oklab, var(--fond) 88%, transparent);
-    backdrop-filter: blur(8px);
+    background: color-mix(in oklab, var(--fond) 72%, transparent);
+    backdrop-filter: var(--flou);
+    -webkit-backdrop-filter: var(--flou);
     border-block-end: var(--trait) solid var(--bord);
     padding-block-start: env(safe-area-inset-top);
   }
@@ -281,15 +432,30 @@
     min-block-size: var(--cible);
   }
 
+  /*
+   * Le titre de l'en-tête n'est pas le titre de la page : c'est une enseigne. En petites
+   * capitales espacées, il se lit comme un bandeau de marque et cesse de concurrencer le
+   * `<h2>` de l'écran, qui est la vraie entrée en matière.
+   */
   .entete__titre {
-    font-size: var(--texte-l);
+    font-size: var(--texte-xs);
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
     margin-inline-end: auto;
     min-inline-size: 0;
   }
 
+  /*
+   * L'enseigne est aussi le retour à l'accueil. Passée en petites capitales, sa boîte
+   * de texte ne fait plus que 15 px : elle s'étire donc sur toute la hauteur de la
+   * barre pour retrouver une cible atteignable au pouce.
+   */
   .entete__titre a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--cible);
     color: inherit;
     text-decoration: none;
   }
@@ -302,18 +468,28 @@
     display: none;
   }
 
+  /*
+   * Le rail de navigation. Il ne s'accroche plus au bord de l'écran mais flotte
+   * au-dessus du contenu, à `--espace-2` des trois côtés : sur un téléphone sans
+   * bordure, une barre collée au bas se confond avec l'indicateur d'accueil du système
+   * et le pouce appuie sur l'un en visant l'autre.
+   */
   .nav-basse {
     position: fixed;
-    inset-inline: 0;
-    inset-block-end: 0;
+    inset-inline: var(--espace-2);
+    inset-block-end: calc(var(--espace-2) + env(safe-area-inset-bottom));
     z-index: 20;
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
-    background: color-mix(in oklab, var(--surface) 92%, transparent);
-    backdrop-filter: blur(12px);
-    border-block-start: var(--trait) solid var(--bord);
-    padding-block-end: env(safe-area-inset-bottom);
+    background: var(--rail);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-l);
+    box-shadow: var(--lustre);
+    /* Le fond flouté doit s'arrêter au rayon, sans quoi les coins bavent. */
+    overflow: hidden;
   }
 
   .nav-basse__lien {
@@ -321,24 +497,32 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    min-block-size: var(--cible);
+    gap: var(--espace-1);
+    min-block-size: var(--rail-hauteur);
     padding-block: var(--espace-1);
     color: var(--encre-douce);
     text-decoration: none;
     font-size: var(--texte-xs);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.1;
     text-align: center;
+    transition:
+      color 0.2s var(--sortie),
+      transform 0.14s var(--ressort);
   }
 
   .nav-basse__lien[aria-current='page'] {
     color: var(--accent);
   }
 
+  /* L'enfoncement se voit sous le doigt, qui masque justement l'icône. */
+  .nav-basse__lien:active {
+    transform: scale(0.94);
+  }
+
   .nav-basse__icone {
-    inline-size: 22px;
-    block-size: 22px;
+    inline-size: 20px;
+    block-size: 20px;
     stroke: currentColor;
     fill: none;
     stroke-width: 1.75;
@@ -431,32 +615,82 @@
 }
 
 @layer composants {
-  /* --- Carte : le bloc de contenu de base ------------------------------------ */
+  /*
+   * --- Carte : le bloc de contenu de base --------------------------------------
+   *
+   * Une plaque de verre : un voile translucide et un filet de lumière sur l'arête haute.
+   *
+   * Pas de `backdrop-filter` ici, contrairement à la maquette : une carte est posée sur
+   * le dégradé du fond, et flouter un dégradé lisse redonne le même dégradé. Le flou n'y
+   * change donc rien à l'œil, alors que chaque surface floutée coûte une couche composée
+   * de plus — sur la page « Réglages », cinq grandes cartes en réclamaient cinq.
+   *
+   * Il reste là où il change quelque chose, c'est-à-dire là où du contenu défile
+   * vraiment par-dessous : l'en-tête, le rail de navigation, les bandeaux et la liste de
+   * suggestions.
+   */
   .carte {
     background: var(--surface);
     border: var(--trait) solid var(--bord);
-    border-radius: var(--rayon-m);
-    padding: var(--espace-4);
-    box-shadow: var(--ombre-1);
+    border-radius: var(--rayon-l);
+    padding: var(--espace-5);
+    box-shadow: var(--lustre);
+    animation: monte 0.34s var(--sortie) both;
   }
 
   .carte--accent {
-    border-color: var(--info-bord);
-    background: var(--info-fond);
+    border-color: var(--bord-accent);
+    background: var(--surface-accent);
   }
 
   /*
-   * Réservée aux bandeaux qui attendent une décision : rayon et ombre plus marqués,
-   * pour qu'ils se détachent du contenu au lieu de s'y fondre.
+   * Réservée aux bandeaux qui attendent une décision : ombre portée plus lourde, pour
+   * qu'ils se détachent du contenu au lieu de s'y fondre.
    */
   .carte--surelevee {
-    border-radius: var(--rayon-l);
-    box-shadow: var(--ombre-3);
+    box-shadow: var(--lustre), var(--ombre-3);
   }
 
   .carte__titre {
     font-size: var(--texte-xl);
     font-weight: 650;
+  }
+
+  /*
+   * L'entrée des cartes se décale de proche en proche. Trois crans suffisent : au
+   * quatrième, le dernier bloc arriverait après que l'œil a fini de lire le premier.
+   */
+  .pile > .carte:nth-child(2),
+  .grille-enfants > .carte:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .pile > .carte:nth-child(3),
+  .grille-enfants > .carte:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .pile > .carte:nth-child(n + 4),
+  .grille-enfants > .carte:nth-child(n + 4) {
+    animation-delay: 180ms;
+  }
+
+  /*
+   * Les cartes du jour, une par enfant.
+   *
+   * Empilées sur téléphone. À partir de 60rem, elles se mettent côte à côte : la
+   * maquette montre un tableau de bord, et une famille de deux enfants doit voir les
+   * deux heures d'un seul regard plutôt qu'en faisant défiler. `auto-fit` avec un
+   * plancher de 20rem évite d'avoir à compter les enfants — un seul enfant occupe
+   * toute la largeur, trois repassent à la ligne d'eux-mêmes.
+   */
+  .grille-enfants {
+    display: grid;
+    gap: var(--espace-4);
+  }
+
+  @media (min-width: 60rem) {
+    .grille-enfants {
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
   }
 
   /* --- Bouton ---------------------------------------------------------------- */
@@ -469,7 +703,7 @@
     min-block-size: var(--cible);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
-    background: var(--surface-haute);
+    background: var(--fond-creux);
     color: var(--encre);
     font-size: var(--texte-m);
     font-weight: 600;
@@ -477,28 +711,42 @@
     text-decoration: none;
     cursor: pointer;
     transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
+      background 0.16s var(--sortie),
+      border-color 0.16s var(--sortie),
+      transform 0.14s var(--ressort);
   }
 
   .bouton:hover {
-    background: color-mix(in oklab, var(--surface-haute) 82%, var(--accent));
+    background: var(--surface-haute);
+  }
+
+  /* Le retour tactile, là où il n'y a pas de survol : le bouton s'enfonce. */
+  .bouton:active {
+    transform: scale(0.97);
   }
 
   .bouton:disabled {
     opacity: 0.55;
     cursor: not-allowed;
   }
+  .bouton:disabled:active {
+    transform: none;
+  }
 
+  /*
+   * L'action principale : un galet plein, clair sur fond sombre et sombre sur fond
+   * clair. Elle ne prend pas la couleur d'accent — celle-ci sert à lire les heures, et
+   * un bouton de la même couleur qu'une heure de départ crée une hésitation.
+   */
   .bouton--primaire {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--encre-sur-accent);
+    background: var(--plein);
+    border-color: transparent;
+    color: var(--encre-sur-plein);
+    font-weight: 700;
   }
 
   .bouton--primaire:hover {
-    background: color-mix(in oklab, var(--accent) 88%, var(--encre));
-    border-color: color-mix(in oklab, var(--accent) 88%, var(--encre));
+    background: color-mix(in oklab, var(--plein) 88%, var(--accent));
   }
 
   /*
@@ -510,6 +758,7 @@
     background: transparent;
     border-color: transparent;
     color: var(--accent);
+    box-shadow: none;
   }
   .bouton--discret:hover {
     background: var(--surface-haute);
@@ -569,12 +818,25 @@
     border-radius: var(--rayon-s);
     color: var(--encre);
     font-size: var(--texte-l); /* < 16 px déclenche un zoom automatique sur iOS */
+    transition: border-color 0.18s var(--sortie);
   }
 
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
     border-color: var(--accent);
+  }
+
+  /*
+   * Le texte d'invite doit rester une invite : à `--encre-douce` il se lit comme une
+   * valeur déjà saisie, et des parents ont validé le formulaire en croyant le champ
+   * rempli. Il descend donc sous le seuil de lecture confortable — c'est voulu, et
+   * c'est la seule encre de la palette qui s'y autorise, parce qu'elle ne porte aucune
+   * information : le libellé au-dessus dit la même chose.
+   */
+  ::placeholder {
+    color: var(--encre-douce);
+    opacity: 0.62;
   }
 
   /*
@@ -588,6 +850,7 @@
    */
   input[type='time'],
   input[type='date'] {
+    font-family: var(--police-chiffres);
     appearance: none;
     -webkit-appearance: none;
     min-inline-size: 0;
@@ -600,7 +863,7 @@
   }
 
   textarea {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--police-chiffres);
     font-size: var(--texte-s);
     resize: vertical;
   }
@@ -627,7 +890,9 @@
     border-radius: var(--rayon-s);
     overflow: hidden;
     background: var(--surface);
-    box-shadow: var(--ombre-2);
+    backdrop-filter: var(--flou);
+    -webkit-backdrop-filter: var(--flou);
+    box-shadow: var(--lustre), var(--ombre-2);
   }
 
   .suggestions li + li {
@@ -816,9 +1081,14 @@
     display: grid;
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
-    overflow: hidden;
-    background: var(--bord);
-    gap: var(--trait);
+    background: var(--fond-creux);
+    /*
+     * Un rail creux, et le choix retenu posé dedans comme un galet. L'ancienne version
+     * découpait le rail en cases jointives séparées par un filet ; sur verre, ces
+     * filets se lisaient comme des fentes.
+     */
+    padding: 3px;
+    gap: 3px;
   }
 
   .bascule {
@@ -833,25 +1103,30 @@
   .segments button {
     padding: var(--espace-2) var(--espace-1);
     min-block-size: var(--cible);
-    background: var(--surface-haute);
+    background: none;
     border: 0;
+    border-radius: calc(var(--rayon-s) - 3px);
     cursor: pointer;
     font-size: var(--texte-m);
     font-weight: 600;
-    color: var(--encre);
-    transition: background 0.15s ease;
+    color: var(--encre-douce);
+    transition:
+      background 0.16s var(--sortie),
+      color 0.2s var(--sortie);
   }
 
   .bascule button:hover,
   .segments button:hover {
-    background: color-mix(in oklab, var(--surface-haute) 82%, var(--accent));
+    background: var(--surface-haute);
+    color: var(--encre);
   }
 
   .bascule button[aria-pressed='true'],
   .segments button[aria-pressed='true'],
   .segments button[aria-selected='true'] {
-    background: var(--accent);
-    color: var(--encre-sur-accent);
+    background: var(--plein);
+    color: var(--encre-sur-plein);
+    font-weight: 700;
   }
 
   /*
@@ -872,6 +1147,93 @@
     white-space: nowrap;
   }
 
+  /*
+   * --- Le prochain départ ---------------------------------------------------------
+   *
+   * Le seul bloc de l'application dimensionné pour être lu à bout de bras. C'est la
+   * question que le parent vient poser — « à quelle heure faut-il partir ? » — et tout
+   * le reste de la carte en découle : l'arrêt, le temps de marche, les trajets suivants
+   * sont des précisions, pas des concurrents. Ils sont donc en dessous et plus petits.
+   */
+  .prochain {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--espace-1) var(--espace-3);
+  }
+
+  .prochain__heure {
+    font-family: var(--police-chiffres);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--heure-geante);
+    font-weight: 600;
+    /* Une interligne inférieure à 1 : le chiffre remplit sa boîte au lieu de flotter. */
+    line-height: 0.86;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+
+  /* Le délai qui accompagne l'heure : il s'aligne sur la ligne de base des chiffres. */
+  .prochain__delai {
+    font-family: var(--police-chiffres);
+    font-size: var(--texte-m);
+    color: var(--encre-douce);
+    padding-block-end: var(--espace-1);
+  }
+
+  /*
+   * « Partir maintenant ». Un point qui bat sous une onde qui s'écarte : le seul état
+   * de l'application qui demande d'agir dans la minute, et le seul mouvement continu
+   * qu'on s'autorise. La mention écrite l'accompagne toujours — le battement n'existe
+   * pas pour qui a coupé les animations, ni pour un lecteur d'écran.
+   */
+  .prochain__maintenant {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espace-2);
+    font-family: var(--police-chiffres);
+    font-size: var(--texte-m);
+    color: var(--accent);
+    padding-block-end: var(--espace-1);
+  }
+
+  .prochain__signal {
+    position: relative;
+    flex: 0 0 auto;
+    inline-size: 16px;
+    block-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .prochain__signal::before,
+  .prochain__signal::after {
+    content: '';
+    border-radius: 999px;
+  }
+
+  .prochain__signal::before {
+    position: absolute;
+    inset: 0;
+    border: var(--trait-fort) solid var(--accent);
+    animation: onde 1.8s var(--sortie) infinite;
+  }
+
+  .prochain__signal::after {
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--accent);
+    animation: souffle 1.8s var(--sortie) infinite;
+  }
+
+  /* Les trajets restants de la journée, en puces : présents, mais sans poids. */
+  .puces-trajets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espace-2);
+  }
+
   /* --- Trajets ---------------------------------------------------------------- */
   .trajet {
     display: grid;
@@ -890,19 +1252,21 @@
   }
 
   .trajet__heure {
+    font-family: var(--police-chiffres);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
 
   /* L'heure qui décide de l'action du parent : partir, ou aller chercher l'enfant. */
   .trajet__heure--principale {
-    font-weight: 700;
-    font-size: var(--texte-xl);
+    font-weight: 600;
+    font-size: var(--texte-2xl);
+    letter-spacing: -0.02em;
     color: var(--accent);
   }
 
   .trajet__heure--secondaire {
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--texte-s);
     color: var(--encre-douce);
   }
@@ -925,25 +1289,40 @@
   /* Un trajet interne ne demande rien au parent : il ne doit pas capter le regard. */
   .trajet--interne .trajet__heure--principale {
     color: var(--encre-douce);
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--texte-l);
   }
 
   /* --- Étiquette -------------------------------------------------------------- */
   .etiquette {
     display: inline-block;
-    padding: var(--espace-1) var(--espace-2);
+    padding: var(--espace-1) var(--espace-3);
     border-radius: 999px;
     font-size: var(--texte-xs);
     font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1.3;
-    background: var(--surface-haute);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    background: var(--fond-creux);
     border: var(--trait) solid var(--bord);
     color: var(--encre-douce);
     white-space: nowrap;
     /* Sans cela, une étiquette posée seule dans une `.pile` s'étire sur toute la largeur. */
     justify-self: start;
+  }
+
+  /*
+   * Une étiquette qui porte une heure : chasse fixe, pas de capitales — « 12:10 →
+   * DILLENDAPP » en petites capitales espacées se lit deux fois plus lentement qu'en
+   * bas de casse.
+   */
+  .etiquette--heure {
+    font-family: var(--police-chiffres);
+    font-size: var(--texte-s);
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--encre);
   }
 
   .etiquette--ligne {
@@ -957,26 +1336,42 @@
     border-color: var(--danger-bord);
   }
 
+  /* Un état terminal apaisant : la journée est finie, il n'y a plus rien à surveiller. */
+  .etiquette--succes {
+    color: var(--succes);
+    background: var(--succes-fond);
+    border-color: var(--succes-bord);
+  }
+
   .etiquette--attention {
     color: var(--attention);
     background: var(--attention-fond);
     border-color: var(--attention-bord);
   }
 
-  /* --- Encarts d'avertissement, gradués par gravité ---------------------------- */
+  /*
+   * --- Encarts d'avertissement, gradués par gravité ----------------------------
+   *
+   * Le filet vertical de gauche a disparu : sur une surface teintée, il redoublait ce
+   * que la teinte disait déjà, et sur verre il tranchait comme un défaut. C'est
+   * désormais le titre — en petites capitales, à la couleur de la famille — qui annonce
+   * la gravité, et le panneau entier qui la porte.
+   */
   .encart {
     border: var(--trait) solid var(--bord);
-    border-inline-start: var(--trait-accent) solid var(--encre-douce);
-    border-radius: var(--rayon-s);
-    padding: var(--espace-3);
-    background: var(--surface-haute);
+    border-radius: var(--rayon-m);
+    padding: var(--espace-4);
+    background: var(--fond-creux);
     font-size: var(--texte-m);
   }
 
   .encart__titre {
+    font-size: var(--texte-xs);
     font-weight: 700;
-    font-size: var(--texte-m);
-    margin-block-end: var(--espace-1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
+    margin-block-end: var(--espace-2);
   }
 
   /* Un encart tient souvent en deux ou trois paragraphes : ils ne doivent pas se coller. */
@@ -985,19 +1380,27 @@
   }
 
   .encart--info {
-    border-color: var(--info-bord);
-    border-inline-start-color: var(--info);
-    background: var(--info-fond);
+    border-color: var(--bord-accent);
+    background: var(--surface-accent);
   }
+  .encart--info .encart__titre {
+    color: var(--accent);
+  }
+
   .encart--attention {
     border-color: var(--attention-bord);
-    border-inline-start-color: var(--attention);
     background: var(--attention-fond);
   }
+  .encart--attention .encart__titre {
+    color: var(--attention);
+  }
+
   .encart--alerte {
     border-color: var(--danger-bord);
-    border-inline-start-color: var(--danger);
     background: var(--danger-fond);
+  }
+  .encart--alerte .encart__titre {
+    color: var(--danger);
   }
 
   /*
@@ -1017,9 +1420,11 @@
     padding: var(--espace-5);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-l);
-    background: var(--surface);
+    /* Une boîte modale se lit par-dessus un fond assombri : le verre y serait illisible,
+       on repasse donc à une surface opaque. */
+    background: color-mix(in oklab, var(--fond) 92%, var(--encre));
     color: var(--encre);
-    box-shadow: var(--ombre-3);
+    box-shadow: var(--lustre), var(--ombre-3);
     margin-block-end: calc(var(--cible) + var(--espace-5) + env(safe-area-inset-bottom));
   }
 
@@ -1030,8 +1435,15 @@
   }
 
   .dialogue::backdrop {
-    background: rgb(0 0 0 / 0.55);
-    backdrop-filter: blur(2px);
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    animation: fondu 0.24s var(--sortie) both;
+  }
+
+  @keyframes fondu {
+    from {
+      opacity: 0;
+    }
   }
 
   /*
@@ -1053,18 +1465,19 @@
     color: var(--encre);
     cursor: pointer;
     transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
+      background 0.2s var(--sortie),
+      border-color 0.2s var(--sortie);
   }
 
   .choix:hover {
-    border-color: var(--accent);
+    border-color: var(--bord-accent);
+    background: var(--surface-haute);
   }
 
+  /* Le choix retenu se teinte, comme un encart d'information : c'est la même grammaire. */
   .choix--retenu {
-    border-color: var(--accent);
-    border-inline-start-width: var(--trait-accent);
-    background: var(--info-fond);
+    border-color: var(--bord-accent);
+    background: var(--surface-accent);
   }
 
   .choix__titre {
@@ -1079,7 +1492,7 @@
 
   /* Le code d'accès se lit et se retape : chasse fixe, gros, espacé. */
   .champ-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--police-chiffres);
     font-size: var(--texte-2xl);
     letter-spacing: 0.12em;
     text-align: center;
@@ -1087,8 +1500,10 @@
 
   /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
-    background: var(--surface-haute);
-    border-block-end: var(--trait) solid var(--bord);
+    background: var(--fond-creux);
+    backdrop-filter: var(--flou);
+    -webkit-backdrop-filter: var(--flou);
+    border-block: var(--trait) solid var(--bord);
     padding: var(--espace-2) var(--gouttiere);
     font-size: var(--texte-m);
   }
@@ -1110,7 +1525,8 @@
   .tableau-conteneur {
     overflow-x: auto;
     border: var(--trait) solid var(--bord);
-    border-radius: var(--rayon-s);
+    border-radius: var(--rayon-m);
+    background: var(--fond-creux);
   }
 
   table {
@@ -1129,7 +1545,11 @@
   thead th {
     background: var(--surface-haute);
     border-block-end: var(--trait) solid var(--bord);
-    font-size: var(--texte-s);
+    font-size: var(--texte-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
   }
 
   tbody tr + tr td,
@@ -1143,6 +1563,7 @@
   }
 
   td.heure {
+    font-family: var(--police-chiffres);
     font-variant-numeric: tabular-nums;
   }
 
@@ -1153,7 +1574,7 @@
 
   .carte-osm {
     block-size: 16rem;
-    border-radius: var(--rayon-s);
+    border-radius: var(--rayon-m);
     overflow: hidden;
     border: var(--trait) solid var(--bord);
   }
@@ -1209,7 +1630,7 @@
   }
 
   .demo__texte--bouton {
-    fill: var(--encre-sur-accent);
+    fill: var(--encre-sur-plein);
     font-weight: 700;
   }
 
@@ -1240,12 +1661,12 @@
   }
 
   .demo__surbrillance {
-    fill: var(--accent);
+    fill: var(--plein);
   }
 
   /* La ligne mise en avant s'écrit sur l'accent : sans ça, elle devient illisible. */
   .demo__surbrillance + .demo__texte {
-    fill: var(--encre-sur-accent);
+    fill: var(--encre-sur-plein);
     font-weight: 700;
   }
 
@@ -1429,7 +1850,7 @@
     inline-size: 1.5rem;
     block-size: 1.5rem;
     border-radius: 999px;
-    background: var(--surface-haute);
+    background: var(--fond-creux);
     border: var(--trait) solid var(--bord);
     /* Le chevron proprement dit, tracé au centre de la pastille. */
     background-image: linear-gradient(currentColor, currentColor),
@@ -1569,15 +1990,52 @@
       margin: 12mm;
     }
 
+    /*
+     * Le papier n'a ni dégradé, ni verre, ni halo : tous les jetons redeviennent opaques.
+     * Sans cela, une carte translucide s'imprimait en gris moucheté et le dégradé du
+     * fond partait en aplat de toner sur la moitié de la feuille.
+     */
     :root {
+      --degrade: none;
+      --halo: transparent;
       --fond: #fff;
       --fond-creux: #fff;
       --surface: #fff;
       --surface-haute: #fff;
+      --surface-accent: #fff;
+      --rail: #fff;
       --bord: #767676;
+      --bord-accent: #767676;
+      --lustre: none;
+      --flou: none;
       --encre: #000;
       --encre-douce: #333;
       --accent: #000;
+      --accent-2: #000;
+      --plein: #000;
+      --encre-sur-plein: #fff;
+      --danger: #000;
+      --danger-fond: #fff;
+      --danger-bord: #767676;
+      --attention: #000;
+      --attention-fond: #fff;
+      --attention-bord: #767676;
+      --succes: #000;
+      --succes-fond: #fff;
+      --succes-bord: #767676;
+      --info-fond: #fff;
+      --info-bord: #767676;
+    }
+
+    /*
+     * `backdrop-filter` ne se désactive pas par un jeton : les valeurs sont posées en
+     * dur dans les règles, et un filtre survivant à l'impression opacifie la boîte
+     * entière chez certains moteurs. On les coupe toutes ici.
+     */
+    * {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
     }
 
     /*

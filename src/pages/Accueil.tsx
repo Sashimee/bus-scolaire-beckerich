@@ -2,37 +2,115 @@ import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { FicheFoyer } from '../composants/FicheFoyer'
 import { useFoyer } from '../etat'
+import { useUrgences } from '../urgences-contexte'
 import { etatDuJour, jourDeSemaine } from '../lib/calendrier'
 import { enMinutes, trajetsDuJour } from '../lib/plan'
-import { distanceLisible, nomArret } from '../lib/affichage'
+import { distanceLisible, nomArret, sensTrajet } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
+import {
+  heureArriveeEffective,
+  heureEffective,
+  perturbationsDuJour,
+  perturbationsDuTrajet,
+  type Perturbation,
+} from '../lib/urgences'
 import type { ContexteEnfant } from '../lib/plan'
 import type { Trajet } from '../lib/types'
 
-/** Le prochain trajet utile au parent, après l'heure courante. */
-function prochain(trajets: Trajet[], maintenant: Date): Trajet | null {
+/**
+ * L'heure que le parent doit retenir d'un trajet.
+ *
+ * À l'aller, c'est le départ : c'est là qu'il faut être à l'arrêt. Au retour, c'est
+ * l'arrivée — savoir quand le bus quitte l'école ne dit rien à qui attend au bout de la
+ * rue. La page « semaine » applique déjà cette règle ; l'écran d'accueil s'en écartait,
+ * ce qui n'avait guère de conséquence tant que l'heure y était petite.
+ */
+function heureUtile(trajet: Trajet): string | null {
+  return sensTrajet(trajet.type) === 'retour' ? trajet.arrivee.heure : trajet.depart.heure
+}
+
+/** La même heure, une fois les perturbations du jour appliquées. */
+function heureUtileEffective(trajet: Trajet, perturbations: Perturbation[]): string | null {
+  return sensTrajet(trajet.type) === 'retour'
+    ? heureArriveeEffective(trajet, perturbations)
+    : heureEffective(trajet, perturbations)
+}
+
+interface Etape {
+  trajet: Trajet
+  /** L'heure telle qu'elle est publiée au plan. */
+  heure: string
+  /** La même, décalée par un retard éventuel. Identique à `heure` en temps normal. */
+  effective: string
+}
+
+/**
+ * Les trajets qui restent à venir aujourd'hui, dans l'ordre.
+ *
+ * Un trajet annulé disparaît de la liste : afficher l'heure d'un bus qui ne passera pas
+ * est pire que ne rien afficher, et le bandeau de perturbation en tête de page dit déjà
+ * ce qui se passe.
+ */
+function etapesRestantes(trajets: Trajet[], perturbations: Perturbation[], maintenant: Date): Etape[] {
   const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
+
+  return trajets
+    .filter((x) => x.concerneParent)
+    .flatMap((trajet) => {
+      const concernees = perturbationsDuTrajet(perturbations, trajet)
+      if (concernees.some((p) => p.type === 'annulation')) return []
+
+      const heure = heureUtile(trajet)
+      const effective = heureUtileEffective(trajet, concernees) ?? heure
+      if (heure === null || effective === null) return []
+
+      const h = enMinutes(effective)
+      if (h === null || h < minutes) return []
+      return [{ trajet, heure, effective }]
+    })
+}
+
+/**
+ * Le prochain départ, en grand.
+ *
+ * C'est la question que le parent vient poser, et la seule chose que cet écran doive
+ * répondre sans être lu. Le délai qui l'accompagne tient compte du temps de marche :
+ * « dans 24 min » signifie « il reste 24 minutes avant de devoir sortir », pas « le bus
+ * passe dans 24 minutes ».
+ */
+function ProchainDepart({ etape, minutesAvant }: { etape: Etape; minutesAvant: number }) {
+  const { t } = useT()
+  const decale = etape.effective !== etape.heure
+
   return (
-    trajets
-      .filter((x) => x.concerneParent)
-      .find((x) => {
-        const h = enMinutes(x.depart.heure)
-        return h !== null && h >= minutes
-      }) ?? null
+    <div className="prochain">
+      {decale && <s className="trajet__heure trajet__heure--secondaire">{etape.heure}</s>}
+      <strong className="prochain__heure">{etape.effective}</strong>
+      {minutesAvant > 0 ? (
+        <span className="prochain__delai">{t('aujourdhui.dans', { minutes: minutesAvant })}</span>
+      ) : (
+        <span className="prochain__maintenant">
+          <span className="prochain__signal" aria-hidden="true" />
+          {t('aujourdhui.partirMaintenant')}
+        </span>
+      )}
+    </div>
   )
 }
 
 function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Date }) {
   const { t } = useT()
+  const { urgences } = useUrgences()
   const jour = jourDeSemaine(maintenant)
   const journee = jour ? trajetsDuJour(ctx, jour) : null
-  const suivant = journee ? prochain(journee.trajets, maintenant) : null
 
-  const minutesAvant = suivant
-    ? enMinutes(suivant.depart.heure)! -
-      (maintenant.getHours() * 60 + maintenant.getMinutes()) -
-      ctx.temps
-    : null
+  const perturbations = perturbationsDuJour(urgences, maintenant)
+  const restantes = journee ? etapesRestantes(journee.trajets, perturbations, maintenant) : []
+  const [suivante, ...suivantes] = restantes
+
+  const minutesAvant = suivante
+    ? enMinutes(suivante.effective)! - (maintenant.getHours() * 60 + maintenant.getMinutes()) - ctx.temps
+    : 0
 
   return (
     <article className="carte pile pile--serre">
@@ -54,6 +132,19 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
         </p>
       ) : (
         <>
+          {suivante ? (
+            <>
+              <ProchainDepart etape={suivante} minutesAvant={minutesAvant} />
+              <p>{t(`trajets.${suivante.trajet.type}`)}</p>
+            </>
+          ) : (
+            jour && (
+              <div className="rangee">
+                <span className="etiquette etiquette--succes">{t('aujourdhui.plusDeBus')}</span>
+              </div>
+            )
+          )}
+
           <p>
             <strong>{nomArret(ctx.arretDomicile, t)}</strong>{' '}
             <span className="champ__aide">
@@ -66,21 +157,15 @@ function CarteEnfant({ ctx, maintenant }: { ctx: ContexteEnfant; maintenant: Dat
             <p className="champ__aide">⚠ {t('arrets.precisionApproximative')}</p>
           )}
 
-          {suivant ? (
-            <p>
-              <strong className="trajet__heure trajet__heure--principale">
-                {suivant.depart.heure}
-              </strong>{' '}
-              {t(`trajets.${suivant.type}`)}
-              {minutesAvant !== null && minutesAvant > 0 && (
-                <span className="champ__aide"> · {t('aujourdhui.dans', { minutes: minutesAvant })}</span>
-              )}
-              {minutesAvant !== null && minutesAvant <= 0 && (
-                <span className="champ__aide"> · {t('aujourdhui.partirMaintenant')}</span>
-              )}
-            </p>
-          ) : (
-            jour && <p className="champ__aide">{t('aujourdhui.plusDeBus')}</p>
+          {/* Le reste de la journée : présent, mais sans jamais concurrencer l'heure. */}
+          {suivantes.length > 0 && (
+            <ul className="puces-trajets liste-nue">
+              {suivantes.map((e, i) => (
+                <li className="etiquette etiquette--heure" key={`${e.trajet.type}-${i}`}>
+                  {e.effective} {t(`trajets.${e.trajet.type}`)}
+                </li>
+              ))}
+            </ul>
           )}
         </>
       )}
@@ -134,17 +219,20 @@ export function Accueil() {
           </div>
         )}
 
-        {etat.ecole &&
-          foyer.enfants.map((e) => {
-            const ctx = contextes.get(e.id)
-            return ctx ? (
-              <CarteEnfant key={e.id} ctx={ctx} maintenant={maintenant} />
-            ) : (
-              <div className="carte encart--alerte" key={e.id}>
-                <strong>{e.prenom}</strong> — {t('enfant.aucunArret')}
-              </div>
-            )
-          })}
+        {etat.ecole && (
+          <div className="grille-enfants">
+            {foyer.enfants.map((e) => {
+              const ctx = contextes.get(e.id)
+              return ctx ? (
+                <CarteEnfant key={e.id} ctx={ctx} maintenant={maintenant} />
+              ) : (
+                <div className="carte encart--alerte" key={e.id}>
+                  <strong>{e.prenom}</strong> — {t('enfant.aucunArret')}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {!etat.ecole &&
           foyer.enfants.map((e) => {

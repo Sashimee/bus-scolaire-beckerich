@@ -7,6 +7,9 @@ import { FournisseurFoyer } from './etat'
 import { FournisseurUrgences } from './urgences-contexte'
 import { FournisseurRechargement } from './rechargement-contexte'
 import { FournisseurInstallation } from './installation-contexte'
+// Avant la feuille principale : les `@font-face` doivent être connues quand la couche
+// `base` désigne les familles.
+import './polices.css'
 import './index.css'
 
 // GitHub Pages sert `404.html` pour toute route inconnue. Celui-ci mémorise le chemin

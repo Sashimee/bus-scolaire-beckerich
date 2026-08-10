@@ -61,6 +61,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R18~~ | 15 | ~~Les onglets d'`/admin` n'ont pas été vus connecté.~~ **Levée le 2026-08-09** : les cinq onglets vus connectés, et deux publications réelles abouties par l'auteur (crédits, perturbation). L'éditeur de crédits lit bien le dépôt et non le bundle ; l'éditeur de textes ne monte aucun champ tant qu'une section n'est pas dépliée. |
 | ~~R19~~ | 17 | ~~L'effet de l'en-tête `Urgency` n'est pas constatable ici.~~ **Levée le 2026-08-09** : marche à suivre iOS affichée, notification d'essai reçue en quelques secondes sur l'iPhone de l'auteur. |
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
+| R25 | 18 | **La couche `impression` n'a toujours pas été vue sur papier** — même réserve qu'au lot 2, aggravée : le thème repose désormais sur un dégradé, des voiles translucides et des `backdrop-filter`. Tout est neutralisé dans `@media print` (jetons repassés en opaque, `backdrop-filter` et `box-shadow` coupés partout par un `!important`), et les variables ont été recroisées une à une, mais **aucune feuille n'est sortie d'une imprimante**. Un voile translucide qui survivrait sortirait en gris moucheté. | Un `Cmd+P` sur `/` avec deux enfants, et un sur une fiche enfant. À faire avant de lever R1, qui porte sur la même feuille. |
+| R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
+| R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
 ### Mise en service, non faite
@@ -1233,6 +1236,81 @@ des noms de tiers : seuls ceux dont l'accord est acquis y figurent, et la page l
 Un bus annulé est une information dont dix minutes de retard changent la valeur. La
 requête push ne portait aucun en-tête d'urgence, et rien n'expliquait au parent comment
 faire sortir ces notifications du lot sur son téléphone.
+
+---
+
+## Lot 18 — Seconde refonte visuelle : la direction « verre »
+
+> **Fait le 2026-08-10.** Mise en œuvre de la maquette *Schulbus App — Produktion*
+> (projet Claude Design `c55e28ef`), importée depuis `Schulbus App - Produktion.dc.html`.
+> La maquette décrit trente écrans dans une direction unique : fond en dégradé bleu
+> profond, surfaces translucides à arête lumineuse, IBM Plex Sans et Mono, heures
+> géantes à chasse fixe, rail de navigation flottant.
+>
+> **La maquette n'a pas été reprise telle quelle.** Cinq écarts, tous assumés :
+>
+> - **Les polices ne viennent pas de Google Fonts.** La maquette pose un `<link>` vers
+>   `fonts.googleapis.com`. Trois raisons de ne pas le suivre : la CSP n'autorise que
+>   `font-src 'self'` ; l'application doit s'ouvrir à un arrêt de bus sans réseau ; et
+>   une requête vers un tiers à chaque ouverture révélerait qui consulte ce site, ce
+>   qu'interdit le principe n° 1. Les deux familles sont donc servies depuis le site
+>   (`src/polices.css`), et **seuls les sous-ensembles réellement lus** sont déclarés —
+>   `latin` et `latin-ext` pour le texte, `latin` seul pour les chiffres. Importer les
+>   feuilles de `@fontsource` aurait embarqué le cyrillique, le grec et le vietnamien,
+>   précachés par le service worker sans jamais s'afficher. Coût réel : 107 Ko.
+> - **La palette a été refaite, pas recopiée.** Les encres de la maquette ne tiennent pas
+>   le seuil de 4,5:1 qu'impose `CLAUDE.md` : son gris de texte secondaire
+>   (`rgb(233 239 246 / .62)`) tombe à **3,13:1** sur un voile posé dans l'angle clair du
+>   dégradé. Un fond translucide ne se vérifie pas comme une couleur unie — il faut
+>   mesurer la COMPOSITION réelle : arrêt du dégradé, halo décoratif, une puis deux
+>   couches de verre. Les 24 compositions possibles ont été calculées par thème, contre
+>   chaque encre, en n'appariant que ce qui se rencontre vraiment (une encre d'alerte ne
+>   paraît jamais sur un encart de succès). Le dégradé a été assombri, les voiles
+>   allégés, les encres relevées : **pire cas 4,58:1**, contre 3,13 en reprenant la
+>   maquette. Les valeurs figurent en commentaire dans la couche `tokens`.
+> - **Pas de `backdrop-filter` sur les cartes.** Une carte est posée sur un dégradé
+>   lisse, et flouter un dégradé lisse redonne le même dégradé : le flou n'y change rien
+>   à l'œil, alors que chaque surface floutée coûte une couche composée. Il ne reste que
+>   sur les quatre surfaces sous lesquelles du contenu défile vraiment — en-tête, rail,
+>   bandeaux, suggestions. Dans le même esprit, `background-attachment: fixed` a été
+>   abandonné : cause connue de saccade au défilement sur téléphone, et ignoré par iOS.
+> - **La bordure claire reste une bordure.** En thème clair, la maquette trace les arêtes
+>   en blanc translucide. Sur un fond clair, un filet blanc ne sépare rien : la bordure
+>   structurelle passe à l'encre translucide, et c'est `--lustre` seul — un filet de
+>   lumière en `inset` — qui garde l'arête de verre.
+> - **Le texte d'invite des champs** descend volontairement sous le seuil de lecture
+>   confortable (`opacity: .62`). À `--encre-douce` il se lisait comme une valeur déjà
+>   saisie. C'est la seule encre qui s'y autorise, et elle ne porte aucune information —
+>   le libellé au-dessus dit la même chose.
+>
+> **Ajouté par la maquette, au-delà du style** : l'heure du prochain départ devient un
+> bloc à part entière (`.prochain`), dimensionné pour être lu à bout de bras. En la
+> grossissant, deux défauts de l'écran d'accueil sont devenus visibles et ont été
+> corrigés :
+>
+> - il affichait l'heure de DÉPART pour un retour, c'est-à-dire l'heure à laquelle le bus
+>   quitte l'école — sans intérêt pour qui attend au bout de la rue. La page « semaine »
+>   appliquait déjà la bonne règle ; l'accueil s'en écartait ;
+> - il **ignorait complètement les perturbations**. Un bus annulé y gardait son heure,
+>   affichée comme si de rien n'était. Les trajets annulés disparaissent maintenant de
+>   l'accueil, et un retard s'y lit comme ailleurs : ancienne heure barrée, nouvelle à
+>   côté.
+>
+> **Vérifié** : 352 tests, `typecheck`, `lint`, build. Puis le même banc qu'au lot 2, mis
+> à jour — 12 routes × 2 largeurs (320 et 430 px) × 2 thèmes = **48 combinaisons**
+> mesurées dans des iframes de largeur fixe. Aucun débordement horizontal ; l'enseigne,
+> le rail et tous les `.bouton` au-dessus de 44 px.
+>
+> **Réserves** : R25, R26, R27.
+
+*Ne dépend de rien, et rien ne dépend de lui : c'est une reprise de la couche `tokens` et
+des primitives du lot 2, sans changement de structure.*
+
+La refonte du lot 2 avait donné une interface correcte et plate. Celle-ci lui donne une
+direction : un fond qui respire, des surfaces qui se détachent, et surtout **une
+hiérarchie qui dit ce que le parent est venu chercher**. Avant, l'heure du prochain bus
+était un mot en gras au milieu d'un paragraphe ; c'est maintenant le seul élément de
+l'application qu'on lit sans lire.
 
 ---
 
