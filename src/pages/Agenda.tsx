@@ -56,6 +56,18 @@ function Procedure({ cle, principal }: { cle: Plateforme; principal: boolean }) 
  * l'onglet, et la portée demandée ne donne accès qu'aux agendas créés par cette
  * application : l'agenda personnel du parent reste hors d'atteinte.
  */
+/**
+ * Ce qui s'affiche pour chaque panne : un titre, et une explication quand la cause est
+ * connue. Le motif brut renvoyé par Google ne s'affiche qu'à défaut — il est en anglais
+ * et écrit pour un développeur, il ne vaut que là où nous n'avons rien de mieux à dire.
+ */
+const PANNES = {
+  portee: { titre: 'agenda.googlePorteeTitre', texte: 'agenda.googlePorteeAbsente' },
+  session: { titre: 'agenda.googleSessionTitre', texte: 'agenda.googleSessionExpiree' },
+  connexion: { titre: 'agenda.googleConnexionEchec', texte: null },
+  synchronisation: { titre: 'agenda.googleEcritureEchec', texte: null },
+} as const
+
 function BlocGoogle() {
   const { t } = useT()
   const { foyer, contextes } = useFoyer()
@@ -69,7 +81,7 @@ function BlocGoogle() {
    * comme un échec de connexion, et sans le moindre détail — alors que Google dit
    * précisément ce qui bloque.
    */
-  const [erreur, setErreur] = useState<'connexion' | 'synchronisation' | null>(null)
+  const [erreur, setErreur] = useState<'connexion' | 'synchronisation' | 'session' | null>(null)
 
   // Le retour de Google porte un code dans l'URL : on l'échange puis on l'efface.
   useEffect(() => {
@@ -108,20 +120,32 @@ function BlocGoogle() {
       }
       setResultat(t('agenda.googleFait', { nombre: total, enfants: enfants.length }))
     } catch (e) {
-      setErreur('synchronisation')
-      setResultat(e instanceof Error ? e.message : null)
       // On ne jette le jeton que s'il est VRAIMENT refusé. Le jeter à la moindre
       // erreur ramenait le bouton « Connecter » après une portée manquante ou une API
       // non activée, ce qui laissait croire à un problème de connexion — et faisait
       // recommencer une autorisation qui n'y changeait rien.
       if ((e as { statut?: number })?.statut === 401) {
+        // Le jeton est mort : expiré, ou révoqué depuis le compte Google — ce qui
+        // arrive justement en suivant la consigne « retirez l'accès, puis
+        // reconnectez-vous » avec l'onglet resté ouvert. L'écran annonçait pourtant
+        // « vous restez connecté » au-dessus d'un bouton « Connecter mon compte », et
+        // recopiait le charabia de Google. Ici la cause est connue : autant la dire.
         oublierJeton()
         setJeton(null)
+        setErreur('session')
+        setResultat(null)
+      } else {
+        setErreur('synchronisation')
+        setResultat(e instanceof Error ? e.message : null)
       }
     } finally {
       setOccupe(false)
     }
   }
+
+  // La portée manquante se signale par le motif de l'erreur, non par son origine : elle
+  // se découvre aussi bien au retour de Google qu'à la première écriture.
+  const panne = resultat === 'portee-absente' ? 'portee' : (erreur ?? 'synchronisation')
 
   return (
     <section className="carte pile pile--serre">
@@ -133,11 +157,9 @@ function BlocGoogle() {
           d'échec — le motif renvoyé par Google. Les deux ne se lisent pas pareil. */}
       {erreur && (
         <div className="encart encart--alerte">
-          <div className="encart__titre">
-            {t(erreur === 'connexion' ? 'agenda.googleConnexionEchec' : 'agenda.googleEcritureEchec')}
-          </div>
-          {resultat === 'portee-absente' ? (
-            <p>{t('agenda.googlePorteeAbsente')}</p>
+          <div className="encart__titre">{t(PANNES[panne].titre)}</div>
+          {PANNES[panne].texte ? (
+            <p>{t(PANNES[panne].texte)}</p>
           ) : (
             resultat && (
               <p className="champ__aide">

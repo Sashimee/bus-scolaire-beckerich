@@ -323,7 +323,10 @@
     "lienDepuisFiche": "Agenda : Google, Apple, Outlook",
     "googleEcritureEchec": "L'écriture dans Google Agenda a été refusée. Vous restez connecté : le détail ci-dessous vient de Google et dit ce qui bloque.",
     "icsTitreSeul": "Importer le fichier dans votre agenda",
-    "googlePorteeAbsente": "Google a bien accepté la connexion, mais sans donner l'accès à l'agenda. La permission « calendar.app.created » doit être déclarée sur l'écran de consentement du projet Google. Une fois ajoutée, retirez l'accès de l'application dans votre compte Google, puis reconnectez-vous ici."
+    "googlePorteeAbsente": "Google a bien accepté la connexion, mais sans donner l'accès à l'agenda. La permission « calendar.app.created » doit être déclarée sur l'écran de consentement du projet Google. Une fois ajoutée, retirez l'accès de l'application dans votre compte Google, puis reconnectez-vous ici.",
+    "googlePorteeTitre": "L'accès à l'agenda n'a pas été accordé",
+    "googleSessionTitre": "La connexion à Google n'est plus valable",
+    "googleSessionExpiree": "Google a refusé l'autorisation de cette session : elle a expiré, ou l'accès de l'application a été retiré depuis votre compte Google. Reconnectez-vous ci-dessous, rien n'est perdu."
   },
   "partage": {
     "titre": "Partager cette configuration",
