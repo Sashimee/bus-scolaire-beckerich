@@ -7,6 +7,7 @@
 import type { Cycle, Enfant, Foyer, Jour, RepasMidi, UsageBus } from './types'
 import { JOURS } from './types'
 import { deduireInscriptions } from './plan'
+import { oublierAgendas } from './agenda/google'
 
 const CLE_FOYER = 'bus-beckerich.foyer'
 const CLE_LANGUE = 'bus-beckerich.langue'
@@ -138,6 +139,10 @@ export const accepterAvertissement = (): void => ecrire(CLE_AVERTISSEMENT, true)
 
 /** Efface toutes les données locales, sur demande explicite du parent. */
 export function toutEffacer(): void {
+  // Les agendas Google créés par l'application ne vivent pas ici, mais leurs
+  // identifiants sont bien des données locales : les laisser derrière ferait réécrire
+  // dans des agendas dont le parent croyait avoir coupé tout lien.
+  oublierAgendas()
   for (const cle of [CLE_FOYER, CLE_LANGUE, CLE_AVERTISSEMENT]) {
     try {
       localStorage.removeItem(cle)

@@ -323,7 +323,10 @@
     "lienDepuisFiche": "Kalenner: Google, Apple, Outlook",
     "googleEcritureEchec": "D'Schreiwen an de Google Kalenner gouf refuséiert. Dir bleift verbonnen: d'Detail hei ënnen kënnt vu Google a seet, wat blockéiert.",
     "icsTitreSeul": "D'Datei an Äre Kalenner importéieren",
-    "googlePorteeAbsente": "Google huet d'Verbindung ugeholl, mä ouni Zougrëff op de Kalenner. D'Berechtegung « calendar.app.created » muss um Zoustëmmungsschirm vum Google-Projet androe sinn. Duerno den Zougrëff vun der App am Google-Kont ewechhuelen a sech hei nei verbannen."
+    "googlePorteeAbsente": "Google huet d'Verbindung ugeholl, mä ouni Zougrëff op de Kalenner. D'Berechtegung « calendar.app.created » muss um Zoustëmmungsschirm vum Google-Projet androe sinn. Duerno den Zougrëff vun der App am Google-Kont ewechhuelen a sech hei nei verbannen.",
+    "googlePorteeTitre": "Den Zougrëff op de Kalenner gouf net accordéiert",
+    "googleSessionTitre": "D'Verbindung mat Google gëllt net méi",
+    "googleSessionExpiree": "Google huet d'Berechtegung vun dëser Sessioun refuséiert: si ass ofgelaf, oder den Zougrëff vun der App gouf am Google-Kont ewechgeholl. Verbannt Iech hei ënnen nei — et geet näischt verluer."
   },
   "partage": {
     "titre": "Dës Konfiguratioun deelen",

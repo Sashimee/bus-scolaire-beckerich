@@ -25,6 +25,7 @@ const PORTEE = 'https://www.googleapis.com/auth/calendar.app.created'
 
 const CLE_VERIFICATEUR = 'bus-beckerich.google-verificateur'
 const CLE_JETON = 'bus-beckerich.google-jeton'
+const CLE_AGENDAS = 'bus-beckerich.google-agendas'
 
 const JOUR_ICS: Record<Jour, string> = {
   lundi: 'MO',
@@ -197,6 +198,15 @@ async function appeler<T>(jeton: string, chemin: string, options: RequestInit = 
       error?: { message?: string; status?: string }
     }
     const motif = corps.error?.message ?? corps.error?.status ?? ''
+
+    // Un jeton obtenu AVANT que la portée soit déclarée reste en session et ne repasse
+    // jamais par le contrôle de la connexion : il échoue donc indéfiniment, avec un
+    // message que seul un développeur sait lire. On le reconnaît ici pour donner la
+    // même consigne que lors d'une connexion incomplète.
+    if (rep.status === 403 && /insufficient authentication scopes/i.test(motif)) {
+      throw new Error('portee-absente')
+    }
+
     const erreur = new Error(motif ? `${rep.status} — ${motif}` : `google-${rep.status}`)
     // Marqué pour que l'appelant sache s'il faut redemander une connexion ou non.
     ;(erreur as Error & { statut?: number }).statut = rep.status
@@ -206,24 +216,73 @@ async function appeler<T>(jeton: string, chemin: string, options: RequestInit = 
 }
 
 /**
+ * Les agendas déjà créés par l'application, par nom d'agenda.
+ *
+ * Cette mémoire remplace un appel que la portée n'autorise pas — voir
+ * `agendaDeLEnfant`. Elle ne contient que des identifiants d'agendas Google, pas de
+ * donnée de famille, et suit le même chemin que le reste : elle ne quitte pas l'appareil.
+ */
+function agendasConnus(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(CLE_AGENDAS) ?? '{}') as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
+function retenirAgenda(nom: string, id: string): void {
+  try {
+    localStorage.setItem(CLE_AGENDAS, JSON.stringify({ ...agendasConnus(), [nom]: id }))
+  } catch {
+    /* Sans mémoire, la prochaine synchronisation créera un agenda de plus : gênant,
+       mais sans perte. Mieux vaut cela qu'une synchronisation qui échoue. */
+  }
+}
+
+/** Appelée à l'effacement des données locales : ces identifiants en font partie. */
+export function oublierAgendas(): void {
+  try {
+    localStorage.removeItem(CLE_AGENDAS)
+  } catch {
+    /* rien à oublier */
+  }
+}
+
+/**
  * L'agenda dédié à un enfant, créé au besoin.
  *
  * Un agenda PAR ENFANT, et non une poignée d'événements dans l'agenda principal :
  * c'est ce qui permet au parent de masquer, de renommer ou de **supprimer d'un geste**
  * tout ce que l'application a écrit, sans toucher au sien.
+ *
+ * **On ne peut pas chercher l'agenda existant en listant.** `calendarList.list` n'accepte
+ * que les portées qui ouvrent l'agenda du parent (`calendar`, `calendar.readonly`,
+ * `calendar.calendarlist…`) — jamais `calendar.app.created`, qui ne donne accès qu'aux
+ * agendas créés ici. Cet appel répondait donc « 403 insufficient authentication scopes »
+ * dès la première synchronisation, **portée pourtant accordée**, et faisait accuser à
+ * tort la configuration du projet Google. On retient l'identifiant nous-mêmes et on le
+ * vérifie par `calendars.get`, qui, lui, accepte la portée.
  */
 async function agendaDeLEnfant(jeton: string, nom: string): Promise<string> {
-  const { items } = await appeler<{ items?: { id: string; summary: string }[] }>(
-    jeton,
-    '/users/me/calendarList',
-  )
-  const existant = items?.find((c) => c.summary === nom)
-  if (existant) return existant.id
+  const connu = agendasConnus()[nom]
+  if (connu) {
+    try {
+      await appeler(jeton, `/calendars/${encodeURIComponent(connu)}`)
+      return connu
+    } catch (e) {
+      // Un jeton refusé ou une portée absente ne disent rien de l'agenda : en créer un
+      // second dans ce cas ne ferait qu'ajouter du désordre à la panne.
+      if ((e as { statut?: number })?.statut === 401) throw e
+      if (e instanceof Error && e.message === 'portee-absente') throw e
+      // Reste le cas normal : le parent a supprimé l'agenda. On en refait un.
+    }
+  }
 
   const cree = await appeler<{ id: string }>(jeton, '/calendars', {
     method: 'POST',
     body: JSON.stringify({ summary: nom, timeZone: 'Europe/Luxembourg' }),
   })
+  retenirAgenda(nom, cree.id)
   return cree.id
 }
 
@@ -258,6 +317,31 @@ function versEvenementGoogle(e: EvenementRecurrent) {
   }
 }
 
+/**
+ * Écrit un événement à un identifiant choisi par nous, qu'il existe déjà ou non.
+ *
+ * Google n'a pas de « poser à cet identifiant » : `events.update` (PUT) exige un
+ * événement existant et répond 404 sinon, `events.insert` (POST) refuse un identifiant
+ * déjà pris avec un 409. Le `PUT` seul écrivait donc… rien du tout à la première
+ * synchronisation : 404 sur chaque événement, comptés en échecs silencieux.
+ *
+ * On tente la mise à jour d'abord : c'est le cas courant dès la deuxième fois, et cela
+ * évite de créer un doublon si les deux appels se croisent.
+ */
+async function ecrireEvenement(
+  jeton: string,
+  agenda: string,
+  corps: ReturnType<typeof versEvenementGoogle>,
+): Promise<void> {
+  const base = `/calendars/${encodeURIComponent(agenda)}/events`
+  try {
+    await appeler(jeton, `${base}/${corps.id}`, { method: 'PUT', body: JSON.stringify(corps) })
+  } catch (e) {
+    if ((e as { statut?: number })?.statut !== 404) throw e
+    await appeler(jeton, base, { method: 'POST', body: JSON.stringify(corps) })
+  }
+}
+
 export interface ResultatSynchronisation {
   agenda: string
   ecrits: number
@@ -284,14 +368,15 @@ export async function synchroniserEnfant(
   for (const e of evenements) {
     const corps = versEvenementGoogle(e)
     try {
-      // `PUT` sur l'identifiant : crée s'il n'existe pas, remplace sinon. Un `POST`
-      // aurait créé un doublon à chaque resynchronisation.
-      await appeler(jeton, `/calendars/${encodeURIComponent(agenda)}/events/${corps.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(corps),
-      })
+      await ecrireEvenement(jeton, agenda, corps)
       ecrits++
-    } catch {
+    } catch (erreur) {
+      // Un refus d'autorisation ne se répare pas en passant à l'événement suivant : les
+      // autres écritures échoueront toutes de la même façon, et le compte rendu
+      // annoncerait « 0 rendez-vous écrits » comme une réussite. On remonte pour que
+      // l'écran dise quoi faire.
+      if ((erreur as { statut?: number })?.statut === 401) throw erreur
+      if (erreur instanceof Error && erreur.message === 'portee-absente') throw erreur
       echecs++
     }
   }

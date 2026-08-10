@@ -323,7 +323,10 @@
     "lienDepuisFiche": "Calendar: Google, Apple, Outlook",
     "googleEcritureEchec": "Writing to Google Calendar was refused. You stay connected: the detail below comes from Google and says what is blocking.",
     "icsTitreSeul": "Import the file into your calendar",
-    "googlePorteeAbsente": "Google accepted the connection, but without granting calendar access. The «calendar.app.created» permission must be declared on the Google project's consent screen. Once added, remove the app's access from your Google account, then connect again here."
+    "googlePorteeAbsente": "Google accepted the connection, but without granting calendar access. The «calendar.app.created» permission must be declared on the Google project's consent screen. Once added, remove the app's access from your Google account, then connect again here.",
+    "googlePorteeTitre": "Calendar access was not granted",
+    "googleSessionTitre": "The Google connection is no longer valid",
+    "googleSessionExpiree": "Google refused this session's authorisation: it has expired, or the app's access was removed from your Google account. Connect again below — nothing is lost."
   },
   "partage": {
     "titre": "Share this setup",
