@@ -1335,8 +1335,21 @@
     -webkit-backdrop-filter: var(--flou);
   }
 
+  /*
+   * Les heures éteintes sont floutées ELLES-MÊMES, et non par le verre posé dessus.
+   *
+   * Première tentative : un `backdrop-filter` sur la plaque, censé brouiller ce qui
+   * passe dessous. Deux `backdrop-filter` imbriqués — la tuile puis la plaque — avec un
+   * groupe d'opacité entre les deux, et le rendu s'inverse : flou tout autour, net juste
+   * sous la plaque. Un `backdrop-filter` établit une racine d'arrière-plan pour ses
+   * descendants, qui n'échantillonnent plus ce qu'on croit.
+   *
+   * `filter` sur le contenu lui-même n'a pas cette subtilité : le texte devient une
+   * texture, partout pareil, et il n'y a plus rien à lire par transparence.
+   */
   .sous-tuile--eteinte .sous-tuile__contenu {
     opacity: 0.35;
+    filter: blur(2.5px);
   }
 
   .sous-tuile__incrustation {
@@ -1360,11 +1373,18 @@
     gap: var(--espace-1);
     justify-items: center;
     text-align: center;
-    background: var(--surface-haute);
-    /* Le flou porte ici sur les heures qui passent dessous : elles deviennent une
-       matière, et cessent d'être un texte qui traverse les lettres du message. */
-    backdrop-filter: var(--flou);
-    -webkit-backdrop-filter: var(--flou);
+    /*
+     * Deux couches, et pas de `backdrop-filter` : la tuile en porte déjà un, et le texte
+     * du dessous est flouté à la source. Rien ne doit traverser ces lettres.
+     *
+     * Dessous, un aplat presque opaque qui masque ; dessus, le voile appuyé du système,
+     * qui rend la plaque plus claire que la tuile et la fait lire comme une lame de
+     * verre POSÉE, et non comme un trou. Sans lui, plaque et tuile ont la même teinte et
+     * seule l'arête les sépare.
+     */
+    background:
+      linear-gradient(var(--surface-haute), var(--surface-haute)),
+      color-mix(in oklab, var(--fond) 96%, transparent);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
     padding: var(--espace-2) var(--espace-3);
