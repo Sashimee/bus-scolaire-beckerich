@@ -1,5 +1,5 @@
 import { useT } from '../i18n'
-import { destinationTrajet, nomArret } from '../lib/affichage'
+import { arretCoteFamille, destinationTrajet, nomArret } from '../lib/affichage'
 import { siteDuCycle, plan } from '../lib/donnees'
 import { semaineEnfant, type ContexteEnfant } from '../lib/plan'
 import { JOURS } from '../lib/types'
@@ -82,12 +82,29 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
                     <span className="fiche__vide">{t('bus.sansBus')}</span>
                   ) : utiles.length ? (
                     <ul className="fiche__trajets">
-                      {utiles.map((trajet, i) => (
-                        <li key={`${trajet.type}-${i}`}>
-                          <b>{trajet.depart.heure ?? '—'}</b> {t(libelleDestination(trajet.type))}
-                          <span className="fiche__ligne"> {trajet.ligne.nom}</span>
-                        </li>
-                      ))}
+                      {utiles.map((trajet, i) => {
+                        // Même manque que sur la fiche du foyer : la feuille donnait des
+                        // heures sans dire de quel arrêt, et ne montrait rien des
+                        // adresses réglées jour par jour.
+                        const derogation = trajet.adresseDerogatoire
+                        const adresse = derogation ? enfant.adresses?.[jour]?.[derogation] : null
+
+                        return (
+                          <li key={`${trajet.type}-${i}`}>
+                            <b>{trajet.depart.heure ?? '—'}</b> {t(libelleDestination(trajet.type))}
+                            <span className="fiche__ligne">
+                              {' '}
+                              {nomArret(arretCoteFamille(trajet), t)} — {trajet.ligne.nom}
+                            </span>
+                            {adresse && (
+                              <span className="fiche__derogation">
+                                <span aria-hidden="true">↳ </span>
+                                {adresse.libelle}
+                              </span>
+                            )}
+                          </li>
+                        )
+                      })}
                     </ul>
                   ) : (
                     <span className="fiche__vide">—</span>

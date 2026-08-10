@@ -6,7 +6,7 @@
  */
 import type { Traduction } from '../i18n'
 import { arret as trouverArret, plan } from './donnees'
-import type { Arret, ArretDesservi, Ligne, Service, TypeTrajet } from './types'
+import type { Arret, ArretDesservi, Ligne, Service, Trajet, TypeTrajet } from './types'
 
 /** Vers quoi va ce trajet. */
 export function destinationTrajet(type: TypeTrajet): 'ecole' | 'maison' | 'dillendapp' {
@@ -34,6 +34,20 @@ export function destinationTrajet(type: TypeTrajet): 'ecole' | 'maison' | 'dille
  */
 export function sensTrajet(type: TypeTrajet): 'aller' | 'retour' {
   return destinationTrajet(type) === 'ecole' ? 'aller' : 'retour'
+}
+
+/**
+ * L'arrêt d'un trajet qui concerne le parent, et lui seul.
+ *
+ * À l'aller c'est celui du départ — l'endroit où il faut être ; au retour celui de
+ * l'arrivée — l'endroit où l'enfant descend. L'autre bout est l'école, que la
+ * destination nomme déjà : l'afficher aussi doublerait la ligne sans rien apprendre.
+ *
+ * C'est cet arrêt-là qui change les jours où le parent a réglé une adresse dérogatoire,
+ * et donc celui qu'une feuille doit nommer.
+ */
+export function arretCoteFamille(trajet: Trajet): Arret {
+  return sensTrajet(trajet.type) === 'retour' ? trajet.arrivee.arret : trajet.depart.arret
 }
 
 /**

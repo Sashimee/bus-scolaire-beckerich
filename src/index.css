@@ -1317,14 +1317,26 @@
   }
 
   /*
-   * Le contenu éteint garde sa place — c'est lui qui donne sa hauteur à la tuile et
-   * montre ce qui aurait eu lieu. Il passe sous le seuil de lisibilité à dessein :
-   * l'incrustation porte le message, et `aria-hidden` n'a pas lieu d'être puisque les
-   * heures restent justes, seulement sans objet ce jour-là.
+   * Une tuile éteinte devient du verre dépoli : presque opaque, et floutée.
+   *
+   * Le creux `--fond-creux` est un voile de 5 % — posé sur le dégradé du fond et
+   * traversé par des horaires eux-mêmes translucides, il ne faisait pas un rectangle
+   * mais une bavure. À 88 %, plus rien ne transparaît du dégradé, et le flou d'arrière-
+   * plan garde la matière : c'est une vitre givrée, pas un aplat. Les heures restent
+   * dessous pour donner sa hauteur à la tuile et dire ce qui aurait eu lieu — elles ne
+   * sont pas faites pour être lues ce jour-là.
+   *
+   * L'un des rares endroits où `backdrop-filter` gagne son coût : ici, il y a vraiment
+   * quelque chose à brouiller dessous.
    */
+  .sous-tuile--eteinte {
+    background: color-mix(in oklab, var(--fond) 88%, transparent);
+    backdrop-filter: var(--flou);
+    -webkit-backdrop-filter: var(--flou);
+  }
+
   .sous-tuile--eteinte .sous-tuile__contenu {
-    opacity: 0.3;
-    filter: grayscale(1);
+    opacity: 0.35;
   }
 
   .sous-tuile__incrustation {
@@ -1337,18 +1349,22 @@
   }
 
   /*
-   * La plaque est OPAQUE — `--fond`, le seul jeton uni de la palette, et non un voile
-   * de plus. Un message translucide posé sur des horaires eux-mêmes translucides laisse
-   * transparaître les chiffres à travers les lettres : deux textes à demi effacés l'un
-   * sur l'autre, illisibles tous les deux. Le fond éteint reste visible tout autour,
-   * ce qui suffit à dire que la journée est vide.
+   * La plaque du message, posée sur une tuile déjà opaque : `--surface-haute` y est un
+   * voile appuyé qui se compose proprement, et non un verre de plus sur un dégradé.
+   * Elle se détache sans que rien ne transparaisse à travers les lettres — c'est le
+   * défaut qu'elle corrige : un message translucide sur des horaires translucides
+   * laissait les chiffres traverser le texte, les deux devenant illisibles.
    */
   .sous-tuile__plaque {
     display: grid;
     gap: var(--espace-1);
     justify-items: center;
     text-align: center;
-    background: var(--fond);
+    background: var(--surface-haute);
+    /* Le flou porte ici sur les heures qui passent dessous : elles deviennent une
+       matière, et cessent d'être un texte qui traverse les lettres du message. */
+    backdrop-filter: var(--flou);
+    -webkit-backdrop-filter: var(--flou);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
     padding: var(--espace-2) var(--espace-3);
@@ -2340,6 +2356,18 @@
       table-layout: fixed;
     }
 
+    /*
+     * La largeur de la colonne des jours se pose sur la PREMIÈRE ligne du tableau,
+     * c'est-à-dire dans le `thead`.
+     *
+     * Elle était posée sur `tbody th`, où `table-layout: fixed` ne la regarde jamais :
+     * l'algorithme ne lit que la première rangée. Les quatre colonnes se partageaient
+     * donc les 186 mm à parts égales — 46 mm pour « Dag », 46 mm par enfant au lieu de
+     * 55. Chaque trajet revenait à la ligne, chaque journée gagnait une ligne, et la
+     * feuille débordait. Constaté sur la feuille d'un foyer de trois enfants, où le
+     * vendredi sortait tronqué.
+     */
+    .fiche-foyer__tableau thead th:first-child,
     .fiche-foyer__tableau tbody th,
     .fiche-foyer__tableau tbody td:first-of-type {
       inline-size: 22mm;
@@ -2361,13 +2389,22 @@
       break-inside: avoid;
     }
 
+    /*
+     * Cellules plus serrées que sur la fiche d'un enfant seul : trois colonnes de cinq
+     * journées, chaque dixième de millimètre est repris cinq fois.
+     */
+    .fiche-foyer__tableau th,
+    .fiche-foyer__tableau td {
+      padding: 0.9mm 1.4mm;
+    }
+
     /* Les trajets s'empilent : en ligne, deux heures et un nom de ligne ne tiennent pas. */
     .fiche__trajets--colonne {
       display: block;
     }
 
     .fiche__trajets--colonne li + li {
-      margin-block-start: 1mm;
+      margin-block-start: 0.8mm;
     }
 
     /*
@@ -2399,14 +2436,33 @@
      */
     .fiche-foyer {
       font-size: 9pt;
+      /*
+       * Interligne resserré, et c'est le principal levier de hauteur de la feuille :
+       * seize trajets à deux lignes chacun, l'interligne du corps de texte coûtait à lui
+       * seul une vingtaine de millimètres. 1,2 reste confortable pour un tableau dont on
+       * lit une cellule à la fois.
+       */
+      line-height: 1.2;
     }
     .fiche-foyer .fiche-foyer__prenom {
       font-size: 10pt;
     }
     .fiche-foyer .fiche__ligne,
     .fiche-foyer .fiche__destination,
+    .fiche-foyer .fiche__derogation,
     .fiche-foyer .fiche__note {
       font-size: 7.5pt;
+    }
+
+    /*
+     * L'adresse dérogatoire : elle ne paraît que les jours où le parent en a réglé une,
+     * et c'est précisément ce qu'il vient vérifier sur la feuille. En italique, pour
+     * qu'elle se distingue de l'arrêt sans crier.
+     */
+    .fiche__derogation {
+      display: block;
+      font-style: italic;
+      color: #333;
     }
   }
 }

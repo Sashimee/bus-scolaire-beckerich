@@ -38,7 +38,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **La feuille sort d'iOS Safari, mes mesures viennent de Chrome.** Trois corrections successives le 2026-08-09 : hauteur des trajets, puis bandeau imprimé et en-têtes collés (sur PDF de l'auteur), puis corps resserré. Le banc annonçait 241 mm pour 273 disponibles et la feuille faisait toujours deux pages : Safari n'a ni les mêmes métriques de police, ni la même surface utile — il ajoute son en-tête et son pied de page. On ne vise donc plus 273 au millimètre, on prend de la marge : 215 mm à deux enfants, 236 mm à trois. **Je ne peux pas prédire la pagination de Safari depuis Chrome.** | Réimprimer. Si cela déborde encore, décocher « En-têtes et pieds de page » dans la boîte d'impression avant d'aller plus loin. |
+| R1 | 2, 7 | **La feuille du foyer débordait, et la cause n'était pas celle qu'on croyait.** Quatre corrections successives le 2026-08-09 sur la hauteur du contenu, puis la feuille d'un foyer de trois enfants est sortie le 2026-08-10 avec le vendredi **tronqué** — et « Page 1 sur 1 » en pied : WebKit avait coupé au lieu de paginer, ce qui ne laisse aucun indice à qui ne compare pas avec l'écran. Cause trouvée le 2026-08-10 : `table-layout: fixed` ne lit les largeurs que sur la PREMIÈRE rangée, et celle de la colonne des jours était posée sur le `tbody`. Les quatre colonnes se partageaient donc la feuille à parts égales — 46 mm pour « Jour » au lieu de 22 — et chaque trajet revenait à la ligne. Corrigé, mesuré à 222 mm pour un foyer réel et 236 mm pour le pire cas imaginable, sur 273 disponibles. **Mais la mesure reste celle de Chrome.** | Réimprimer la feuille du foyer à trois enfants. Elle doit tenir sur une page entière, vendredi compris. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | ~~R3~~ | 8 | ~~Le Worker n'avait jamais écrit sur GitHub, et il ne le pouvait pas.~~ **Levée le 2026-08-09** : `cache: 'no-store'`, refusé par le runtime Cloudflare, faisait échouer toute publication depuis le lot 8. Corrigé, puis éprouvé — une correction publiée depuis `/traductions` a bien atteint le dépôt. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
@@ -55,18 +55,19 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R12 | 11 | **La CSP avait cassé `npm run dev`** en bloquant le préambule inline de React Refresh — page blanche, découvert seulement au lot 13. Corrigé : la politique ne s'applique qu'au build. Rappel de méthode : vérifier le build **et** le serveur de développement après toute modification de `vite.config.ts`. | Corrigé. Ligne gardée comme trace. |
 | R13 | 6 | **Trois vérifications successives n'avaient pas montré que la boîte d'installation ne s'ouvrait jamais**, parce qu'elles simulaient `beforeinstallprompt` APRÈS le montage de React — exactement le cas qui fonctionnait. Rappel de méthode : un événement simulé ne prouve rien sur le moment où le vrai arrive. | Corrigé. Ligne gardée comme trace. |
 | ~~R14~~ | — | ~~Les champs d'heure débordaient sur iPhone.~~ **Levée le 2026-08-09** : la refonte du lot 14 — une case et un champ par ligne, deux blocs séparés — vérifiée sur l'iPhone de l'auteur. |
-| R15 | — | **La vignette de partage n'a pas été soumise aux validateurs.** Les métadonnées Open Graph sont posées et l'image existe, mais aucun aperçu réel n'a été obtenu depuis WhatsApp, Facebook ou LinkedIn. | Coller le lien dans une conversation WhatsApp, ou passer par le débogueur de partage de chaque plateforme. |
+| ~~R15~~ | — | ~~La vignette de partage n'a pas été soumise aux validateurs.~~ **Levée le 2026-08-10** par l'auteur : les métadonnées de partage rendent bien à l'usage. |
 | ~~R16~~ | 14 | ~~Les bornes `min`/`max` n'ont pas été vues sur Safari iOS.~~ **Levée le 2026-08-09** : la roue de sélection les respecte. |
 | ~~R17~~ | 15 | ~~L'espace `/traductions` n'a jamais parlé à un vrai Worker.~~ **Levée le 2026-08-09** : code de traducteur créé, connexion établie, correction publiée et arrivée dans `public/traductions.json`. |
 | ~~R18~~ | 15 | ~~Les onglets d'`/admin` n'ont pas été vus connecté.~~ **Levée le 2026-08-09** : les cinq onglets vus connectés, et deux publications réelles abouties par l'auteur (crédits, perturbation). L'éditeur de crédits lit bien le dépôt et non le bundle ; l'éditeur de textes ne monte aucun champ tant qu'une section n'est pas dépliée. |
 | ~~R19~~ | 17 | ~~L'effet de l'en-tête `Urgency` n'est pas constatable ici.~~ **Levée le 2026-08-09** : marche à suivre iOS affichée, notification d'essai reçue en quelques secondes sur l'iPhone de l'auteur. |
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
-| R25 | 18 | **La couche `impression` n'a toujours pas été vue sur papier** — même réserve qu'au lot 2, aggravée : le thème repose désormais sur un dégradé, des voiles translucides et des `backdrop-filter`. Tout est neutralisé dans `@media print` (jetons repassés en opaque, `backdrop-filter` et `box-shadow` coupés partout par un `!important`), et les variables ont été recroisées une à une, mais **aucune feuille n'est sortie d'une imprimante**. Un voile translucide qui survivrait sortirait en gris moucheté. | Un `Cmd+P` sur `/` avec deux enfants, et un sur une fiche enfant. À faire avant de lever R1, qui porte sur la même feuille. |
+| ~~R25~~ | 18 | ~~La couche `impression` n'a toujours pas été vue sur papier.~~ **Levée le 2026-08-10** : la feuille d'un foyer de trois enfants est sortie d'iOS Safari en noir sur blanc franc — aucun voile translucide n'a survécu, aucune ombre, aucun gris moucheté. C'était la crainte de la refonte « verre » ; elle est levée. |
 | R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
 | R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
 | ~~R28~~ | 19 | ~~Le pied de page collé en bas n'a pas été vu sur iPhone.~~ **Levée le 2026-08-10** : vérifié sous Safari iOS par l'auteur, avec le reste des écrans du lot. |
-| R29 | 19 | **La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.** La couche `impression` remet `#root` et `.page` en `display: block` et annule la hauteur minimale — précisément les deux réglages qui avaient allongé la feuille au correctif du 2026-08-09 — et `src/impression.test.ts` passe, mais **aucune page n'est sortie**. Même terrain que R1 et R25. | À joindre au prochain `Cmd+P` : si la fiche du foyer gagne une seconde feuille, c'est ici qu'il faut regarder d'abord. |
+| ~~R29~~ | 19 | ~~La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.~~ **Levée le 2026-08-10** : la feuille est sortie sur une seule page — le conteneur souple et la hauteur minimale en hauteur de fenêtre n'ont ajouté aucune feuille. Le débordement constaté le même jour avait une tout autre cause, voir R1. |
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
+| R32 | 19 | **Un débordement de la feuille du foyer ne se voit pas.** WebKit a coupé le vendredi au bas de la page en annonçant « Page 1 sur 1 » : un contenu trop haut n'y produit pas une seconde feuille mais une troncature silencieuse. Le banc mesure désormais 222 mm pour un foyer réel et 236 mm pour le pire cas, sur 273 — la marge est confortable, mais rien dans l'application ne préviendra si elle est un jour reprise. | Rien à faire tant que la marge tient. Si la feuille se charge encore (une sixième langue, un plan plus dense), remesurer au banc **avant** d'imprimer : la feuille, elle, ne se plaindra pas. |
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
@@ -1704,6 +1705,50 @@ Voir R20, rayée.
 > du Worker, qui n'en avait aucun.
 
 *Dépend du lot 13. Réserve R31.*
+
+---
+
+## Correctif du 2026-08-10 — la feuille du foyer coupait le vendredi
+
+> **Fait le 2026-08-10**, sur la feuille d'un foyer de trois enfants envoyée par l'auteur.
+> Deux défauts distincts, dont un que quatre corrections successives avaient manqué.
+>
+> **La colonne des jours prenait la place de deux enfants.** `table-layout: fixed` ne lit
+> les largeurs de colonnes que sur la PREMIÈRE rangée du tableau — le `thead`. La règle
+> les posait sur `tbody th`, où l'algorithme ne les regarde jamais : les quatre colonnes
+> se partageaient les 186 mm à parts égales, 46 mm pour « Jour » au lieu de 22, et 46 mm
+> par enfant au lieu de 55. Chaque trajet revenait donc à la ligne, chaque journée gagnait
+> une ligne, et la feuille débordait.
+>
+> Le débordement, lui, ne s'est pas annoncé : WebKit a **coupé** le vendredi en pied de
+> page en affichant « Page 1 sur 1 ». Un contenu trop haut n'y produit pas une seconde
+> feuille mais une troncature silencieuse — c'est inscrit en R32, parce que rien ne
+> préviendra la prochaine fois.
+>
+> **Les arrêts n'étaient nulle part.** La feuille donnait des heures sans dire de quel
+> arrêt, et surtout elle ne montrait rien des adresses réglées jour par jour : un mardi
+> chez la nounou part d'un autre arrêt, et la feuille l'affichait comme les autres jours
+> — le réglage le plus fin de l'application était invisible sur le seul support qu'on
+> emporte. Chaque trajet nomme désormais l'arrêt qui concerne le parent (départ à
+> l'aller, arrivée au retour ; l'autre bout est l'école, que la destination nomme déjà),
+> et l'adresse dérogatoire vient dessous, en italique, quand il y en a une. Le domicile
+> est en tête de feuille, une fois pour les trois colonnes. Les deux feuilles le font :
+> celle du foyer et celle d'un enfant seul.
+>
+> **Ce qui a été gagné en hauteur pour le payer** : interligne à 1,2 (le poste le plus
+> lourd — seize trajets à deux lignes chacun), cellules à 0,9 mm de rembourrage, et
+> l'adresse dérogatoire réduite au libellé précédé d'un chevron. « Départ d'une autre
+> adresse · Schweich, 3 rue de l'École » faisait deux lignes pour répéter ce que
+> l'italique dit déjà : à lui seul, ce raccourci a fait passer le pire cas de 292 à
+> 236 mm.
+>
+> **Mesuré au banc** (règles de `@media print` rejouées hors media, dans un cadre de
+> 186 mm) : foyer réel de trois enfants avec dérogations, **222 mm** ; pire cas imaginable
+> — trois enfants, quatre trajets par jour, une adresse dérogatoire sur chacun des quinze
+> trajets de la semaine —, **236 mm** ; fiche d'un enfant seul, **139 mm**. Pour 273 mm
+> utiles. Colonnes vérifiées à 22 / 54,6 / 54,6 / 54,6 mm.
+
+*Dépend des lots 7 et 18. Lève R25 et R29, rouvre R1 avec sa cause, ouvre R32.*
 
 ---
 

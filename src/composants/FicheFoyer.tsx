@@ -1,5 +1,6 @@
 import { useT } from '../i18n'
-import { destinationTrajet, nomArret } from '../lib/affichage'
+import { useFoyer } from '../etat'
+import { arretCoteFamille, destinationTrajet, nomArret } from '../lib/affichage'
 import { plan, siteDuCycle } from '../lib/donnees'
 import { semaineEnfant, type ContexteEnfant } from '../lib/plan'
 import { JOURS } from '../lib/types'
@@ -50,22 +51,50 @@ function CelluleJour({ ctx, jour }: { ctx: ContexteEnfant; jour: Jour }) {
         <span className="fiche__vide">{t('bus.sansBus')}</span>
       ) : utiles.length ? (
         <ul className="fiche__trajets fiche__trajets--colonne">
-          {utiles.map((trajet, i) => (
-            <li key={`${trajet.type}-${i}`}>
-              {/*
-                  Les heures et la destination sur la même ligne, le nom de la ligne en
-                  dessous. Les trois empilés faisaient 57 mm par jour de cours : la
-                  feuille passait à 285 mm pour 273 disponibles, et débordait dès deux
-                  enfants. La destination tient en trois mots — « → école » — elle n'a
-                  pas besoin de sa propre ligne.
-              */}
-              <b>{trajet.depart.heure ?? '—'}</b>
-              <span aria-hidden="true"> → </span>
-              <b>{trajet.arrivee.heure ?? '—'}</b>
-              <span className="fiche__destination"> {t(libelleDestination(trajet.type))}</span>
-              <span className="fiche__ligne">{trajet.ligne.nom}</span>
-            </li>
-          ))}
+          {utiles.map((trajet, i) => {
+            // Le libellé saisi par le parent — « chez la nounou » — vaut mieux que le
+            // seul nom de l'arrêt : c'est sous ce nom-là qu'il a réglé sa semaine.
+            const derogation = trajet.adresseDerogatoire
+            const adresse = derogation ? ctx.enfant.adresses?.[jour]?.[derogation] : null
+
+            return (
+              <li key={`${trajet.type}-${i}`}>
+                {/*
+                    Les heures et la destination sur la même ligne, l'arrêt et la ligne
+                    en dessous. Les trois empilés faisaient 57 mm par jour de cours : la
+                    feuille passait à 285 mm pour 273 disponibles, et débordait dès deux
+                    enfants. La destination tient en trois mots — « → école » — elle n'a
+                    pas besoin de sa propre ligne.
+                */}
+                <b>{trajet.depart.heure ?? '—'}</b>
+                <span aria-hidden="true"> → </span>
+                <b>{trajet.arrivee.heure ?? '—'}</b>
+                <span className="fiche__destination"> {t(libelleDestination(trajet.type))}</span>
+                {/*
+                    L'arrêt, nommé à chaque trajet. Il manquait entièrement : la feuille
+                    donnait des heures sans dire où se présenter, et surtout elle ne
+                    montrait rien des adresses réglées jour par jour — le mardi chez la
+                    nounou partait d'un autre arrêt, et la feuille l'affichait comme les
+                    autres jours.
+                */}
+                <span className="fiche__ligne">
+                  {nomArret(arretCoteFamille(trajet), t)} — {trajet.ligne.nom}
+                </span>
+                {/*
+                    L'adresse elle-même, et rien d'autre : « Départ d'une autre adresse »
+                    devant chaque libellé faisait revenir la ligne à la ligne, pour
+                    répéter ce que l'italique et le chevron disent déjà. Le sens — matin,
+                    midi, soir — se déduit de la place du trajet dans la journée.
+                */}
+                {adresse && (
+                  <span className="fiche__derogation">
+                    <span aria-hidden="true">↳ </span>
+                    {adresse.libelle}
+                  </span>
+                )}
+              </li>
+            )
+          })}
         </ul>
       ) : (
         <span className="fiche__vide">—</span>
@@ -102,6 +131,7 @@ function CelluleJour({ ctx, jour }: { ctx: ContexteEnfant; jour: Jour }) {
  */
 export function FicheFoyer({ contextes }: { contextes: ContexteEnfant[] }) {
   const { t, langue } = useT()
+  const { foyer } = useFoyer()
   if (!contextes.length) return null
 
   return (
@@ -111,6 +141,14 @@ export function FicheFoyer({ contextes }: { contextes: ContexteEnfant[] }) {
           <header className="fiche__entete">
             <h1 className="fiche__nom">{t('impression.familleTitre')}</h1>
             <p className="fiche__site">
+              {/* Le domicile, une fois pour toute la feuille : il vaut pour les trois
+                  colonnes, et c'est de lui que dérogent les adresses des cellules. */}
+              {foyer.adresse && (
+                <>
+                  {foyer.adresse.libelle}
+                  <br />
+                </>
+              )}
               {t('impression.genereLe', { date: new Date().toLocaleDateString(langue) })}
             </p>
           </header>
