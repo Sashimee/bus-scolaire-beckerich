@@ -21,6 +21,10 @@
     "principale": "Navigation principale",
     "credits": "Crédits"
   },
+  "choixLangue": {
+    "titre": "Choisissez votre langue",
+    "aide": "Vous pourrez en changer à tout moment dans les réglages."
+  },
   "avertissement": {
     "titre": "Avant de commencer",
     "independance": "Ce site n'a aucun lien avec la commune de Beckerich ni avec l'école. Il est réalisé par un parent, à titre privé.",

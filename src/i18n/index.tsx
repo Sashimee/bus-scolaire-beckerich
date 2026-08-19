@@ -26,6 +26,12 @@ function interpoler(texte: string, params?: Record<string, string | number>): st
 
 export interface Traduction {
   langue: Langue
+  /**
+   * Vrai dès que la langue a été choisie par quelqu'un, faux tant qu'elle n'est que
+   * devinée. Ce sont deux choses différentes : `langue` vaut toujours quelque chose,
+   * y compris au tout premier lancement.
+   */
+  langueChoisie: boolean
   changerLangue: (l: Langue) => void
   /** Traduit une clé. Repli sur le français, puis sur la clé elle-même. */
   t: (cle: string, params?: Record<string, string | number>) => string
@@ -37,12 +43,24 @@ export interface Traduction {
 
 const Contexte = createContext<Traduction | null>(null)
 
-/** Devine la langue à partir des préférences du navigateur, français par défaut. */
-function langueInitiale(): Langue {
+/**
+ * La langue déjà choisie, ou `null` si personne ne l'a encore choisie.
+ *
+ * Une valeur stockée hors de `LANGUES` — dictionnaire retiré, stockage bricolé — n'est
+ * pas un choix : elle ne se traduirait nulle part, et on repose la question.
+ */
+function langueEnregistree(): Langue | null {
   const enregistree = chargerLangue()
   if (enregistree && (LANGUES as readonly string[]).includes(enregistree)) {
     return enregistree as Langue
   }
+  return null
+}
+
+/** Devine la langue à partir des préférences du navigateur, français par défaut. */
+function langueInitiale(): Langue {
+  const enregistree = langueEnregistree()
+  if (enregistree) return enregistree
   for (const pref of navigator.languages ?? [navigator.language]) {
     const code = pref.slice(0, 2).toLowerCase()
     // Le luxembourgeois se déclare « lb », l'allemand d'Autriche ou de Suisse « de ».
@@ -53,6 +71,7 @@ function langueInitiale(): Langue {
 
 export function FournisseurTraduction({ children }: { children: ReactNode }) {
   const [langue, setLangue] = useState<Langue>(langueInitiale)
+  const [langueChoisie, setLangueChoisie] = useState(() => langueEnregistree() !== null)
   const [surcouche, setSurcouche] = useState<Surcouche>(SURCOUCHE_VIDE)
 
   useEffect(() => {
@@ -70,6 +89,7 @@ export function FournisseurTraduction({ children }: { children: ReactNode }) {
 
   const changerLangue = useCallback((l: Langue) => {
     setLangue(l)
+    setLangueChoisie(true)
     enregistrerLangue(l)
   }, [])
 
@@ -97,8 +117,8 @@ export function FournisseurTraduction({ children }: { children: ReactNode }) {
   )
 
   const valeur = useMemo(
-    () => ({ langue, changerLangue, t, tListe, surcouche }),
-    [langue, changerLangue, t, tListe, surcouche],
+    () => ({ langue, langueChoisie, changerLangue, t, tListe, surcouche }),
+    [langue, langueChoisie, changerLangue, t, tListe, surcouche],
   )
 
   return <Contexte.Provider value={valeur}>{children}</Contexte.Provider>

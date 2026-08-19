@@ -21,6 +21,10 @@
     "principale": "Haaptnavigatioun",
     "credits": "Merci"
   },
+  "choixLangue": {
+    "titre": "Wielt Är Sprooch",
+    "aide": "Dir kënnt se zu all Moment an den Astellungen änneren."
+  },
   "avertissement": {
     "titre": "Ier Dir ufänkt",
     "independance": "Dës Säit huet keng Verbindung mat der Gemeng Biekerech oder mat der Schoul. Si gouf vun engem Elterendeel privat gemaach.",

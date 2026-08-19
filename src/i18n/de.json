@@ -21,6 +21,10 @@
     "principale": "Hauptnavigation",
     "credits": "Danksagung"
   },
+  "choixLangue": {
+    "titre": "Wählen Sie Ihre Sprache",
+    "aide": "Sie können sie jederzeit in den Einstellungen ändern."
+  },
   "avertissement": {
     "titre": "Bevor Sie beginnen",
     "independance": "Diese Website steht in keiner Verbindung zur Gemeinde Beckerich oder zur Schule. Sie wurde von einem Elternteil privat erstellt.",

@@ -1807,6 +1807,18 @@
     font-size: var(--texte-s);
   }
 
+  /*
+   * Les langues, au premier lancement. Cinq cartes de choix pleine largeur poussaient
+   * les dernières hors de l'écran d'un téléphone : le parent devait faire défiler pour
+   * savoir que sa langue était proposée. Deux colonnes dès que la largeur les tient
+   * sans rétrécir les cibles sous `--cible`.
+   */
+  .choix-langues {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--espace-2);
+  }
+
   /* Le code d'accès se lit et se retape : chasse fixe, gros, espacé. */
   .champ-code {
     font-family: var(--police-chiffres);

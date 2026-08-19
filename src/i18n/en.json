@@ -21,6 +21,10 @@
     "principale": "Main navigation",
     "credits": "Credits"
   },
+  "choixLangue": {
+    "titre": "Choose your language",
+    "aide": "You can change it at any time in the settings."
+  },
   "avertissement": {
     "titre": "Before you start",
     "independance": "This site has no connection with the municipality of Beckerich or with the school. It was made by a parent, privately.",

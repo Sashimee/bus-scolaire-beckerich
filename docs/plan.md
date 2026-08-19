@@ -72,6 +72,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R35 | 11 | **Le compteur de visites n'a rien enregistré du 2026-08-08 au 2026-08-10.** La CSP du lot 11 ouvrait `gc.zgo.at` en `connect-src` — l'hôte qui SERT `count.js`, pas celui vers lequel il compte. Le script se chargeait donc normalement, puis son relevé partait vers `bus.goatcounter.com` : refusé en `connect-src`, refusé une seconde fois en `img-src` sur le repli image. Aucune erreur visible, aucune visite comptée. Corrigé le 2026-08-10, reproduit avant et après dans le navigateur (deux violations, puis zéro). **Mais aucun relevé n'a encore été vu arriver dans le tableau de bord depuis le site déployé.** | Ouvrir le site publié, puis vérifier dans GoatCounter que la visite apparaît. Les visiteurs déjà installés ne comptent qu'après la relève de leur service worker, à l'ouverture suivante. |
 | R36 | 11 | **Seule la page d'arrivée est comptée.** `count.js` compte au chargement et n'écoute ni `pushState` ni `popstate` ; toute la navigation interne de l'application lui échappe. Sur l'application installée, l'arrivée est toujours `start_url` : les statistiques ne diront donc jamais qu'une seule page, quel que soit l'usage réel. | Décision à prendre : appeler `window.goatcounter.count({path})` au changement de route donnerait la fréquentation écran par écran, au prix d'un relevé par navigation — à peser contre le premier principe du projet. |
 | R32 | 19 | **Un débordement de la feuille du foyer ne se voit pas.** WebKit a coupé le vendredi au bas de la page en annonçant « Page 1 sur 1 » : un contenu trop haut n'y produit pas une seconde feuille mais une troncature silencieuse. Le banc mesure désormais 222 mm pour un foyer réel et 236 mm pour le pire cas, sur 273 — la marge est confortable, mais rien dans l'application ne préviendra si elle est un jour reprise. | Rien à faire tant que la marge tient. Si la feuille se charge encore (une sixième langue, un plan plus dense), remesurer au banc **avant** d'imprimer : la feuille, elle, ne se plaindra pas. |
+| R37 | — | **L'écran de choix de la langue n'a pas été vu sur un vrai téléphone.** Le navigateur de mesure a refusé de réduire son viewport — il annonçait 2056 px quelle que soit la taille demandée. Le comportement étroit a donc été mesuré en contraignant le conteneur des bandeaux à 280, 320 et 360 px : bascule en une colonne sous 340 px, aucun retour à la ligne, cibles à 51 px. C'est la grille qui est éprouvée, pas l'écran. Restent invérifiés le rendu réel sur iPhone et, surtout, le fait que les cinq langues tiennent au-dessus de la ligne de flottaison — le point même que la grille en deux colonnes vise à régler. | Ouvrir le site avec un stockage vide sur l'iPhone de l'auteur. Les cinq langues doivent être visibles sans faire défiler. |
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 
@@ -1857,6 +1858,60 @@ Voir R20, rayée.
 > **Réserves** : R33, R34.
 
 *Dépend des lots 4, 5 et 14, qu'il remplace pour la partie « réglages d'un enfant ».*
+
+---
+
+## Évolution du 2026-08-13 — la langue avant tout le reste
+
+**Demande** : qu'un nouvel utilisateur choisisse la langue de l'application avant de
+faire quoi que ce soit d'autre.
+
+**Ce qui se passait** : la langue était *devinée* d'après `navigator.languages` et jamais
+demandée. La devinette est bonne la plupart du temps, mais quand elle est mauvaise, le
+premier écran servi est l'avertissement d'indépendance — le texte le plus important du
+site — dans une langue que le parent ne parle pas. Il ne l'a alors pas lu : il l'a cliqué.
+Rien ne le rattrapait, la langue ne se réglant qu'une fois arrivé dans `/reglages`.
+
+**Ce qui a été fait**
+
+- `src/i18n/index.tsx` distingue désormais deux choses qui étaient confondues : `langue`,
+  qui vaut toujours quelque chose, et `langueChoisie`, qui ne devient vrai que lorsque
+  quelqu'un a tranché. Aucune nouvelle clé de stockage : la présence d'une langue *valide*
+  dans `bus-beckerich.langue` fait foi. Une valeur stockée hors de `LANGUES` est traitée
+  comme une absence de choix — elle ne se traduirait nulle part.
+- `src/composants/ChoixLangueInitial.tsx` : cinq cartes de choix, chaque langue écrite
+  dans sa propre langue, pour que le parent reconnaisse la sienne sans comprendre la
+  question. La langue devinée est *signalée* (`choix--retenu`) et non présélectionnée :
+  sans clic, rien n'est enregistré, faute de quoi on ne distinguerait plus une devinette
+  d'un choix.
+- `PileBandeaux` passe de deux bandeaux bloquants à trois, dans l'ordre langue →
+  avertissement → partage. Chaque marche donne son sens à la suivante. La grammaire
+  existante est conservée : un seul bloquant à la fois, les bandeaux informatifs derrière.
+- **Écart assumé** : la question n'est posée qu'au premier lancement, c'est-à-dire tant
+  que l'avertissement n'a pas été accepté — et non à tout parent dont la langue n'a
+  jamais été choisie explicitement. Sans cette borne, la mise en production aurait
+  interrogé *tous* les utilisateurs existants, qui n'ont pour la plupart jamais touché au
+  réglage de langue : une question d'accueil à quelqu'un qui utilise l'application depuis
+  des mois le renvoie à une case départ qu'il a franchie. La demande portait sur les
+  nouveaux utilisateurs ; c'est ce qui est livré.
+- `.choix-langues` dans la couche `composants` : grille en `auto-fit minmax(9rem, 1fr)`.
+  Cinq cartes pleine largeur poussaient les dernières langues sous la ligne de flottaison
+  d'un téléphone — le parent aurait dû faire défiler pour savoir que la sienne était
+  proposée.
+- Clés `choixLangue.titre` et `choixLangue.aide` dans les cinq dictionnaires.
+
+**Vérifications** : `Bandeaux.test.tsx`, 7 tests, dont l'ordre des marches, le
+non-enregistrement de la devinette, le cas d'une langue stockée inconnue et celui de
+l'habitué qu'on n'interroge pas. Éprouvés par mutation dans les deux sens : neutraliser la
+marche « langue » fait tomber 6 tests sur 7, retirer la borne du premier lancement en fait
+tomber 1. Mesuré dans le navigateur sur le serveur de développement — cibles à 51 px
+(≥ 44), deux colonnes à 375 px et une seule en dessous de 340 px, aucun retour à la ligne
+jusqu'à 280 px de large, aucun débordement horizontal, carte entière visible sans
+défilement. Parcours réel exercé : choix de « Português » → toute l'application bascule,
+`<html lang="pt">`, avertissement servi en portugais, et la question ne se repose pas au
+rechargement.
+
+**Réserve** : R37.
 
 ---
 
