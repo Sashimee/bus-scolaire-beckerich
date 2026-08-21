@@ -68,7 +68,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R29~~ | 19 | ~~La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.~~ **Levée le 2026-08-10** : la feuille est sortie sur une seule page — le conteneur souple et la hauteur minimale en hauteur de fenêtre n'ont ajouté aucune feuille. Le débordement constaté le même jour avait une tout autre cause, voir R1. |
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
 | R33 | 20 | **Aucun parent n'a parcouru le nouvel assistant.** La refonte répond à un défaut d'usage réel, mais elle n'a été éprouvée que par les tests et la mesure DOM. Le pari central — qu'une question par moment de la journée se comprenne mieux que cinq grilles par champ — ne se vérifie qu'en regardant quelqu'un s'en servir sans aide. | Faire configurer un enfant, de bout en bout, par un parent qui ne connaît pas l'application, sans commenter. Noter chaque endroit où il hésite. |
-| R34 | 20 | **Les réponses en cartes reposent sur `:has()`.** L'état coché se voit à trois signes : le bouton radio lui-même, le fond teinté et la bordure d'accent. Les deux derniers viennent de `.choix__option:has(input:checked)`. Sur un moteur sans `:has()`, seul le bouton radio distinguerait la réponse retenue — lisible, mais bien plus discret que prévu. Safari le gère depuis 15.4, Chrome depuis 105 ; aucune vérification n'a été faite sur un moteur plus ancien. | Ouvrir l'assistant sur le plus vieil appareil accessible et vérifier que la carte cochée est teintée. À défaut, ajouter un repli sur le sélecteur frère `input:checked + .choix__texte`. |
+| ~~R34~~ | 20 | ~~Les réponses en cartes reposent sur `:has()`.~~ **Levée le 2026-08-21**, mais pas par le moyen qu'elle proposait : le repli `input:checked + .choix__texte` était impossible, la teinte portant sur le `<label>`, PARENT de l'input, hors de portée de tout sélecteur frère. La classe est désormais posée par le composant, comme le fait déjà `.choix--retenu` — `:has()` a disparu de la feuille au lieu d'être replié (zéro occurrence dans le CSS construit), et l'état coché est enfin assertable : il ne l'était nulle part. **Leçon inscrite** : une réserve peut se tromper sur son propre remède ; relire ce qu'elle prescrit avant de l'appliquer. |
 | R35 | 11 | **Le compteur de visites n'a rien enregistré du 2026-08-08 au 2026-08-10.** La CSP du lot 11 ouvrait `gc.zgo.at` en `connect-src` — l'hôte qui SERT `count.js`, pas celui vers lequel il compte. Le script se chargeait donc normalement, puis son relevé partait vers `bus.goatcounter.com` : refusé en `connect-src`, refusé une seconde fois en `img-src` sur le repli image. Aucune erreur visible, aucune visite comptée. Corrigé le 2026-08-10, reproduit avant et après dans le navigateur (deux violations, puis zéro). **Mais aucun relevé n'a encore été vu arriver dans le tableau de bord depuis le site déployé.** | Ouvrir le site publié, puis vérifier dans GoatCounter que la visite apparaît. Les visiteurs déjà installés ne comptent qu'après la relève de leur service worker, à l'ouverture suivante. |
 | R36 | 11 | **Seule la page d'arrivée est comptée.** `count.js` compte au chargement et n'écoute ni `pushState` ni `popstate` ; toute la navigation interne de l'application lui échappe. Sur l'application installée, l'arrivée est toujours `start_url` : les statistiques ne diront donc jamais qu'une seule page, quel que soit l'usage réel. | Décision à prendre : appeler `window.goatcounter.count({path})` au changement de route donnerait la fréquentation écran par écran, au prix d'un relevé par navigation — à peser contre le premier principe du projet. |
 | R32 | 19 | **Un débordement de la feuille du foyer ne se voit pas.** WebKit a coupé le vendredi au bas de la page en annonçant « Page 1 sur 1 » : un contenu trop haut n'y produit pas une seconde feuille mais une troncature silencieuse. Le banc mesure désormais 222 mm pour un foyer réel et 236 mm pour le pire cas, sur 273 — la marge est confortable, mais rien dans l'application ne préviendra si elle est un jour reprise. | Rien à faire tant que la marge tient. Si la feuille se charge encore (une sixième langue, un plan plus dense), remesurer au banc **avant** d'imprimer : la feuille, elle, ne se plaindra pas. |
@@ -1913,6 +1913,64 @@ défilement. Parcours réel exercé : choix de « Português » → toute l'appl
 rechargement.
 
 **Réserve** : R37.
+
+---
+
+## Évolution du 2026-08-21 — l'état coché, et la collision de noms qu'il cachait
+
+**Demande** : lever R34, la dernière réserve qui se levait entièrement depuis le dépôt — les
+autres attendent un vrai téléphone, une vraie impression ou un vrai matin d'école.
+
+**Ce que R34 disait** : l'état coché des cartes-réponses de l'assistant tenait à
+`.choix__option:has(input:checked)`. Sur un moteur sans `:has()`, la réponse retenue n'aurait
+plus été signalée que par la puce du bouton radio. Le remède proposé était « un repli sur le
+sélecteur frère `input:checked + .choix__texte` ».
+
+**Ce remède ne pouvait pas marcher.** La teinte, la bordure d'accent et le trait interne sont
+posés sur le `<label>`, qui est le **parent** de l'input : aucun sélecteur frère ne remonte
+jusque-là. Au mieux on aurait teinté le texte, pas la carte. Le dépôt avait déjà la bonne
+grammaire ailleurs — `.choix--retenu`, dans `ChoixLangueInitial.tsx` et `CommuneAlertes.tsx`,
+pose sa classe en JS — et `ChoixSimple` connaissait déjà la réponse retenue puisqu'il écrit
+`checked`. Il lui suffisait de l'écrire aussi en classe.
+
+**Le défaut que la réserve a fait trouver.** `.choix` était déclaré **deux fois** dans la
+couche `composants` : le conteneur du groupe de radios, et la carte cliquable de l'espace
+commune. Deux blocs sans rapport, même nom, même spécificité — la seconde déclaration gagnait
+en silence. Le groupe de réponses de l'assistant héritait donc d'un `padding`, d'un
+`background: var(--surface)`, d'une bordure, d'un `cursor: pointer` et d'un `.choix:hover` qui
+le teintait **comme s'il était lui-même cliquable**, plus un `gap` ramené à `--espace-1` au
+lieu du `--espace-2` que sa propre règle demandait. Rien ne le signalait : une collision de
+noms dans une même couche ne produit ni erreur, ni avertissement, ni rendu manifestement faux
+— juste un composant qui obéit à la règle d'un autre.
+
+**Ce qui a été fait**
+
+- La famille du groupe de radios est renommée : `.choix` → `.reponses`, `.choix__option` →
+  `.reponses__option`, `.choix__texte` → `.reponses__texte`, `.choix__libelle` →
+  `.reponses__libelle`. Elle n'avait qu'un consommateur, `ChoixSemaine.tsx`. La famille
+  « carte de choix » garde son nom : elle est employée dans deux pages et assertée par un
+  test. Le préfixe `choix__` ne désigne plus deux blocs différents.
+- `.reponses__option--retenu` remplace les deux règles `:has()`. **`:has()` ne figure plus
+  nulle part** dans la feuille — vérifié aussi sur le CSS construit, zéro occurrence.
+- Le commentaire de tête du bloc dit pourquoi l'état est une classe et non un sélecteur : le
+  fond porte sur le parent de l'input, et un moteur sans `:has()` aurait effacé le signal.
+
+**Vérifications** : `src/composants/ChoixSemaine.test.tsx`, 5 tests — la classe et `checked`
+sur la seule option retenue, l'absence sur les deux autres (trois options, pour qu'une classe
+posée sur toutes ne passe pas), le suivi de la valeur reçue sans état interne, la réponse
+annoncée au clic, et le groupe qui n'est plus enveloppé dans une carte. Plus une assertion
+dans `AssistantEnfant.test.tsx` sur le parcours réel : après avoir répondu « je l'emmène
+d'abord à la maison relais », la carte est teintée, et une seule dans le groupe. 409 tests au
+total. **Éprouvé par mutation** : retirer `${retenu ? …}` du JSX fait tomber exactement trois
+tests, les trois qui assèrent la classe. `npm run typecheck`, `npm run lint` et `npm run build`
+propres.
+
+**Écart assumé** : la vérification visuelle n'a pas été refaite sur appareil — décision de
+l'auteur, le rendu sur téléphone est couvert de son côté. Les deux points qu'un coup d'œil
+aurait servi à voir sont d'ailleurs devenus statiques : la carte teintée est prouvée par
+l'assertion de classe, et la disparition de la carte parasite par le test qui vérifie que le
+parent d'une option est bien `.reponses` et rien d'autre. Le rendu sur moteur ancien, lui,
+n'a plus d'objet.
 
 ---
 

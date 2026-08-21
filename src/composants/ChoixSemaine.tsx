@@ -59,23 +59,33 @@ export function ChoixSimple<T extends string>({
   onChoisir: (v: T) => void
 }) {
   return (
-    <div className="choix">
-      {options.map((o) => (
-        <label className="choix__option" key={o.valeur} htmlFor={`${id}-${o.valeur}`}>
-          <input
-            id={`${id}-${o.valeur}`}
-            type="radio"
-            name={id}
-            value={o.valeur}
-            checked={valeur === o.valeur}
-            onChange={() => onChoisir(o.valeur)}
-          />
-          <span className="choix__texte">
-            <span className="choix__libelle">{o.libelle}</span>
-            {o.aide && <span className="champ__aide">{o.aide}</span>}
-          </span>
-        </label>
-      ))}
+    <div className="reponses">
+      {options.map((o) => {
+        // La teinte de la réponse retenue est portée par le `<label>`, parent de
+        // l'input : aucun sélecteur frère ne l'atteint, et `:has()` la rendrait
+        // tributaire du moteur. Le composant sait déjà laquelle est cochée.
+        const retenu = valeur === o.valeur
+        return (
+          <label
+            className={`reponses__option${retenu ? ' reponses__option--retenu' : ''}`}
+            key={o.valeur}
+            htmlFor={`${id}-${o.valeur}`}
+          >
+            <input
+              id={`${id}-${o.valeur}`}
+              type="radio"
+              name={id}
+              value={o.valeur}
+              checked={retenu}
+              onChange={() => onChoisir(o.valeur)}
+            />
+            <span className="reponses__texte">
+              <span className="reponses__libelle">{o.libelle}</span>
+              {o.aide && <span className="champ__aide">{o.aide}</span>}
+            </span>
+          </label>
+        )
+      })}
     </div>
   )
 }

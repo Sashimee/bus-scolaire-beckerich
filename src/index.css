@@ -1110,13 +1110,24 @@
    * qu'il y a un choix, puis comparer les réponses de mémoire. Posées à plat, chacune
    * avec sa conséquence écrite dessous, elles se lisent d'un coup d'œil — et la cible
    * tactile devient la carte entière au lieu du seul bouton radio.
+   *
+   * Le bloc s'appelait `.choix`, comme la carte cliquable de l'espace commune plus bas
+   * dans cette même couche. Deux blocs sans rapport, même nom, même spécificité : la
+   * seconde déclaration gagnait, et le groupe de réponses héritait en silence d'un fond
+   * de carte, d'un `padding` et d'un `:hover` qui le teintait comme s'il était lui-même
+   * cliquable.
+   *
+   * L'état retenu est une classe posée par le composant, et non `:has(input:checked)` :
+   * la teinte porte sur le `<label>`, PARENT de l'input, donc hors de portée de tout
+   * sélecteur frère — sur un moteur sans `:has()`, la réponse cochée n'aurait plus été
+   * signalée que par la puce du bouton radio. C'est déjà la grammaire de `.choix--retenu`.
    */
-  .choix {
+  .reponses {
     display: grid;
     gap: var(--espace-2);
   }
 
-  .choix__option {
+  .reponses__option {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
@@ -1132,17 +1143,17 @@
       border-color 0.16s var(--sortie);
   }
 
-  .choix__option:hover {
+  .reponses__option:hover {
     background: var(--surface-haute);
   }
 
-  .choix__option:has(input:checked) {
+  .reponses__option--retenu {
     background: var(--surface-accent);
     border-color: var(--bord-accent);
     box-shadow: inset 0 0 0 var(--trait) var(--bord-accent);
   }
 
-  .choix__option input[type='radio'] {
+  .reponses__option input[type='radio'] {
     inline-size: 1.35rem;
     block-size: 1.35rem;
     margin-block-start: 0.1rem;
@@ -1150,17 +1161,17 @@
     cursor: pointer;
   }
 
-  .choix__texte {
+  .reponses__texte {
     display: grid;
     gap: var(--espace-1);
   }
 
-  .choix__libelle {
+  .reponses__libelle {
     font-size: var(--texte-l);
     font-weight: 600;
   }
 
-  .choix__option:has(input:checked) .choix__libelle {
+  .reponses__option--retenu .reponses__libelle {
     font-weight: 700;
   }
 

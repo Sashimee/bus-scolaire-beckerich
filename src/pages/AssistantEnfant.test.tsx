@@ -130,6 +130,20 @@ describe('adresse du foyer dans l’assistant', () => {
 })
 
 describe('une question par moment de la journée', () => {
+  it('montre la réponse retenue sur la carte, et pas seulement dans le stockage', () => {
+    // La teinte de la carte cochée tenait à `:has(input:checked)`, donc au moteur du
+    // navigateur. Elle est maintenant posée par le composant, sur le parcours réel.
+    monter({ adresse: HOVELANGE, enfants: [enfant('a', 'Léa')] }, 'a')
+    allerA(fr.assistant.titreMatin)
+    repondre(fr.matin.relais)
+
+    const carte = screen.getByLabelText(fr.matin.relais, { exact: false }).closest('label')!
+    expect(carte.className).toContain('reponses__option--retenu')
+    // Une seule réponse teintée dans le groupe : la question du matin n'en admet pas deux.
+    const groupe = carte.parentElement!
+    expect(groupe.querySelectorAll('.reponses__option--retenu')).toHaveLength(1)
+  })
+
   it('écrit d’un seul geste tout ce qu’une dépose à la maison relais implique', () => {
     // Trois réglages du stockage — l'heure de présence, l'usage du bus, l'adresse de
     // départ — pour une seule phrase de parent. C'est la raison d'être des moments.
