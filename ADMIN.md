@@ -48,7 +48,7 @@ les parents, et on publie.
 
 Pour l'utiliser, il faut se connecter, de l'une des deux façons :
 
-- **« Se connecter avec GitHub »** — nécessite le Worker (§ 3). Le jeton obtenu est
+- **« Se connecter avec GitHub »** — nécessite le serveur (§ 3). Le jeton obtenu est
   éphémère et disparaît à la fermeture de l'onglet. C'est la voie recommandée.
 - **Coller un jeton d'accès** — solution de secours. Créer un
   [jeton fin](https://github.com/settings/personal-access-tokens/new) limité au seul
@@ -74,42 +74,45 @@ sans `ligne` ni `arret` s'affiche chez **tout le monde**.
 
 **C'est la voie normale depuis l'espace commune.** L'agent n'a besoin d'aucun compte
 GitHub, ne voit aucun JSON, et ne détient aucun jeton : il se connecte avec un code
-personnel sur `/commune`, et c'est le Worker qui publie en son nom.
+personnel sur `/commune`, et c'est le serveur qui publie en son nom.
 
-Prérequis, une seule fois :
+Prérequis, une seule fois : deux variables d'environnement posées sur le service
+`bus-api` dans Dokploy, puis un redéploiement.
 
-```bash
-cd worker
-npx wrangler secret put SECRET_SESSION   # une longue chaîne au hasard, à ne pas réutiliser
-npx wrangler secret put GITHUB_PAT       # voir ci-dessous
-npx wrangler deploy
-```
+| Variable | Contenu |
+| --- | --- |
+| `SECRET_SESSION` | Une longue chaîne au hasard, à ne pas réutiliser. Sans elle, `/commune` et `/traductions` répondent 503 et le reste du serveur fonctionne normalement. |
+| `GITHUB_PAT` | Jeton **fine-grained** (`Settings → Developer settings → Personal access tokens → Fine-grained tokens`), limité à **ce seul dépôt**, avec la permission `Contents: Read and write` et rien d'autre. C'est lui qui écrit ; il ne quitte jamais le serveur. |
 
-Le `GITHUB_PAT` est un jeton **fine-grained** (`Settings → Developer settings → Personal
-access tokens → Fine-grained tokens`), limité à **ce seul dépôt**, avec la permission
-`Contents: Read and write` et rien d'autre. C'est lui qui écrit ; il ne quitte jamais
-le Worker.
+`/api/sante` doit ensuite répondre `"commune": true` **et** `"depot": {"urgences":"ok", …}`.
+Le premier dit que les secrets sont posés, le second qu'ils fonctionnent : un jeton
+révoqué passe le premier contrôle et échoue le second.
 
 Puis, pour chaque agent :
 
 ```bash
-./creer-agent.sh "Marie Weber" "service technique"
+DATABASE_URL=… node serveur/creer-agent.mjs "Marie Weber" "service technique"
 ```
 
-Le script engendre un code au format `xxxx-xxxx`, en stocke **l'empreinte SHA-256** dans
-le KV et affiche le code **une seule fois**. Il n'est récupérable nulle part ensuite :
+Le script engendre un code au format `xxxx-xxxx`, en stocke **l'empreinte SHA-256** en
+base et affiche le code **une seule fois**. Il n'est récupérable nulle part ensuite :
 en cas de perte, on en crée un autre et on retire l'ancien. Transmettez-le de vive voix
 ou par un canal distinct de celui du lien.
 
-Le Worker limite les tentatives à **5 par quart d'heure et par adresse IP**, sans quoi
-un code de huit caractères se forcerait en quelques heures. Chaque publication est
-inscrite au journal, consultable sur `/commune` : qui a publié quoi, et quand.
+Le serveur limite les tentatives à **5 par quart d'heure et par adresse IP**, sans quoi
+un code de huit caractères se forcerait en quelques heures. Cette limite est désormais
+**stricte** : elle tient dans un seul énoncé atomique de PostgreSQL. Sur l'ancien
+stockage clé-valeur, la cohérence différée laissait passer quelques tentatives de plus
+(c'était la réserve R4). Chaque publication est inscrite au journal, consultable sur
+`/commune` : qui a publié quoi, et quand.
 
 Pour retirer un accès, la commande est affichée à la création. On peut aussi lister les
-agents :
+agents des deux espaces, avec leur date de dernier accès — de quoi repérer un code
+oublié :
 
 ```bash
-npx wrangler kv key list --binding ABONNEMENTS --remote --prefix "agent:"
+DATABASE_URL=… node serveur/creer-agent.mjs --lister
+DATABASE_URL=… node serveur/creer-agent.mjs --retirer <empreinte> [commune|traductions]
 ```
 
 ### Donner accès aux traductions (`/traductions`)
@@ -118,24 +121,22 @@ Même mécanique, mais un espace à part : le code n'ouvre **que** la correction
 de l'application. Un traducteur ne peut ni annuler un bus, ni toucher au plan.
 
 ```bash
-./creer-agent.sh "Jean Muller" "bénévole" traductions
+DATABASE_URL=… node serveur/creer-agent.mjs "Jean Muller" "bénévole" traductions
 ```
 
-La séparation ne tient pas à une seule ligne de code. Les codes de traduction vivent sous
-le préfixe KV `traducteur:` et non `agent:` — un code de l'un n'existe littéralement pas
-là où l'autre le cherche — et le jeton de session porte son rôle, revérifié à chaque
-route. La liste et le retrait se font avec le même préfixe :
-
-```bash
-npx wrangler kv key list --binding ABONNEMENTS --remote --prefix "traducteur:"
-```
+La séparation ne tient pas à une seule ligne de code. Les codes de traduction vivent
+dans la table `agent_traduction` et non `agent_commune` — un code de l'un n'existe
+littéralement pas là où l'autre le cherche — et le jeton de session porte son rôle,
+revérifié à chaque route. **Deux tables et non une colonne `role`** : une table unique
+ne laisserait qu'une seule barrière, suspendue à une clause de filtrage qu'un jour
+quelqu'un oubliera d'écrire.
 
 Ce que le traducteur peut faire : choisir une langue, corriger n'importe quel texte de
 l'application, et publier. Les corrections vont dans `public/traductions.json`, relu à
 chaque ouverture — elles sont visibles **sans reconstruction du site**, contrairement au
 plan ou aux crédits. Une correction ne peut viser qu'une clé existante, du même type et
 avec les mêmes repères `{…}` que le français ; le reste est refusé, côté navigateur comme
-côté Worker.
+côté serveur.
 
 ### Donner accès au mainteneur (`/admin`)
 
@@ -174,105 +175,132 @@ sans l'étape 3, c'est uniquement la notification qui sonne toute seule.
 
 **Pourquoi une brique en plus.** Le Web Push exige techniquement un serveur qui émet
 la notification et un endroit où conserver les abonnements. Aucune page statique ne
-peut le faire seule. Le Worker Cloudflare ci-dessous est ce minimum. Il ne stocke
-**aucune donnée personnelle** — ni adresse, ni prénom, ni cycle, seulement des
-identifiants d'appareil opaques, supprimés dès le désabonnement.
+peut le faire seule. Le serveur `bus-api` est ce minimum. Il ne stocke **aucune donnée
+personnelle de famille** — ni adresse, ni prénom, ni cycle, seulement des identifiants
+d'appareil opaques, supprimés dès le désabonnement.
 
 ### Ce que ça coûte réellement
 
-Chiffres relevés sur la [documentation Cloudflare](https://developers.cloudflare.com/workers/platform/limits/)
-en août 2026, à revérifier : les grilles tarifaires changent.
+Depuis le passage sur VPS, le coût est celui de la VPS, et rien d'autre : le serveur,
+la base et le site tournent dans les mêmes conteneurs que le reste.
 
-| | Plan gratuit | Plan payant |
-| --- | --- | --- |
-| Requêtes | 100 000 / jour | illimité — **5 $/mois** |
-| **Processeur par invocation** | **10 ms** | jusqu'à 5 minutes |
-| Lectures KV | 100 000 / jour | — |
-| Écritures KV | 1 000 / jour | — |
-| Stockage KV | 1 Go | — |
+**Ce qui a disparu avec Cloudflare, et qui vaut d'être su :** le palier gratuit
+n'accordait que **10 ms de processeur par invocation**, alors que le Web Push impose un
+chiffrement et une signature *par destinataire*. Une boucle sur tous les abonnés
+dépassait ce budget dès quelques dizaines d'inscrits, et l'envoi était interrompu en
+silence. Le Worker contournait cela en découpant en lots de dix, chaque lot repartant
+en sous-requête avec son propre budget ; au-delà d'environ 450 abonnés il répondait
+`507 trop-abonnes` plutôt que de servir une partie des familles.
 
-Pour cette commune, les volumes ne posent aucun problème : 300 familles abonnées et
-trois alertes par jour représentent environ 900 lectures KV, très loin des 100 000.
-
-**La contrainte réelle est ailleurs : les 10 ms de processeur par invocation.** Le Web
-Push impose un chiffrement et une signature *par destinataire*. Une boucle sur tous les
-abonnés dépasserait ce budget dès quelques dizaines d'inscrits, et Cloudflare
-interromprait l'envoi en silence — une partie des parents ne recevrait rien sans que
-personne s'en aperçoive.
-
-Le Worker contourne cela en découpant l'envoi en lots, chaque lot repartant avec son
-propre budget. Avec les réglages par défaut (`TAILLE_LOT = 10`, 45 lots), il couvre
-**environ 450 abonnés par envoi**. Au-delà, il répond explicitement `507 trop-abonnes`
-plutôt que de servir une partie des familles seulement.
-
-> **Le coût par push n'a pas été mesuré.** `TAILLE_LOT = 10` est une estimation
-> prudente, pas une valeur validée. Après le premier envoi réel, regarde
-> `npx wrangler tail` : si aucune invocation n'est interrompue, tu peux monter la
-> valeur ; si certaines le sont, descends-la. Passer au plan payant à 5 $/mois lève
-> entièrement la question.
+Tout cela n'existe plus. Il n'y a qu'une boucle, avec vingt envois simultanés au plus
+pour ne pas ouvrir mille connexions d'un coup. **Il n'y a plus de plafond d'abonnés**,
+plus de `TAILLE_LOT` — dont le code disait lui-même qu'il était « une estimation
+prudente, NON MESURÉE » —, plus de `/notifier-lot`, et plus d'erreur `1042`.
 
 ### « Sans maintenance » serait exagéré
 
-Ce n'est pas un service qu'on installe et qu'on oublie : `wrangler` se met à jour,
-l'application OAuth GitHub et les clés VAPID peuvent devoir être renouvelées, et l'API de
-Cloudflare évolue. Compte une vérification par an, en même temps que la mise à jour du
-plan de bus.
+Ce n'est pas un service qu'on installe et qu'on oublie : les images de base se mettent
+à jour, l'application OAuth GitHub et les clés VAPID peuvent devoir être renouvelées, et
+PostgreSQL a des versions majeures. Compte une vérification par an, en même temps que la
+mise à jour du plan de bus.
 
-Le chiffrement des notifications, lui, n'a plus de dépendance : il est écrit directement
-dans `worker/src/push.js`, aux normes RFC 8291 et RFC 8292, et verrouillé par le vecteur
-de test officiel dans `worker/src/push.test.js`.
+**Et désormais, une sauvegarde à surveiller.** L'ancien stockage clé-valeur n'en avait
+aucune ; la base en a une, et une sauvegarde qu'on n'a jamais restaurée n'est pas une
+sauvegarde. À éprouver sur la préproduction, pas sur la production.
 
-> Ces étapes demandent tes identifiants Cloudflare et GitHub : à toi de les faire.
-> Le code est écrit, mais **il n'a pas pu être testé de bout en bout** faute de compte.
-> Prévois de vérifier `/sante` puis un envoi réel avant d'annoncer la fonctionnalité
-> aux parents.
+Le chiffrement des notifications, lui, n'a aucune dépendance : il est écrit directement
+dans `serveur/src/push.js`, aux normes RFC 8291 et RFC 8292, et verrouillé par le
+vecteur de test officiel de l'annexe A dans `serveur/src/push.test.js`. **Ce fichier a
+traversé le portage sans qu'une ligne change** — il ne tient que sur WebCrypto, et
+c'est la seule brique qu'on ne peut pas déboguer à distance : c'est elle qui parle aux
+serveurs d'Apple.
 
-### Le chemin court : le script guidé
+### Mettre le serveur en service
 
-```bash
-cd worker
-./installer.sh
-```
+Le déploiement lui-même se fait dans **Dokploy** : c'est là que se posent les variables
+d'environnement, que se déclenchent les redéploiements et que se règlent les
+sauvegardes. Ce document ne décrit que ce qui se prépare en dehors.
 
-**Si `wrangler login` échoue** — ce qui arrive régulièrement quand le compte Cloudflare
-passe par Google — utilise un jeton d'API, qui évite complètement le passage par le
-navigateur et reste la méthode recommandée pour un script :
-
-1. [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
-   → **Create Token** ;
-2. modèle **« Edit Cloudflare Workers »** (il couvre Workers Scripts et Workers KV) ;
-3. vérifier que le compte sélectionné est le bon, puis créer le jeton ;
-4. l'exporter et relancer :
+**a. Les clés de notification.**
 
 ```bash
-export CLOUDFLARE_API_TOKEN='le-jeton'
-./installer.sh
+node scripts/generer-vapid.mjs
 ```
 
-Le jeton reste dans ton terminal : il n'est ni affiché, ni écrit dans le dépôt.
-Ferme la session ou fais `unset CLOUDFLARE_API_TOKEN` quand tu as fini.
+Il rend deux choses : une clé publique (87 caractères, à poser en variable de dépôt
+`CLE_VAPID`) et un JWK privé (à poser en variable `VAPID_JWK` sur `bus-api`). **La clé
+privée ne doit jamais être affichée ailleurs ni écrite dans le dépôt.**
 
-Il enchaîne tout — dépendances, connexion Cloudflare, création de l'espace de
-stockage, génération des clés, dépôt des quatre secrets, déploiement, déclaration des
-variables côté GitHub, puis vérification — en s'arrêtant aux deux seuls moments qui
-demandent une décision : l'identifiant de compte Cloudflare et la création de
-l'application OAuth GitHub.
+La préproduction a ses **propres** clés. Sans quoi une notification d'essai lancée
+depuis la préproduction réveille les vrais téléphones des vrais parents.
 
-Deux précautions y sont prises :
+**b. L'application OAuth GitHub.** `Settings → Developer settings → OAuth Apps`. L'URL
+de rappel doit être exactement `https://app.schoulbus.lu/api/auth/callback` — GitHub la
+compare caractère par caractère. Reporter l'identifiant et le secret en
+`GITHUB_CLIENT_ID` et `GITHUB_CLIENT_SECRET`.
 
-- **la clé privée VAPID n'est jamais affichée** : elle passe directement du générateur
-  au secret Cloudflare ;
-- **l'identifiant de compte n'est pas écrit dans le dépôt** : il est lu depuis
-  `CLOUDFLARE_ACCOUNT_ID` ou demandé à l'exécution.
+**c. Les variables du service `bus-api`.**
+
+| Variable | Rôle | Sans elle |
+| --- | --- | --- |
+| `DATABASE_URL` | Connexion PostgreSQL | Le serveur démarre quand même, et `/api/sante` répond `"base": false` — c'est voulu : un conteneur qui redémarre en boucle ne dit pas ce qui lui manque. |
+| `ORIGINES_AUTORISEES` | Les origines qui ont le droit d'appeler le serveur, séparées par des virgules | Aucune origine n'est autorisée. Le serveur le dit au démarrage. |
+| `URL_API_PUBLIQUE` | L'origine publique, pour fabriquer le `redirect_uri` d'OAuth | Déduite des en-têtes du proxy — ce qui produit `http://bus-api:3000/…` et un échange refusé sans qu'on comprenne pourquoi. **À poser.** |
+| `VAPID_JWK`, `CONTACT_VAPID` | Notifications | `/api/sante` répond `"push": false` avec le motif. |
+| `SECRET_SESSION`, `GITHUB_PAT` | Espaces commune et traductions | Ils répondent 503, et le reste fonctionne. |
+| `SECRET_NOTIFICATION` | Envoi déclenché depuis GitHub Actions | `/api/notifier` répond 401. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Relais Google Agenda | L'intégration disparaît de l'interface, l'export `.ics` reste. |
+| `URL_SITE` | Site publié, relu pour les rappels | Aucun rappel n'est programmé. |
+| `NB_PROXYS_FIABLES` | Nombre de relais devant le serveur (défaut : 1) | Voir ci-dessous — **c'est le réglage le plus silencieux de tous**. |
+
+> **`NB_PROXYS_FIABLES` mérite qu'on s'y arrête.** L'adresse du client est lue dans
+> `X-Forwarded-For`, en partant de la FIN : le client peut écrire ce qu'il veut dans
+> cet en-tête, mais il ne peut pas écrire après le relais. Avec Traefik seul devant,
+> la valeur est 1. Si un jour un second relais s'ajoute, il faut la passer à 2 —
+> sinon la limitation de débit compte les adresses du relais au lieu de celles des
+> visiteurs, et cinq tentatives suffisent à bloquer tout le monde. Rien ne le
+> signalerait.
+
+**d. Les variables de dépôt GitHub.** `Settings → Secrets and variables → Actions` :
+variables `URL_API` (`https://app.schoulbus.lu/api`), `CLE_VAPID`, `ID_CLIENT_GOOGLE` ;
+secret `SECRET_NOTIFICATION`, le même que côté serveur.
+
+**e. Contrôler.**
+
+```bash
+curl https://app.schoulbus.lu/api/sante
+```
+
+`"base"`, `"push"`, `"commune"` et `"depot"` doivent tous être au vert. `"commune": true`
+dit que les secrets sont posés ; `"depot": {"urgences":"ok"}` dit qu'ils fonctionnent.
+Un jeton révoqué passe le premier et échoue le second — c'est exactement pour cela que
+les deux sont là.
+
+### Reprendre l'état de l'ancien serveur
+
+À faire **une seule fois**, au moment de la bascule. Sans cette étape, tous les codes
+d'agents sont invalidés et tous les parents désabonnés, sans que rien ne le signale.
+
+```bash
+node serveur/exporter-kv.mjs > /tmp/kv.json          # depuis un poste connecté à Cloudflare
+DATABASE_URL=… node serveur/importer-kv.mjs /tmp/kv.json
+```
+
+L'import est idempotent : le relancer ne crée pas de doublon. Les états OAuth, les
+verrous d'essai et les compteurs de tentatives ne sont **pas** repris — ils auront
+expiré avant la fin de la bascule.
+
+Le seul contrôle qui prouve quelque chose est de **se connecter à `/commune` avec un
+vrai code d'agent**. Compter les lignes ne suffit pas.
 
 ### Si les notifications ne partent pas
 
-**Commence par lire ce que le Worker a répondu** — ne régénère surtout pas les clés
+**Commence par lire ce que le serveur a répondu** — ne régénère surtout pas les clés
 d'emblée. Le workflow « Notifier les perturbations » journalise la réponse complète :
 
 ```bash
 gh run list --workflow=notifier.yml --limit 1
-gh run view <identifiant> --log | grep 'Worker a répondu'
+gh run view <identifiant> --log | grep 'a répondu'
 ```
 
 La réponse dit exactement ce qui s'est passé :
@@ -282,107 +310,53 @@ La réponse dit exactement ce qui s'est passé :
 | `envoyees` > 0 | Les notifications sont parties. Si le téléphone ne sonne pas, le problème est côté appareil (autorisation refusée, mode concentration). |
 | `total: 0` | Aucun abonné enregistré. Il faut activer les notifications depuis le site, sur l'appareil. |
 | `echecs` > 0 | Le service de push a refusé l'envoi. **Le champ `details` donne le service, le code HTTP et le motif exact** — c'est lui qu'il faut lire. |
-| `details` mentionne `error code: 1042` | Cloudflare a refusé la sous-requête de `/notifier` vers `/notifier-lot` : un Worker n'a pas le droit d'appeler un Worker de la même zone. Le drapeau `global_fetch_strictly_public` de `wrangler.toml` lève l'interdiction ; vérifie qu'il est bien présent et que le Worker a été redéployé depuis. |
+| `401 non-autorise` | `SECRET_NOTIFICATION` diffère entre le secret du dépôt et la variable du serveur. |
 
-Pour suivre un envoi en direct : `cd worker && npx wrangler tail`, puis publier la
-perturbation.
+Pour suivre un envoi en direct : `sudo docker logs -f <conteneur bus-api>` (ou le
+journal du service dans Dokploy), puis publier la perturbation.
 
-> Attention : `npx wrangler dev` autorise cet appel d'un Worker à lui-même, alors que la
-> production le refuse. Un envoi qui marche en local peut donc échouer une fois déployé —
-> c'est exactement ainsi que le défaut 1042 est passé inaperçu. Le seul essai qui tranche
-> est une perturbation réellement publiée.
+> **`507 trop-abonnes` et `error code: 1042` n'existent plus.** Ces deux réponses
+> venaient du découpage en lots imposé par le palier gratuit de Cloudflare. Si tu les
+> retrouves dans un ancien journal, c'est un envoi d'avant la bascule.
 
 Ce n'est **que si `details` montre un refus de signature** (`401`, `403`, ou un motif du
 genre `BadJwtToken`, `VapidPkHashMismatch`) que la paire VAPID est en cause : la clé
-publique du site ne correspond alors plus à la clé privée du Worker. `./reparer-vapid.sh`
-régénère la paire et la redépose des deux côtés, puis relance le déploiement. Les
-appareils déjà abonnés doivent ensuite réactiver les notifications — ne le lance donc
-pas sans raison.
+publique du site ne correspond alors plus à la clé privée du serveur. Régénérer la paire
+avec `node scripts/generer-vapid.mjs`, reposer les deux moitiés — `CLE_VAPID` côté dépôt,
+`VAPID_JWK` côté serveur — puis redéployer les deux. Les appareils déjà abonnés doivent
+ensuite réactiver les notifications : ne le fais donc pas sans raison.
 
 Une vérification rapide, avant tout soupçon sur les clés : la clé publique servie par le
 site doit être identique à la variable du dépôt.
 
 ```bash
 gh variable list | grep CLE_VAPID
-curl -s https://sashimee.github.io/bus-scolaire-beckerich/ \
-  | grep -oE '/assets/index-[^"]+\.js' | head -1
-# puis chercher la clé (commence par « B », 87 caractères) dans ce fichier
+curl -s https://app.schoulbus.lu/api/sante | grep -o '"clePubliqueVapid":"[^"]*"'
 ```
 
-Si les deux concordent, les clés ne sont pas le problème.
+`/api/sante` importe réellement le JWK privé et en dérive la clé publique : si elle
+concorde avec la variable du dépôt, les clés ne sont pas le problème. Constater que le
+secret « existe » ne prouvait rien — c'est précisément ainsi qu'un `VAPID_JWK` présent
+mais illisible avait pu passer pour valide.
 
-> **Le sous-domaine workers.dev sera public.** L'URL du Worker est compilée dans le
-> JavaScript servi à tous les parents : elle apparaît donc en clair dans le code du
-> site, et reste indexable. Un sous-domaine contenant un nom de personne y réintroduit
-> une donnée personnelle. Il se change dans Cloudflare, sous
-> **Workers & Pages → Subdomain** — un nom neutre comme `bus-beckerich` évite le
-> problème. Le script prévient si le sous-domaine choisi ressemble à un nom propre.
+> **L'URL de l'API est publique.** Elle est compilée dans le JavaScript servi à tous
+> les parents : elle apparaît donc en clair dans le code du site. C'est sans
+> conséquence tant qu'elle ne porte le nom de personne — ce qui était le risque du
+> sous-domaine `workers.dev`, dérivé du nom du compte Cloudflare, et ce que
+> `app.schoulbus.lu` règle définitivement.
 
-Les étapes ci-dessous décrivent la même chose à la main, si tu préfères contrôler
-chaque commande ou si le script échoue quelque part.
+### Relancer un déploiement
 
-### a. Générer les clés VAPID
+Un push sur `main` reconstruit le site et redéploie le serveur. Manuellement :
+`Actions → Déploiement → Run workflow`, ou le bouton de redéploiement de Dokploy pour
+le seul serveur — utile quand seule une variable d'environnement a changé, puisque
+l'image, elle, n'a pas bougé.
 
-```bash
-node scripts/generer-vapid.mjs
-```
+La chaîne d'intégration bloque la mise en ligne sur : audit de sécurité des dépendances
+au niveau « élevé », vérification des types, et la totalité des tests — ceux de
+l'application **et** ceux du serveur, ces derniers contre un vrai PostgreSQL.
 
-Deux valeurs s'affichent : une clé **publique** et un **JWK privé**. Le JWK privé ne
-doit jamais être commité.
-
-### b. Créer l'application OAuth GitHub
-
-Sur [github.com/settings/developers](https://github.com/settings/developers) →
-*New OAuth App* :
-
-- **Homepage URL** : `https://sashimee.github.io/bus-scolaire-beckerich/`
-- **Authorization callback URL** : `https://bus-beckerich.abadev.workers.dev/auth/callback`
-
-Noter le *Client ID* et générer un *Client secret*.
-
-### c. Déployer le Worker
-
-```bash
-cd worker
-npm install
-npx wrangler login
-npx wrangler kv namespace create ABONNEMENTS   # reporter l'id dans wrangler.toml
-npx wrangler secret put GITHUB_CLIENT_ID
-npx wrangler secret put GITHUB_CLIENT_SECRET
-npx wrangler secret put VAPID_JWK              # le JWK privé de l'étape a
-npx wrangler secret put SECRET_NOTIFICATION    # une chaîne aléatoire, à réutiliser en d
-npx wrangler deploy
-```
-
-Vérifier ensuite :
-
-```bash
-curl https://bus-beckerich.abadev.workers.dev/sante
-# {"ok":true,"oauth":true,"push":true,"origines":"https://sashimee.github.io,..."}
-```
-
-Si `oauth` ou `push` valent `false`, un secret manque.
-
-### d. Déclarer les valeurs côté dépôt
-
-Dans `Settings → Secrets and variables → Actions` :
-
-| Type | Nom | Valeur |
-| --- | --- | --- |
-| Variable | `URL_WORKER` | `https://bus-beckerich.abadev.workers.dev` |
-| Variable | `CLE_VAPID` | la clé publique de l'étape a |
-| Secret | `SECRET_NOTIFICATION` | la même chaîne aléatoire qu'en c |
-
-Ce sont des **variables** et non des secrets pour les deux premières : l'URL du Worker
-et la clé publique VAPID se retrouvent de toute façon dans le code servi au navigateur.
-Les traiter comme des secrets donnerait une fausse impression de confidentialité.
-
-### e. Relancer un déploiement
-
-Un push sur `main`, ou `Actions → Déploiement GitHub Pages → Run workflow`. Le bouton
-« Activer les notifications » apparaît alors dans les réglages du site.
-
-### f. Vérifier avant d'annoncer
+### Vérifier avant d'annoncer
 
 1. Activer les notifications sur un téléphone, depuis les réglages du site.
 2. Publier une perturbation de test datée d'aujourd'hui.

@@ -76,6 +76,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 | R38 | — | **Le dossier de commercialisation est un instantané, et ses chiffres ne se vérifient pas tout seuls.** `docs/dossier-commercialisation.md` (2026-08-19) décrit le dépôt au commit `578a1db` : il ignore donc l'évolution « la langue avant tout le reste », encore non commitée au moment de sa rédaction. Ses chiffres (17 341 lignes, 751 clés par langue, ~365 cas de test, 188 occurrences de `dillendapp` dans le moteur, 1 162 adresses) ont été recomptés à la main ce jour-là ; rien ne les recomptera ensuite. Il ne contient **aucune donnée de marché** — 26 questions y sont marquées `[À VÉRIFIER]` au lieu d'être estimées, notamment le nombre de communes concernées, les seuils de marchés publics, le cadre CNPD et l'assurance responsabilité. | Recompter les chiffres avant tout usage externe du dossier (`wc -l`, taille des JSON, `git log`). Répondre aux `[À VÉRIFIER]` par recherche, jamais par estimation. |
+| R39 | 21 | **La reprise de l'état clé-valeur vers PostgreSQL n'a jamais été exécutée sur les vraies données.** `serveur/exporter-kv.mjs` et `serveur/importer-kv.mjs` sont écrits et l'import est idempotent, mais il n'a tourné que contre une base vide. Un import raté invalide **tous** les codes d'agents communaux et désabonne **tous** les parents, sans que rien ne le signale : l'espace commune répondrait « code inconnu », et les notifications ne partiraient plus. | Exporter le KV réel, importer dans la base de préproduction, puis **se connecter à `/commune` avec un vrai code d'agent**. Compter les lignes ne prouve rien : seule la connexion prouve que l'empreinte a été reprise à l'identique. |
+| R40 | 21 | **L'extraction de l'adresse cliente derrière Traefik n'a pas été vue à l'œuvre.** Le Worker lisait `CF-Connecting-IP` ; le serveur lit `X-Forwarded-For` en partant de la fin, sur `NB_PROXYS_FIABLES` rangs. 7 tests couvrent la fonction et 3 tests de route la traversent, mais **aucun vrai proxy n'a encore été devant**. Une erreur ici transforme la limitation de débit en un seul seau global : cinq tentatives pour la planète entière, puis plus personne ne se connecte. Aucun signe extérieur. | Deux connexions échouées depuis deux réseaux différents (par exemple domicile et 4G) contre le serveur déployé : la seconde ne doit pas hériter du compteur de la première. Si un second relais s'ajoute un jour devant Traefik, `NB_PROXYS_FIABLES` doit passer à 2. |
+| R41 | 21 | **Le paquet a été construit et l'image exercée, mais jamais sous charge.** L'envoi des notifications est passé d'un découpage en lots de 10 à une boucle à 20 envois simultanés. La nouvelle valeur n'est pas plus mesurée que ne l'était `TAILLE_LOT` — elle est seulement libre du plafond qui justifiait l'ancienne. | Regarder le journal du conteneur au premier envoi réel de plus de cinquante abonnés. Ce qui compte n'est pas la durée mais le nombre d'échecs : un service de push qui répond `429` dit que la concurrence est trop haute. |
 
 ### Mise en service — faite
 
@@ -2003,13 +2006,135 @@ npm run dev          # inspection manuelle des écrans touchés
 npm run build        # le build doit rester propre
 ```
 
-Pour le Worker (lots 8, 10, 11) :
+Pour le serveur (lots 8, 10, 11, 21 et suivants) :
 
 ```bash
-cd worker && npm test
-npx wrangler dev                    # essai local des routes /commune
-curl https://<worker>/sante         # après déploiement
+sudo docker compose up -d bus-postgres
+cd serveur
+DATABASE_URL_TEST=postgres://bus:bus@localhost:5433/bus npm test
+npm run typecheck && npm run build
+curl https://app.schoulbus.lu/api/sante      # après déploiement
 ```
+
+Sans `DATABASE_URL_TEST`, les tests de stockage **se sautent** au lieu d'échouer : la
+boucle courte doit rester lançable sans Docker. La CI, elle, la pose toujours — un test
+qui se saute en silence ne protège rien s'il se saute partout.
+
+`npm test` à la racine **ne couvre pas** le serveur. `npm run test:tout` lance les deux.
 
 Aucun lot n'est considéré comme terminé tant que la fiche d'un enfant n'a pas été
 réexaminée sur un viewport de 430 × 932 px, en thème clair **et** sombre.
+
+
+## Lot 21 — Le serveur, réécrit et conteneurisé (2026-08-22)
+
+> **Fait le 2026-08-22.** Premier lot du passage sur VPS Dokploy (lots 21 à 27, voir
+> le plan de bascule). Objectif volontairement étroit : **un conteneur qui répond
+> exactement comme le Worker, et rien de plus.** Aucune fonctionnalité nouvelle, aucun
+> changement d'origine, aucune modification du chemin de publication. Mélanger la
+> rupture d'hébergement avec une rupture fonctionnelle aurait rendu impossible de dire
+> laquelle des deux a cassé quoi.
+
+`worker/` (3 143 lignes, 0 dépendance, Cloudflare Workers + un espace clé-valeur)
+devient `serveur/` (Hono + PostgreSQL, 3 dépendances, empaqueté par esbuild en un
+fichier de 218 Ko). Le nom a changé parce que « worker » ne veut plus rien dire ici.
+
+### Ce qui a été repris tel quel, et pourquoi
+
+`push.js` et `rappels.js` sont copiés **sans qu'une ligne change**, avec leurs tests.
+Ni l'un ni l'autre n'avait la moindre attache Cloudflare : le premier ne tient que sur
+WebCrypto, le second sur du calcul de dates. Réécrire `push.js` au passage aurait été
+le meilleur moyen de casser la seule brique qu'on ne peut pas déboguer à distance —
+celle qui parle aux serveurs d'Apple, et qui avait déjà dû être écrite à la main parce
+que la bibliothèque disponible n'implémentait que l'ancien brouillon. **Ses 28 tests,
+dont le vecteur de l'annexe A de la RFC 8291, sont passés sous Node du premier coup.**
+
+`src/lib/validation.ts`, `traductions.ts`, `calendrier.ts` et `donnees.ts` restent
+partagés avec l'application, importés et non réécrits. C'est ce qui impose que le
+contexte de construction Docker soit la **racine** du dépôt et non `serveur/`.
+
+### Le schéma, et ce qu'il corrige
+
+Huit préfixes de clés dans un seul sac deviennent cinq tables. Deux choix méritent
+d'être justifiés :
+
+- **`agent_commune` et `agent_traduction` sont deux tables, pas une table avec une
+  colonne `role`.** La séparation des deux espaces reposait sur *deux* barrières
+  indépendantes : deux préfixes distincts — un code de l'un n'existait littéralement
+  pas là où l'autre le cherchait — et le rôle réinscrit dans le jeton signé. Une table
+  unique n'en aurait laissé qu'une, suspendue à une clause `where role = …` qu'un jour
+  quelqu'un oubliera. Le coût de la duplication est de quatre lignes de SQL.
+- **`ephemere` porte une colonne `expire_le`, et toute lecture la filtre.** Le balayage
+  périodique ne fait que récupérer la place. S'y fier pour l'expiration ferait dépendre
+  une propriété de sécurité d'une tâche de fond, donc la perdrait le jour où cette
+  tâche tombe.
+
+**R4 est levée.** La limitation à cinq tentatives par quart d'heure tient désormais
+dans un seul `insert … on conflict do update … returning` : PostgreSQL n'a pas la
+cohérence différée du clé-valeur. Un test lance vingt tentatives simultanées et exige
+que **cinq exactement** passent — c'est le cas que l'ancien mécanisme ne pouvait pas
+tenir.
+
+### Ce qui a disparu
+
+| Supprimé | Pourquoi |
+| --- | --- |
+| `/notifier-lot`, `TAILLE_LOT`, `507 trop-abonnes`, le plafond d'environ 450 abonnés | Le découpage en lots n'existait que pour les 10 ms de processeur du palier gratuit. Une boucle à concurrence bornée suffit. `TAILLE_LOT = 10`, que le code déclarait « estimation prudente, NON MESURÉE », ne sera jamais mesuré : la question ne se pose plus. |
+| `global_fetch_strictly_public`, `nodejs_compat`, l'erreur `1042` | Drapeaux et pannes propres à Cloudflare. |
+| `cf: { cacheTtl: 0 }` | Redevient `cache: 'no-store'`. **La règle s'inverse avec le runtime** : sous Workers, `cache` n'était pas implémenté et son emploi cassait toute publication (R3, deux jours de diagnostic) ; sous Node, c'est `cf` qui n'existe pas. |
+| `worker/src/runtime.test.js` | Ce test relisait les sources et **refusait** toute occurrence de `cache:`. Il gardait exactement la panne dont la correction vient d'être annulée. Sa leçon passe en commentaire là où `cache: 'no-store'` réapparaît. |
+| La fenêtre cron « toutes les 15 min, 4 h–15 h UTC, lun-ven » | 44 réveils par jour pour au plus 5 créneaux utiles, et un pas de 15 minutes sur des créneaux qui n'en font pas le tour. Le planificateur réveille `rappels.js` chaque minute et le laisse décider — la logique, elle, ne bouge pas. |
+| `worker/installer.sh`, `creer-agent.sh`, `reparer-vapid.sh` | Remplacés par `serveur/creer-agent.mjs` (création, liste, retrait). Le shell appelait déjà Python pour échapper du JSON : trois langages pour créer un code, c'en était deux de trop. `randomInt` remplace `$RANDOM`, dont la graine est prévisible — sur huit caractères, ce n'est pas un détail. |
+
+### Les tests : 80 cas deviennent 109
+
+C'était la réserve que j'avais posée sur la réécriture — jeter des tests éprouvés. Le
+compte final est à l'inverse : **80 cas dans `worker/`, 109 dans `serveur/`**, dont
+2 abandonnés à dessein (`runtime.test.js`, devenu faux). Ce qui change surtout, c'est
+leur nature : les tests de routes ne rejouent plus contre un faux clé-valeur mais
+contre la **vraie** application Hono et une **vraie** base, par `app.request()`. Ils
+traversent donc le routage et les intergiciels — ce que les anciens ne pouvaient pas
+faire.
+
+Et cela a immédiatement servi : **le premier défaut du portage était dans le montage**,
+pas dans la logique. Le préflight CORS de `/commune/*` n'ouvrait pas l'en-tête
+`Authorization`, parce que `c.req.path` rend `/api/commune/connexion` alors que les
+routes sont déclarées `/commune/connexion`. Le navigateur aurait refusé toute requête
+de l'espace commune avant même de l'émettre, et aucune erreur serveur ne l'aurait
+expliqué. Trouvé au premier `curl -X OPTIONS`, corrigé, et couvert par trois tests.
+
+Second défaut du même genre, trouvé en relisant : `VITE_URL_API ?? VITE_URL_WORKER`
+n'aurait **jamais** basculé sur l'ancien nom, une variable de dépôt GitHub non définie
+arrivant comme chaîne vide et non comme `undefined`. Une construction faite avant le
+renommage de la variable aurait produit une application sans notifications, sans espace
+commune et sans Google Agenda, en silence. C'est `||`.
+
+### Écarts assumés par rapport au texte du lot
+
+- **`push.js` et `rappels.js` restent en `.js`, pas en `.ts`.** Le plan les annonçait
+  en `.ts`. Les convertir aurait voulu dire les modifier, ce que « repris tel quel »
+  exclut. `allowJs` suffit, et le typage n'aurait rien apporté à un module verrouillé
+  par un vecteur de test officiel.
+- **`URL_API` n'a pas de valeur par défaut `/api`**, contrairement au texte du lot.
+  Vide doit continuer de vouloir dire « fonctionnalités désactivées » : c'est ce qui
+  fait que l'application parent tourne intégralement sans serveur. Une origine sans
+  serveur en face répondrait `/api` par la page de l'application, l'appel échouerait
+  sur du HTML, et la panne se lirait « erreur réseau » au lieu de « non configuré ».
+  Le `/api` se pose explicitement à la construction, au lot 23.
+- **`npm test` à la racine ne couvre plus le serveur.** Il le couvrait par accident
+  jusqu'ici : le vitest racine ramassait `worker/src/*.test.js`, ce qui explique le
+  passage apparent de 409 à 325 cas côté application. `npm run test:tout` lance les
+  deux, et la CI a un travail distinct avec un vrai PostgreSQL en service.
+
+### Ce qui n'a PAS été fait, volontairement
+
+Le Worker déployé continue de tourner et de servir les parents : ce lot ne change rien
+en production. Sa **source** a disparu du dépôt, en revanche. En cas de besoin urgent
+d'y toucher avant le lot 23, elle se récupère par `git show <commit>:worker/…` — le
+dernier commit à la porter est celui qui précède ce lot.
+
+`GITHUB_PAT`, `SECRET_NOTIFICATION`, `serveur/src/github.ts` et le workflow
+`notifier.yml` sont conservés à l'identique. Ils disparaissent au lot 24, quand la
+publication cessera de passer par le dépôt.
+
+*Dépend de rien. Les lots 22 et suivants en dépendent tous.*

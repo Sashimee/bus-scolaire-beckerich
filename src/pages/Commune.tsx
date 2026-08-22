@@ -17,7 +17,7 @@ import {
 /**
  * Le journal des publications.
  *
- * Le Worker inscrit chaque publication et chaque retrait depuis le lot 8, mais rien ne
+ * Le serveur inscrit chaque publication et chaque retrait depuis le lot 8, mais rien ne
  * les affichait : un journal que personne ne peut lire ne rend de comptes à personne.
  * Il est replié — on ne le consulte qu'en cas de doute — et se charge à l'ouverture,
  * pour ne pas coûter un aller-retour à chaque connexion.

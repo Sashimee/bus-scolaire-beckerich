@@ -27,9 +27,9 @@ const HEURE = /^([01]\d|2[0-3]):[0-5]\d$/
  * ligne → course → arrêts, chaque heure étant un champ modifiable. Ce que l'agent
  * confirme avant publication est un diff en français, pas un objet.
  *
- * La publication passe par le Worker, qui **revalide le plan complet** avec le même
+ * La publication passe par le serveur, qui **revalide le plan complet** avec le même
  * `validerPlan()` que celui utilisé ici. La validation côté navigateur sert à montrer
- * les problèmes tout de suite ; c'est celle du Worker qui fait autorité.
+ * les problèmes tout de suite ; c'est celle du serveur qui fait autorité.
  */
 export function CommuneHoraires() {
   const { t } = useT()
@@ -66,7 +66,7 @@ export function CommuneHoraires() {
     })
   }
 
-  /** Le plan complet, retouches appliquées. C'est lui qui part au Worker. */
+  /** Le plan complet, retouches appliquées. C'est lui qui part au serveur. */
   const planModifie = useMemo((): Plan => {
     if (!retouches.length) return plan
     return {

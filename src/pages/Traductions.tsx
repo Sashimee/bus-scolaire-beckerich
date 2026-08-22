@@ -16,7 +16,7 @@ import {
  * Espace traduction, calqué sur `/commune`.
  *
  * Même mécanique — un code personnel, jamais de compte GitHub — mais un code qui n'est
- * valable QUE pour les textes : côté Worker, il vit sous un autre préfixe et le jeton
+ * valable QUE pour les textes : côté serveur, il vit sous un autre préfixe et le jeton
  * porte son rôle. Confier la relecture des cinq langues à quelqu'un ne revient donc
  * jamais à lui donner le droit d'annuler un bus.
  */

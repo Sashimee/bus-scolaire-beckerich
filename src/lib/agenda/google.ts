@@ -4,8 +4,8 @@
  * Deux garanties, qui sont la raison d'être de ce choix technique :
  *
  *  1. **Le jeton ne quitte pas l'appareil.** Le flux est un OAuth PKCE ; seul l'échange
- *     du code passe par le Worker, que Google oblige à détenir le `client_secret`. Le
- *     Worker relaie et ne retient rien : ni lui ni GitHub Pages n'ont de moyen de lire
+ *     du code passe par le serveur, que Google oblige à détenir le `client_secret`. Le
+ *     serveur relaie et ne retient rien : ni lui ni GitHub Pages n'ont de moyen de lire
  *     l'agenda de qui que ce soit. La session, elle, vit dans `localStorage` — elle
  *     survit donc à la fermeture de l'application, comme l'autorisation survit chez
  *     Google.
@@ -17,7 +17,7 @@
  * Sans `VITE_ID_CLIENT_GOOGLE`, tout ce module reste inerte et la fonctionnalité
  * disparaît de l'interface — même politique que les notifications.
  */
-import { ID_CLIENT_GOOGLE, URL_WORKER } from '../../config'
+import { ID_CLIENT_GOOGLE, URL_API } from '../../config'
 import type { EvenementRecurrent } from './evenements'
 import type { Jour } from '../types'
 
@@ -121,7 +121,7 @@ export async function jetonValide(): Promise<string | null> {
   let donnees: { access_token?: string; expires_in?: number; detail?: unknown; erreur?: string }
   let rep: Response
   try {
-    rep = await fetch(`${URL_WORKER}/google/rafraichir`, {
+    rep = await fetch(`${URL_API}/google/rafraichir`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ rafraichissement: s.rafraichissement }),
@@ -216,10 +216,10 @@ export async function terminerConnexion(): Promise<boolean> {
   history.replaceState(null, '', window.location.pathname)
   if (!v) throw new Error('verificateur-perdu')
 
-  // L'échange passe par le Worker et non par Google directement : Google l'exige avec
+  // L'échange passe par le serveur et non par Google directement : Google l'exige avec
   // le `client_secret` pour un client « Application Web », et ce secret n'a rien à
   // faire dans du code servi aux parents. Même mécanique que la connexion GitHub.
-  const rep = await fetch(`${URL_WORKER}/google/jeton`, {
+  const rep = await fetch(`${URL_API}/google/jeton`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, verificateur: v, redirection: urlRetour() }),

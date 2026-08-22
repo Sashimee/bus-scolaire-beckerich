@@ -123,7 +123,7 @@ export async function ecrireFichier(
  * Publie la surcouche de traduction depuis `/admin`, avec le jeton de l'utilisateur.
  *
  * Pendant du `publierTraductions` de l'espace `/traductions`, qui passe lui par le
- * Worker. La validation est la même des deux côtés — `relireSurcouche` — pour qu'un
+ * serveur. La validation est la même des deux côtés — `relireSurcouche` — pour qu'un
  * fichier publié par l'un soit toujours lisible par l'autre.
  */
 export async function publierSurcoucheGithub(
@@ -131,7 +131,7 @@ export async function publierSurcoucheGithub(
   langue: string,
   modifications: Modifications,
 ): Promise<Surcouche> {
-  // Relire avant de fusionner, comme le Worker : /admin et /traductions écrivent dans
+  // Relire avant de fusionner, comme le serveur : /admin et /traductions écrivent dans
   // le même fichier, et rien n'empêche les deux d'être ouverts en même temps.
   const { contenu, sha } = await lireFichier<unknown>(jeton, CHEMIN_TRADUCTIONS)
   const propre = appliquerModifications(relireSurcouche(contenu), langue as Langue, modifications)

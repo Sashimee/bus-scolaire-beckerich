@@ -1,0 +1,25 @@
+{
+  "name": "bus-beckerich-serveur",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Serveur du site « Bus scolaire Beckerich » : OAuth GitHub, abonnements et envoi des notifications push.",
+  "scripts": {
+    "dev": "node --watch --experimental-strip-types src/index.ts",
+    "build": "node construire.mjs",
+    "start": "node dist/serveur.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "hono": "^4.7.0",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "esbuild": "^0.28.1",
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.10"
+  }
+}

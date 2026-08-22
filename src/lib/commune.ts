@@ -2,14 +2,14 @@
  * Client de l'espace commune.
  *
  * Un agent communal ne détient ni compte GitHub, ni jeton de dépôt : il échange un
- * code personnel contre un jeton de session, et c'est le Worker qui publie en son nom.
+ * code personnel contre un jeton de session, et c'est le serveur qui publie en son nom.
  * Ce module ne connaît donc que quatre routes et un jeton, jamais l'API GitHub.
  *
  * Le jeton vit en `sessionStorage` et pas en `localStorage` : il expire au bout de
  * huit heures côté serveur, et fermer l'onglet doit suffire à se déconnecter d'un
  * poste partagé — c'est la même politique que le jeton GitHub de `/admin`.
  */
-import { URL_WORKER } from '../config'
+import { URL_API } from '../config'
 import type { Modifications, Surcouche } from './traductions'
 import type { Perturbation } from './urgences'
 
@@ -31,7 +31,7 @@ export interface SessionCommune {
   jeton: string
   nom: string
   service: string
-  /** Secondes depuis l'époque, telles que le Worker les a signées. */
+  /** Secondes depuis l'époque, telles que le serveur les a signées. */
   expire: number
 }
 
@@ -43,8 +43,8 @@ export interface EntreeJournal {
   detail: string
 }
 
-/** L'espace commune n'existe que si un Worker est configuré à la construction. */
-export const communeConfiguree = (): boolean => Boolean(URL_WORKER)
+/** L'espace commune n'existe que si un serveur est configuré à la construction. */
+export const communeConfiguree = (): boolean => Boolean(URL_API)
 
 export function chargerSession(role: RoleCommune = 'commune'): SessionCommune | null {
   try {
@@ -79,16 +79,16 @@ export function oublierSession(role: RoleCommune = 'commune'): void {
 /**
  * Motifs d'échec, tels qu'ils seront traduits à l'écran.
  *
- * Le Worker répond en identifiants, pas en phrases : c'est l'interface qui décide de
+ * Le serveur répond en identifiants, pas en phrases : c'est l'interface qui décide de
  * la formulation, et la même erreur doit se lire de la même façon dans les cinq langues.
  */
 export type MotifCommune =
   | 'code-inconnu'
   | 'trop-de-tentatives'
   | 'session-expiree'
-  /** Le Worker tourne, mais ses secrets ne sont pas posés : l'espace n'existe pas encore. */
+  /** Le serveur tourne, mais ses secrets ne sont pas posés : l'espace n'existe pas encore. */
   | 'non-activee'
-  /** Le Worker a levé une exception. `detail` porte ce qu'il a bien voulu en dire. */
+  /** Le serveur a levé une exception. `detail` porte ce qu'il a bien voulu en dire. */
   | 'exception'
   | 'charge-invalide'
   | 'plan-invalide'
@@ -142,7 +142,7 @@ async function appeler<T>(
 ): Promise<T> {
   let reponse: Response
   try {
-    reponse = await fetch(`${URL_WORKER}${chemin}`, {
+    reponse = await fetch(`${URL_API}${chemin}`, {
       method: options.methode ?? 'GET',
       headers: {
         ...(options.corps ? { 'Content-Type': 'application/json' } : {}),
@@ -161,10 +161,10 @@ async function appeler<T>(
   if (motif === 'code-inconnu') throw new ErreurCommune('code-inconnu')
   if (motif === 'trop-de-tentatives') throw new ErreurCommune('trop-de-tentatives', donnees.minutes)
   if (motif === 'session-expiree') throw new ErreurCommune('session-expiree')
-  // Sans `SECRET_SESSION`, le Worker répond 503 à tout l'espace. Le dire franchement
+  // Sans `SECRET_SESSION`, le serveur répond 503 à tout l'espace. Le dire franchement
   // vaut mieux qu'une « erreur inconnue » devant laquelle personne ne sait quoi faire.
   if (motif === 'espace-commune-non-configure') throw new ErreurCommune('non-activee')
-  // Le Worker dit ce qui a cassé chez lui. Ces écrans sont ceux d'un agent ou d'un
+  // Le serveur dit ce qui a cassé chez lui. Ces écrans sont ceux d'un agent ou d'un
   // traducteur, pas d'un parent : leur cacher le motif ne protège personne et rend
   // toute panne indiagnosticable à distance.
   if (motif === 'exception') throw new ErreurCommune('exception', donnees.detail)
@@ -177,7 +177,7 @@ async function appeler<T>(
 /**
  * Échange un code contre un jeton de session, pour l'espace demandé.
  *
- * Un code de l'autre espace est refusé côté Worker : il n'y existe littéralement pas,
+ * Un code de l'autre espace est refusé côté serveur : il n'y existe littéralement pas,
  * les deux vivant sous des préfixes distincts.
  */
 export async function seConnecter(
@@ -225,7 +225,7 @@ export async function publierPlan(
 /**
  * Publie des corrections pour UNE langue.
  *
- * On n'envoie que ce qui change, pas la surcouche entière : le Worker relit l'état en
+ * On n'envoie que ce qui change, pas la surcouche entière : le serveur relit l'état en
  * ligne et fusionne clé par clé. Deux traducteurs connectés en même temps ne se
  * recouvrent donc plus. Renvoie l'état fusionné, qui devient la nouvelle base.
  */

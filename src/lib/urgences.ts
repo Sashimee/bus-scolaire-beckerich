@@ -34,7 +34,7 @@ export interface Perturbation {
   publiePar: string
   gravite: Gravite
   /**
-   * Nombre de rappels souhaités, envoyés par le Worker aux créneaux utiles du jour
+   * Nombre de rappels souhaités, envoyés par le serveur aux créneaux utiles du jour
    * concerné. Absent = trois, le plafond. Ne vaut que pour la gravité `alerte` : une
    * information ne fait pas sonner un téléphone trois fois.
    */
@@ -95,7 +95,7 @@ const PERTURBATIONS_MAX = 50
  * Relit une perturbation publiée, ou renvoie `null` si elle est inexploitable.
  *
  * Ce fichier est relu à CHAQUE ouverture de l'application, et il est écrit par le
- * Worker, par `/admin`, et à la main dans le dépôt en cas de secours. Une entrée
+ * serveur, par `/admin`, et à la main dans le dépôt en cas de secours. Une entrée
  * cassée par une faute de frappe ne doit pas emporter les autres avec elle : on
  * l'ignore, et le reste s'affiche.
  */

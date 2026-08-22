@@ -2,7 +2,7 @@
  * Chargement de la surcouche de traduction.
  *
  * Séparé de `src/lib/traductions.ts`, qui porte les règles : celui-là est importé par
- * le Worker, qui n'a ni `fetch` vers le site ni `import.meta.env`. Ici, on est
+ * le serveur, qui n'a ni `fetch` vers le site ni `import.meta.env`. Ici, on est
  * franchement côté navigateur.
  */
 import { relireSurcouche, SURCOUCHE_VIDE, type Surcouche } from '../lib/traductions'

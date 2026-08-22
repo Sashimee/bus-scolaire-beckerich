@@ -6,7 +6,7 @@
  * laquelle il la compare.
  *
  * Séparés aussi de `src/lib/traductions.ts`, qui n'a besoin que du français comme
- * référence et qui est importé par le Worker : lui charger les cinq dictionnaires
+ * référence et qui est importé par le serveur : lui charger les cinq dictionnaires
  * alourdirait son bundle pour rien.
  */
 import fr from './fr.json'

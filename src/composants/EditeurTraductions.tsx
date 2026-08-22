@@ -74,7 +74,7 @@ interface Props {
  * Correction des textes de l'application, langue par langue.
  *
  * Un seul composant pour deux hôtes : `/admin` publie avec le jeton GitHub de son
- * utilisateur, `/traductions` avec un code personnel et le jeton machine du Worker.
+ * utilisateur, `/traductions` avec un code personnel et le jeton machine du serveur.
  * Ce qui change, c'est `publier` — rien d'autre.
  *
  * Le texte français reste affiché à côté de chaque champ : traduire sans voir la

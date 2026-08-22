@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:serveur": "npm --prefix serveur test",
+    "test:tout": "npm test && npm run test:serveur",
     "test:watch": "vitest",
     "typecheck": "tsc -b --noEmit",
     "lint": "oxlint",

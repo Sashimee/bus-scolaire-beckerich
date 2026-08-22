@@ -1,3 +1,12 @@
+/*
+ * REPRIS TEL QUEL de `worker/src/rappels.js`, à l'en-tête près.
+ *
+ * Ce fichier n'a jamais eu la moindre attache Cloudflare : il ne tient que sur
+ * WebCrypto et sur du calcul de dates, disponibles à l'identique sous Node 22. Le
+ * réécrire au passage sur la VPS aurait été le meilleur moyen de casser la seule
+ * brique qu'on ne peut pas déboguer à distance — celle qui parle aux services de
+ * notification d'Apple, de Google et de Mozilla. Ses tests l'accompagnent, inchangés.
+ */
 /**
  * Planificateur des rappels de perturbation.
  *

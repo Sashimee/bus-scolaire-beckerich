@@ -1,0 +1,10 @@
+node_modules
+serveur/node_modules
+worker/node_modules
+dist
+serveur/dist
+.git
+.github
+docs
+*.md
+public/plan-bus-*.pdf

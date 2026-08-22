@@ -38,8 +38,8 @@ const ORIGINE_MESURE = 'https://bus.goatcounter.com'
  * service worker injectent des styles, et une politique qui casse la carte protégerait
  * surtout les parents de leur propre application.
  */
-function politiqueSecurite(urlWorker: string): string {
-  const worker = urlWorker.replace(/\/$/, '')
+function politiqueSecurite(urlApi: string): string {
+  const api = urlApi.replace(/\/$/, '')
   return [
     "default-src 'self'",
     "script-src 'self' https://gc.zgo.at",
@@ -59,7 +59,7 @@ function politiqueSecurite(urlWorker: string): string {
     // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
     // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
     // alors que l'ID client peut être posé sans reconstruire cette liste.
-    `connect-src 'self' ${ORIGINE_MESURE} https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${worker ? ` ${worker}` : ''}`,
+    `connect-src 'self' ${ORIGINE_MESURE} https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${api ? ` ${api}` : ''}`,
     // L'écran de consentement Google est une navigation, pas une inclusion : seule
     // `form-action` doit s'ouvrir, et uniquement vers Google.
     "form-action 'self' https://accounts.google.com",
@@ -132,7 +132,11 @@ function pluginCsp() {
     name: 'bus-csp',
     apply: 'build' as const,
     transformIndexHtml(html: string) {
-      const csp = politiqueSecurite(process.env.VITE_URL_WORKER ?? '')
+      // Même repli que `src/config.ts` : `VITE_URL_WORKER` est le nom que porte
+      // encore la variable de dépôt pendant la bascule. Un désaccord entre les deux
+      // produirait une CSP qui n'ouvre pas l'origine que l'application appelle —
+      // exactement la panne du lot 11, muette et longue à diagnostiquer.
+      const csp = politiqueSecurite(process.env.VITE_URL_API || process.env.VITE_URL_WORKER || '')
       // Origine publique du site. Le défaut couvre GitHub Pages ; une commune qui
       // hébergerait le site ailleurs pose la variable, comme pour `BASE_PATH`.
       const urlPublique =
@@ -283,5 +287,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    // `serveur/` a sa propre configuration, son propre environnement (node, pas
+    // jsdom) et ses propres tests, dont certains exigent un PostgreSQL. Les laisser
+    // remonter ici rendrait `npm test` dépendant de Docker, et personne ne lancerait
+    // plus la boucle courte.
+    exclude: ['**/node_modules/**', '**/dist/**', 'serveur/**'],
   },
 })

@@ -17,7 +17,7 @@ import {
 } from '../lib/github'
 import { definirSimulationActive, simulationActive } from '../lib/simulation'
 import { nouvelIdentifiant, type Gravite, type Perturbation, type TypePerturbation } from '../lib/urgences'
-import { URL_WORKER, connexionGithubConfiguree, lienEditeurGithub } from '../config'
+import { URL_API, connexionGithubConfiguree, lienEditeurGithub } from '../config'
 import { AdminArrets } from '../composants/AdminArrets'
 import { AdminPlan } from '../composants/AdminPlan'
 import { EditeurCredits } from '../composants/EditeurCredits'
@@ -107,7 +107,7 @@ export function Admin() {
   // l'annonce, au pire moment : celui où quelqu'un cherche à publier une urgence.
   useBlocageRechargement(message.trim().length > 0, 'brouillon-admin')
 
-  // Récupère le jeton renvoyé par le Worker après la connexion GitHub.
+  // Récupère le jeton renvoyé par le serveur après la connexion GitHub.
   useEffect(() => {
     const m = /[#&]jeton=([^&]+)/.exec(window.location.hash)
     if (!m) return
@@ -216,7 +216,7 @@ export function Admin() {
         {connexionGithubConfiguree() && (
           <a
             className="bouton bouton--primaire"
-            href={`${URL_WORKER}/auth/start?retour=${encodeURIComponent(window.location.href)}`}
+            href={`${URL_API}/auth/start?retour=${encodeURIComponent(window.location.href)}`}
           >
             {t('admin.connexionGithub')}
           </a>

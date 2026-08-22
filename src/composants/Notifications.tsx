@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useT } from '../i18n'
-import { CLE_VAPID_PUBLIQUE, URL_WORKER, notificationsConfigurees } from '../config'
+import { CLE_VAPID_PUBLIQUE, URL_API, notificationsConfigurees } from '../config'
 
 type Etat = 'indisponible' | 'non-configure' | 'proposable' | 'active' | 'refusee' | 'erreur'
 
-/** Ce que le parent accepte de recevoir. Le Worker filtre sur cette valeur. */
+/** Ce que le parent accepte de recevoir. Le serveur filtre sur cette valeur. */
 type Preference = 'urgences' | 'urgences-rappels' | 'tout'
 
 const PREFERENCES: Preference[] = ['urgences', 'urgences-rappels', 'tout']
@@ -74,7 +74,7 @@ export function Notifications() {
         userVisibleOnly: true,
         applicationServerKey: cleEnOctets(CLE_VAPID_PUBLIQUE),
       })
-      const rep = await fetch(`${URL_WORKER}/abonner`, {
+      const rep = await fetch(`${URL_API}/abonner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...abonnement.toJSON(), preference }),
@@ -89,7 +89,7 @@ export function Notifications() {
   }
 
   /**
-   * Demande au Worker de renvoyer une notification à cet appareil-ci.
+   * Demande au serveur de renvoyer une notification à cet appareil-ci.
    *
    * Le endpoint sert d'authentification : lui seul le connaît, et la seule chose qu'il
    * obtient est de se faire vibrer lui-même.
@@ -102,7 +102,7 @@ export function Notifications() {
       const abonnement = await sw.pushManager.getSubscription()
       if (!abonnement) return setEssai('echec')
 
-      const rep = await fetch(`${URL_WORKER}/essai`, {
+      const rep = await fetch(`${URL_API}/essai`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -114,7 +114,7 @@ export function Notifications() {
       if (rep.status === 429) return setEssai('trop-frequent')
       if (!rep.ok) return setEssai('echec')
 
-      // Le Worker répond 200 même quand le service de push a refusé : c'est le
+      // Le serveur répond 200 même quand le service de push a refusé : c'est le
       // compteur qui dit si quelque chose est réellement parti.
       const { envoyees } = (await rep.json()) as { envoyees?: number }
       setEssai(envoyees ? 'envoye' : 'echec')
@@ -133,7 +133,7 @@ export function Notifications() {
       if (abonnement) {
         // On prévient le serveur avant de résilier : une fois l'abonnement détruit
         // côté navigateur, on n'aurait plus l'identifiant à supprimer.
-        await fetch(`${URL_WORKER}/desabonner`, {
+        await fetch(`${URL_API}/desabonner`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: abonnement.endpoint }),
@@ -149,7 +149,7 @@ export function Notifications() {
   /**
    * Change la préférence.
    *
-   * Elle est renvoyée au Worker en réutilisant `/abonner` : la clé y étant dérivée du
+   * Elle est renvoyée au serveur en réutilisant `/abonner` : la clé y étant dérivée du
    * endpoint, l'enregistrement est remplacé et non dupliqué. Pas besoin d'une route de
    * plus pour un champ.
    */
@@ -165,7 +165,7 @@ export function Notifications() {
       const sw = await navigator.serviceWorker.ready
       const abonnement = await sw.pushManager.getSubscription()
       if (!abonnement) return
-      await fetch(`${URL_WORKER}/abonner`, {
+      await fetch(`${URL_API}/abonner`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...abonnement.toJSON(), preference: nouvelle }),

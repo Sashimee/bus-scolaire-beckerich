@@ -1,0 +1,62 @@
+# Pile de développement local, et modèle de ce que Dokploy montera sur la VPS.
+#
+# Ce fichier n'est PAS le déploiement : Dokploy compose la sienne à partir des mêmes
+# images, avec Traefik devant. Il sert à deux choses — travailler en local avec une
+# vraie base, et faire tourner les tests de stockage.
+#
+#   docker compose up -d bus-postgres     # la base seule, pour `npm test`
+#   docker compose up                     # la pile entière
+
+name: bus-beckerich
+
+services:
+  bus-postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: bus
+      POSTGRES_PASSWORD: bus
+      POSTGRES_DB: bus
+    ports:
+      # Exposé en local uniquement pour que `npm test` et `psql` y accèdent depuis
+      # l'hôte. Sur la VPS, la base ne sort jamais du réseau interne de Dokploy.
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      # Les autres services attendent que la base soit VRAIMENT prête : un conteneur
+      # « démarré » n'accepte pas encore de connexion, et le serveur échouerait ses
+      # migrations au premier essai.
+      test: ['CMD-SHELL', 'pg_isready -U bus -d bus']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  bus-api:
+    build:
+      # La racine du dépôt : le serveur importe `src/lib/*.ts`. Voir le Dockerfile.
+      context: .
+      dockerfile: serveur/Dockerfile
+    environment:
+      PORT: 3000
+      BASE_API: /api
+      DATABASE_URL: postgres://bus:bus@bus-postgres:5432/bus
+      ORIGINES_AUTORISEES: http://localhost:5173,http://localhost:8080
+      URL_API_PUBLIQUE: http://localhost:8080/api
+      CONTACT_VAPID: ${CONTACT_VAPID:-}
+      VAPID_JWK: ${VAPID_JWK:-}
+      SECRET_SESSION: ${SECRET_SESSION:-}
+      SECRET_NOTIFICATION: ${SECRET_NOTIFICATION:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GITHUB_PAT: ${GITHUB_PAT:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      URL_SITE: ${URL_SITE:-}
+    depends_on:
+      bus-postgres:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:3000:3000'
+
+volumes:
+  postgres:

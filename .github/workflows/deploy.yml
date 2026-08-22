@@ -37,6 +37,48 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+  serveur:
+    name: Tests du serveur
+    runs-on: ubuntu-latest
+    services:
+      # Un vrai PostgreSQL, et non un simulacre : les tests de stockage vérifient
+      # `on conflict … returning` sous concurrence, `make_interval` et le typage
+      # `jsonb`. Un faux les ferait passer sans rien prouver — or c'est précisément
+      # cette requête-là qui rend stricte la limitation de débit (réserve R4).
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: bus
+          POSTGRES_PASSWORD: bus
+          POSTGRES_DB: bus
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U bus -d bus"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: serveur/package-lock.json
+      - run: npm ci
+        working-directory: serveur
+      - name: Vulnérabilités connues des dépendances
+        run: npm audit --audit-level=high
+        working-directory: serveur
+      - run: npm run typecheck
+        working-directory: serveur
+      - run: npm test
+        working-directory: serveur
+        env:
+          DATABASE_URL_TEST: postgres://bus:bus@localhost:5433/bus
+      # Le paquet doit se construire : une erreur d'empaquetage ne se voit ni au
+      # typage ni aux tests, et n'apparaîtrait qu'à la construction de l'image.
+      - run: npm run build
+        working-directory: serveur
+
   construction:
     name: Construction du site
     needs: controle
@@ -59,6 +101,11 @@ jobs:
           # ces deux valeurs sont publiques par nature (l'URL du Worker et la clé
           # publique VAPID se retrouvent de toute façon dans le code servi).
           # Vides, l'application fonctionne à l'identique, sans ces fonctionnalités.
+          # Deux noms le temps de la bascule : `URL_API` est le nouveau, `URL_WORKER`
+          # l'ancien. `src/config.ts` lit le premier qui n'est pas vide, si bien qu'une
+          # construction faite avant ou après le renommage de la variable de dépôt
+          # produit la même application.
+          VITE_URL_API: ${{ vars.URL_API }}
           VITE_URL_WORKER: ${{ vars.URL_WORKER }}
           VITE_CLE_VAPID: ${{ vars.CLE_VAPID }}
           # Vide, l'intégration Google Agenda disparaît de l'interface et l'export .ics

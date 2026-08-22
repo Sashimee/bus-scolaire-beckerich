@@ -47,7 +47,7 @@ export type MotifRefus =
  *
  * Renvoyer le motif plutôt qu'un booléen permet à l'éditeur de le dire au traducteur
  * pendant qu'il tape : un marqueur perdu doit se voir à la saisie, pas au retour d'un
- * 400 du Worker. La même fonction sert des deux côtés.
+ * 400 du serveur. La même fonction sert des deux côtés.
  */
 export function motifRefus(langue: string, cle: string, valeur: unknown): MotifRefus | null {
   if (!(LANGUES as readonly string[]).includes(langue)) return 'langue-inconnue'
@@ -133,7 +133,7 @@ export type Modifications = Record<string, string | string[] | null>
  * et le second à publier réécrivait le fichier complet — les corrections du premier
  * disparaissaient sans un mot, y compris dans une autre langue.
  *
- * On raisonne donc comme `majUrgences` côté Worker : relire l'état courant, appliquer
+ * On raisonne donc comme `majUrgences` côté serveur : relire l'état courant, appliquer
  * une transformation, réécrire. Deux personnes qui corrigent deux clés différentes ne se
  * gênent plus. Deux personnes sur la MÊME clé restent en dernier-arrivé-gagnant, mais
  * c'est là un vrai désaccord, pas un accident de mécanique.
@@ -157,4 +157,4 @@ export function appliquerModifications(
 }
 
 // Le chargement du fichier vit dans `src/i18n/surcouche.ts` : ce module-ci est importé
-// par le Worker, qui n'a ni `fetch` vers le site ni `import.meta.env`.
+// par le serveur, qui n'a ni `fetch` vers le site ni `import.meta.env`.
