@@ -2489,7 +2489,12 @@ n'atteindrait plus les parents. Ordre :
    code-login inchangé) écrit le document `horaires` versionné, plus aucune écriture
    GitHub. 5 tests d'amorçage (dont le refus d'un plan malformé), 2 serveur (153/330).
    `github.ts` n'est plus utilisé que par `/sante` ; il tombe à la tranche 7.
-6. Corrections d'arrêts (refuge de l'ancien `/admin`, sous la capacité `arrets`).
+6. **Corrections d'arrêts (fait, sauf l'éditeur).** `POST /edition/corrections` et
+   `DELETE /edition/corrections/:arret`, sous la capacité `arrets` — refuge de l'ancien
+   `/admin`. Revalidées par les mêmes garde-fous que le navigateur (un arrêt ne se
+   déplace pas hors du Luxembourg), l'auteur étant celui de la session. La LECTURE était
+   déjà faite en tranche 2 (les corrections viennent de `/urgences`). L'éditeur vient en
+   tranche 7. 4 tests (157 serveur).
 7. Consolidation de l'authentification : replier `/commune` et `/traductions` sur les
    capacités, retirer `/admin` et le chemin GitHub entier.
 
@@ -2500,4 +2505,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–5 faites ; restent les corrections d’arrêts (6) et la consolidation (7).*
+*Dépend des lots 21–24. Tranches 1–6 faites ; reste la consolidation (7) : éditeurs, retrait de `/admin`, suppression de `github.ts`.*

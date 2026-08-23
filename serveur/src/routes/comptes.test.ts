@@ -56,7 +56,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate utilisateur, debit, journal, ephemere, document`
+  await db`truncate utilisateur, debit, journal, ephemere, document, correction_arret`
   courrielsCaptures.length = 0
 })
 
@@ -460,5 +460,55 @@ describe.skipIf(!avecBase)('édition gardée par capacité — crédits', () => 
     const doc = await db`select contenu from document where nom = 'credits'`
     expect(doc[0].contenu.developpement).toHaveLength(1)
     expect(doc[0].contenu.developpement[0].nom).toBe('Bien')
+  })
+})
+
+describe.skipIf(!avecBase)('édition gardée par capacité — corrections d\'arrêts', () => {
+  it('publie une correction pour un compte porteur de `arrets`, et /urgences la sert', async () => {
+    await creerCompte({ courriel: 'arr@ville.lu', capacites: ['arrets'] })
+    const jeton = await connecter('arr@ville.lu', 'motdepasse-solide')
+    const rep = await poster(
+      '/edition/corrections',
+      { correction: { arret: 'bec-eglise', coord: [49.7, 5.9] } },
+      avecJeton(jeton),
+    )
+    expect(rep.status).toBe(200)
+
+    const pub = (await (await app.request('/api/urgences')).json()) as any
+    expect(pub.correctionsArrets).toHaveLength(1)
+    expect(pub.correctionsArrets[0].arret).toBe('bec-eglise')
+    // L'auteur est celui de la session, pas ce que le client prétend.
+    expect(pub.correctionsArrets[0].publiePar).toBe('Agent Test')
+  })
+
+  it('refuse une coordonnée hors du Luxembourg', async () => {
+    await creerCompte({ courriel: 'arr@ville.lu', capacites: ['arrets'] })
+    const jeton = await connecter('arr@ville.lu', 'motdepasse-solide')
+    const rep = await poster(
+      '/edition/corrections',
+      { correction: { arret: 'x', coord: [48.85, 2.35] } },
+      avecJeton(jeton),
+    )
+    expect(rep.status).toBe(400)
+  })
+
+  it('refuse un compte sans la capacité `arrets`', async () => {
+    await creerCompte({ courriel: 'sans@ville.lu', capacites: ['credits'] })
+    const jeton = await connecter('sans@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/corrections', { correction: { arret: 'x', coord: [49.7, 5.9] } }, avecJeton(jeton))
+    expect(rep.status).toBe(403)
+  })
+
+  it('retire une correction', async () => {
+    await creerCompte({ courriel: 'arr@ville.lu', capacites: ['arrets'] })
+    const jeton = await connecter('arr@ville.lu', 'motdepasse-solide')
+    await poster('/edition/corrections', { correction: { arret: 'bec-eglise', coord: [49.7, 5.9] } }, avecJeton(jeton))
+    const del = await app.request('/api/edition/corrections/bec-eglise', {
+      method: 'DELETE',
+      headers: { ...avecJeton(jeton), 'X-Forwarded-For': '203.0.113.7' },
+    })
+    expect(del.status).toBe(200)
+    const pub = (await (await app.request('/api/urgences')).json()) as any
+    expect(pub.correctionsArrets).toHaveLength(0)
   })
 })
