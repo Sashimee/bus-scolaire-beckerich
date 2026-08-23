@@ -84,10 +84,10 @@ implémentation des règles de validation aurait divergé au premier ajustement.
 
 ## Documentation
 
-- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 20 sont
-  faits ; les lots 21 à 27 portent le passage sur VPS Dokploy (serveur conteneurisé,
-  bascule d'origine vers `app.schoulbus.lu`, publication sans détour par GitHub,
-  mesure auto-hébergée). **À consulter avant d'entamer une évolution.**
+- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 22 sont
+  faits ; les lots 23 à 27 portent la suite du passage sur VPS Dokploy (bascule
+  d'origine vers `app.schoulbus.lu`, publication sans détour par GitHub, mesure
+  auto-hébergée). **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une
@@ -96,4 +96,5 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   lot, et pourquoi.
 - [DONNEES.md](DONNEES.md) — mettre à jour horaires, arrêts, cycles et vacances.
 - [ADMIN.md](ADMIN.md) — publier une urgence, activer les notifications push.
+- [docs/deploiement.md](docs/deploiement.md) — déployer le serveur sur la VPS (Dokploy, image GHCR, DNS).
 - [README.md](README.md) — présentation publique et sources des données.

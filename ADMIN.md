@@ -219,7 +219,9 @@ serveurs d'Apple.
 
 Le déploiement lui-même se fait dans **Dokploy** : c'est là que se posent les variables
 d'environnement, que se déclenchent les redéploiements et que se règlent les
-sauvegardes. Ce document ne décrit que ce qui se prépare en dehors.
+sauvegardes. Ce document ne décrit que ce qui se prépare en dehors ; la mécanique
+Dokploy elle-même — image GHCR, fichier Compose, DNS et routage — est dans
+**[docs/deploiement.md](docs/deploiement.md)**.
 
 **a. Les clés de notification.**
 

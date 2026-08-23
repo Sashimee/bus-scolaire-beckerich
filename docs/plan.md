@@ -79,6 +79,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R39 | 21 | **La reprise de l'état clé-valeur vers PostgreSQL n'a jamais été exécutée sur les vraies données.** `serveur/exporter-kv.mjs` et `serveur/importer-kv.mjs` sont écrits et l'import est idempotent, mais il n'a tourné que contre une base vide. Un import raté invalide **tous** les codes d'agents communaux et désabonne **tous** les parents, sans que rien ne le signale : l'espace commune répondrait « code inconnu », et les notifications ne partiraient plus. | Exporter le KV réel, importer dans la base de préproduction, puis **se connecter à `/commune` avec un vrai code d'agent**. Compter les lignes ne prouve rien : seule la connexion prouve que l'empreinte a été reprise à l'identique. |
 | R40 | 21 | **L'extraction de l'adresse cliente derrière Traefik n'a pas été vue à l'œuvre.** Le Worker lisait `CF-Connecting-IP` ; le serveur lit `X-Forwarded-For` en partant de la fin, sur `NB_PROXYS_FIABLES` rangs. 7 tests couvrent la fonction et 3 tests de route la traversent, mais **aucun vrai proxy n'a encore été devant**. Une erreur ici transforme la limitation de débit en un seul seau global : cinq tentatives pour la planète entière, puis plus personne ne se connecte. Aucun signe extérieur. | Deux connexions échouées depuis deux réseaux différents (par exemple domicile et 4G) contre le serveur déployé : la seconde ne doit pas hériter du compteur de la première. Si un second relais s'ajoute un jour devant Traefik, `NB_PROXYS_FIABLES` doit passer à 2. |
 | R41 | 21 | **Le paquet a été construit et l'image exercée, mais jamais sous charge.** L'envoi des notifications est passé d'un découpage en lots de 10 à une boucle à 20 envois simultanés. La nouvelle valeur n'est pas plus mesurée que ne l'était `TAILLE_LOT` — elle est seulement libre du plafond qui justifiait l'ancienne. | Regarder le journal du conteneur au premier envoi réel de plus de cinquante abonnés. Ce qui compte n'est pas la durée mais le nombre d'échecs : un service de push qui répond `429` dit que la concurrence est trop haute. |
+| R42 | 22 | **La chaîne de déploiement n'a jamais été montée par le vrai Dokploy.** `compose.deploiement.yaml`, la poussée d'image sur GHCR et le routage Traefik (`Host(app.schoulbus.lu) && PathPrefix(/api)`, certificat Let's Encrypt) sont vérifiés en local — `docker build`, la pile montée depuis l'image construite, `/api/sante` au vert avec `base: true`, la sonde de l'image qui passe, `docker compose config` qui résout le fichier — mais **aucun Dokploy, aucun Traefik, aucun certificat réel** n'a été devant. Trois choses ne se voient qu'au premier déploiement : que Dokploy sait tirer l'image (paquet privé → identifiant de registre requis), que Traefik émet bien le certificat (DNS à résoudre d'abord), et que le chemin `/api` arrive non tronqué au serveur. | Pousser sur `main`, créer l'application Compose dans Dokploy sur `compose.deploiement.yaml`, poser les variables, déployer, puis `curl https://app.schoulbus.lu/api/sante`. Voir [docs/deploiement.md](deploiement.md). C'est le même déploiement qui lèvera R39 (reprise clé-valeur) et R40 (adresse client derrière Traefik). |
 
 ### Mise en service — faite
 
@@ -2138,3 +2139,78 @@ dernier commit à la porter est celui qui précède ce lot.
 publication cessera de passer par le dépôt.
 
 *Dépend de rien. Les lots 22 et suivants en dépendent tous.*
+
+---
+
+## Lot 22 — Le serveur se déploie sur la VPS, sans que le site y touche encore (2026-08-22)
+
+> **Fait le 2026-08-22.** Deuxième lot du passage sur VPS Dokploy. Objectif étroit,
+> comme le lot 21 : **faire tourner en production le conteneur écrit au lot 21, avec
+> les vraies données dedans, pendant que le site continue de parler au Worker.** Aucune
+> bascule d'origine (lot 23), aucun changement du chemin de publication (lot 24). Tenir
+> le déploiement du serveur séparé de la bascule est ce qui rendra une panne
+> ultérieure attribuable : si quelque chose casse après le lot 23, ce sera la bascule,
+> parce que le serveur aura déjà été prouvé vert tout seul.
+
+### La chaîne de livraison
+
+Un push sur `main` fait tester le serveur — 109 cas contre un vrai PostgreSQL — puis,
+si c'est vert, **construit l'image et la pousse sur GHCR** ; Dokploy la tire et la fait
+tourner derrière Traefik. L'image qui servira les parents est donc, à l'octet près,
+celle que les tests ont validée, et non une seconde construction faite sur une machine
+où personne ne regarde. C'est tout l'intérêt de la construire dans la CI plutôt que de
+laisser Dokploy la bâtir depuis les sources : la construction et la garde ne sont pas
+séparées.
+
+- **`.github/workflows/deploy.yml`** gagne un travail `image-serveur`, qui **dépend** du
+  travail `serveur` — une image ne part jamais sans les tests. Il pousse
+  `ghcr.io/sashimee/bus-api`, étiquetée `latest` et `sha-<commit>`. Le second tag permet
+  d'épingler un redéploiement à une version précise depuis Dokploy.
+- **`compose.deploiement.yaml`** (racine) est le fichier que Dokploy monte. Il **tire**
+  l'image (`image:`), il ne la construit pas (`build:`) — à la différence du
+  `compose.yaml` local, qui reste réservé au développement et aux tests de stockage. La
+  base y est sans port exposé (réseau interne seul), les deux services en
+  `restart: unless-stopped`, et le routeur Traefik n'ouvre que `app.schoulbus.lu/api` :
+  la racine du domaine n'est pas à nous au lot 22, le site étant encore sur Pages.
+
+### La documentation, répartie et non dupliquée
+
+ADMIN.md portait déjà, depuis le lot 21, le gros du manuel d'exploitation — clés VAPID,
+application OAuth, table des variables, reprise de l'état clé-valeur (le lever de R39).
+Il disait explicitement ne pas décrire la mécanique Dokploy elle-même. C'est cette
+pièce manquante que le lot ajoute : **`docs/deploiement.md`** — image GHCR, fichier
+Compose, DNS, routage Traefik, et les trois réserves qui ne se lèvent qu'au premier
+déploiement réel. Il renvoie à ADMIN.md pour la table des variables plutôt que de la
+recopier : deux copies d'une même liste divergent au premier ajustement, exactement le
+motif qui fait partager `validation.ts` entre l'application et le serveur.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+En local, de bout en bout : `docker build` sur le contexte racine, la pile montée
+depuis l'image construite, `/api/sante` répondant `base: true`, la sonde `HEALTHCHECK`
+de l'image qui passe dans le conteneur, et `docker compose config` qui résout
+`compose.deploiement.yaml` — image, `DATABASE_URL`, labels Traefik, réseau externe,
+dépendance `service_healthy`, absence de port sur la base.
+
+La preuve s'arrête là où commence le vrai Dokploy. **R42** est posée pour ce qui n'a
+jamais été monté par lui : la poussée GHCR effective, l'émission du certificat par
+Traefik, le chemin `/api` arrivant non tronqué. **R39** (reprise clé-valeur sur vraies
+données) et **R40** (adresse client derrière Traefik) restent également ouvertes — leur
+outillage est complet et documenté, mais elles ne se lèvent qu'en se connectant à
+`/commune` avec un vrai code et en échouant deux connexions depuis deux réseaux. Le même
+premier déploiement les lève toutes les trois.
+
+### Écarts assumés par rapport au texte du lot
+
+- **Le manuel d'exploitation n'a pas été réécrit** : il existait déjà dans ADMIN.md.
+  Le lot ajoute un document distinct pour la seule mécanique Dokploy, et se contente de
+  poser des renvois croisés entre les deux. Recopier ADMIN.md dans un runbook neuf
+  aurait créé la divergence qu'on cherche partout à éviter.
+- **`compose.deploiement.yaml` tire l'image au lieu de la construire.** Le texte du lot
+  parlait d'un conteneur ; le choix de le livrer par une image CI plutôt que par une
+  construction Dokploy découle du principe « ce qui tourne est ce qui a été testé ». Le
+  `compose.yaml` local, lui, construit toujours — c'est ce qui fait tourner les tests de
+  stockage sans dépendre d'un registre.
+
+*Dépend du lot 21. Les lots 23 et suivants en dépendent : ils supposent le serveur
+joignable sur `app.schoulbus.lu/api`.*

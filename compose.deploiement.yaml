@@ -1,0 +1,111 @@
+# Déploiement sur la VPS, monté par Dokploy — le modèle que `compose.yaml` annonçait.
+#
+# `compose.yaml` (à la racine) sert au développement local : il CONSTRUIT l'image et
+# expose la base sur l'hôte pour `npm test`. Ce fichier-ci, lui, ne construit rien : il
+# TIRE l'image que la CI a déjà construite et poussée sur GHCR, pour que ce qui tourne
+# en production soit exactement ce que les tests ont validé — jamais une image bâtie une
+# seconde fois sur une machine où personne ne regarde. Voir `.github/workflows/deploy.yml`.
+#
+# Dokploy fournit `dokploy-network` (le réseau où vit Traefik) et injecte les secrets
+# depuis son interface. Les `${…}` ci-dessous sont donc renseignés côté Dokploy, pas
+# dans un `.env` du dépôt : aucun secret ne doit entrer ici.
+#
+#   Lot 22 : ce fichier fait RÉPONDRE le serveur sur app.schoulbus.lu/api, et rien de
+#   plus. Le site reste sur GitHub Pages et continue de parler au Worker. La bascule
+#   d'origine — le jour où le site lui-même vit sous app.schoulbus.lu — est le lot 23.
+
+name: bus-beckerich
+
+services:
+  bus-postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?mot de passe de la base requis}
+      POSTGRES_DB: ${POSTGRES_DB:-bus}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    # AUCUN `ports:` : la base ne sort jamais du réseau interne. Contrairement au
+    # `compose.yaml` local, rien sur la VPS n'a à joindre PostgreSQL depuis l'hôte —
+    # seul `bus-api`, sur le réseau interne, lui parle.
+    networks:
+      - interne
+    healthcheck:
+      # Le serveur applique ses migrations au démarrage : s'il part avant que la base
+      # accepte des connexions, la première migration échoue et le conteneur redémarre
+      # en boucle. `depends_on … service_healthy` l'en empêche.
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-bus} -d ${POSTGRES_DB:-bus}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  bus-api:
+    # L'image poussée par la CI. Épinglée par défaut sur `:latest`, mais Dokploy peut
+    # imposer un condensat précis (`@sha256:…`) pour qu'un redéploiement rejoue la même
+    # image et non « la dernière en date ».
+    image: ${IMAGE_SERVEUR:-ghcr.io/sashimee/bus-api:latest}
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      BASE_API: /api
+      # Le serveur et la base se voient par leurs noms de service sur le réseau interne.
+      DATABASE_URL: postgres://${POSTGRES_USER:-bus}:${POSTGRES_PASSWORD:?}@bus-postgres:5432/${POSTGRES_DB:-bus}
+
+      # Origine du site tant qu'il vit ailleurs (GitHub Pages, lot 22). Au lot 23,
+      # quand le site passera sous app.schoulbus.lu, l'API et lui partageront l'origine
+      # et le CORS n'aura plus d'objet — mais d'ici là, c'est CETTE valeur qui autorise
+      # l'application déployée à appeler le serveur.
+      ORIGINES_AUTORISEES: ${ORIGINES_AUTORISEES:?origine(s) du site requises}
+
+      # Déclarée, et non devinée : derrière Traefik, l'URL vue par le serveur porte le
+      # nom du conteneur (`http://bus-api:3000/…`). La déduire casserait le `redirect_uri`
+      # d'OAuth, que GitHub et Google comparent caractère par caractère. Voir http.ts.
+      URL_API_PUBLIQUE: ${URL_API_PUBLIQUE:-https://app.schoulbus.lu/api}
+      # Origine du site, pour les liens des notifications de rappel.
+      URL_SITE: ${URL_SITE:?}
+
+      # Un seul relais devant nous : Traefik. Si un jour un second s'ajoute (un CDN, un
+      # autre proxy), passer à 2 — sinon la limitation de débit lira l'adresse du relais
+      # et la partagera entre tout le monde. Réserve R40.
+      NB_PROXYS_FIABLES: ${NB_PROXYS_FIABLES:-1}
+
+      # — Secrets, injectés par Dokploy —
+      SECRET_SESSION: ${SECRET_SESSION:?}
+      VAPID_JWK: ${VAPID_JWK:?}
+      CONTACT_VAPID: ${CONTACT_VAPID:?}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:?}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Publication vers le dépôt, conservée à l'identique jusqu'au lot 24 (où la
+      # publication cessera de passer par GitHub). Le jeton machine, fine-grained,
+      # Contents: RW sur ce seul dépôt.
+      GITHUB_PAT: ${GITHUB_PAT:?}
+      SECRET_NOTIFICATION: ${SECRET_NOTIFICATION:?}
+    depends_on:
+      bus-postgres:
+        condition: service_healthy
+    networks:
+      - interne
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      # app.schoulbus.lu/api → ce conteneur. Rien d'autre : la racine du domaine n'est
+      # pas à nous au lot 22 (le site est encore sur Pages). Le `/api` n'est PAS retiré
+      # du chemin — le serveur monte toutes ses routes sous `BASE_API=/api` et l'attend.
+      - traefik.http.routers.bus-api.rule=Host(`app.schoulbus.lu`) && PathPrefix(`/api`)
+      - traefik.http.routers.bus-api.entrypoints=websecure
+      - traefik.http.routers.bus-api.tls.certresolver=letsencrypt
+      - traefik.http.services.bus-api.loadbalancer.server.port=3000
+
+networks:
+  # Réseau privé serveur↔base, invisible de Traefik : la base n'y est jamais exposée.
+  interne:
+  # Fourni par Dokploy ; c'est là que Traefik cherche les routeurs.
+  dokploy-network:
+    external: true
+
+volumes:
+  postgres:

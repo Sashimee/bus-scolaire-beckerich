@@ -1,7 +1,11 @@
-name: Déploiement GitHub Pages
+name: Déploiement — site et image du serveur
 
-# Chaque push sur main met à jour le site ET la webapp installée chez les parents :
-# le service worker détecte la nouvelle version et propose le rechargement.
+# Chaque push sur main fait deux choses indépendantes :
+#  - met à jour le site sur GitHub Pages ET la webapp installée chez les parents (le
+#    service worker détecte la nouvelle version et propose le rechargement) ;
+#  - construit et pousse l'image du serveur sur GHCR, que Dokploy tire ensuite sur la
+#    VPS. Ainsi l'image qui tourne en production est CELLE que les tests ont validée,
+#    jamais une seconde construction faite ailleurs. Voir `compose.deploiement.yaml`.
 on:
   push:
     branches: [main]
@@ -125,3 +129,46 @@ jobs:
     steps:
       - id: pages
         uses: actions/deploy-pages@v4
+
+  image-serveur:
+    name: Image du serveur (GHCR)
+    # Gardée par les tests du serveur : une image ne part JAMAIS sans que les 109 cas
+    # soient passés contre un vrai PostgreSQL. C'est tout l'intérêt de la construire
+    # ici plutôt que de laisser Dokploy la bâtir depuis les sources, sans garde-fou.
+    needs: serveur
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Connexion à GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Étiquettes de l'image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/bus-api
+          # `latest` pour le suivi courant, et le condensat du commit pour épingler un
+          # redéploiement à une version précise depuis Dokploy (`…@sha256:` ou le tag
+          # `sha-…`). Voir `IMAGE_SERVEUR` dans compose.deploiement.yaml.
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+      - name: Construire et pousser
+        uses: docker/build-push-action@v6
+        with:
+          # Le contexte est la RACINE : le serveur importe `src/lib/*.ts`. Voir le
+          # Dockerfile, qui porte le même avertissement.
+          context: .
+          file: serveur/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
