@@ -19,6 +19,9 @@ import { Traductions } from './pages/Traductions'
 import { Credits } from './pages/Credits'
 import { CommuneAlertes } from './pages/CommuneAlertes'
 import { CommuneHoraires } from './pages/CommuneHoraires'
+import { Connexion } from './pages/Connexion'
+import { Comptes } from './pages/Comptes'
+import { Reinitialiser } from './pages/Reinitialiser'
 
 export default function App() {
   const { t } = useT()
@@ -55,6 +58,9 @@ export default function App() {
           <Route path="/reglages" element={<Reglages />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/traductions" element={<Traductions />} />
+          <Route path="/connexion" element={<Connexion />} />
+          <Route path="/comptes" element={<Comptes />} />
+          <Route path="/reinitialiser" element={<Reinitialiser />} />
           <Route path="/commune" element={<Commune />} />
           <Route path="/commune/alertes" element={<CommuneAlertes />} />
           <Route path="/commune/horaires" element={<CommuneHoraires />} />

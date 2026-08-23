@@ -2301,12 +2301,11 @@ origine, un autre service worker.
 
 ## Lot 24 — Comptes utilisateurs et rôles (2026-08-23)
 
-> **Fait le 2026-08-23 (côté serveur).** L'authentification par compte est en place et
-> testée de bout en bout par l'API. **L'interface web** — écran de connexion, « mon
-> compte », gestion des comptes, pages `/reinitialiser` — reste la tranche suivante ;
-> l'opérateur amorce d'abord un administrateur par la CLI, et tout l'espace répond au
-> `curl`. La migration des données et le retrait de `/admin` restent le lot 25. Ce lot
-> est né en cours de route :
+> **Fait le 2026-08-23.** L'authentification par compte est en place — serveur ET
+> interface web (`/connexion`, « mon compte », `/reinitialiser`, gestion des comptes sous
+> la capacité `comptes`), en cinq langues. L'opérateur amorce le premier administrateur
+> par la CLI, les suivants se gèrent depuis l'application. La migration des données et le
+> retrait de `/admin` restent le lot 25. Ce lot est né en cours de route :
 > retirer l'espace `/admin` (qui publiait par un jeton GitHub personnel) laissait sans
 > foyer l'édition des **corrections d'arrêts** et des **crédits**, que `/commune` ne
 > savait pas faire. Plutôt que de bricoler deux barrières de plus, on pose une vraie
@@ -2411,6 +2410,11 @@ lot 25 les replie sur les capacités.
   109) : connexion, refus indistinct inconnu/mauvais/désactivé, non-vérifié qui se dit,
   débit, activation par lien, réinitialisation à usage unique, capacité accordée sans
   reconnexion, auto-verrouillage refusé.
+- **Interface web** : `lib/comptes.ts` (session en `sessionStorage`, ou `localStorage`
+  si « rester connecté »), pages `Connexion`, `Reinitialiser`, `Comptes` (gestion), et
+  49 clés i18n × 5 langues — la parité des dictionnaires est vérifiée par le test
+  existant. Aucune chaîne en dur, aucune couleur hors jetons : les classes réemployées
+  sont celles du reste du site (`case`, `rangee`, `carte`, `champ`, `etiquette`).
 - **La vérification, non la seule vérification** : l'activation d'un compte pose le mot
   de passe ET vérifie l'adresse d'un même geste — ouvrir le lien reçu par courriel
   prouve le contrôle de la boîte. Il n'y a donc pas de courriel de vérification distinct.
