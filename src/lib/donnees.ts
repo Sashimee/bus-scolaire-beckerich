@@ -19,7 +19,24 @@ import type {
   TransportALaDemande,
 } from './types'
 
-export const plan = planJson as unknown as Plan
+/**
+ * Le plan de référence. `let` et non `const` : depuis le lot 25, il peut être REMPLACÉ
+ * au démarrage par la version publiée en base (voir `remplacerPlan`), le fichier
+ * embarqué servant de graine et de repli hors ligne.
+ *
+ * Ce remplacement est un choix sûr et vérifié : AUCUN module ne lit `plan` au moment de
+ * son chargement — toutes les lectures sont dans des fonctions ou des rendus, donc
+ * postérieures au remplacement, qui a lieu AVANT le montage de React. Les index
+ * précalculés ci-dessous portent sur `arrets`/`cycles`/`sites`, jamais sur `plan` :
+ * les échanger n'invalide donc rien. Un binding `let` d'un module ES est vivant : les
+ * `import { plan }` voient la nouvelle valeur dès la réaffectation.
+ */
+export let plan = planJson as unknown as Plan
+
+/** Remplace le plan de référence. Appelé une seule fois, au démarrage, avant le montage. */
+export function remplacerPlan(nouveau: Plan): void {
+  plan = nouveau
+}
 
 export const arrets: Arret[] = (arretsJson as unknown as { arrets: Arret[] }).arrets
 

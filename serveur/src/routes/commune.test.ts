@@ -369,3 +369,44 @@ describe.skipIf(!avecBase)('perturbations en base', () => {
     expect(await db`select 1 from perturbation where id = 'u-1'`).toHaveLength(0)
   })
 })
+
+/**
+ * Horaires en base (lot 25). Le plan complet, revalidé, écrit dans le document
+ * `horaires` avec une version — plus de reconstruction du site, plus d'écriture GitHub.
+ */
+describe.skipIf(!avecBase)('horaires en base', () => {
+  it('publie le plan validé et le sert versionné par /horaires', async () => {
+    const planBundle = (await import('../../../src/data/plan-2025-2026.json')).default
+    const jeton = await signerJeton(
+      { nom: 'Marie', service: '', role: 'commune', expire: Date.now() / 1000 + 60 },
+      SECRET,
+    )
+    const rep = await poster(
+      '/commune/horaires',
+      { plan: planBundle, resume: 'rentrée' },
+      { Authorization: `Bearer ${jeton}` },
+    )
+    expect(rep.status).toBe(200)
+
+    const doc = await db`select version from document where nom = 'horaires'`
+    expect(doc[0].version).not.toBe('embarque')
+
+    const pub = (await (await app.request('/api/horaires')).json()) as any
+    expect(pub.version).toBe(doc[0].version)
+    expect(pub.plan.lignes.length).toBe((planBundle as any).lignes.length)
+  })
+
+  it('refuse un plan invalide sans rien écrire', async () => {
+    const jeton = await signerJeton(
+      { nom: 'Marie', service: '', role: 'commune', expire: Date.now() / 1000 + 60 },
+      SECRET,
+    )
+    const rep = await poster(
+      '/commune/horaires',
+      { plan: { lignes: 'pas une liste' } },
+      { Authorization: `Bearer ${jeton}` },
+    )
+    expect(rep.status).toBe(400)
+    expect(await db`select 1 from document where nom = 'horaires'`).toHaveLength(0)
+  })
+})

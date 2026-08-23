@@ -21,7 +21,6 @@ import { validerPlan } from '../../../src/lib/validation.ts'
 import { appliquerModifications, relireSurcouche } from '../../../src/lib/traductions.ts'
 import { corpsJson, ipDeLaRequete } from '../http.ts'
 import { empreinte, signerJeton, verifierJeton, type ChargeJeton } from '../crypto.ts'
-import { ecrireFichier, lireFichier } from '../github.ts'
 import {
   ecrireDocument,
   enregistrerPerturbation,
@@ -35,8 +34,6 @@ import { debitDepasse, FENETRE_DEBIT_S, reussite } from '../stockage/debit.ts'
 import { journaliser, lireJournal } from '../stockage/journal.ts'
 import { lireAgent, noterAcces, type Role } from '../stockage/agents.ts'
 import { LANGUES, perturbationPropre, texteSur, validerPerturbation } from '../validation-perturbation.ts'
-
-const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
 
 const DUREE_SESSION_S = 8 * 3600
 
@@ -175,15 +172,10 @@ async function publierHoraires(c: Context, agent: ChargeJeton) {
     return c.json({ erreur: 'plan-invalide', problemes: erreurs.slice(0, 30) }, 400)
   }
 
-  const { sha } = await lireFichier(CHEMIN_PLAN)
-  await ecrireFichier(
-    CHEMIN_PLAN,
-    JSON.stringify(charge.plan, null, 2) + '\n',
-    sha,
-    `Horaires : mise à jour du plan — publié par ${agent.nom}${
-      agent.service ? ` (${agent.service})` : ''
-    }`,
-  )
+  // Écrit en base, versionné par horodatage : le client compare la version pour décider
+  // d'adopter le nouveau plan au prochain démarrage. Plus de reconstruction du site, plus
+  // d'écriture dans le dépôt.
+  await ecrireDocument('horaires', charge.plan, new Date().toISOString())
   await journaliser(agent, 'horaires', charge?.resume ?? '')
   return c.json({
     ok: true,

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { initialiserHoraires } from './lib/horaires'
 import { FournisseurTraduction } from './i18n'
 import { FournisseurFoyer } from './etat'
 import { FournisseurUrgences } from './urgences-contexte'
@@ -24,22 +25,27 @@ if (redirection) {
   }
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    {/* Le préfixe vient de la configuration de build : le site doit pouvoir être
-        servi sous n'importe quel chemin sans modification du code. */}
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <FournisseurTraduction>
-        <FournisseurRechargement>
-          <FournisseurUrgences>
-            <FournisseurFoyer>
-              <FournisseurInstallation>
-                <App />
-              </FournisseurInstallation>
-            </FournisseurFoyer>
-          </FournisseurUrgences>
-        </FournisseurRechargement>
-      </FournisseurTraduction>
-    </BrowserRouter>
-  </StrictMode>,
-)
+// Le plan publié en base, s'il existe, est adopté AVANT le premier rendu : le moteur lit
+// alors la bonne version sans qu'aucune signature ne change. Hors ligne ou sans serveur,
+// le repli (cache, puis fichier embarqué) est déjà en place, et le fetch échoue vite.
+initialiserHoraires().finally(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      {/* Le préfixe vient de la configuration de build : le site doit pouvoir être
+          servi sous n'importe quel chemin sans modification du code. */}
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <FournisseurTraduction>
+          <FournisseurRechargement>
+            <FournisseurUrgences>
+              <FournisseurFoyer>
+                <FournisseurInstallation>
+                  <App />
+                </FournisseurInstallation>
+              </FournisseurFoyer>
+            </FournisseurUrgences>
+          </FournisseurRechargement>
+        </FournisseurTraduction>
+      </BrowserRouter>
+    </StrictMode>,
+  )
+})

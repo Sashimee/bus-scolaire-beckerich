@@ -2478,8 +2478,17 @@ n'atteindrait plus les parents. Ordre :
    L'ÉDITEUR de crédits (jusqu'ici dans `/admin`) est construit à la tranche 7, avec le
    retrait de `/admin` ; d'ici là l'endpoint répond au `curl` et 3 tests le couvrent
    (151 au total côté serveur).
-5. Horaires — la tranche délicate : le plan servi par l'API, **amorcé au démarrage avec
-   repli sur le plan embarqué** pour rester hors ligne et ne pas réécrire le moteur.
+5. **Horaires (fait) — la tranche délicate.** Le plan est servi par l'API et **amorcé au
+   démarrage** : `donnees.plan` devient un binding `let` remplaçable, échangé AVANT le
+   montage de React par `initialiserHoraires()`. Sûr parce qu'AUCUN module ne lit `plan`
+   au chargement (vérifié) — toutes les lectures sont postérieures au montage —, et parce
+   qu'un plan n'est adopté que s'il passe `validerPlan` : un plan malformé ne remplace
+   jamais un plan valide. Cache local pour le hors-ligne, fichier embarqué pour repli
+   ultime. Le plan changeant une fois l'an, on ne vise pas la propagation en direct : un
+   nouveau plan est adopté à la prochaine ouverture. La publication (`/commune/horaires`,
+   code-login inchangé) écrit le document `horaires` versionné, plus aucune écriture
+   GitHub. 5 tests d'amorçage (dont le refus d'un plan malformé), 2 serveur (153/330).
+   `github.ts` n'est plus utilisé que par `/sante` ; il tombe à la tranche 7.
 6. Corrections d'arrêts (refuge de l'ancien `/admin`, sous la capacité `arrets`).
 7. Consolidation de l'authentification : replier `/commune` et `/traductions` sur les
    capacités, retirer `/admin` et le chemin GitHub entier.
@@ -2491,4 +2500,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–4 faites ; les suivantes restent à mener.*
+*Dépend des lots 21–24. Tranches 1–5 faites ; restent les corrections d’arrêts (6) et la consolidation (7).*
