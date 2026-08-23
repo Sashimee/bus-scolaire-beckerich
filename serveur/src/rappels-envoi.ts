@@ -14,6 +14,8 @@ import { etatDuJour } from '../../src/lib/calendrier.ts'
 import { plan } from '../../src/lib/donnees.ts'
 import { envoyerATous } from './envois.ts'
 import { ecrireEphemere, lireEphemere } from './stockage/ephemeres.ts'
+import { listerPerturbations } from './stockage/publications.ts'
+import { baseConfiguree } from './stockage/client.ts'
 
 const PREFIXE_RAPPEL = 'rappel:'
 /** L'état survit à la perturbation le temps qu'elle expire, puis disparaît seul. */
@@ -27,21 +29,16 @@ const TITRES: Record<string, string> = {
 }
 
 /**
- * Relit les perturbations publiées.
+ * Relit les perturbations publiées, directement dans la table `perturbation` (lot 25).
  *
- * On lit le fichier tel qu'il est servi aux parents, et non le dépôt : c'est
- * exactement ce qu'ils voient, et cela n'exige aucun jeton.
- *
- * Au lot 25, cette lecture deviendra une requête sur la table `perturbation` — et le
- * détour par le site publié disparaîtra avec elle.
+ * Avant, on relisait le fichier servi aux parents par un aller-retour HTTP vers le site
+ * publié — un détour qui n'avait de sens que quand les perturbations vivaient dans un
+ * fichier du dépôt. La source est désormais la base, la même que celle où la publication
+ * les écrit : plus de détour, et plus de dépendance à ce que le site soit joignable.
  */
 async function lireUrgencesPubliees(): Promise<any[]> {
-  const base = (process.env.URL_SITE ?? '').replace(/\/$/, '')
-  if (!base) return []
-  const rep = await fetch(`${base}/urgences.json`, { cache: 'no-store' })
-  if (!rep.ok) throw new Error(`urgences-illisibles-${rep.status}`)
-  const donnees = (await rep.json()) as { perturbations?: unknown[] }
-  return (donnees?.perturbations ?? []) as any[]
+  if (!baseConfiguree()) return []
+  return listerPerturbations()
 }
 
 interface EtatRappel {

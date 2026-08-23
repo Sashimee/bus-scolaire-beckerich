@@ -265,9 +265,9 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 > signalerait.
 
 **d. Les variables de dépôt GitHub.** `Settings → Secrets and variables → Actions` :
-variables `URL_API` (`https://app.schoulbus.lu/api`), `CLE_VAPID`, `ID_CLIENT_GOOGLE` ;
-secret `SECRET_NOTIFICATION`, le même que côté serveur. Ces variables servent aux deux
-constructions du site — celle de GitHub Pages (repli) et l'image `bus-site` de la VPS.
+variables `URL_API` (`https://app.schoulbus.lu/api`), `CLE_VAPID`, `ID_CLIENT_GOOGLE`.
+Ces variables servent aux deux constructions du site — celle de GitHub Pages (repli) et
+l'image `bus-site` de la VPS.
 `URL_PUBLIQUE` est facultative : sans elle, l'image `bus-site` se déclare sous
 `https://app.schoulbus.lu`, ce qui est le cas voulu.
 
@@ -334,25 +334,27 @@ DATABASE_URL=… node serveur/creer-utilisateur.mjs --desactiver "agent@ville.lu
 
 ### Si les notifications ne partent pas
 
+**Depuis le lot 25, l'envoi fait partie de la publication** : annoncer une perturbation
+depuis l'espace agents l'écrit en base ET notifie dans la même opération — il n'y a plus
+de workflow GitHub `notifier.yml`, plus de `/notifier`, plus de `SECRET_NOTIFICATION`.
+La réponse à la publication porte le résultat de l'envoi (`notification`), et le journal
+du conteneur le détaille.
+
 **Commence par lire ce que le serveur a répondu** — ne régénère surtout pas les clés
-d'emblée. Le workflow « Notifier les perturbations » journalise la réponse complète :
+d'emblée. Suis l'envoi dans le journal du conteneur, puis publie la perturbation :
 
 ```bash
-gh run list --workflow=notifier.yml --limit 1
-gh run view <identifiant> --log | grep 'a répondu'
+sudo docker logs -f <conteneur bus-api>   # ou le journal du service dans Dokploy
 ```
 
-La réponse dit exactement ce qui s'est passé :
+Le résultat de l'envoi dit exactement ce qui s'est passé :
 
-| Réponse | Interprétation |
+| Champ | Interprétation |
 | --- | --- |
 | `envoyees` > 0 | Les notifications sont parties. Si le téléphone ne sonne pas, le problème est côté appareil (autorisation refusée, mode concentration). |
 | `total: 0` | Aucun abonné enregistré. Il faut activer les notifications depuis le site, sur l'appareil. |
 | `echecs` > 0 | Le service de push a refusé l'envoi. **Le champ `details` donne le service, le code HTTP et le motif exact** — c'est lui qu'il faut lire. |
-| `401 non-autorise` | `SECRET_NOTIFICATION` diffère entre le secret du dépôt et la variable du serveur. |
-
-Pour suivre un envoi en direct : `sudo docker logs -f <conteneur bus-api>` (ou le
-journal du service dans Dokploy), puis publier la perturbation.
+| `notifiee: false` | La perturbation existait déjà (même identifiant) ou n'a pas de message français : c'est voulu, une reprise ne re-réveille personne. |
 
 > **`507 trop-abonnes` et `error code: 1042` n'existent plus.** Ces deux réponses
 > venaient du découpage en lots imposé par le palier gratuit de Cloudflare. Si tu les

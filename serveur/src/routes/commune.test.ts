@@ -58,7 +58,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate agent_commune, agent_traduction, debit, journal, ephemere`
+  await db`truncate agent_commune, agent_traduction, debit, journal, ephemere, perturbation, correction_arret, document`
 })
 
 /** Chaque appel vient d'une adresse propre, sauf mention contraire. */
@@ -328,31 +328,70 @@ describe.skipIf(!avecBase)('relecture avant écriture', () => {
     expect(rep.status).toBe(400)
   })
 
-  it("inscrit l'auteur réel de la publication au journal, pas celui que le client prétend", async () => {
-    depotSimule({ perturbations: [] })
-    process.env.GITHUB_PAT = 'jeton-de-test'
-    const jeton = await signerJeton(
-      { nom: 'Marie', service: 'technique', role: 'commune', expire: Date.now() / 1000 + 60 },
-      SECRET,
-    )
-    const rep = await poster(
-      '/commune/perturbations',
-      {
-        perturbation: {
-          id: 'u-1',
-          type: 'annulation',
-          gravite: 'alerte',
-          du: '2026-08-10',
-          au: '2026-08-10',
-          message: { fr: 'Le bus de 07:25 ne circule pas.' },
-          publiePar: 'Pirate',
-        },
-      },
-      { Authorization: `Bearer ${jeton}` },
-    )
+})
+
+/**
+ * Perturbations en base (lot 25). La publication n'écrit plus dans le dépôt : elle
+ * insère dans la table `perturbation`, et notifie DANS la même opération — ce que faisait
+ * le workflow `notifier.yml`, désormais retiré. Ces tests ne simulent donc plus GitHub.
+ */
+describe.skipIf(!avecBase)('perturbations en base', () => {
+  const jetonCommune = (nom: string, service = '') =>
+    signerJeton({ nom, service, role: 'commune', expire: Date.now() / 1000 + 60 }, SECRET)
+
+  const perturbation = (sur: Record<string, unknown> = {}) => ({
+    id: 'u-1',
+    type: 'annulation',
+    gravite: 'alerte',
+    du: '2026-08-10',
+    au: '2026-08-10',
+    message: { fr: 'Le bus de 07:25 ne circule pas.' },
+    ...sur,
+  })
+
+  const publier = async (p: Record<string, unknown>, nom = 'Marie') =>
+    poster('/commune/perturbations', { perturbation: p }, { Authorization: `Bearer ${await jetonCommune(nom)}` })
+
+  it('écrit la perturbation en base, sous l\'auteur réel et non celui que le client prétend', async () => {
+    const rep = await publier(perturbation({ publiePar: 'Pirate' }))
     expect(rep.status).toBe(200)
-    const entrees = await db`select * from journal order by quand desc limit 1`
-    expect(entrees[0].qui).toBe('Marie')
-    expect(entrees[0].action).toBe('publication')
+
+    const lignes = await db`select donnees from perturbation where id = 'u-1'`
+    expect(lignes).toHaveLength(1)
+    expect(lignes[0].donnees.publiePar).toBe('Marie')
+
+    const journal = await db`select * from journal order by quand desc limit 1`
+    expect(journal[0].qui).toBe('Marie')
+    expect(journal[0].action).toBe('publication')
+  })
+
+  it('notifie à la première pose, pas à la reprise du même identifiant', async () => {
+    const un = await publier(perturbation())
+    expect(((await un.json()) as any).notifiee).toBe(true)
+
+    // Republier le même id (correction) ne re-réveille pas les téléphones.
+    const deux = await publier(perturbation({ message: { fr: 'Correction : le bus circule.' } }))
+    expect(((await deux.json()) as any).notifiee).toBe(false)
+
+    // Et le contenu a bien été remplacé.
+    const lignes = await db`select donnees from perturbation where id = 'u-1'`
+    expect(lignes[0].donnees.message.fr).toBe('Correction : le bus circule.')
+  })
+
+  it('ne notifie pas une perturbation sans message français', async () => {
+    const rep = await publier(perturbation({ type: 'message', message: { de: 'Nur Deutsch' } }))
+    // La validation exige un message français : sans lui, la charge est refusée avant
+    // même la question de la notification.
+    expect(rep.status).toBe(400)
+  })
+
+  it('retire une perturbation de la base', async () => {
+    await publier(perturbation())
+    const del = await app.request('/api/commune/perturbations/u-1', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${await jetonCommune('Marie')}`, 'X-Forwarded-For': '203.0.113.9' },
+    })
+    expect(del.status).toBe(200)
+    expect(await db`select 1 from perturbation where id = 'u-1'`).toHaveLength(0)
   })
 })

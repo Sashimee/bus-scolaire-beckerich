@@ -22,12 +22,17 @@ import { appliquerModifications, relireSurcouche } from '../../../src/lib/traduc
 import { corpsJson, ipDeLaRequete } from '../http.ts'
 import { empreinte, signerJeton, verifierJeton, type ChargeJeton } from '../crypto.ts'
 import { ecrireFichier, lireFichier } from '../github.ts'
+import {
+  enregistrerPerturbation,
+  listerPerturbations,
+  supprimerPerturbation,
+} from '../stockage/publications.ts'
+import { envoyerATous } from '../envois.ts'
 import { debitDepasse, FENETRE_DEBIT_S, reussite } from '../stockage/debit.ts'
 import { journaliser, lireJournal } from '../stockage/journal.ts'
 import { lireAgent, noterAcces, type Role } from '../stockage/agents.ts'
 import { LANGUES, perturbationPropre, texteSur, validerPerturbation } from '../validation-perturbation.ts'
 
-const CHEMIN_URGENCES = 'public/urgences.json'
 const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
 const CHEMIN_TRADUCTIONS = 'public/traductions.json'
 
@@ -92,24 +97,16 @@ async function connexion(c: Context, role: Role) {
   return c.json({ jeton, nom: agent.nom, service: agent.service ?? '', role, expire })
 }
 
-/** Relit les urgences, applique une transformation, republie. */
-async function majUrgences(
-  agent: ChargeJeton,
-  transformer: (liste: any[]) => any[],
-  resume: string,
-): Promise<number> {
-  const { contenu, sha } = await lireFichier(CHEMIN_URGENCES)
-  const perturbations = transformer(contenu.perturbations ?? [])
-  const nouveau = { ...contenu, perturbations, misAJour: new Date().toISOString() }
-  await ecrireFichier(
-    CHEMIN_URGENCES,
-    JSON.stringify(nouveau, null, 2) + '\n',
-    sha,
-    // Le message de commit porte l'auteur réel : l'historique du dépôt doit dire qui
-    // a annulé un bus, pas « le serveur ».
-    `${resume} — publié par ${agent.nom}${agent.service ? ` (${agent.service})` : ''}`,
-  )
-  return perturbations.length
+/**
+ * Titres des notifications, par type de perturbation. Repris à l'identique du workflow
+ * `notifier.yml` qu'ils remplacent — la publication et l'envoi étaient deux opérations
+ * (écriture GitHub, puis Action déclenchée sur push) ; ils n'en font plus qu'une.
+ */
+const TITRES: Record<string, string> = {
+  annulation: 'Bus annulé',
+  retard: 'Bus en retard',
+  'arret-deplace': 'Arrêt déplacé',
+  message: 'Information bus scolaire',
 }
 
 async function publierPerturbation(c: Context, agent: ChargeJeton) {
@@ -124,23 +121,40 @@ async function publierPerturbation(c: Context, agent: ChargeJeton) {
     publiePar: agent.nom,
   }
 
-  const total = await majUrgences(
-    agent,
-    (liste) => [...liste.filter((x) => x.id !== p.id), p],
-    `Urgence : ${p.type}`,
-  )
+  const { nouvelle } = await enregistrerPerturbation(p.id, p)
   await journaliser(agent, 'publication', `${p.type} ${p.du}→${p.au} (${p.id})`)
-  return c.json({ ok: true, total })
+
+  // Notification : SEULEMENT à la première pose d'un identifiant, et seulement si un
+  // message français existe — c'était la règle de `notifier.yml`. Republier une
+  // perturbation corrigée ne re-réveille pas les téléphones. L'envoi ne doit pas faire
+  // échouer la publication : le bandeau dans l'application reste, quoi qu'il arrive au
+  // push. On journalise l'échec, on ne le propage pas.
+  let notification: unknown = null
+  const notifiee = Boolean(nouvelle && p.message?.fr)
+  if (notifiee) {
+    notification = await envoyerATous({
+      id: p.id,
+      titre: TITRES[p.type] ?? 'Bus scolaire Beckerich',
+      corps: p.message.fr,
+      gravite: p.gravite,
+      url: './',
+    }).catch((e) => {
+      console.log(`notification perturbation ${p.id} : échec — ${e?.stack ?? e}`)
+      return { erreur: String(e) }
+    })
+  }
+
+  const total = (await listerPerturbations()).length
+  return c.json({ ok: true, total, notifiee, notification })
 }
 
 async function retirerPerturbation(c: Context, agent: ChargeJeton, id: string) {
   if (!texteSur(id, 64)) return c.json({ erreur: 'id-invalide' }, 400)
-  const total = await majUrgences(
-    agent,
-    (liste) => liste.filter((x) => x.id !== id),
-    `Retrait de l'urgence ${id}`,
-  )
+  // Un retrait ne notifie personne : réveiller tout le monde pour dire qu'une alerte
+  // n'a plus lieu d'être serait du bruit.
+  await supprimerPerturbation(id)
   await journaliser(agent, 'retrait', id)
+  const total = (await listerPerturbations()).length
   return c.json({ ok: true, total })
 }
 

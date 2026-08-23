@@ -9,6 +9,7 @@
  */
 import { isoDate } from './calendrier'
 import { coordValide, dateIsoValide, entierEntre, texteSur } from './nettoyage'
+import { URL_API } from '../config'
 import type { Trajet } from './types'
 
 export type TypePerturbation = 'annulation' | 'retard' | 'arret-deplace' | 'message'
@@ -163,7 +164,13 @@ function relireCorrection(brut: unknown): CorrectionArret | null {
 
 export async function chargerUrgences(signal?: AbortSignal): Promise<Urgences | null> {
   try {
-    const rep = await fetch(`${import.meta.env.BASE_URL}urgences.json`, {
+    // Depuis le lot 25, les perturbations viennent de l'API (`/urgences`), à la même
+    // origine que le site. Sans serveur configuré, on retombe sur le fichier embarqué :
+    // c'est le dernier état connu à la construction, et l'application doit rester
+    // utilisable sans serveur. Le service worker met la réponse en cache (NetworkFirst),
+    // filet hors ligne.
+    const source = URL_API ? `${URL_API}/urgences` : `${import.meta.env.BASE_URL}urgences.json`
+    const rep = await fetch(source, {
       cache: 'no-store',
       signal,
     })

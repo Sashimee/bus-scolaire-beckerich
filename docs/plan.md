@@ -2458,8 +2458,13 @@ n'atteindrait plus les parents. Ordre :
    les données embarquées** quand la base est vide — le site a toujours un plan et des
    crédits, même neuf. Additif : rien ne s'en sert encore, la publication passe encore
    par GitHub. **10 tests** (144 au total côté serveur).
-2. Perturbations : publication → base + notification dans la même opération, client qui
-   lit `/urgences`, retrait de `notifier.yml`.
+2. **Perturbations (fait).** Publication → base + notification dans la MÊME opération
+   (`enregistrerPerturbation` dit si l'identifiant est neuf, ce qui décide s'il faut
+   notifier) ; `rappels-envoi` lit la table au lieu de refaire un aller-retour HTTP vers
+   le site ; le client lit `/urgences` (repli sur le fichier embarqué sans serveur), le
+   service worker le met en cache. `notifier.yml`, la route `/notifier` et
+   `SECRET_NOTIFICATION` retirés — l'envoi n'a plus besoin d'un détour par GitHub Actions.
+   4 tests de bout en bout (147 au total côté serveur).
 3. Surcouche de traduction : même schéma.
 4. Crédits.
 5. Horaires — la tranche délicate : le plan servi par l'API, **amorcé au démarrage avec
@@ -2475,4 +2480,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranche 1 faite ; les suivantes restent à mener.*
+*Dépend des lots 21–24. Tranches 1–2 faites ; les suivantes restent à mener.*

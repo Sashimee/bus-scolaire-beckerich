@@ -215,7 +215,9 @@ export default defineConfig({
           {
             // Les urgences doivent toujours être relues en ligne ; le cache ne sert
             // que de filet hors réseau, pour ne pas perdre une annulation déjà connue.
-            urlPattern: /urgences\.json$/,
+            // Depuis le lot 25, elles viennent de `/api/urgences` (même origine) ; le
+            // fichier `urgences.json` reste le repli sans serveur. Les deux sont cachés.
+            urlPattern: /(?:urgences\.json|\/api\/urgences)$/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'urgences',

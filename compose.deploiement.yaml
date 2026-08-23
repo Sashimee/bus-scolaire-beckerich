@@ -97,7 +97,6 @@ services:
       # publication cessera de passer par GitHub). Le jeton machine, fine-grained,
       # Contents: RW sur ce seul dépôt.
       GITHUB_PAT: ${GITHUB_PAT:?}
-      SECRET_NOTIFICATION: ${SECRET_NOTIFICATION:?}
     depends_on:
       bus-postgres:
         condition: service_healthy

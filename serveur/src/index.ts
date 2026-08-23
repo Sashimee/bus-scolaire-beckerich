@@ -21,7 +21,6 @@ import { monterSante } from './routes/sante.ts'
 import { monterAuthGithub } from './routes/authentification-github.ts'
 import { monterAbonnements } from './routes/abonnements.ts'
 import { monterGoogle } from './routes/google.ts'
-import { monterNotifier } from './routes/notifier.ts'
 import { monterCommune, monterTraductions } from './routes/commune.ts'
 import { monterComptes } from './routes/comptes.ts'
 import { monterPubliques } from './routes/publiques.ts'
@@ -85,7 +84,6 @@ export function creerApplication(): Hono {
   monterAuthGithub(api)
   monterAbonnements(api)
   monterGoogle(api)
-  monterNotifier(api)
   // Les deux espaces AVANT rien d'autre : leurs chemins leur sont propres, mais les
   // monter en dernier laisserait `notFound` les rattraper si un préfixe changeait.
   monterCommune(api)
