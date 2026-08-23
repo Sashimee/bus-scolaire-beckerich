@@ -1,5 +1,24 @@
+import { useEffect, useState } from 'react'
 import { NOMS_LANGUES, useT, LANGUES } from '../i18n'
-import { credits, lienSur, type Credit } from '../lib/credits'
+import { credits, relireCredits, lienSur, type Credit, type Credits } from '../lib/credits'
+import { URL_API } from '../config'
+
+/**
+ * Charge les crédits depuis l'API (`/credits`) quand un serveur est configuré, avec le
+ * bundle pour repli — sans serveur, hors ligne, ou avant toute publication. Écrit ici,
+ * côté navigateur, et non dans `lib/credits.ts` que le serveur partage.
+ */
+async function chargerCredits(signal: AbortSignal): Promise<Credits> {
+  if (!URL_API) return credits
+  try {
+    const rep = await fetch(`${URL_API}/credits`, { cache: 'no-store', signal })
+    if (!rep.ok) return credits
+    const donnees = (await rep.json()) as { credits?: unknown }
+    return relireCredits(donnees.credits)
+  } catch {
+    return credits
+  }
+}
 
 /** Une personne créditée : son nom, ce qu'elle a fait, et un lien s'il en existe un. */
 function Personne({ credit }: { credit: Credit }) {
@@ -29,7 +48,17 @@ function Personne({ credit }: { credit: Credit }) {
  */
 export function Credits() {
   const { t } = useT()
-  const languesTraduites = LANGUES.filter((l) => credits.traductions[l]?.length)
+  // Le bundle d'abord, pour un affichage immédiat ; la version publiée le remplace dès
+  // qu'elle arrive.
+  const [donnees, setDonnees] = useState<Credits>(credits)
+
+  useEffect(() => {
+    const ctrl = new AbortController()
+    void chargerCredits(ctrl.signal).then(setDonnees)
+    return () => ctrl.abort()
+  }, [])
+
+  const languesTraduites = LANGUES.filter((l) => donnees.traductions[l]?.length)
 
   return (
     <div className="pile pile--large">
@@ -38,11 +67,11 @@ export function Credits() {
         <p>{t('credits.intro')}</p>
       </header>
 
-      {credits.developpement.length > 0 && (
+      {donnees.developpement.length > 0 && (
         <section className="carte pile pile--serre">
           <h3 className="titre-carte">{t('credits.developpement')}</h3>
           <ul className="liste-nue pile pile--serre">
-            {credits.developpement.map((c) => (
+            {donnees.developpement.map((c) => (
               <Personne credit={c} key={c.nom} />
             ))}
           </ul>
@@ -57,7 +86,7 @@ export function Credits() {
             <div className="pile pile--serre" key={langue}>
               <span className="etiquette">{NOMS_LANGUES[langue]}</span>
               <ul className="liste-nue pile pile--serre">
-                {credits.traductions[langue]!.map((c) => (
+                {donnees.traductions[langue]!.map((c) => (
                   <Personne credit={c} key={c.nom} />
                 ))}
               </ul>
@@ -66,12 +95,12 @@ export function Credits() {
         </section>
       )}
 
-      {credits.remerciements.length > 0 && (
+      {donnees.remerciements.length > 0 && (
         <section className="carte pile pile--serre">
           <h3 className="titre-carte">{t('credits.remerciements')}</h3>
           <p className="champ__aide">{t('credits.remerciementsAide')}</p>
           <ul className="liste-nue pile pile--serre">
-            {credits.remerciements.map((c) => (
+            {donnees.remerciements.map((c) => (
               <Personne credit={c} key={c.nom} />
             ))}
           </ul>

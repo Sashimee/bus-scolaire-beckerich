@@ -2471,7 +2471,13 @@ n'atteindrait plus les parents. Ordre :
    concurrence optimiste (`sha`, 409). Le client lit `/traductions`. La route de
    publication (`/traductions/publier`) ne change pas de chemin : seul son fond bascule
    du dépôt à la base. 148 tests serveur.
-4. Crédits.
+4. **Crédits (fait, sauf l'éditeur).** Premier usage de la garde par CAPACITÉ (lot 24) :
+   `POST /edition/credits` exige la capacité `credits`, revalide par `relireCredits`
+   partagé, écrit le document `credits`. Le client (`Credits.tsx`) lit `/credits` avec
+   repli sur le bundle — une page de crédits doit s'afficher en toutes circonstances.
+   L'ÉDITEUR de crédits (jusqu'ici dans `/admin`) est construit à la tranche 7, avec le
+   retrait de `/admin` ; d'ici là l'endpoint répond au `curl` et 3 tests le couvrent
+   (151 au total côté serveur).
 5. Horaires — la tranche délicate : le plan servi par l'API, **amorcé au démarrage avec
    repli sur le plan embarqué** pour rester hors ligne et ne pas réécrire le moteur.
 6. Corrections d'arrêts (refuge de l'ancien `/admin`, sous la capacité `arrets`).
@@ -2485,4 +2491,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–3 faites ; les suivantes restent à mener.*
+*Dépend des lots 21–24. Tranches 1–4 faites ; les suivantes restent à mener.*

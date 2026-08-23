@@ -24,6 +24,7 @@ import { monterGoogle } from './routes/google.ts'
 import { monterCommune, monterTraductions } from './routes/commune.ts'
 import { monterComptes } from './routes/comptes.ts'
 import { monterPubliques } from './routes/publiques.ts'
+import { monterEdition } from './routes/edition.ts'
 import { demarrerPlanificateur } from './planificateur.ts'
 import { baseConfiguree, fermerBase, migrer } from './stockage/client.ts'
 
@@ -44,7 +45,8 @@ export function aJeton(chemin: string, base = process.env.BASE_API ?? '/api'): b
   return (
     relatif.startsWith('/commune/') ||
     relatif.startsWith('/traductions/') ||
-    relatif.startsWith('/comptes/')
+    relatif.startsWith('/comptes/') ||
+    relatif.startsWith('/edition/')
   )
 }
 
@@ -90,6 +92,7 @@ export function creerApplication(): Hono {
   monterTraductions(api)
   monterComptes(api)
   monterPubliques(api)
+  monterEdition(api)
 
   const app = new Hono()
   app.route(process.env.BASE_API ?? '/api', api)

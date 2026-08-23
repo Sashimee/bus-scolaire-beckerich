@@ -56,7 +56,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate utilisateur, debit, journal, ephemere`
+  await db`truncate utilisateur, debit, journal, ephemere, document`
   courrielsCaptures.length = 0
 })
 
@@ -421,5 +421,44 @@ describe.skipIf(!avecBase)('espace comptes', () => {
         process.env.SECRET_SESSION = secret
       }
     })
+  })
+})
+
+describe.skipIf(!avecBase)('édition gardée par capacité — crédits', () => {
+  it('publie les crédits pour un compte porteur de la capacité `credits`', async () => {
+    await creerCompte({ courriel: 'red@ville.lu', capacites: ['credits'] })
+    const jeton = await connecter('red@ville.lu', 'motdepasse-solide')
+    const rep = await poster(
+      '/edition/credits',
+      { credits: { developpement: [{ nom: 'Alex', role: 'Dév' }], remerciements: [] } },
+      avecJeton(jeton),
+    )
+    expect(rep.status).toBe(200)
+    const doc = await db`select contenu from document where nom = 'credits'`
+    expect(doc[0].contenu.developpement[0].nom).toBe('Alex')
+
+    // La lecture publique sert bien ce qui vient d'être publié.
+    const pub = (await (await app.request('/api/credits')).json()) as any
+    expect(pub.credits.developpement[0].nom).toBe('Alex')
+  })
+
+  it('refuse un compte sans la capacité `credits`', async () => {
+    await creerCompte({ courriel: 'sans@ville.lu', capacites: ['perturbations'] })
+    const jeton = await connecter('sans@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/credits', { credits: { developpement: [] } }, avecJeton(jeton))
+    expect(rep.status).toBe(403)
+  })
+
+  it('revalide : une entrée sans nom est écartée', async () => {
+    await creerCompte({ courriel: 'red@ville.lu', capacites: ['credits'] })
+    const jeton = await connecter('red@ville.lu', 'motdepasse-solide')
+    await poster(
+      '/edition/credits',
+      { credits: { developpement: [{ role: 'sans nom' }, { nom: 'Bien', role: 'ok' }] } },
+      avecJeton(jeton),
+    )
+    const doc = await db`select contenu from document where nom = 'credits'`
+    expect(doc[0].contenu.developpement).toHaveLength(1)
+    expect(doc[0].contenu.developpement[0].nom).toBe('Bien')
   })
 })
