@@ -2465,7 +2465,12 @@ n'atteindrait plus les parents. Ordre :
    service worker le met en cache. `notifier.yml`, la route `/notifier` et
    `SECRET_NOTIFICATION` retirés — l'envoi n'a plus besoin d'un détour par GitHub Actions.
    4 tests de bout en bout (147 au total côté serveur).
-3. Surcouche de traduction : même schéma.
+3. **Surcouche de traduction (fait).** Publication fusionnée dans le document
+   `traductions` sous un **verrou consultatif de transaction** — deux traducteurs
+   connectés en même temps ne se recouvrent pas, ce que GitHub assurait par sa
+   concurrence optimiste (`sha`, 409). Le client lit `/traductions`. La route de
+   publication (`/traductions/publier`) ne change pas de chemin : seul son fond bascule
+   du dépôt à la base. 148 tests serveur.
 4. Crédits.
 5. Horaires — la tranche délicate : le plan servi par l'API, **amorcé au démarrage avec
    repli sur le plan embarqué** pour rester hors ligne et ne pas réécrire le moteur.
@@ -2480,4 +2485,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–2 faites ; les suivantes restent à mener.*
+*Dépend des lots 21–24. Tranches 1–3 faites ; les suivantes restent à mener.*

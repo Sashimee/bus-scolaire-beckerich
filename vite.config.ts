@@ -228,7 +228,7 @@ export default defineConfig({
           {
             // Même traitement pour les corrections de traduction : relues en ligne,
             // avec le cache pour seul filet hors réseau.
-            urlPattern: /traductions\.json$/,
+            urlPattern: /(?:traductions\.json|\/api\/traductions)$/,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'traductions',

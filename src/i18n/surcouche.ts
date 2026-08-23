@@ -6,15 +6,19 @@
  * franchement côté navigateur.
  */
 import { relireSurcouche, SURCOUCHE_VIDE, type Surcouche } from '../lib/traductions'
+import { URL_API } from '../config'
 
 /**
- * Relit `public/traductions.json`. Hors ligne, on renvoie une surcouche vide plutôt
- * qu'une erreur : les dictionnaires du bundle sont complets, l'application reste
- * entièrement lisible sans ce fichier.
+ * Relit la surcouche de traduction. Depuis le lot 25, elle vient de l'API
+ * (`/traductions`), à la même origine que le site ; sans serveur configuré, on retombe
+ * sur le fichier embarqué. Hors ligne, on renvoie une surcouche vide plutôt qu'une
+ * erreur : les dictionnaires du bundle sont complets, l'application reste entièrement
+ * lisible sans ce fichier.
  */
 export async function chargerTraductions(signal?: AbortSignal): Promise<Surcouche> {
   try {
-    const rep = await fetch(`${import.meta.env.BASE_URL}traductions.json`, {
+    const source = URL_API ? `${URL_API}/traductions` : `${import.meta.env.BASE_URL}traductions.json`
+    const rep = await fetch(source, {
       cache: 'no-store',
       signal,
     })

@@ -23,10 +23,13 @@ import { corpsJson, ipDeLaRequete } from '../http.ts'
 import { empreinte, signerJeton, verifierJeton, type ChargeJeton } from '../crypto.ts'
 import { ecrireFichier, lireFichier } from '../github.ts'
 import {
+  ecrireDocument,
   enregistrerPerturbation,
+  lireDocument,
   listerPerturbations,
   supprimerPerturbation,
 } from '../stockage/publications.ts'
+import { base, type Sql } from '../stockage/client.ts'
 import { envoyerATous } from '../envois.ts'
 import { debitDepasse, FENETRE_DEBIT_S, reussite } from '../stockage/debit.ts'
 import { journaliser, lireJournal } from '../stockage/journal.ts'
@@ -34,7 +37,6 @@ import { lireAgent, noterAcces, type Role } from '../stockage/agents.ts'
 import { LANGUES, perturbationPropre, texteSur, validerPerturbation } from '../validation-perturbation.ts'
 
 const CHEMIN_PLAN = 'src/data/plan-2025-2026.json'
-const CHEMIN_TRADUCTIONS = 'public/traductions.json'
 
 const DUREE_SESSION_S = 8 * 3600
 
@@ -207,30 +209,28 @@ async function publierTraductions(c: Context, agent: ChargeJeton) {
     return c.json({ erreur: 'charge-invalide', motifs: ['langue'] }, 400)
   }
 
-  const { contenu, sha } = await lireFichier(CHEMIN_TRADUCTIONS)
-  const propre = appliquerModifications(
-    relireSurcouche(contenu),
-    charge.langue as never,
-    (charge.modifications ?? {}) as never,
-  )
+  // Transaction avec verrou consultatif : deux traducteurs connectés en même temps ne
+  // doivent pas se recouvrir. La surcouche est relue SOUS verrou, fusionnée, réécrite —
+  // ce qui sérialise les publications concurrentes, là où GitHub offrait une concurrence
+  // optimiste par `sha` (409, puis relecture et nouvel essai). Le verrou se libère à la
+  // fin de la transaction, quoi qu'il arrive.
+  const propre = await base().begin(async (tx) => {
+    // `tx` (transaction) et `Sql` (pool) partagent l'interface de requête mais pas
+    // toute la surface du type : le cast dit ce que le code fait déjà, appeler la même
+    // fonction de stockage sous transaction.
+    const sousTx = tx as unknown as Sql
+    await tx`select pg_advisory_xact_lock(hashtext('document:traductions'))`
+    const doc = await lireDocument('traductions', sousTx)
+    const fusionnee = appliquerModifications(
+      relireSurcouche(doc?.contenu ?? { langues: {} }),
+      charge.langue as never,
+      (charge.modifications ?? {}) as never,
+    )
+    await ecrireDocument('traductions', { langues: fusionnee }, new Date().toISOString(), sousTx)
+    return fusionnee
+  })
 
   const langues = Object.keys(propre)
-  const nouveau = {
-    $commentaire:
-      "Corrections de traduction, relues par l'application À CHAQUE OUVERTURE, sans " +
-      'reconstruction du bundle. Publié depuis /traductions ou /admin.',
-    misAJour: new Date().toISOString(),
-    langues: propre,
-  }
-
-  await ecrireFichier(
-    CHEMIN_TRADUCTIONS,
-    JSON.stringify(nouveau, null, 2) + '\n',
-    sha,
-    `Traductions (${charge.langue}) — publié par ${agent.nom}${
-      agent.service ? ` (${agent.service})` : ''
-    }`,
-  )
   await journaliser(
     agent,
     'traductions',

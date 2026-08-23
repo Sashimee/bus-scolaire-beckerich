@@ -9,7 +9,7 @@
  * premier défaut du portage s'est logé (le préflight de `/commune/` n'ouvrait pas
  * `Authorization`).
  */
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import postgres from 'postgres'
 
 const SCHEMA = 'essai_routes'
@@ -256,52 +256,17 @@ describe.skipIf(!avecBase)('espace non configuré', () => {
 })
 
 /**
- * La publication de traductions et la publication de perturbations passent toutes
- * deux par une relecture-avant-écriture du dépôt. C'est ce qui empêche deux agents
- * connectés en même temps de se recouvrir — un incident réel, corrigé le 2026-08-09.
- *
- * Ces tests remplacent GitHub par un fichier en mémoire : ce qui est vérifié, c'est
- * la fusion, pas l'API de GitHub. Au lot 25, la même propriété devra être retenue
- * sous une transaction PostgreSQL, et ces tests devront continuer de passer.
+ * Traductions en base (lot 25). La publication n'écrit plus dans le dépôt : elle fusionne
+ * dans le document `traductions`, sous un verrou consultatif de transaction — deux
+ * traducteurs connectés en même temps ne doivent pas se recouvrir. La propriété de
+ * relecture-avant-écriture, vérifiée jadis contre un dépôt simulé, l'est désormais
+ * contre la vraie base.
  */
-describe.skipIf(!avecBase)('relecture avant écriture', () => {
+describe.skipIf(!avecBase)('traductions en base', () => {
   const jetonTrad = (nom: string) =>
-    signerJeton(
-      { nom, service: '', role: 'traductions', expire: Date.now() / 1000 + 60 },
-      SECRET,
-    )
+    signerJeton({ nom, service: '', role: 'traductions', expire: Date.now() / 1000 + 60 }, SECRET)
 
-  /** Remplace le dépôt par un fichier en mémoire. */
-  function depotSimule(initial: unknown) {
-    let fichier: any = initial
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (entree: any, init: any) => {
-      if (init?.method === 'PUT') {
-        fichier = JSON.parse(
-          Buffer.from(JSON.parse(init.body).content, 'base64').toString('utf8'),
-        )
-        return new Response(JSON.stringify({ content: {} }), { status: 200 })
-      }
-      return new Response(
-        JSON.stringify({
-          content: Buffer.from(JSON.stringify(fichier), 'utf8').toString('base64'),
-          sha: 'abc',
-        }),
-        { status: 200 },
-      )
-    })
-    return () => fichier
-  }
-
-  afterEach(() => vi.restoreAllMocks())
-
-  it('fusionne deux publications concurrentes au lieu de les écraser', async () => {
-    // Deux traducteurs ouvrent leur page au même moment, donc partent tous deux d'un
-    // fichier vide. Publier la surcouche entière faisait disparaître le travail du
-    // premier ; on envoie désormais les seules modifications, et le serveur relit le
-    // fichier avant de fusionner.
-    const lire = depotSimule({ langues: {} })
-    process.env.GITHUB_PAT = 'jeton-de-test'
-
+  it('fusionne deux publications successives au lieu de les écraser', async () => {
     const publier = (jeton: string, langue: string, modifications: unknown) =>
       poster('/traductions/publier', { langue, modifications }, { Authorization: `Bearer ${jeton}` })
 
@@ -311,23 +276,32 @@ describe.skipIf(!avecBase)('relecture avant écriture', () => {
     const rep = await publier(await jetonTrad('B'), 'pt', { 'assistant.terminer': 'Terminado' })
     expect(rep.status).toBe(200)
 
-    // Les deux corrections coexistent dans le fichier réellement écrit.
-    expect(lire().langues.de).toEqual({ 'assistant.terminer': 'Fertig' })
-    expect(lire().langues.pt).toEqual({ 'assistant.terminer': 'Terminado' })
+    // Les deux corrections coexistent dans le document réellement écrit.
+    const lignes = await db`select contenu from document where nom = 'traductions'`
+    expect(lignes[0].contenu.langues.de).toEqual({ 'assistant.terminer': 'Fertig' })
+    expect(lignes[0].contenu.langues.pt).toEqual({ 'assistant.terminer': 'Terminado' })
     // Et le second reçoit l'état fusionné, pas le sien.
     expect(((await rep.json()) as any).surcouche.de).toEqual({ 'assistant.terminer': 'Fertig' })
   })
 
+  it('est servie telle quelle par la lecture publique /traductions', async () => {
+    await poster(
+      '/traductions/publier',
+      { langue: 'de', modifications: { 'nav.limites': 'Grenzen' } },
+      { Authorization: `Bearer ${await jetonTrad('A')}` },
+    )
+    const pub = await (await app.request('/api/traductions')).json()
+    expect((pub as any).langues.de['nav.limites']).toBe('Grenzen')
+  })
+
   it('refuse une publication sans langue reconnue', async () => {
-    const jeton = await jetonTrad('A')
     const rep = await poster(
       '/traductions/publier',
       { langue: 'es', modifications: {} },
-      { Authorization: `Bearer ${jeton}` },
+      { Authorization: `Bearer ${await jetonTrad('A')}` },
     )
     expect(rep.status).toBe(400)
   })
-
 })
 
 /**
