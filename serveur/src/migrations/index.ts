@@ -10,8 +10,10 @@
  */
 import initial from './001-initial.sql'
 import comptes from './002-comptes.sql'
+import publication from './003-publication.sql'
 
 export const MIGRATIONS: readonly { nom: string; sql: string }[] = [
   { nom: '001-initial.sql', sql: initial },
   { nom: '002-comptes.sql', sql: comptes },
+  { nom: '003-publication.sql', sql: publication },
 ]

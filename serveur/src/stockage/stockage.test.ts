@@ -30,10 +30,13 @@ describe.skipIf(!avecBase)('migrations', () => {
       'abonnement',
       'agent_commune',
       'agent_traduction',
+      'correction_arret',
       'debit',
+      'document',
       'ephemere',
       'journal',
       'migration',
+      'perturbation',
       'utilisateur',
     ])
   })

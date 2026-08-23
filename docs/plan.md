@@ -2433,3 +2433,46 @@ lot 25 les replie sur les capacités.
 
 *Dépend des lots 21–23 (serveur en base, sous `app.schoulbus.lu`, courriel relayé sur
 le réseau interne). Le lot 25 en dépend : c'est lui qui gréera les capacités.*
+
+---
+
+## Lot 25 — Publication en base, sans détour par GitHub (en cours)
+
+> **Commencé le 2026-08-23.** Le plus gros lot du passage : perturbations, corrections
+> d'arrêts, surcouche de traduction, horaires et crédits quittent les fichiers du dépôt
+> pour la base, publiés par l'espace agents (aux capacités du lot 24) et servis par
+> l'API ; `/admin` et tout le chemin GitHub (`github.ts`, `notifier.ts`, `notifier.yml`,
+> `GITHUB_PAT`, `SECRET_NOTIFICATION`) disparaissent. Parce qu'il touche le moteur
+> testé — le plan est embarqué et lu synchroniquement par 30 fichiers —, il est mené en
+> **tranches**, chacune compilant et testée, plutôt qu'en une seule rupture.
+
+### Le découpage retenu
+
+Chaque nature de donnée bascule **de bout en bout** (serveur qui publie, endpoint qui
+sert, client qui lit) en une fois : à moitié migrée, une perturbation publiée
+n'atteindrait plus les parents. Ordre :
+
+1. **Fondation serveur (fait).** Migration `003-publication.sql` (`perturbation`,
+   `correction_arret`, `document`), stockage `publications.ts`, et les lectures
+   publiques `GET /urgences · /traductions · /horaires · /credits`, qui **retombent sur
+   les données embarquées** quand la base est vide — le site a toujours un plan et des
+   crédits, même neuf. Additif : rien ne s'en sert encore, la publication passe encore
+   par GitHub. **10 tests** (144 au total côté serveur).
+2. Perturbations : publication → base + notification dans la même opération, client qui
+   lit `/urgences`, retrait de `notifier.yml`.
+3. Surcouche de traduction : même schéma.
+4. Crédits.
+5. Horaires — la tranche délicate : le plan servi par l'API, **amorcé au démarrage avec
+   repli sur le plan embarqué** pour rester hors ligne et ne pas réécrire le moteur.
+6. Corrections d'arrêts (refuge de l'ancien `/admin`, sous la capacité `arrets`).
+7. Consolidation de l'authentification : replier `/commune` et `/traductions` sur les
+   capacités, retirer `/admin` et le chemin GitHub entier.
+
+### Réserves attendues
+
+- La reprise des fichiers actuels (`urgences.json`, `traductions.json`, `credits.json`,
+  le plan) vers la base est une étape de déploiement : sans elle, les corrections de
+  traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
+  bascule.
+
+*Dépend des lots 21–24. Tranche 1 faite ; les suivantes restent à mener.*
