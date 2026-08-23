@@ -80,6 +80,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R40 | 21 | **L'extraction de l'adresse cliente derrière Traefik n'a pas été vue à l'œuvre.** Le Worker lisait `CF-Connecting-IP` ; le serveur lit `X-Forwarded-For` en partant de la fin, sur `NB_PROXYS_FIABLES` rangs. 7 tests couvrent la fonction et 3 tests de route la traversent, mais **aucun vrai proxy n'a encore été devant**. Une erreur ici transforme la limitation de débit en un seul seau global : cinq tentatives pour la planète entière, puis plus personne ne se connecte. Aucun signe extérieur. | Deux connexions échouées depuis deux réseaux différents (par exemple domicile et 4G) contre le serveur déployé : la seconde ne doit pas hériter du compteur de la première. Si un second relais s'ajoute un jour devant Traefik, `NB_PROXYS_FIABLES` doit passer à 2. |
 | R41 | 21 | **Le paquet a été construit et l'image exercée, mais jamais sous charge.** L'envoi des notifications est passé d'un découpage en lots de 10 à une boucle à 20 envois simultanés. La nouvelle valeur n'est pas plus mesurée que ne l'était `TAILLE_LOT` — elle est seulement libre du plafond qui justifiait l'ancienne. | Regarder le journal du conteneur au premier envoi réel de plus de cinquante abonnés. Ce qui compte n'est pas la durée mais le nombre d'échecs : un service de push qui répond `429` dit que la concurrence est trop haute. |
 | R42 | 22 | **La chaîne de déploiement n'a jamais été montée par le vrai Dokploy.** `compose.deploiement.yaml`, la poussée d'image sur GHCR et le routage Traefik (`Host(app.schoulbus.lu) && PathPrefix(/api)`, certificat Let's Encrypt) sont vérifiés en local — `docker build`, la pile montée depuis l'image construite, `/api/sante` au vert avec `base: true`, la sonde de l'image qui passe, `docker compose config` qui résout le fichier — mais **aucun Dokploy, aucun Traefik, aucun certificat réel** n'a été devant. Trois choses ne se voient qu'au premier déploiement : que Dokploy sait tirer l'image (paquet privé → identifiant de registre requis), que Traefik émet bien le certificat (DNS à résoudre d'abord), et que le chemin `/api` arrive non tronqué au serveur. | Pousser sur `main`, créer l'application Compose dans Dokploy sur `compose.deploiement.yaml`, poser les variables, déployer, puis `curl https://app.schoulbus.lu/api/sante`. Voir [docs/deploiement.md](deploiement.md). C'est le même déploiement qui lèvera R39 (reprise clé-valeur) et R40 (adresse client derrière Traefik). |
+| R43 | 23 | **Le site sous app.schoulbus.lu n'a jamais été servi par le vrai Traefik, et la PWA jamais installée depuis la nouvelle origine.** L'image `bus-site` (Caddy) est vérifiée en local — racine qui rend un 200, en-têtes `X-Frame-Options: DENY`/`nosniff`/`Referrer-Policy`, repli SPA d'une route profonde vers `index.html`, chemins d'actifs à la racine (`BASE_PATH=/`), CSP portant `app.schoulbus.lu/api`. Restent invérifiés : le partage d'origine site↔API à travers Traefik (les deux routeurs, priorité 100 contre 1), l'installation de la PWA depuis la nouvelle origine (dont `start_url`/`scope` passent à `/`), et le fait qu'une PWA déjà installée depuis GitHub Pages (portée `/bus-scolaire-beckerich/`) **ne migre pas toute seule** — c'est une autre origine, un autre service worker ; le parent garde l'ancienne installation jusqu'à réinstaller depuis `app.schoulbus.lu`. | Après le déploiement : ouvrir `https://app.schoulbus.lu`, vérifier que le site s'affiche et qu'une route profonde rechargée ne rend pas un 404, installer la PWA depuis cette origine, et confirmer que l'espace commune et les notifications répondent (même origine, sans CORS). Prévoir un mot aux parents déjà installés : réinstaller depuis la nouvelle adresse. |
 
 ### Mise en service — faite
 
@@ -2214,3 +2215,84 @@ premier déploiement les lève toutes les trois.
 
 *Dépend du lot 21. Les lots 23 et suivants en dépendent : ils supposent le serveur
 joignable sur `app.schoulbus.lu/api`.*
+
+---
+
+## Lot 23 — Bascule d'origine vers `app.schoulbus.lu` (2026-08-23)
+
+> **Fait le 2026-08-23.** Troisième lot du passage sur VPS Dokploy. Le site quitte son
+> sous-domaine `github.io` et vit désormais sous la **racine d'`app.schoulbus.lu`**, à la
+> **même origine que l'API**. C'est la bascule que les lots précédents préparaient : le
+> commentaire de `http.ts` l'annonçait (« le jour où le site et l'API partagent l'origine
+> app.schoulbus.lu »), celui d'`index.ts` en dépendait (« le site et l'API partagent une
+> seule origine, ce qui fait disparaître le CORS »).
+
+### Un conteneur de plus, pas un serveur de plus
+
+Le site est servi par un conteneur **`bus-site`** (Caddy) distinct de `bus-api`, et non
+par le serveur Hono lui-même. Le choix — deux conteneurs à une origine plutôt qu'un
+processus qui sert tout — garde la séparation que le dépôt a déjà entre les deux
+chaînes : le site et le serveur se construisent, se testent et se redéploient
+indépendamment, chacun derrière ses propres tests. Coupler leurs constructions aurait
+fait reconstruire le serveur à chaque retouche de bouton, et inversement.
+
+Traefik répartit l'origine unique par priorité : `PathPrefix(/api)` (priorité 100) va au
+serveur, tout le reste (priorité 1) au site. La priorité est posée explicitement et non
+laissée à la longueur de règle : sur un chemin aussi sensible, on ne départage pas au
+hasard.
+
+### Ce que la même origine fait tomber, et resserre
+
+- **Le CORS n'a plus d'objet.** L'intergiciel reste en place — inerte tant que le site
+  et l'API se répondent depuis `app.schoulbus.lu` —, le temps que Pages, cross-origin,
+  serve encore de repli. `ORIGINES_AUTORISEES` liste donc les **deux** origines pendant
+  la transition.
+- **La CSP se resserre.** Servie par un vrai serveur (Caddy), et non plus par une page
+  Pages sans en-têtes, elle gagne ce que la balise `<meta>` ne peut pas porter :
+  `X-Frame-Options: DENY` en en-tête HTTP — l'équivalent de `frame-ancestors`, que la
+  spécification **ignore** en `<meta>`. La CSP complète, elle, reste en `<meta>`, à un
+  seul endroit : deux politiques (en-tête + balise) s'appliqueraient par intersection, et
+  une carte cassée serait vite arrivée. Ajoutés aussi : `X-Content-Type-Options` et
+  `Referrer-Policy`.
+
+### La construction, figée dans l'image
+
+`Dockerfile.site` construit le site avec `BASE_PATH=/` (la racine du domaine, non plus le
+préfixe projet de Pages) et `VITE_URL_API=https://app.schoulbus.lu/api`. Vite **inline**
+ces valeurs dans le JavaScript : l'image est donc figée sur son origine, et les passer en
+variables d'exécution du compose n'aurait aucun effet — d'où des `ARG`, pas des `env`.
+L'URL de l'API est déclarée en **absolu** et non en `/api` relatif : la CSP engendrée la
+nomme comme une source, et un chemin nu n'est pas une source CSP valide.
+
+### La transition, filet gardé
+
+Le déploiement GitHub Pages **reste vivant** : le lot ne le touche pas. Il sert de repli
+le temps que le DNS bascule et que le nouveau site soit vérifié. Les deux sites pointent
+alors vers la même API — celui de la VPS en même origine, celui de Pages en cross-origin
+autorisé. Retirer Pages est un geste ultérieur, une fois `app.schoulbus.lu` éprouvé.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+En local : `docker build -f Dockerfile.site`, le conteneur monté, la racine qui rend un
+200 avec les trois en-têtes, une route profonde (`/agenda`) qui retombe sur `index.html`
+au lieu d'un 404, les actifs servis depuis la racine, la CSP portant `app.schoulbus.lu/api`
+et `docker compose config` qui résout les deux routeurs. **R43** est posée pour ce qui ne
+se voit qu'au premier déploiement réel : le partage d'origine à travers Traefik,
+l'installation de la PWA depuis la nouvelle origine (`start_url`/`scope` passés à `/`), et
+le fait qu'une PWA déjà installée depuis Pages ne migre pas seule — c'est une autre
+origine, un autre service worker.
+
+### Écarts assumés par rapport au texte du lot
+
+- **Aucun code d'application changé.** La bascule tient entièrement dans la construction
+  (`BASE_PATH`, `VITE_URL_API`) et l'hébergement (Caddy, Traefik). `config.ts` et la CSP
+  d'`index.html` supportaient déjà une origine paramétrable depuis les lots précédents.
+- **`connect-src` n'est pas réduit à `'self'` seul.** L'idéal annoncé par `index.ts` est
+  atteint en pratique — l'origine de l'API `app.schoulbus.lu/api` **est** `'self'` —, mais
+  la liste porte encore l'URL absolue de l'API (redondante avec `'self'`, sans danger) et
+  les origines de GitHub et Google, nécessaires à `/admin` et à l'agenda. Réduire à
+  `'self'` seul demanderait de router aussi ces appels par la VPS, ce qui n'est pas
+  l'objet de ce lot.
+
+*Dépend des lots 21 et 22 (le serveur doit répondre sous `app.schoulbus.lu/api`). Le lot
+24 en dépend : il retire la publication par GitHub, une fois l'origine propre en place.*

@@ -10,9 +10,10 @@
 # depuis son interface. Les `${…}` ci-dessous sont donc renseignés côté Dokploy, pas
 # dans un `.env` du dépôt : aucun secret ne doit entrer ici.
 #
-#   Lot 22 : ce fichier fait RÉPONDRE le serveur sur app.schoulbus.lu/api, et rien de
-#   plus. Le site reste sur GitHub Pages et continue de parler au Worker. La bascule
-#   d'origine — le jour où le site lui-même vit sous app.schoulbus.lu — est le lot 23.
+#   Lot 22 : le serveur RÉPOND sur app.schoulbus.lu/api.
+#   Lot 23 : le site (service bus-site) vit sous la RACINE d'app.schoulbus.lu, à la même
+#   origine que l'API — la bascule d'origine. Le déploiement GitHub Pages reste vivant
+#   le temps de la transition (filet de repli), jusqu'à ce que le DNS bascule.
 
 name: bus-beckerich
 
@@ -92,13 +93,39 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
-      # app.schoulbus.lu/api → ce conteneur. Rien d'autre : la racine du domaine n'est
-      # pas à nous au lot 22 (le site est encore sur Pages). Le `/api` n'est PAS retiré
-      # du chemin — le serveur monte toutes ses routes sous `BASE_API=/api` et l'attend.
+      # app.schoulbus.lu/api → ce conteneur ; tout le reste du domaine → le site
+      # (service bus-site ci-dessous). Le `/api` n'est PAS retiré du chemin : le serveur
+      # monte toutes ses routes sous `BASE_API=/api` et l'attend. La `priority` élevée
+      # garantit que cette règle l'emporte sur celle du site, qui capte la racine : sans
+      # elle, Traefik les départage par longueur de règle, ce qui tomberait juste ici
+      # mais qu'on ne veut pas laisser au hasard sur un chemin aussi sensible.
       - traefik.http.routers.bus-api.rule=Host(`app.schoulbus.lu`) && PathPrefix(`/api`)
+      - traefik.http.routers.bus-api.priority=100
       - traefik.http.routers.bus-api.entrypoints=websecure
       - traefik.http.routers.bus-api.tls.certresolver=letsencrypt
       - traefik.http.services.bus-api.loadbalancer.server.port=3000
+
+  bus-site:
+    # Le site construit (lot 23), servi par Caddy sous la RACINE d'app.schoulbus.lu, à
+    # la même origine que l'API. C'est la bascule d'origine : le CORS n'a plus d'objet,
+    # et la CSP se resserre. L'image est construite et poussée par la CI, comme bus-api ;
+    # l'origine et le chemin de base y sont figés au build (voir Dockerfile.site).
+    image: ${IMAGE_SITE:-ghcr.io/sashimee/bus-site:latest}
+    restart: unless-stopped
+    # Le site est purement statique : il ne touche ni la base ni aucun secret. Il ne
+    # tient donc que sur le réseau de Traefik.
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      # La racine du domaine, tout ce que `/api` ne capte pas. Priority basse : l'API
+      # passe devant.
+      - traefik.http.routers.bus-site.rule=Host(`app.schoulbus.lu`)
+      - traefik.http.routers.bus-site.priority=1
+      - traefik.http.routers.bus-site.entrypoints=websecure
+      - traefik.http.routers.bus-site.tls.certresolver=letsencrypt
+      - traefik.http.services.bus-site.loadbalancer.server.port=8080
 
 networks:
   # Réseau privé serveur↔base, invisible de Traefik : la base n'y est jamais exposée.

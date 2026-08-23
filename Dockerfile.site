@@ -1,0 +1,50 @@
+# Image du site, servie sous app.schoulbus.lu par Caddy.
+#
+# CONTEXTE DE BUILD : la RACINE du dépôt (le paquet du site EST à la racine). C'est le
+# même contexte que `serveur/Dockerfile` ; les deux se construisent depuis `.`.
+#
+#   docker build -f Dockerfile.site -t bus-site .
+#
+# Les valeurs `VITE_*` sont INLINÉES dans le JavaScript par Vite au moment du build :
+# l'image est donc figée sur une origine (app.schoulbus.lu) et un chemin de base (`/`).
+# C'est pour cela qu'elles sont des `ARG` et non des variables d'exécution — les poser
+# dans `compose.deploiement.yaml` n'aurait aucun effet, le bundle étant déjà écrit.
+
+# — Construction ————————————————————————————————————————————————————
+FROM node:22-alpine AS construction
+WORKDIR /chantier
+
+# Origine et chemin propres à la VPS. Le site vit à la racine du domaine (`/`), non
+# plus sous le préfixe projet de GitHub Pages, et se connaît sous app.schoulbus.lu.
+ARG BASE_PATH=/
+ARG URL_PUBLIQUE=https://app.schoulbus.lu
+# L'API partage l'origine : `/api` sur le même hôte. Déclarée en absolu pour que la CSP
+# engendrée la nomme comme une source valide — un chemin nu n'est pas une source CSP.
+ARG VITE_URL_API=https://app.schoulbus.lu/api
+# Publiques par nature (elles finissent dans le code servi). Vides, l'application
+# fonctionne sans notifications ni Google Agenda — exactement comme un build sans elles.
+ARG VITE_CLE_VAPID=
+ARG VITE_ID_CLIENT_GOOGLE=
+# Empreinte de version, pour que la webapp installée détecte le déploiement.
+ARG GITHUB_SHA=
+
+# Dépendances d'abord, pour que le cache de couches survive à une modification du code.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN BASE_PATH="$BASE_PATH" URL_PUBLIQUE="$URL_PUBLIQUE" GITHUB_SHA="$GITHUB_SHA" \
+    VITE_URL_API="$VITE_URL_API" VITE_CLE_VAPID="$VITE_CLE_VAPID" \
+    VITE_ID_CLIENT_GOOGLE="$VITE_ID_CLIENT_GOOGLE" \
+    npm run build
+
+# — Exécution ————————————————————————————————————————————————————————
+FROM caddy:2-alpine AS execution
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=construction /chantier/dist /srv
+EXPOSE 8080
+
+# Caddy n'a pas besoin d'utilisateur ajouté : l'image officielle tourne déjà sans
+# privilège pour servir des fichiers statiques.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/index.html || exit 1

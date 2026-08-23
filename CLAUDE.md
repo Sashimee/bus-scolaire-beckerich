@@ -84,10 +84,10 @@ implémentation des règles de validation aurait divergé au premier ajustement.
 
 ## Documentation
 
-- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 22 sont
-  faits ; les lots 23 à 27 portent la suite du passage sur VPS Dokploy (bascule
-  d'origine vers `app.schoulbus.lu`, publication sans détour par GitHub, mesure
-  auto-hébergée). **À consulter avant d'entamer une évolution.**
+- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 23 sont
+  faits ; les lots 24 à 27 portent la suite du passage sur VPS Dokploy (publication
+  sans détour par GitHub, mesure auto-hébergée). **À consulter avant d'entamer une
+  évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

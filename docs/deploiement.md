@@ -7,29 +7,43 @@ VAPID, l'application OAuth, la liste des variables du service et la reprise de l
 état clé-valeur. Les deux se lisent ensemble ; celui-ci ne répète pas la table des
 variables.
 
-> **Ce que le lot 22 fait, et ce qu'il ne fait pas.** Il fait *répondre* le serveur sur
-> `app.schoulbus.lu/api`, et rien de plus. Le site reste sur GitHub Pages et continue de
-> parler à l'ancien Worker : aucun parent ne dépend encore de la VPS. La bascule de
-> l'origine — le jour où le site lui-même vit sous `app.schoulbus.lu` et où
-> `VITE_URL_API` pointe vers la VPS — est le **lot 23**. Tenir les deux séparés est
-> délibéré : si quelque chose casse après le lot 23, on saura que c'est la bascule et
-> non le serveur, parce que le serveur aura déjà été prouvé vert tout seul.
+> **Le lot 22 puis le lot 23.** Le lot 22 a fait *répondre* le serveur sur
+> `app.schoulbus.lu/api`, le site restant sur GitHub Pages. Le **lot 23** est la bascule
+> d'origine : le site lui-même vit désormais sous la RACINE d'`app.schoulbus.lu`, à la
+> même origine que l'API, servi par un conteneur `bus-site` (Caddy). Le CORS n'a plus
+> d'objet et la CSP se resserre. Le déploiement GitHub Pages reste vivant en parallèle,
+> comme filet de repli, jusqu'à ce que le DNS bascule et que le nouveau site soit
+> vérifié.
 
 ## La chaîne, en une phrase
 
-Un push sur `main` → la CI teste le serveur (109 cas contre un vrai PostgreSQL) → si
-c'est vert, elle **construit l'image et la pousse sur GHCR** → Dokploy tire cette image
-et la fait tourner derrière Traefik. L'image qui sert les parents est donc, à l'octet
-près, celle que les tests ont validée — jamais une seconde construction faite sur une
-machine où personne ne regarde.
+Un push sur `main` → la CI teste (l'application ET le serveur, ce dernier contre un vrai
+PostgreSQL) → si c'est vert, elle **construit deux images et les pousse sur GHCR** →
+Dokploy les tire et les fait tourner derrière Traefik. Ce qui sert les parents est donc,
+à l'octet près, ce que les tests ont validé — jamais une seconde construction faite sur
+une machine où personne ne regarde.
 
-- Construction et poussée : le travail `image-serveur` de
-  [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Il **dépend** du
-  travail `serveur` : une image ne part jamais sans que les tests soient passés.
-- Image publiée : `ghcr.io/sashimee/bus-api`, étiquetée `latest` et `sha-<commit>`.
+- Travaux de construction dans [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) :
+  `image-serveur` (dépend des tests `serveur`) et `image-site` (dépend des tests
+  `controle`). Une image ne part jamais sans que ses tests soient passés.
+- Images publiées : `ghcr.io/sashimee/bus-api` (le serveur) et `ghcr.io/sashimee/bus-site`
+  (le site), chacune étiquetée `latest` et `sha-<commit>`.
 - Fichier monté par Dokploy : [`compose.deploiement.yaml`](../compose.deploiement.yaml)
-  — qui **tire** l'image (`image:`) et ne la construit pas (`build:`), à la différence
-  du `compose.yaml` local, réservé au développement et aux tests.
+  — qui **tire** les images (`image:`) et ne les construit pas (`build:`), à la
+  différence du `compose.yaml` local, réservé au développement et aux tests.
+
+### Le routage : une origine, deux conteneurs
+
+Traefik répartit `app.schoulbus.lu` par priorité, sans ambiguïté :
+
+- `Host(app.schoulbus.lu) && PathPrefix(/api)` → `bus-api` (priorité 100) ;
+- `Host(app.schoulbus.lu)` → `bus-site` (priorité 1), tout ce que `/api` ne capte pas.
+
+Le site (`bus-site`) est **purement statique** : il ne touche ni la base ni aucun
+secret, et ne tient que sur le réseau de Traefik. L'origine et le chemin de base y sont
+figés au moment du build (Vite les inline dans le JavaScript) — c'est pourquoi
+`Dockerfile.site` reçoit `BASE_PATH=/` et `VITE_URL_API=https://app.schoulbus.lu/api` en
+`ARG`, et non en variables d'exécution : les poser dans le compose n'aurait aucun effet.
 
 ## Mise en place, une fois
 

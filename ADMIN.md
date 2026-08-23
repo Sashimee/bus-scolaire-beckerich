@@ -246,7 +246,7 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 | Variable | Rôle | Sans elle |
 | --- | --- | --- |
 | `DATABASE_URL` | Connexion PostgreSQL | Le serveur démarre quand même, et `/api/sante` répond `"base": false` — c'est voulu : un conteneur qui redémarre en boucle ne dit pas ce qui lui manque. |
-| `ORIGINES_AUTORISEES` | Les origines qui ont le droit d'appeler le serveur, séparées par des virgules | Aucune origine n'est autorisée. Le serveur le dit au démarrage. |
+| `ORIGINES_AUTORISEES` | Les origines qui ont le droit d'appeler le serveur, séparées par des virgules. Pendant la transition, **les deux** : `https://sashimee.github.io,https://app.schoulbus.lu` — le site de Pages (repli) comme celui de la VPS doivent pouvoir appeler l'API. Une fois Pages retiré, `https://app.schoulbus.lu` seule suffit. | Aucune origine n'est autorisée. Le serveur le dit au démarrage. |
 | `URL_API_PUBLIQUE` | L'origine publique, pour fabriquer le `redirect_uri` d'OAuth | Déduite des en-têtes du proxy — ce qui produit `http://bus-api:3000/…` et un échange refusé sans qu'on comprenne pourquoi. **À poser.** |
 | `VAPID_JWK`, `CONTACT_VAPID` | Notifications | `/api/sante` répond `"push": false` avec le motif. |
 | `SECRET_SESSION`, `GITHUB_PAT` | Espaces commune et traductions | Ils répondent 503, et le reste fonctionne. |
@@ -265,7 +265,10 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 
 **d. Les variables de dépôt GitHub.** `Settings → Secrets and variables → Actions` :
 variables `URL_API` (`https://app.schoulbus.lu/api`), `CLE_VAPID`, `ID_CLIENT_GOOGLE` ;
-secret `SECRET_NOTIFICATION`, le même que côté serveur.
+secret `SECRET_NOTIFICATION`, le même que côté serveur. Ces variables servent aux deux
+constructions du site — celle de GitHub Pages (repli) et l'image `bus-site` de la VPS.
+`URL_PUBLIQUE` est facultative : sans elle, l'image `bus-site` se déclare sous
+`https://app.schoulbus.lu`, ce qui est le cas voulu.
 
 **e. Contrôler.**
 

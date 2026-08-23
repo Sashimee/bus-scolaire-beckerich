@@ -1,11 +1,13 @@
 name: Déploiement — site et image du serveur
 
-# Chaque push sur main fait deux choses indépendantes :
+# Chaque push sur main fait, en parallèle :
 #  - met à jour le site sur GitHub Pages ET la webapp installée chez les parents (le
-#    service worker détecte la nouvelle version et propose le rechargement) ;
-#  - construit et pousse l'image du serveur sur GHCR, que Dokploy tire ensuite sur la
-#    VPS. Ainsi l'image qui tourne en production est CELLE que les tests ont validée,
-#    jamais une seconde construction faite ailleurs. Voir `compose.deploiement.yaml`.
+#    service worker détecte la nouvelle version et propose le rechargement) — filet de
+#    repli le temps de la transition vers app.schoulbus.lu ;
+#  - construit et pousse DEUX images sur GHCR, que Dokploy tire ensuite sur la VPS :
+#    `bus-api` (le serveur) et `bus-site` (le site sous app.schoulbus.lu, lot 23).
+#    Ainsi ce qui tourne en production est CE que les tests ont validé, jamais une
+#    seconde construction faite ailleurs. Voir `compose.deploiement.yaml`.
 on:
   push:
     branches: [main]
@@ -170,5 +172,54 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  image-site:
+    name: Image du site (GHCR)
+    # Gardée par les tests de l'application, comme l'image du serveur l'est par les
+    # siens. C'est l'image qui sert app.schoulbus.lu (lot 23) ; le déploiement Pages
+    # ci-dessus reste vivant en parallèle, le temps de la transition.
+    needs: controle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Connexion à GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Étiquettes de l'image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/bus-site
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+      - name: Construire et pousser
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.site
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # L'origine et le chemin de base sont FIGÉS dans l'image, Vite les inlinant au
+          # build. Cette image est celle d'app.schoulbus.lu, à la racine — d'où
+          # `BASE_PATH=/`, distinct du `/bus-scolaire-beckerich/` du build Pages. Les
+          # clés publiques viennent des variables de dépôt, comme pour Pages.
+          build-args: |
+            BASE_PATH=/
+            URL_PUBLIQUE=${{ vars.URL_PUBLIQUE || 'https://app.schoulbus.lu' }}
+            VITE_URL_API=${{ vars.URL_API || 'https://app.schoulbus.lu/api' }}
+            VITE_CLE_VAPID=${{ vars.CLE_VAPID }}
+            VITE_ID_CLIENT_GOOGLE=${{ vars.ID_CLIENT_GOOGLE }}
+            GITHUB_SHA=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

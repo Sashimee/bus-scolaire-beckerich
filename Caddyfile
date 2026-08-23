@@ -1,0 +1,31 @@
+# Sert le site construit, sous app.schoulbus.lu, à côté de l'API (même origine).
+#
+# Caddy écoute en clair sur :8080 dans le conteneur : c'est Traefik, devant, qui porte
+# le TLS et le certificat (voir compose.deploiement.yaml). Doubler le HTTPS ici ne
+# ferait que déchiffrer puis rechiffrer pour rien.
+:8080 {
+	root * /srv
+	encode gzip zstd
+
+	# Ce que la balise <meta> ne peut PAS poser, et que GitHub Pages ne permettait pas
+	# non plus faute d'en-têtes HTTP. `frame-ancestors` est ignorée en <meta> par
+	# spécification ; `X-Frame-Options` est son équivalent qui, lui, s'applique en
+	# en-tête — le site ne doit jamais s'ouvrir dans un cadre tiers. La CSP complète,
+	# elle, reste posée en <meta> par le build : la garder à un seul endroit évite deux
+	# politiques qui se contrediraient (le navigateur applique alors leur intersection,
+	# et une carte cassée est vite arrivée).
+	header {
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		# Caddy pose sa propre bannière `Server` ; rien n'oblige à annoncer le serveur.
+		-Server
+	}
+
+	# Routage côté client : une URL profonde (`/agenda`, `/limites`) n'est pas un
+	# fichier sur le disque. On sert le fichier s'il existe — les binaires hachés de
+	# Vite existent tous —, sinon `index.html`, à charge pour React Router de résoudre
+	# la route. Sans ce repli, un rechargement sur une route interne rendrait un 404.
+	try_files {path} /index.html
+	file_server
+}
