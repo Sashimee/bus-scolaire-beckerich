@@ -2495,8 +2495,18 @@ n'atteindrait plus les parents. Ordre :
    déplace pas hors du Luxembourg), l'auteur étant celui de la session. La LECTURE était
    déjà faite en tranche 2 (les corrections viennent de `/urgences`). L'éditeur vient en
    tranche 7. 4 tests (157 serveur).
-7. Consolidation de l'authentification : replier `/commune` et `/traductions` sur les
-   capacités, retirer `/admin` et le chemin GitHub entier.
+7. Consolidation, en deux temps :
+   - **7a (fait) — le SERVEUR quitte GitHub.** `serveur/src/github.ts` supprimé (plus
+     personne ne l'importait : perturbations, traductions, horaires et crédits écrivent
+     tous en base) ; `/sante` perd le champ `depot` ; la santé `commune` ne dépend plus
+     que de `SECRET_SESSION` ; `GITHUB_PAT` retiré du compose et d'ADMIN.md. Le serveur
+     n'écrit plus une ligne dans le dépôt.
+   - **7b (à faire) — le CLIENT quitte GitHub.** Retirer `/admin` (page + `src/lib/github.ts`
+     client + `AdminArrets`/`AdminPlan`), construire les éditeurs de crédits et de
+     corrections d'arrêts gardés par capacité (les endpoints existent, tranches 4 et 6),
+     retirer `api.github.com` de la CSP, et — plus tard — replier `/commune` et
+     `/traductions` sur les capacités. L'OAuth GitHub (`authentification-github.ts`,
+     `GITHUB_CLIENT_ID/SECRET`) tombe avec `/admin`.
 
 ### Réserves attendues
 
@@ -2505,4 +2515,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–6 faites ; reste la consolidation (7) : éditeurs, retrait de `/admin`, suppression de `github.ts`.*
+*Dépend des lots 21–24. Tranches 1–6 et 7a faites ; reste 7b : retrait du `/admin` client, éditeurs par capacité, CSP.*

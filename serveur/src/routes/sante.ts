@@ -8,7 +8,6 @@
  */
 import type { Hono } from 'hono'
 import { base64urlEncode, importerClesVapid } from '../push.js'
-import { etatDepot } from '../github.ts'
 import { courrielConfigure } from '../courriel.ts'
 import { base, baseConfiguree } from '../stockage/client.ts'
 
@@ -49,17 +48,13 @@ export function monterSante(app: Hono): void {
       oauth: Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
       ...(await santePush()),
       ...(await santeBase()),
-      commune: Boolean(process.env.SECRET_SESSION && process.env.GITHUB_PAT),
+      commune: Boolean(process.env.SECRET_SESSION),
       // Comptes utilisateurs (lot 24) : le secret qui signe les jetons suffit à activer
       // l'espace ; `courriel` dit à part si vérification et réinitialisation peuvent
       // partir — un espace comptes sans relai ne peut créer aucun compte activable.
       comptes: Boolean(process.env.SECRET_SESSION),
       courriel: courrielConfigure(),
       google: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      // Que le jeton machine soit POSÉ ne dit pas qu'il fonctionne. Sans cette ligne,
-      // un jeton révoqué ou sans droit d'écriture ne se manifestait qu'au moment d'une
-      // vraie publication, sous la forme d'une erreur illisible.
-      depot: await etatDepot(),
       rappels: Boolean(process.env.URL_SITE),
       origines: process.env.ORIGINES_AUTORISEES ?? '',
     })

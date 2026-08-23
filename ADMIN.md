@@ -249,8 +249,7 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 | `ORIGINES_AUTORISEES` | Les origines qui ont le droit d'appeler le serveur, séparées par des virgules. Pendant la transition, **les deux** : `https://sashimee.github.io,https://app.schoulbus.lu` — le site de Pages (repli) comme celui de la VPS doivent pouvoir appeler l'API. Une fois Pages retiré, `https://app.schoulbus.lu` seule suffit. | Aucune origine n'est autorisée. Le serveur le dit au démarrage. |
 | `URL_API_PUBLIQUE` | L'origine publique, pour fabriquer le `redirect_uri` d'OAuth | Déduite des en-têtes du proxy — ce qui produit `http://bus-api:3000/…` et un échange refusé sans qu'on comprenne pourquoi. **À poser.** |
 | `VAPID_JWK`, `CONTACT_VAPID` | Notifications | `/api/sante` répond `"push": false` avec le motif. |
-| `SECRET_SESSION`, `GITHUB_PAT` | Espaces commune et traductions | Ils répondent 503, et le reste fonctionne. |
-| `SECRET_NOTIFICATION` | Envoi déclenché depuis GitHub Actions | `/api/notifier` répond 401. |
+| `SECRET_SESSION` | Espaces commune, traductions ET comptes (il signe les jetons de session) | Ils répondent 503, et le reste fonctionne. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Relais Google Agenda | L'intégration disparaît de l'interface, l'export `.ics` reste. |
 | `URL_SITE` | Site publié, relu pour les rappels ; sert aussi de base aux liens d'activation et de réinitialisation des comptes | Aucun rappel n'est programmé ; les liens de compte seraient malformés. |
 | `SMTP_HOTE`, `SMTP_PORT`, `SMTP_EXPEDITEUR` | Relai courriel pour les comptes utilisateurs (vérification, réinitialisation) — vise le conteneur de relai sur le réseau interne | La création de compte et la réinitialisation répondent 503 avec un motif clair ; la connexion aux comptes existants marche quand même. `SMTP_TLS`, `SMTP_UTILISATEUR`, `SMTP_MOTDEPASSE` sont facultatifs. |
@@ -277,10 +276,9 @@ l'image `bus-site` de la VPS.
 curl https://app.schoulbus.lu/api/sante
 ```
 
-`"base"`, `"push"`, `"commune"` et `"depot"` doivent tous être au vert. `"commune": true`
-dit que les secrets sont posés ; `"depot": {"urgences":"ok"}` dit qu'ils fonctionnent.
-Un jeton révoqué passe le premier et échoue le second — c'est exactement pour cela que
-les deux sont là.
+`"base"`, `"push"` et `"commune"` doivent être au vert. Depuis le lot 25, la publication
+ne passe plus par le dépôt : il n'y a plus de champ `"depot"`, plus de `GITHUB_PAT`, tout
+s'écrit en base.
 
 ### Reprendre l'état de l'ancien serveur
 

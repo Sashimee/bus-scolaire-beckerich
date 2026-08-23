@@ -93,10 +93,6 @@ services:
       SMTP_TLS: ${SMTP_TLS:-}
       SMTP_UTILISATEUR: ${SMTP_UTILISATEUR:-}
       SMTP_MOTDEPASSE: ${SMTP_MOTDEPASSE:-}
-      # Publication vers le dépôt, conservée à l'identique jusqu'au lot 24 (où la
-      # publication cessera de passer par GitHub). Le jeton machine, fine-grained,
-      # Contents: RW sur ce seul dépôt.
-      GITHUB_PAT: ${GITHUB_PAT:?}
     depends_on:
       bus-postgres:
         condition: service_healthy
