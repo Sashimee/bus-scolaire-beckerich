@@ -261,7 +261,7 @@ describe.skipIf(!avecBase)('espace non configuré', () => {
  * connectés en même temps de se recouvrir — un incident réel, corrigé le 2026-08-09.
  *
  * Ces tests remplacent GitHub par un fichier en mémoire : ce qui est vérifié, c'est
- * la fusion, pas l'API de GitHub. Au lot 24, la même propriété devra être retenue
+ * la fusion, pas l'API de GitHub. Au lot 25, la même propriété devra être retenue
  * sous une transaction PostgreSQL, et ces tests devront continuer de passer.
  */
 describe.skipIf(!avecBase)('relecture avant écriture', () => {

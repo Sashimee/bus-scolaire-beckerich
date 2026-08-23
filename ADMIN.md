@@ -252,7 +252,8 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 | `SECRET_SESSION`, `GITHUB_PAT` | Espaces commune et traductions | Ils répondent 503, et le reste fonctionne. |
 | `SECRET_NOTIFICATION` | Envoi déclenché depuis GitHub Actions | `/api/notifier` répond 401. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Relais Google Agenda | L'intégration disparaît de l'interface, l'export `.ics` reste. |
-| `URL_SITE` | Site publié, relu pour les rappels | Aucun rappel n'est programmé. |
+| `URL_SITE` | Site publié, relu pour les rappels ; sert aussi de base aux liens d'activation et de réinitialisation des comptes | Aucun rappel n'est programmé ; les liens de compte seraient malformés. |
+| `SMTP_HOTE`, `SMTP_PORT`, `SMTP_EXPEDITEUR` | Relai courriel pour les comptes utilisateurs (vérification, réinitialisation) — vise le conteneur de relai sur le réseau interne | La création de compte et la réinitialisation répondent 503 avec un motif clair ; la connexion aux comptes existants marche quand même. `SMTP_TLS`, `SMTP_UTILISATEUR`, `SMTP_MOTDEPASSE` sont facultatifs. |
 | `NB_PROXYS_FIABLES` | Nombre de relais devant le serveur (défaut : 1) | Voir ci-dessous — **c'est le réglage le plus silencieux de tous**. |
 
 > **`NB_PROXYS_FIABLES` mérite qu'on s'y arrête.** L'adresse du client est lue dans
@@ -297,6 +298,39 @@ expiré avant la fin de la bascule.
 
 Le seul contrôle qui prouve quelque chose est de **se connecter à `/commune` avec un
 vrai code d'agent**. Compter les lignes ne suffit pas.
+
+### Amorcer les comptes utilisateurs
+
+Depuis le lot 24, un agent peut se connecter par **compte (courriel + mot de passe)**,
+avec des **capacités** — `perturbations`, `arrets`, `horaires`, `traductions`,
+`credits`, `comptes` (gérer les comptes eux-mêmes). C'est optionnel : sans
+`SECRET_SESSION`, l'espace est éteint et l'application parent tourne comme avant.
+
+Le premier administrateur ne peut pas être créé depuis l'application — il n'y a encore
+personne pour le créer. On l'amorce par la CLI, sur la VPS (un terminal Dokploy sur le
+service `bus-api`, ou un conteneur jetable sur le réseau interne) :
+
+```bash
+DATABASE_URL=… node serveur/creer-utilisateur.mjs "agent@ville.lu" "Marie Weber" comptes
+```
+
+Le compte naît **déjà vérifié** (l'opérateur en répond) avec un mot de passe tiré au
+hasard, **affiché une seule fois**. Ensuite, toute personne portant `comptes` crée et
+gère les autres depuis l'application (l'interface web arrive au lot suivant ; d'ici là,
+l'espace répond à l'API). Les comptes créés dans l'application reçoivent un **lien
+d'activation** par courriel qui pose leur mot de passe et vérifie leur adresse d'un même
+geste — d'où l'exigence d'un relai SMTP configuré (voir le tableau des variables).
+
+En secours, sans relai ou pour une personne verrouillée dehors :
+
+```bash
+DATABASE_URL=… node serveur/creer-utilisateur.mjs --lister
+DATABASE_URL=… node serveur/creer-utilisateur.mjs --mot-de-passe "agent@ville.lu"
+DATABASE_URL=… node serveur/creer-utilisateur.mjs --desactiver "agent@ville.lu"
+```
+
+> On ne peut ni se retirer à soi-même la capacité `comptes`, ni se désactiver soi-même :
+> la dernière personne à pouvoir gérer les comptes ne peut pas se verrouiller dehors.
 
 ### Si les notifications ne partent pas
 

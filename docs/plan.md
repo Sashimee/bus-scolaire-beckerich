@@ -2296,3 +2296,136 @@ origine, un autre service worker.
 
 *Dépend des lots 21 et 22 (le serveur doit répondre sous `app.schoulbus.lu/api`). Le lot
 24 en dépend : il retire la publication par GitHub, une fois l'origine propre en place.*
+
+---
+
+## Lot 24 — Comptes utilisateurs et rôles (2026-08-23)
+
+> **Fait le 2026-08-23 (côté serveur).** L'authentification par compte est en place et
+> testée de bout en bout par l'API. **L'interface web** — écran de connexion, « mon
+> compte », gestion des comptes, pages `/reinitialiser` — reste la tranche suivante ;
+> l'opérateur amorce d'abord un administrateur par la CLI, et tout l'espace répond au
+> `curl`. La migration des données et le retrait de `/admin` restent le lot 25. Ce lot
+> est né en cours de route :
+> retirer l'espace `/admin` (qui publiait par un jeton GitHub personnel) laissait sans
+> foyer l'édition des **corrections d'arrêts** et des **crédits**, que `/commune` ne
+> savait pas faire. Plutôt que de bricoler deux barrières de plus, on pose une vraie
+> **authentification par compte**, à rôles, sur laquelle tout le reste s'appuiera.
+>
+> **Réordonnancement du plan.** Ce lot s'insère à 24 ; les suivants glissent d'un rang :
+> l'ancien lot 24 (publication en base) devient **25**, le journal de livraison des
+> rappels **26**, la mesure auto-hébergée **27–28**. Les commentaires du code qui
+> pointaient « lot 24 » pour la fin de la publication GitHub sont corrigés en « lot 25 ».
+
+### Pourquoi des comptes, alors que `/commune` est déjà une connexion à rôle
+
+`/commune` **est** déjà une connexion à rôle : code personnel → empreinte SHA-256
+comparée à temps constant → jeton de session signé portant un `role`, revérifié à chaque
+route, avec deux tables (`agent_commune`, `agent_traduction`) aux espaces de codes
+disjoints. Ce qui manque n'est pas l'idée, c'est la **généralité** : deux rôles figés,
+codés en dur, et aucun moyen de dire « cette personne peut corriger un arrêt mais pas
+annuler un bus ». Le lot remplace les deux rôles figés par un modèle **capacités par
+utilisateur**, et le code personnel par un **compte courriel + mot de passe** — un vrai
+identifiant réutilisable, avec vérification d'adresse et réinitialisation.
+
+### Décisions prises (2026-08-23)
+
+| Sujet | Décision |
+| --- | --- |
+| Identifiant | **Courriel + mot de passe.** |
+| Hachage | **argon2id**, paquet `@node-rs/argon2` (binaires musl préconstruits — s'installe dans `node:22-alpine` sans chaîne de compilation ; le paquet `argon2` de référence, lui, compile depuis les sources). |
+| Courriels | **Vérification d'adresse ET liens de réinitialisation**, envoyés en **SMTP** (`nodemailer`) vers le **relai courriel** déjà présent en conteneur sur la VPS — hôte/port/expéditeur par variables d'environnement, le relai fait la livraison réelle. |
+| Création de comptes | **CLI `creer-utilisateur.mjs`** amorce le premier administrateur (capacité `comptes`) ; ensuite, toute personne portant `comptes` crée, modifie et désactive les comptes depuis l'application. Pas d'inscription ouverte. |
+| Capacités | Un compte porte un sous-ensemble de `{ perturbations, arrets, horaires, traductions, credits, comptes }`. Le jeton de session porte l'ensemble ; chaque route d'édition exige UNE capacité. Cela subsume les deux rôles actuels (`commune` = perturbations + horaires ; `traduction` = traductions). |
+| Optionnel | Comme `SECRET_SESSION` aujourd'hui : sans configuration, l'espace de connexion répond « non configuré » et **l'application parent tourne intégralement sans**. Aucun parent ne se connecte jamais. |
+| Session | Réemploi de `crypto.ts` (`signerJeton`/`verifierJeton`), le jeton portant désormais l'identifiant du compte et ses capacités. |
+
+### Réglages retenus (2026-08-23, « tout ce qui a été suggéré »)
+
+- **Vérification d'adresse obligatoire pour agir.** Un compte créé dans l'application
+  reçoit un courriel de vérification et **ne peut pas se connecter tant qu'il n'a pas
+  vérifié**. Le premier administrateur, créé par la CLI, naît **déjà vérifié** :
+  l'opérateur en répond.
+- **Session 8 h**, comme `/commune`. Une case « rester connecté » à la connexion la
+  porte à **30 jours** — le seul réglage qui change la durée signée dans le jeton.
+- **Mot de passe : 10 caractères au minimum.** argon2id fait le reste ; on ne réclame
+  ni chiffre ni majuscule (une règle de composition pousse aux mots de passe faibles et
+  notés sur un papier), seulement de la longueur.
+- **Champs du compte** : `courriel`, `nom`, `capacites`, `service` (facultatif),
+  `langue` (des courriels qu'il reçoit, `fr` par défaut), `courriel_verifie`,
+  `desactive`. Rien de plus — ni téléphone, ni donnée qui ne serve pas.
+- **Pas de 2FA.** La limitation de débit partagée avec `/commune` suffit à l'échelle
+  d'une poignée d'agents ; une seconde barrière serait du zèle non mesuré.
+- **Activation par `SECRET_SESSION`**, déjà là : c'est le secret qui signe les jetons.
+  Sans lui, l'espace comptes répond « non configuré », comme `/commune`. Le SMTP a ses
+  propres variables (`SMTP_HOTE`, `SMTP_PORT`, `SMTP_EXPEDITEUR`), et sans elles la
+  vérification et la réinitialisation sont refusées avec un motif clair plutôt
+  qu'échouées en silence.
+- **Les codes `/commune` actuels ne sont pas migrés** : les deux systèmes cohabitent
+  jusqu'au lot 25, qui repliera l'un sur l'autre.
+
+### Schéma (migration 002)
+
+- **`utilisateur`** — `courriel` (clé), `mot_de_passe_hash` (argon2id), `nom`,
+  `capacites` (jsonb, liste), `service` (texte, défaut vide), `langue` (texte, défaut
+  `fr`), `courriel_verifie` (bool), `desactive` (bool), `cree_le`, `dernier_acces`. Le
+  mot de passe n'est jamais stocké en clair, jamais journalisé.
+- Les **jetons de vérification et de réinitialisation** ne prennent pas de table : ils
+  vivent dans `ephemere`, avec `expire_le` — vérification 24 h, réinitialisation 1 h.
+  C'est exactement ce que la table sait faire, et l'expiration y est filtrée à la
+  lecture, jamais laissée à un balayage.
+
+### Serveur
+
+- `comptes/argon.ts` — envelopper `@node-rs/argon2` (hachage, vérification à temps
+  constant), rien de plus.
+- `courriel.ts` — un seul point d'envoi SMTP, testable à sec (un transport de journal
+  en test, le vrai relai en production). C'est la SEULE brique qui parle à l'extérieur ;
+  elle s'isole comme `push.js` s'isole.
+- Routes `/comptes/*` : `connexion`, `deconnexion`, `moi`, `mot-de-passe-oublie`,
+  `reinitialiser`, `verifier-courriel`, `changer-mot-de-passe`, et — sous la capacité
+  `comptes` — `lister`, `creer`, `modifier`, `desactiver`.
+- `exigerCapacite(c, capacite)` remplace `exigerAgent(c, role)`, sur le même modèle
+  d'appel-en-tête-de-route (pas d'intergiciel dont la portée dépend de l'ordre).
+- Limitation de débit : la connexion et la demande de réinitialisation passent par le
+  même seau que `/commune` aujourd'hui — sinon la connexion la plus récente devient la
+  porte de toutes les autres.
+
+### Ce qui N'est PAS dans ce lot
+
+La **migration des données** en base (perturbations, traductions, horaires, crédits,
+corrections d'arrêts) et le retrait de `/admin` et du chemin GitHub restent le **lot
+25**. Ce lot-ci ne fait que poser l'authentification : à sa fin, on peut créer un
+compte, se connecter, vérifier son adresse, réinitialiser son mot de passe et gérer les
+comptes — mais rien de neuf ne se publie encore par ce biais. Les deux espaces `/commune`
+et `/traductions` continuent de fonctionner comme avant, en parallèle, jusqu'à ce que le
+lot 25 les replie sur les capacités.
+
+### Ce qui a été construit et prouvé
+
+- Migration `002-comptes.sql` (table `utilisateur`), argon2id (`@node-rs/argon2`),
+  `courriel.ts` (SMTP nodemailer, mode capture en test), routes `/comptes/*`, la
+  capacité lue **en base** à chaque requête (désactiver prend effet tout de suite), le
+  garde-fou anti-auto-verrouillage, et la CLI `creer-utilisateur.mjs`.
+- **25 tests de bout en bout** contre une vraie base (134 cas au total côté serveur, vs
+  109) : connexion, refus indistinct inconnu/mauvais/désactivé, non-vérifié qui se dit,
+  débit, activation par lien, réinitialisation à usage unique, capacité accordée sans
+  reconnexion, auto-verrouillage refusé.
+- **La vérification, non la seule vérification** : l'activation d'un compte pose le mot
+  de passe ET vérifie l'adresse d'un même geste — ouvrir le lien reçu par courriel
+  prouve le contrôle de la boîte. Il n'y a donc pas de courriel de vérification distinct.
+
+### Réserves
+
+- **R44 — le relai courriel n'a jamais reçu d'envoi depuis ce serveur.** En test, le
+  courriel est en mode capture ; aucun vrai SMTP n'a été devant. À éprouver au premier
+  déploiement : une inscription réelle, un courriel de vérification reçu, un lien qui
+  active. Sans relai configuré, la création de compte et la réinitialisation sont
+  refusées avec un motif clair — ce n'est donc pas une panne silencieuse, mais ce n'est
+  pas non plus une preuve que ça marche.
+- ~~argon2id via `@node-rs/argon2` dans l'image musl~~ **Levée le 2026-08-23** :
+  l'image `alpine` construite, le binaire chargé, un `hash`+`verify` passé dedans, et
+  `/api/sante` répond `"comptes": true`.
+
+*Dépend des lots 21–23 (serveur en base, sous `app.schoulbus.lu`, courriel relayé sur
+le réseau interne). Le lot 25 en dépend : c'est lui qui gréera les capacités.*

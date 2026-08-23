@@ -23,6 +23,7 @@ import { monterAbonnements } from './routes/abonnements.ts'
 import { monterGoogle } from './routes/google.ts'
 import { monterNotifier } from './routes/notifier.ts'
 import { monterCommune, monterTraductions } from './routes/commune.ts'
+import { monterComptes } from './routes/comptes.ts'
 import { demarrerPlanificateur } from './planificateur.ts'
 import { baseConfiguree, fermerBase, migrer } from './stockage/client.ts'
 
@@ -40,7 +41,11 @@ import { baseConfiguree, fermerBase, migrer } from './stockage/client.ts'
 export function aJeton(chemin: string, base = process.env.BASE_API ?? '/api'): boolean {
   const prefixe = base.replace(/\/$/, '')
   const relatif = prefixe && chemin.startsWith(prefixe) ? chemin.slice(prefixe.length) : chemin
-  return relatif.startsWith('/commune/') || relatif.startsWith('/traductions/')
+  return (
+    relatif.startsWith('/commune/') ||
+    relatif.startsWith('/traductions/') ||
+    relatif.startsWith('/comptes/')
+  )
 }
 
 export function creerApplication(): Hono {
@@ -84,6 +89,7 @@ export function creerApplication(): Hono {
   // monter en dernier laisserait `notFound` les rattraper si un préfixe changeait.
   monterCommune(api)
   monterTraductions(api)
+  monterComptes(api)
 
   const app = new Hono()
   app.route(process.env.BASE_API ?? '/api', api)

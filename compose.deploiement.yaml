@@ -79,6 +79,20 @@ services:
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+
+      # Comptes utilisateurs (lot 24). L'espace comptes s'active avec SECRET_SESSION
+      # (déjà là) ; le SMTP ci-dessous lui permet d'ENVOYER les courriels de vérification
+      # et de réinitialisation. Vise le conteneur de relai courriel sur le réseau interne
+      # (`bus-site` et `bus-api` ne le voient pas — le relai est joint par son nom de
+      # service). Sans SMTP_HOTE, la création de compte et la réinitialisation sont
+      # refusées avec un motif clair plutôt qu'échouées en silence.
+      SMTP_HOTE: ${SMTP_HOTE:-}
+      SMTP_PORT: ${SMTP_PORT:-25}
+      SMTP_EXPEDITEUR: ${SMTP_EXPEDITEUR:-}
+      # Facultatifs : un relai interne n'exige en général ni TLS ni identifiant.
+      SMTP_TLS: ${SMTP_TLS:-}
+      SMTP_UTILISATEUR: ${SMTP_UTILISATEUR:-}
+      SMTP_MOTDEPASSE: ${SMTP_MOTDEPASSE:-}
       # Publication vers le dépôt, conservée à l'identique jusqu'au lot 24 (où la
       # publication cessera de passer par GitHub). Le jeton machine, fine-grained,
       # Contents: RW sur ce seul dépôt.

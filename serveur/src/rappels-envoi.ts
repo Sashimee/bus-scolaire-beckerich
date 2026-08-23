@@ -6,7 +6,7 @@
  * les états, envoyer, réécrire les états.
  *
  * C'est la chaîne visée par la réserve R7 : elle a été corrigée une fois mais jamais
- * exercée un vrai matin d'école. Le lot 25 lui ajoutera un journal de livraison, sans
+ * exercée un vrai matin d'école. Le lot 26 lui ajoutera un journal de livraison, sans
  * lequel il n'existe aucun moyen de VOIR ce qui est parti à 06:45.
  */
 import { rappelsDus } from './rappels.js'
@@ -32,7 +32,7 @@ const TITRES: Record<string, string> = {
  * On lit le fichier tel qu'il est servi aux parents, et non le dépôt : c'est
  * exactement ce qu'ils voient, et cela n'exige aucun jeton.
  *
- * Au lot 24, cette lecture deviendra une requête sur la table `perturbation` — et le
+ * Au lot 25, cette lecture deviendra une requête sur la table `perturbation` — et le
  * détour par le site publié disparaîtra avec elle.
  */
 async function lireUrgencesPubliees(): Promise<any[]> {

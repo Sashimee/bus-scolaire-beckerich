@@ -39,7 +39,7 @@ la commune ni avec l'école**.
 | `src/composants/`, `src/pages/` | Affichage uniquement. Aucune règle métier. |
 | `src/data/` | Toutes les données : plan de bus, arrêts, écoles, vacances, adresses. |
 | `src/i18n/` | Dictionnaires de traduction. |
-| `serveur/` | Serveur Node (Hono + PostgreSQL), conteneurisé : OAuth GitHub, abonnements, envoi des notifications push, espaces commune et traductions. |
+| `serveur/` | Serveur Node (Hono + PostgreSQL), conteneurisé : OAuth GitHub, abonnements, envoi des notifications push, espaces commune et traductions, comptes utilisateurs à capacités (courriel + mot de passe argon2id, `src/comptes/`, `src/routes/comptes.ts`, `creer-utilisateur.mjs`). |
 | `serveur/src/migrations/` | Schéma de la base, en fichiers `.sql` numérotés, appliqués au démarrage. Ajouter une migration : créer le fichier **et** l'inscrire dans `migrations/index.ts`. |
 | `public/urgences.json` | Perturbations ponctuelles, relues à chaque ouverture, hors bundle. |
 
@@ -84,9 +84,10 @@ implémentation des règles de validation aurait divergé au premier ajustement.
 
 ## Documentation
 
-- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 23 sont
-  faits ; les lots 24 à 27 portent la suite du passage sur VPS Dokploy (publication
-  sans détour par GitHub, mesure auto-hébergée). **À consulter avant d'entamer une
+- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 24 sont
+  faits (le lot 24, comptes utilisateurs à capacités, l'est côté serveur ; son interface
+  web reste à faire) ; les lots 25 à 28 portent la suite (publication sans détour par
+  GitHub, journal des rappels, mesure auto-hébergée). **À consulter avant d'entamer une
   évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section

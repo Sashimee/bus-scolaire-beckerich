@@ -15,6 +15,15 @@ export async function empreinte(texte: string): Promise<string> {
 }
 
 /**
+ * Un jeton opaque, imprévisible : 32 octets tirés au hasard, en base64url. Sert aux
+ * liens de vérification d'adresse et de réinitialisation, qui ne sont devinables par
+ * personne — c'est leur seule protection, puisque les connaître suffit à s'en servir.
+ */
+export function jetonAleatoire(): string {
+  return base64url(crypto.getRandomValues(new Uint8Array(32)))
+}
+
+/**
  * Comparaison à temps constant.
  *
  * Un `===` sur deux chaînes s'arrête au premier caractère différent : le temps de
@@ -53,6 +62,11 @@ export interface ChargeJeton {
   service: string
   role: string
   expire: number
+  // Comptes utilisateurs (lot 24). Absents sur les jetons des espaces à code personnel,
+  // qui n'ont qu'un `role` ; présents sur les jetons de compte, qui portent un courriel
+  // et un ensemble de capacités signé — donc non modifiable par le porteur.
+  courriel?: string
+  capacites?: string[]
 }
 
 /** Jeton de session signé : `charge.signature`, tous deux en base64url. */

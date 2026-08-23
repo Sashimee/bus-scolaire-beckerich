@@ -5,7 +5,7 @@
  * la réponse `507 trop-abonnes` et le plafond d'environ 450 abonnés par envoi. Il n'y
  * a plus qu'une route.
  *
- * **Cette route a elle aussi une date de péremption : le lot 24.** Quand les
+ * **Cette route a elle aussi une date de péremption : le lot 25.** Quand les
  * perturbations vivront en base, la publication et l'envoi seront la même opération,
  * dans la même transaction, et `SECRET_NOTIFICATION` disparaîtra avec le workflow
  * `notifier.yml`.

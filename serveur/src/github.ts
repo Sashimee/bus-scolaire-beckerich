@@ -4,7 +4,7 @@
  * Le jeton employé est `GITHUB_PAT`, un jeton machine *fine-grained* limité au contenu
  * de CE dépôt. Aucun agent communal ne le voit ni ne le manipule.
  *
- * **Ce module a une date de péremption : le lot 24.** Quand les perturbations, la
+ * **Ce module a une date de péremption : le lot 25.** Quand les perturbations, la
  * surcouche de traduction et les horaires vivront en base, plus rien n'aura besoin
  * d'écrire dans le dépôt, et `GITHUB_PAT` disparaîtra avec lui. Il est repris ici
  * parce que le lot 21 change d'hébergement et rien d'autre : mélanger les deux

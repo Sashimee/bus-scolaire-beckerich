@@ -17,8 +17,12 @@ await build({
   format: 'esm',
   sourcemap: true,
   loader: { '.sql': 'text' },
-  // `postgres` charge des modules natifs par chemin calculé : le laisser hors du
-  // paquet évite qu'esbuild ne les manque en silence.
-  external: ['postgres'],
+  // Laissés hors du paquet, et installés dans l'image d'exécution par `npm ci` :
+  //  — `postgres` charge des modules par chemin calculé ;
+  //  — `@node-rs/argon2` charge un binaire natif `.node` propre à la plateforme, qu'un
+  //    paquet ne peut pas embarquer ;
+  //  — `nodemailer` résout des transports par nom à l'exécution.
+  // Les empaqueter les ferait manquer en silence, à l'exécution seulement.
+  external: ['postgres', '@node-rs/argon2', 'nodemailer'],
   logLevel: 'info',
 })

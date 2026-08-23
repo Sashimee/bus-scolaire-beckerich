@@ -9,7 +9,9 @@
  * Ajouter une migration : créer `00N-…​.sql` et l'ajouter à cette liste, dans l'ordre.
  */
 import initial from './001-initial.sql'
+import comptes from './002-comptes.sql'
 
 export const MIGRATIONS: readonly { nom: string; sql: string }[] = [
   { nom: '001-initial.sql', sql: initial },
+  { nom: '002-comptes.sql', sql: comptes },
 ]
