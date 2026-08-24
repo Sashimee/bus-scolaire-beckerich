@@ -120,3 +120,50 @@ l'image — après un simple changement de variable — le bouton de redéploiem
 suffit. Pour forcer une nouvelle image sans nouveau commit : `Actions → Déploiement →
 Run workflow`, puis redéployer côté Dokploy pour qu'il tire le `latest` fraîchement
 poussé.
+
+## Déploiement réel — 2026-08-24
+
+Premier déploiement en production, sur le vrai Dokploy (`dok.seil.pro`, projet
+**Schoulbus**, service Compose `bus-app`). **En service** sur `https://app.schoulbus.lu` :
+site à la racine, API sous `/api`, PostgreSQL interne, Traefik + certificat automatique.
+`/api/sante` répond `base/push/commune/comptes/courriel/rappels` au vert.
+
+Choix de ce premier jet, à connaître :
+
+- **Images construites sur la VPS**, pas tirées de GHCR (la CI n'avait pas encore publié).
+  Un redéploiement qui retire les images locales échouerait tant que GHCR n'est pas
+  peuplé : pousser sur `main` pour que la CI publie, ou reconstruire sur place.
+- **Départ à neuf** : aucune reprise des données de l'ancien Worker Cloudflare (réserve
+  R39 non levée, assumé). Pas d'abonnés ni de codes d'agents repris ; l'ancien Worker
+  tourne toujours, intact.
+- **Connexion GitHub et Google Agenda éteintes** (`oauth:false`, `google:false`) : aucun
+  identifiant OAuth posé. `/admin` en dépend et part au lot 25 (7b) de toute façon.
+- **SMTP** vers le conteneur `mailrelay`, expéditeur `noreply@schoulbus.lu`.
+
+### À faire pour rendre l'espace agents utilisable
+
+Le premier administrateur s'amorce par la CLI, qui n'est pas dans l'image (seul le paquet
+l'est) — on l'y copie le temps de l'exécuter, contre la base déjà branchée dans le
+conteneur :
+
+```bash
+C=compose-hack-neural-pixel-ai3w3f-bus-api-1
+sudo docker cp serveur/creer-utilisateur.mjs "$C:/app/creer-utilisateur.mjs"
+sudo docker exec "$C" node creer-utilisateur.mjs "alex.baskewitsch@gmail.com" "Alex" \
+  "comptes,perturbations,arrets,horaires,traductions,credits"
+sudo docker exec "$C" rm -f /app/creer-utilisateur.mjs
+```
+
+Le mot de passe s'affiche une seule fois. Se connecter ensuite sur
+`https://app.schoulbus.lu/connexion`.
+
+### Réserves encore ouvertes après ce déploiement
+
+- **R44 — le relai courriel n'a reçu aucun envoi réel.** `courriel:true` dit seulement
+  que le SMTP est configuré. À éprouver : créer un compte depuis `/comptes` et vérifier
+  que le courriel d'activation arrive (et que `noreply@schoulbus.lu` est bien un
+  expéditeur autorisé du relai).
+- **R40 — l'adresse client derrière Traefik.** `NB_PROXYS_FIABLES=1` (Traefik seul).
+  À éprouver : deux connexions échouées depuis deux réseaux différents ; la seconde ne
+  doit pas hériter du compteur de la première.
+- **R43 (reste)** — installer la PWA depuis `app.schoulbus.lu` sur un vrai appareil.
