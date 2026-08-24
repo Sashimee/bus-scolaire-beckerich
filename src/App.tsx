@@ -18,6 +18,7 @@ import { Credits } from './pages/Credits'
 import { Connexion } from './pages/Connexion'
 import { Comptes } from './pages/Comptes'
 import { Reinitialiser } from './pages/Reinitialiser'
+import { comptesConfigures } from './lib/comptes'
 
 export default function App() {
   const { t } = useT()
@@ -72,6 +73,10 @@ export default function App() {
             <Link to="/independance">{t('nav.independance')}</Link>
             <Link to="/credits">{t('nav.credits')}</Link>
             <Link to="/installer">{t('nav.installer')}</Link>
+            {/* L'entrée de l'espace agents/commune. Discrète, en pied, et seulement quand
+                un serveur est configuré — sinon elle ne mènerait qu'à un « non configuré ».
+                Ce n'est pas pour les parents, d'où le libellé explicite et la place en pied. */}
+            {comptesConfigures() && <Link to="/connexion">{t('comptes.titre')}</Link>}
           </nav>
           <p>{t('avertissement.independance')}</p>
           <p>
