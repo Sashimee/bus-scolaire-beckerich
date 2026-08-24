@@ -2436,9 +2436,9 @@ le réseau interne). Le lot 25 en dépend : c'est lui qui gréera les capacités
 
 ---
 
-## Lot 25 — Publication en base, sans détour par GitHub (en cours)
+## Lot 25 — Publication en base, sans détour par GitHub (2026-08-24)
 
-> **Commencé le 2026-08-23.** Le plus gros lot du passage : perturbations, corrections
+> **Fait le 2026-08-24** (commencé le 2026-08-23). Le plus gros lot du passage : perturbations, corrections
 > d'arrêts, surcouche de traduction, horaires et crédits quittent les fichiers du dépôt
 > pour la base, publiés par l'espace agents (aux capacités du lot 24) et servis par
 > l'API ; `/admin` et tout le chemin GitHub (`github.ts`, `notifier.ts`, `notifier.yml`,
@@ -2501,12 +2501,17 @@ n'atteindrait plus les parents. Ordre :
      tous en base) ; `/sante` perd le champ `depot` ; la santé `commune` ne dépend plus
      que de `SECRET_SESSION` ; `GITHUB_PAT` retiré du compose et d'ADMIN.md. Le serveur
      n'écrit plus une ligne dans le dépôt.
-   - **7b (à faire) — le CLIENT quitte GitHub.** Retirer `/admin` (page + `src/lib/github.ts`
-     client + `AdminArrets`/`AdminPlan`), construire les éditeurs de crédits et de
-     corrections d'arrêts gardés par capacité (les endpoints existent, tranches 4 et 6),
-     retirer `api.github.com` de la CSP, et — plus tard — replier `/commune` et
-     `/traductions` sur les capacités. L'OAuth GitHub (`authentification-github.ts`,
-     `GITHUB_CLIENT_ID/SECRET`) tombe avec `/admin`.
+   - **7b (fait) — le CLIENT quitte GitHub.** `/admin` retiré (page + `src/lib/github.ts`
+     client + `AdminArrets` + `AdminPlan`). Nouvelle page `/edition`, gardée par capacité,
+     à onglets : éditeur de **crédits** (l'`EditeurCredits` existant, déjà découplé, ne
+     restait couplé que par un type) et éditeur de **corrections d'arrêts** (`EditeurArrets`,
+     repris de la carte Leaflet d'`AdminArrets` mais publiant par l'API sous la capacité
+     `arrets`, la correction définitive dans `arrets.json` — un changement de données de
+     référence — n'ayant plus sa place dans une page web). `api.github.com` retiré de la
+     CSP ; l'OAuth GitHub serveur (`authentification-github.ts`, champ `oauth` de `/sante`,
+     `GITHUB_CLIENT_ID/SECRET`) supprimé ; les constantes GitHub de `config.ts` avec.
+     Lot 25 **complet**. Reste, pour plus tard et hors lot 25, de replier `/commune` et
+     `/traductions` (code personnel) sur les capacités — les deux systèmes cohabitent.
 
 ### Réserves attendues
 
@@ -2515,4 +2520,4 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Tranches 1–6 et 7a faites ; reste 7b : retrait du `/admin` client, éditeurs par capacité, CSP.*
+*Dépend des lots 21–24. Les sept tranches sont faites : plus aucune écriture dans le dépôt, ni serveur ni client. Reste, hors lot, le repli de `/commune`/`/traductions` sur les capacités.*

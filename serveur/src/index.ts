@@ -18,7 +18,6 @@ import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
 import { entetesCors, originesPermises } from './http.ts'
 import { monterSante } from './routes/sante.ts'
-import { monterAuthGithub } from './routes/authentification-github.ts'
 import { monterAbonnements } from './routes/abonnements.ts'
 import { monterGoogle } from './routes/google.ts'
 import { monterCommune, monterTraductions } from './routes/commune.ts'
@@ -83,7 +82,6 @@ export function creerApplication(): Hono {
   api.notFound((c) => c.json({ erreur: 'route-inconnue' }, 404))
 
   monterSante(api)
-  monterAuthGithub(api)
   monterAbonnements(api)
   monterGoogle(api)
   // Les deux espaces AVANT rien d'autre : leurs chemins leur sont propres, mais les

@@ -75,11 +75,9 @@ services:
       SECRET_SESSION: ${SECRET_SESSION:?}
       VAPID_JWK: ${VAPID_JWK:?}
       CONTACT_VAPID: ${CONTACT_VAPID:?}
-      # Connexion GitHub (l'ancien /admin) et Google Agenda : facultatives. Vides, la
-      # fonctionnalité disparaît de l'interface et le reste tourne — `/admin` est retiré
-      # au lot 25 (7b), l'OAuth GitHub tombera avec.
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      # Google Agenda : facultatif. Vide, l'intégration disparaît de l'interface et
+      # l'export .ics reste. (La connexion GitHub de l'ancien /admin a été retirée au
+      # lot 25, 7b — plus d'OAuth GitHub.)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
 

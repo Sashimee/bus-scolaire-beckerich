@@ -10,6 +10,8 @@
  * — le serveur ayant alors signé un jeton de trente jours et non de huit heures.
  */
 import { URL_API } from '../config'
+import { relireCredits, type Credits } from './credits'
+import type { CorrectionArret } from './urgences'
 
 export type Capacite = 'perturbations' | 'arrets' | 'horaires' | 'traductions' | 'credits' | 'comptes'
 
@@ -222,3 +224,44 @@ export const CAPACITES: Capacite[] = [
   'credits',
   'comptes',
 ]
+
+// — Édition gardée par capacité (remplace l'ancien /admin par jeton GitHub) —————
+
+/** Ce que l'éditeur de crédits reçoit et republie. Sans `sha` : l'API écrase en dernier. */
+export interface CreditsEnLigne {
+  credits: Credits
+}
+
+/** Lit les crédits courants (lecture publique), pour partir de l'état en ligne et non du bundle. */
+export const lireCreditsEnLigne = async (): Promise<CreditsEnLigne> => {
+  const r = await appeler<{ credits: unknown }>('/credits')
+  return { credits: relireCredits(r.credits) }
+}
+
+export const publierCredits = async (
+  session: SessionCompte,
+  credits: Credits,
+): Promise<CreditsEnLigne> => {
+  const r = await appeler<{ credits: unknown }>('/edition/credits', {
+    methode: 'POST',
+    corps: { credits },
+    jeton: session.jeton,
+  })
+  return { credits: relireCredits(r.credits) }
+}
+
+export const publierCorrection = (
+  session: SessionCompte,
+  correction: Pick<CorrectionArret, 'arret' | 'coord'> & { jusqua?: string; note?: string },
+): Promise<unknown> =>
+  appeler('/edition/corrections', {
+    methode: 'POST',
+    corps: { correction },
+    jeton: session.jeton,
+  })
+
+export const retirerCorrection = (session: SessionCompte, arret: string): Promise<unknown> =>
+  appeler(`/edition/corrections/${encodeURIComponent(arret)}`, {
+    methode: 'DELETE',
+    jeton: session.jeton,
+  })

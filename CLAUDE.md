@@ -84,10 +84,13 @@ implémentation des règles de validation aurait divergé au premier ajustement.
 
 ## Documentation
 
-- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 24 sont
-  faits (le lot 24 ajoute les comptes utilisateurs à capacités, serveur et interface
-  web) ; les lots 25 à 28 portent la suite (publication sans détour par GitHub, journal
-  des rappels, mesure auto-hébergée). **À consulter avant d'entamer une évolution.**
+- **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 25 sont
+  faits (25 : toute la publication — perturbations, traductions, horaires, crédits,
+  corrections d'arrêts — vit en base et se fait par capacité ; plus aucune écriture dans
+  le dépôt, `/admin` et le chemin GitHub retirés). L'application est **déployée sur
+  `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). Restent les
+  lots 26 à 28 (journal des rappels, mesure auto-hébergée). **À consulter avant d'entamer
+  une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

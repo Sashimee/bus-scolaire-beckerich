@@ -13,7 +13,7 @@ import { Limites, Independance } from './pages/Infos'
 import { Installer } from './pages/Installer'
 import { Agenda } from './pages/Agenda'
 import { Reglages } from './pages/Reglages'
-import { Admin } from './pages/Admin'
+import { Edition } from './pages/Edition'
 import { Commune } from './pages/Commune'
 import { Traductions } from './pages/Traductions'
 import { Credits } from './pages/Credits'
@@ -56,7 +56,7 @@ export default function App() {
           <Route path="/installer" element={<Installer />} />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/reglages" element={<Reglages />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/edition" element={<Edition />} />
           <Route path="/traductions" element={<Traductions />} />
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/comptes" element={<Comptes />} />

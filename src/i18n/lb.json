@@ -975,5 +975,8 @@
       "reseau": "De Server ass net erreechbar. Kuckt Är Verbindung.",
       "inconnu": "E Feeler ass geschitt."
     }
+  },
+  "edition": {
+    "titre": "Editéieren"
   }
 }

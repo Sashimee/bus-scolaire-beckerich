@@ -49,17 +49,14 @@ function politiqueSecurite(urlApi: string): string {
     // `sendBeacon`, ou une extension qui le neutralise. Les deux directives doivent
     // donc ouvrir la même origine, sans quoi le repli est muet lui aussi.
     `img-src 'self' data: https://*.tile.openstreetmap.org ${ORIGINE_MESURE}`,
-    // `api.github.com` : TOUT `/admin` passe par là — vérification du jeton, lecture et
-    // écriture des urgences, du plan, des textes et des crédits. Son absence rendait la
-    // page inutilisable en production sans qu'aucun test ne le voie : `/admin` exige une
-    // connexion GitHub, et la vérification de la CSP (lot 11) n'était jamais allée
-    // jusque-là. L'échec se lisait « Jeton refusé par GitHub », alors que GitHub n'avait
-    // rien reçu du tout.
+    // `api.github.com` a DISPARU au lot 25 (7b) : `/admin` et sa publication par jeton
+    // GitHub personnel sont retirés, toute l'édition passe désormais par l'API (même
+    // origine, couverte par `'self'`) sous garde de capacité.
     //
     // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
     // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
     // alors que l'ID client peut être posé sans reconstruire cette liste.
-    `connect-src 'self' ${ORIGINE_MESURE} https://api.github.com https://oauth2.googleapis.com https://www.googleapis.com${api ? ` ${api}` : ''}`,
+    `connect-src 'self' ${ORIGINE_MESURE} https://oauth2.googleapis.com https://www.googleapis.com${api ? ` ${api}` : ''}`,
     // L'écran de consentement Google est une navigation, pas une inclusion : seule
     // `form-action` doit s'ouvrir, et uniquement vers Google.
     "form-action 'self' https://accounts.google.com",

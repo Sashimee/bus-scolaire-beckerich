@@ -975,5 +975,8 @@
       "reseau": "Server nicht erreichbar. Prüfen Sie Ihre Verbindung.",
       "inconnu": "Ein Fehler ist aufgetreten."
     }
+  },
+  "edition": {
+    "titre": "Bearbeiten"
   }
 }

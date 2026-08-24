@@ -975,5 +975,8 @@
       "reseau": "Não foi possível contactar o servidor. Verifique a sua ligação.",
       "inconnu": "Ocorreu um erro."
     }
+  },
+  "edition": {
+    "titre": "Edição"
   }
 }

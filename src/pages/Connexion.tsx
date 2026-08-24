@@ -73,6 +73,11 @@ function MonCompte({ session, onDeconnexion }: { session: SessionCompte; onDecon
             ))}
           </div>
         )}
+        {(session.capacites.includes('credits') || session.capacites.includes('arrets')) && (
+          <Link to="/edition" className="bouton">
+            {t('edition.titre')}
+          </Link>
+        )}
         {session.capacites.includes('comptes') && (
           <Link to="/comptes" className="bouton">
             {t('comptes.gestionAcces')}

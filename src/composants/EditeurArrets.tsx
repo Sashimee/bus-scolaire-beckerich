@@ -4,29 +4,23 @@ import { useUrgences } from '../urgences-contexte'
 import { arrets } from '../lib/donnees'
 import { nomArret } from '../lib/affichage'
 import { distanceVolOiseau } from '../lib/distance'
-import { CHEMIN_ARRETS, CHEMIN_URGENCES } from '../config'
-import { ecrireFichier, lireFichier } from '../lib/github'
+import { publierCorrection, retirerCorrection, type SessionCompte } from '../lib/comptes'
 import type { Arret } from '../lib/types'
-import type { CorrectionArret, Urgences } from '../lib/urgences'
-
-interface Props {
-  jeton: string
-  auteur: string
-  onErreur: (e: string | null) => void
-}
 
 /** Latitude/longitude affichées avec la précision utile, pas plus. */
 const fmt = (n: number) => n.toFixed(5)
 
 /**
- * Vérification et correction de la position des arrêts.
+ * Correction de position d'un arrêt, gardée par la capacité `arrets` (lot 25, 7b —
+ * remplace l'onglet Arrêts de l'ancien `/admin` par jeton GitHub).
  *
- * Deux niveaux volontairement distincts : une correction temporaire prend effet en
- * une minute sans reconstruire le site, une correction définitive modifie les données
- * de référence. On veut pouvoir réagir vite à un arrêt mal placé sans être obligé de
- * trancher tout de suite s'il s'agit d'une erreur durable ou d'un déplacement passager.
+ * Une seule sorte de correction ici : la TEMPORAIRE, publiée en base et effective tout
+ * de suite. La correction définitive de l'ancien `/admin` écrivait dans `arrets.json` du
+ * dépôt — une donnée de référence qui se corrige par une mise à jour du dépôt, pas depuis
+ * une page web. On garde donc le geste rapide et réversible, et on renvoie le durable là
+ * où il appartient.
  */
-export function AdminArrets({ jeton, auteur, onErreur }: Props) {
+export function EditeurArrets({ session }: { session: SessionCompte }) {
   const { t } = useT()
   const { urgences, rafraichir } = useUrgences()
   const conteneur = useRef<HTMLDivElement>(null)
@@ -34,7 +28,8 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
   const [selection, setSelection] = useState<Arret | null>(null)
   const [nouvelle, setNouvelle] = useState<[number, number] | null>(null)
   const [occupe, setOccupe] = useState(false)
-  const [temporaireJusqua, setTemporaireJusqua] = useState('')
+  const [jusqua, setJusqua] = useState('')
+  const [erreur, setErreur] = useState<string | null>(null)
 
   const corrections = urgences.correctionsArrets ?? []
 
@@ -84,83 +79,34 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
     }
   }, [t])
 
-  async function publier(temporaire: boolean) {
+  async function publier() {
     if (!selection || !nouvelle) return
     setOccupe(true)
-    onErreur(null)
+    setErreur(null)
     try {
-      if (temporaire) {
-        const { contenu, sha } = await lireFichier<Urgences>(jeton, CHEMIN_URGENCES)
-        const correction: CorrectionArret = {
-          arret: selection.id,
-          coord: nouvelle,
-          ...(temporaireJusqua ? { jusqua: temporaireJusqua } : {}),
-          publieLe: new Date().toISOString(),
-          publiePar: auteur,
-        }
-        await ecrireFichier(
-          jeton,
-          CHEMIN_URGENCES,
-          {
-            ...contenu,
-            misAJour: new Date().toISOString(),
-            correctionsArrets: [
-              ...(contenu.correctionsArrets ?? []).filter((c) => c.arret !== selection.id),
-              correction,
-            ],
-          },
-          sha,
-          `Correction temporaire de l'arrêt ${selection.id}`,
-        )
-      } else {
-        const { contenu, sha } = await lireFichier<{ arrets: Arret[] }>(jeton, CHEMIN_ARRETS)
-        await ecrireFichier(
-          jeton,
-          CHEMIN_ARRETS,
-          {
-            ...contenu,
-            arrets: contenu.arrets.map((a) =>
-              a.id === selection.id
-                ? {
-                    ...a,
-                    coord: nouvelle,
-                    precision: 'verifiee',
-                    source: `Position corrigée à la main le ${new Date().toISOString().slice(0, 10)}`,
-                  }
-                : a,
-            ),
-          },
-          sha,
-          `Position définitive de l'arrêt ${selection.id}`,
-        )
-      }
+      await publierCorrection(session, {
+        arret: selection.id,
+        coord: nouvelle,
+        ...(jusqua ? { jusqua } : {}),
+      })
       setNouvelle(null)
-      setTimeout(rafraichir, 90_000)
+      // Effectif tout de suite, plus d'attente de reconstruction : on relit sans délai.
+      rafraichir()
     } catch (e) {
-      onErreur(e instanceof Error ? e.message : 'publication-impossible')
+      setErreur(e instanceof Error ? e.message : 'publication-impossible')
     } finally {
       setOccupe(false)
     }
   }
 
-  async function retirerCorrection(idArret: string) {
+  async function retirer(idArret: string) {
     setOccupe(true)
+    setErreur(null)
     try {
-      const { contenu, sha } = await lireFichier<Urgences>(jeton, CHEMIN_URGENCES)
-      await ecrireFichier(
-        jeton,
-        CHEMIN_URGENCES,
-        {
-          ...contenu,
-          misAJour: new Date().toISOString(),
-          correctionsArrets: (contenu.correctionsArrets ?? []).filter((c) => c.arret !== idArret),
-        },
-        sha,
-        `Retrait de la correction de l'arrêt ${idArret}`,
-      )
-      setTimeout(rafraichir, 90_000)
+      await retirerCorrection(session, idArret)
+      rafraichir()
     } catch (e) {
-      onErreur(e instanceof Error ? e.message : 'publication-impossible')
+      setErreur(e instanceof Error ? e.message : 'publication-impossible')
     } finally {
       setOccupe(false)
     }
@@ -184,6 +130,8 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
         </div>
       )}
 
+      {erreur && <div className="encart encart--alerte">{erreur}</div>}
+
       <div className="carte-osm" ref={conteneur} />
       <p className="champ__aide">{t('adminArrets.mode')}</p>
 
@@ -206,12 +154,12 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
               </p>
 
               <div className="champ">
-                <label htmlFor="temp-jusqua">{t('adminArrets.jusqua')}</label>
+                <label htmlFor="corr-jusqua">{t('adminArrets.jusqua')}</label>
                 <input
-                  id="temp-jusqua"
+                  id="corr-jusqua"
                   type="date"
-                  value={temporaireJusqua}
-                  onChange={(e) => setTemporaireJusqua(e.target.value)}
+                  value={jusqua}
+                  onChange={(e) => setJusqua(e.target.value)}
                 />
                 <p className="champ__aide">{t('adminArrets.jusquaAide')}</p>
               </div>
@@ -219,19 +167,11 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
               <div className="rangee">
                 <button
                   type="button"
-                  className="bouton"
-                  disabled={occupe}
-                  onClick={() => publier(true)}
-                >
-                  {t('adminArrets.temporaire')}
-                </button>
-                <button
-                  type="button"
                   className="bouton bouton--primaire"
                   disabled={occupe}
-                  onClick={() => publier(false)}
+                  onClick={() => void publier()}
                 >
-                  {t('adminArrets.definitive')}
+                  {t('adminArrets.temporaire')}
                 </button>
                 <button
                   type="button"
@@ -241,7 +181,6 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
                   {t('commun.annuler')}
                 </button>
               </div>
-              <p className="champ__aide">{t('adminArrets.differenceAide')}</p>
             </>
           ) : (
             <p className="champ__aide">{t('adminArrets.cliquerCarte')}</p>
@@ -265,7 +204,7 @@ export function AdminArrets({ jeton, auteur, onErreur }: Props) {
                 type="button"
                 className="bouton bouton--danger"
                 disabled={occupe}
-                onClick={() => retirerCorrection(c.arret)}
+                onClick={() => void retirer(c.arret)}
               >
                 {t('admin.retirer')}
               </button>

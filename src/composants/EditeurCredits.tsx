@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import { lienSur, relireCredits, type Credit, type Credits } from '../lib/credits'
-import type { CreditsEnLigne } from '../lib/github'
+import type { CreditsEnLigne } from '../lib/comptes'
 import { useBlocageRechargement } from '../rechargement-contexte'
 
 /** Une liste de personnes, modifiable : ajouter, retirer, réordonner. */

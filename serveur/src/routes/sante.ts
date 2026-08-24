@@ -45,7 +45,6 @@ export function monterSante(app: Hono): void {
   app.get('/sante', async (c) => {
     return c.json({
       ok: true,
-      oauth: Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
       ...(await santePush()),
       ...(await santeBase()),
       commune: Boolean(process.env.SECRET_SESSION),

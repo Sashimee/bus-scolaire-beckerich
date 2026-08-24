@@ -975,5 +975,8 @@
       "reseau": "Could not reach the server. Check your connection.",
       "inconnu": "Something went wrong."
     }
+  },
+  "edition": {
+    "titre": "Editing"
   }
 }

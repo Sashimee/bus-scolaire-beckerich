@@ -975,5 +975,8 @@
       "reseau": "Impossible de joindre le serveur. Vérifiez votre connexion.",
       "inconnu": "Une erreur est survenue."
     }
+  },
+  "edition": {
+    "titre": "Édition"
   }
 }
