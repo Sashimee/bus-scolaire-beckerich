@@ -56,7 +56,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate utilisateur, debit, journal, ephemere, document, correction_arret, perturbation`
+  await db`truncate utilisateur, debit, journal, ephemere, document, correction_arret, perturbation, mesure`
   courrielsCaptures.length = 0
 })
 
@@ -673,5 +673,47 @@ describe.skipIf(!avecBase)('édition — journal lisible par toute session', () 
   it('refuse le journal sans session', async () => {
     const rep = await app.request('/api/edition/journal')
     expect(rep.status).toBe(401)
+  })
+})
+
+describe.skipIf(!avecBase)('mesure de fréquentation auto-hébergée', () => {
+  it('compte une vue par relevé public, agrégée par jour et par écran', async () => {
+    expect((await poster('/mesure', { chemin: '/plan' })).status).toBe(204)
+    await poster('/mesure', { chemin: '/plan' })
+    await poster('/mesure', { chemin: '/agenda' })
+
+    const lignes = await db`select chemin, vues from mesure where jour = current_date order by chemin`
+    expect(lignes).toEqual([
+      { chemin: '/agenda', vues: 1 },
+      { chemin: '/plan', vues: 2 },
+    ])
+  })
+
+  it('normalise côté serveur : un identifiant d’enfant ou un chemin inconnu ne s’inscrit jamais tel quel', async () => {
+    await poster('/mesure', { chemin: '/enfant/8f3a-secret/assistant' })
+    await poster('/mesure', { chemin: '/plan?ref=courriel' })
+    await poster('/mesure', { chemin: '/chemin-inexistant' })
+
+    const chemins = (await db`select chemin from mesure where jour = current_date order by chemin`).map(
+      (l) => l.chemin,
+    )
+    // `/enfant/…` réduit à `/enfant`, la requête tombée de `/plan`, l'inconnu en `autre`.
+    expect(chemins).toEqual(['/enfant', '/plan', 'autre'])
+    // Aucun identifiant ni fragment n'a survécu.
+    expect(JSON.stringify(chemins)).not.toContain('secret')
+  })
+
+  it('la lecture agrégée exige une session, mais aucune capacité', async () => {
+    await poster('/mesure', { chemin: '/plan' })
+    expect((await app.request('/api/edition/mesure')).status).toBe(401)
+
+    await creerCompte({ courriel: 'lecteur@ville.lu', capacites: [] })
+    const jeton = await connecter('lecteur@ville.lu', 'motdepasse-solide')
+    const rep = await app.request('/api/edition/mesure', { headers: avecJeton(jeton) })
+    expect(rep.status).toBe(200)
+    const m = (await rep.json()) as any
+    expect(m.total).toBe(1)
+    expect(m.parChemin).toEqual([{ chemin: '/plan', vues: 1 }])
+    expect(m.parJour).toHaveLength(1)
   })
 })

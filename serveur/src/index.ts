@@ -23,6 +23,7 @@ import { monterGoogle } from './routes/google.ts'
 import { monterComptes } from './routes/comptes.ts'
 import { monterPubliques } from './routes/publiques.ts'
 import { monterEdition } from './routes/edition.ts'
+import { monterMesure } from './routes/mesure.ts'
 import { demarrerPlanificateur } from './planificateur.ts'
 import { baseConfiguree, fermerBase, migrer } from './stockage/client.ts'
 
@@ -81,6 +82,7 @@ export function creerApplication(): Hono {
   monterComptes(api)
   monterPubliques(api)
   monterEdition(api)
+  monterMesure(api)
 
   const app = new Hono()
   app.route(process.env.BASE_API ?? '/api', api)

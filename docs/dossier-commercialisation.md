@@ -315,7 +315,7 @@ sont majoritairement sur iPhone.
 | Stockage des abonnements | Cloudflare KV, palier gratuit | **0 €** |
 | Intégration continue | GitHub Actions, dépôt public | **0 €** |
 | Fonds de carte | OpenStreetMap | **0 €** |
-| Mesure d'audience | GoatCounter, sans cookie | **0 €** (palier non commercial) |
+| Mesure d'audience | Auto-hébergée sur le serveur du projet, sans cookie ni service tiers | **0 €** (comprise dans la VPS) |
 
 **Coût marginal d'exploitation ≈ 0 €/an**, hors nom de domaine. Tout le coût réel est en
 temps humain.

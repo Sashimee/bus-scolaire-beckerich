@@ -158,3 +158,14 @@ export async function lireJournal(session: SessionCompte): Promise<EntreeJournal
   const { entrees } = await appeler<{ entrees: EntreeJournal[] }>('/edition/journal', session)
   return entrees ?? []
 }
+
+export interface Mesures {
+  total: number
+  parJour: { jour: string; vues: number }[]
+  parChemin: { chemin: string; vues: number }[]
+}
+
+/** La fréquentation agrégée des `jours` derniers jours (mesure auto-hébergée, lots 27-28). */
+export async function lireMesures(session: SessionCompte, jours = 30): Promise<Mesures> {
+  return appeler<Mesures>(`/edition/mesure?jours=${jours}`, session)
+}

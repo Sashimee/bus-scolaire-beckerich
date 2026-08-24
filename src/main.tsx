@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { initialiserHoraires } from './lib/horaires'
+import { mesurer } from './lib/mesure'
 import { FournisseurTraduction } from './i18n'
 import { FournisseurFoyer } from './etat'
 import { FournisseurUrgences } from './urgences-contexte'
@@ -48,4 +49,7 @@ initialiserHoraires().finally(() => {
       </BrowserRouter>
     </StrictMode>,
   )
+  // Un relevé de visite, une seule fois, après le rendu : auto-hébergé, il ne part que
+  // si un serveur est configuré et n'emporte que le chemin d'arrivée.
+  mesurer()
 })

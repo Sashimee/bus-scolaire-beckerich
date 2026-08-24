@@ -8,6 +8,7 @@ import { EditeurPerturbations } from '../composants/EditeurPerturbations'
 import { EditeurHoraires } from '../composants/EditeurHoraires'
 import { EditeurTraductions } from '../composants/EditeurTraductions'
 import { JournalEdition } from '../composants/JournalEdition'
+import { MesureEdition } from '../composants/MesureEdition'
 import {
   chargerSession,
   comptesConfigures,
@@ -102,6 +103,12 @@ export function Edition() {
     cle: 'journal',
     libelle: t('commune.journal'),
     contenu: <JournalEdition session={session} />,
+  })
+  // La fréquentation, ouverte à toute session comme le journal (lots 27-28).
+  onglets.push({
+    cle: 'mesure',
+    libelle: t('mesure.titre'),
+    contenu: <MesureEdition session={session} />,
   })
 
   return (

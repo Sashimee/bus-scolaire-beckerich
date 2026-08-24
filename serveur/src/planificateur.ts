@@ -18,6 +18,7 @@ import { envoyerRappels } from './rappels-envoi.ts'
 import { balayerEphemeres } from './stockage/ephemeres.ts'
 import { balayerDebits } from './stockage/debit.ts'
 import { purgerJournal } from './stockage/journal.ts'
+import { balayerMesures } from './stockage/mesure.ts'
 
 const MINUTE_MS = 60_000
 const HEURE_MS = 3_600_000
@@ -29,14 +30,16 @@ const HEURE_MS = 3_600_000
  * nulle part — c'est voulu.
  */
 async function balayer(): Promise<void> {
-  const [ephemeres, debits, journal] = await Promise.all([
+  const [ephemeres, debits, journal, mesures] = await Promise.all([
     balayerEphemeres(),
     balayerDebits(),
     purgerJournal(),
+    balayerMesures(),
   ])
-  if (ephemeres || debits || journal) {
+  if (ephemeres || debits || journal || mesures) {
     console.log(
-      `balayage : ${ephemeres} éphémère(s), ${debits} compteur(s), ${journal} entrée(s) de journal`,
+      `balayage : ${ephemeres} éphémère(s), ${debits} compteur(s), ` +
+        `${journal} entrée(s) de journal, ${mesures} mesure(s)`,
     )
   }
 }

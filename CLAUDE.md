@@ -93,8 +93,9 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   (voir la section « Consolidation » du plan). L'application est **déployée sur
   `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). **Lot 26 fait le
   2026-08-24** : les rappels ont un journal de livraison, lisible à l'onglet « Journal » de
-  `/edition`. Restent les lots 27 à 28 (mesure auto-hébergée). **À consulter avant d'entamer
-  une évolution.**
+  `/edition`. **Lots 27-28 faits le 2026-08-24** : la mesure de fréquentation est
+  auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Tous les
+  lots planifiés (0 à 28) sont faits.** **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

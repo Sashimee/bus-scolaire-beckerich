@@ -69,8 +69,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
 | R33 | 20 | **Aucun parent n'a parcouru le nouvel assistant.** La refonte répond à un défaut d'usage réel, mais elle n'a été éprouvée que par les tests et la mesure DOM. Le pari central — qu'une question par moment de la journée se comprenne mieux que cinq grilles par champ — ne se vérifie qu'en regardant quelqu'un s'en servir sans aide. | Faire configurer un enfant, de bout en bout, par un parent qui ne connaît pas l'application, sans commenter. Noter chaque endroit où il hésite. |
 | ~~R34~~ | 20 | ~~Les réponses en cartes reposent sur `:has()`.~~ **Levée le 2026-08-21**, mais pas par le moyen qu'elle proposait : le repli `input:checked + .choix__texte` était impossible, la teinte portant sur le `<label>`, PARENT de l'input, hors de portée de tout sélecteur frère. La classe est désormais posée par le composant, comme le fait déjà `.choix--retenu` — `:has()` a disparu de la feuille au lieu d'être replié (zéro occurrence dans le CSS construit), et l'état coché est enfin assertable : il ne l'était nulle part. **Leçon inscrite** : une réserve peut se tromper sur son propre remède ; relire ce qu'elle prescrit avant de l'appliquer. |
-| R35 | 11 | **Le compteur de visites n'a rien enregistré du 2026-08-08 au 2026-08-10.** La CSP du lot 11 ouvrait `gc.zgo.at` en `connect-src` — l'hôte qui SERT `count.js`, pas celui vers lequel il compte. Le script se chargeait donc normalement, puis son relevé partait vers `bus.goatcounter.com` : refusé en `connect-src`, refusé une seconde fois en `img-src` sur le repli image. Aucune erreur visible, aucune visite comptée. Corrigé le 2026-08-10, reproduit avant et après dans le navigateur (deux violations, puis zéro). **Mais aucun relevé n'a encore été vu arriver dans le tableau de bord depuis le site déployé.** | Ouvrir le site publié, puis vérifier dans GoatCounter que la visite apparaît. Les visiteurs déjà installés ne comptent qu'après la relève de leur service worker, à l'ouverture suivante. |
-| R36 | 11 | **Seule la page d'arrivée est comptée.** `count.js` compte au chargement et n'écoute ni `pushState` ni `popstate` ; toute la navigation interne de l'application lui échappe. Sur l'application installée, l'arrivée est toujours `start_url` : les statistiques ne diront donc jamais qu'une seule page, quel que soit l'usage réel. | Décision à prendre : appeler `window.goatcounter.count({path})` au changement de route donnerait la fréquentation écran par écran, au prix d'un relevé par navigation — à peser contre le premier principe du projet. |
+| ~~R35~~ | 11 | ~~Le compteur de visites GoatCounter n'a rien enregistré et aucun relevé n'a été vu dans son tableau de bord.~~ **Sans objet depuis les lots 27-28** : GoatCounter est retiré. La mesure est auto-hébergée (`POST /mesure`, agrégée en base), et se vérifie désormais dans l'onglet « Fréquentation » de `/edition`, sans service tiers. |
+| ~~R36~~ | 11 | ~~Seule la page d'arrivée est comptée ; le comptage par écran serait à peser contre le premier principe.~~ **Décidée aux lots 27-28** : la mesure reste à la page d'ARRIVÉE (un relevé au démarrage), désormais auto-hébergée. Le comptage écran par écran est écarté au nom du premier principe — un relevé par navigation en dirait trop sur l'usage réel d'un foyer. Sur la PWA installée, l'arrivée reste `start_url` (`/`). |
+| R47 | 27-28 | **Le compteur auto-hébergé est approximatif.** `POST /mesure` est public et sans jeton — c'était déjà le cas de GoatCounter : rien n'empêche d'appeler l'endpoint à la main pour gonfler un compteur. Le chemin est normalisé côté serveur (liste blanche d'écrans, jamais un identifiant ni un fragment), donc rien de personnel ne peut s'y inscrire ; mais le NOMBRE, lui, reste un ordre de grandeur d'usage, pas une métrique de confiance. | Rien à faire tant qu'on lit ces chiffres comme une tendance. Si un jour l'exactitude comptait, il faudrait un jeton éphémère par page ou une limitation par IP — au prix d'un peu de la confidentialité que l'absence d'IP garantit aujourd'hui. |
 | R32 | 19 | **Un débordement de la feuille du foyer ne se voit pas.** WebKit a coupé le vendredi au bas de la page en annonçant « Page 1 sur 1 » : un contenu trop haut n'y produit pas une seconde feuille mais une troncature silencieuse. Le banc mesure désormais 222 mm pour un foyer réel et 236 mm pour le pire cas, sur 273 — la marge est confortable, mais rien dans l'application ne préviendra si elle est un jour reprise. | Rien à faire tant que la marge tient. Si la feuille se charge encore (une sixième langue, un plan plus dense), remesurer au banc **avant** d'imprimer : la feuille, elle, ne se plaindra pas. |
 | R37 | — | **L'écran de choix de la langue n'a pas été vu sur un vrai téléphone.** Le navigateur de mesure a refusé de réduire son viewport — il annonçait 2056 px quelle que soit la taille demandée. Le comportement étroit a donc été mesuré en contraignant le conteneur des bandeaux à 280, 320 et 360 px : bascule en une colonne sous 340 px, aucun retour à la ligne, cibles à 51 px. C'est la grille qui est éprouvée, pas l'écran. Restent invérifiés le rendu réel sur iPhone et, surtout, le fait que les cinq langues tiennent au-dessus de la ligne de flottaison — le point même que la grille en deux colonnes vise à régler. | Ouvrir le site avec un stockage vide sur l'iPhone de l'auteur. Les cinq langues doivent être visibles sans faire défiler. |
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
@@ -2601,4 +2602,47 @@ rappel à la même minute, rien pour une simple information). **Où s'arrête la
 reste ouverte — la chaîne n'a toujours pas tourné contre de vrais téléphones un matin
 d'école ; ce que le lot change, c'est qu'on pourra désormais le VOIR quand elle le fera.
 
-*Reste, dans le fil des lots, la mesure auto-hébergée (lots 27-28) — voir R35/R36.*
+*Reste, dans le fil des lots, la mesure auto-hébergée (lots 27-28) — faite le même jour, voir ci-dessous.*
+
+## Lots 27-28 — La mesure de fréquentation, ramenée à la maison (2026-08-24)
+
+> **Fait le 2026-08-24.** Le compteur de visites était GoatCounter, un service tiers : son
+> script venait d'une CDN, ses relevés partaient vers un sous-domaine externe (et, deux
+> jours durant, n'y arrivaient pas — R35). Les lots 27-28 le remplacent par une mesure
+> **auto-hébergée** sur `bus-api`, ce qui aligne le compteur sur le premier principe du
+> projet : plus rien ne quitte l'appareil vers un tiers.
+
+### La décision de portée
+
+Deux formes étaient possibles (R36) : la page d'arrivée seule, ou un relevé par écran. La
+seconde aurait dit quels écrans un foyer parcourt, et à quel rythme — trop, pour une
+application qui promet que rien de l'usage ne s'apprend d'elle. **Décision : page d'arrivée
+seule**, comme GoatCounter, mais sans le tiers. R36 est ainsi tranchée, pas seulement
+déplacée.
+
+### Ce qui a été fait
+
+- **Serveur** : table `mesure (jour, chemin, vues)` (migration 005), incrémentée en un
+  énoncé atomique. `POST /mesure` **public** reçoit le relevé ; le chemin est **normalisé
+  côté serveur** contre une liste blanche d'écrans — `/enfant/8f3a…` devient `/enfant`, une
+  requête ou un fragment tombent, l'inconnu devient `autre`. Rien de personnel ne peut donc
+  s'inscrire, même envoyé par un client trafiqué, et aucune IP, aucun cookie, aucun
+  horodatage plus fin que le jour n'est gardé. `GET /edition/mesure` (session, comme le
+  journal) sert l'agrégat. Purge à 400 jours par le balayeur.
+- **Client** : `src/lib/mesure.ts` dépose un relevé au démarrage par `sendBeacon` vers
+  `URL_API` (repli `fetch keepalive`), une seule fois, et seulement si un serveur est
+  configuré. Le script GoatCounter et **toute origine tierce disparaissent de la CSP**
+  (`script-src 'self'`, plus de `gc.zgo.at` ni de `bus.goatcounter.com`). Un onglet
+  **Fréquentation** dans `/edition` montre total, répartition par écran et courbe par jour
+  — sans graphique (une barre proportionnelle demanderait une largeur en ligne, interdite).
+  Le texte « Données » des 5 langues dit désormais « notre propre serveur », plus GoatCounter.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : app 337 tests (dont 3 sur l'onglet), serveur 151 tests (dont 3 sur `/mesure` :
+comptage agrégé, **normalisation qui écarte un identifiant d'enfant**, lecture gardée par
+session). CSP du build inspectée : plus aucune origine de mesure. **Où s'arrête la preuve** :
+R47 — le compteur public reste approximatif (gonflable à la main, comme l'était GoatCounter) ;
+c'est un ordre de grandeur, pas une métrique de confiance, et on l'assume.
+
+*Tous les lots planifiés (0 à 28) sont faits.*

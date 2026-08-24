@@ -32,6 +32,7 @@ describe.skipIf(!avecBase)('migrations', () => {
       'document',
       'ephemere',
       'journal',
+      'mesure',
       'migration',
       'perturbation',
       'utilisateur',

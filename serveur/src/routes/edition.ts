@@ -35,6 +35,7 @@ import {
 import { base, type Sql } from '../stockage/client.ts'
 import { envoyerATous } from '../envois.ts'
 import { journaliser, lireJournal } from '../stockage/journal.ts'
+import { lireMesures } from '../stockage/mesure.ts'
 import { LANGUES, perturbationPropre, validerPerturbation } from '../validation-perturbation.ts'
 
 const TAILLE_CORPS_MAX = 64 * 1024
@@ -259,6 +260,18 @@ async function journal(c: Context) {
   return c.json({ entrees: await lireJournal() })
 }
 
+/**
+ * La fréquentation agrégée (lots 27-28). Lisible par toute session connectée, comme le
+ * journal : ce sont des chiffres d'usage, pas un droit d'édition, et rien de personnel
+ * n'y figure — la normalisation est faite à l'écriture.
+ */
+async function mesures(c: Context) {
+  const r = await exigerSession(c)
+  if ('refus' in r) return r.refus
+  const jours = Number(c.req.query('jours') ?? 30)
+  return c.json(await lireMesures(Number.isFinite(jours) ? jours : 30))
+}
+
 export function monterEdition(app: Hono): void {
   app.post('/edition/credits', publierCredits)
   app.post('/edition/corrections', publierCorrection)
@@ -268,4 +281,5 @@ export function monterEdition(app: Hono): void {
   app.post('/edition/horaires', publierHoraires)
   app.post('/edition/traductions', publierTraductions)
   app.get('/edition/journal', journal)
+  app.get('/edition/mesure', mesures)
 }

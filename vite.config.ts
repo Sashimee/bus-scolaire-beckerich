@@ -16,16 +16,6 @@ const version = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
 const dateBuild = new Date().toISOString()
 
 /**
- * Où le compteur de visites dépose ses relevés.
- *
- * Ce n'est PAS l'hôte qui sert son script : `count.js` vient de la CDN `gc.zgo.at`,
- * mais il compte vers le sous-domaine du site. Confondre les deux — ce qui a été fait
- * au lot 11 — laisse le script se charger sans qu'aucune visite n'arrive jamais.
- * Doit rester d'accord avec l'attribut `data-goatcounter` d'`index.html`.
- */
-const ORIGINE_MESURE = 'https://bus.goatcounter.com'
-
-/**
  * Politique de sécurité du contenu, posée en balise `<meta>`.
  *
  * GitHub Pages ne permet pas de définir d'en-tête HTTP : la balise est le seul moyen.
@@ -42,13 +32,12 @@ function politiqueSecurite(urlApi: string): string {
   const api = urlApi.replace(/\/$/, '')
   return [
     "default-src 'self'",
-    "script-src 'self' https://gc.zgo.at",
+    // Plus aucun script tiers : le compteur GoatCounter (`gc.zgo.at`) a été retiré au
+    // profit d'une mesure auto-hébergée (lots 27-28), dont le relevé part vers l'API en
+    // `connect-src`, couverte par `'self'` (même origine) et par `${api}`.
+    "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    // `count.js` compte d'abord par `navigator.sendBeacon` (donc `connect-src`), et
-    // retombe sur une image d'un pixel quand celui-ci échoue — un navigateur sans
-    // `sendBeacon`, ou une extension qui le neutralise. Les deux directives doivent
-    // donc ouvrir la même origine, sans quoi le repli est muet lui aussi.
-    `img-src 'self' data: https://*.tile.openstreetmap.org ${ORIGINE_MESURE}`,
+    "img-src 'self' data: https://*.tile.openstreetmap.org",
     // `api.github.com` a DISPARU au lot 25 (7b) : `/admin` et sa publication par jeton
     // GitHub personnel sont retirés, toute l'édition passe désormais par l'API (même
     // origine, couverte par `'self'`) sous garde de capacité.
@@ -56,7 +45,7 @@ function politiqueSecurite(urlApi: string): string {
     // `oauth2.googleapis.com` et `www.googleapis.com` : échange du jeton PKCE et
     // écriture dans l'agenda. Ajoutés inconditionnellement — la CSP est statique,
     // alors que l'ID client peut être posé sans reconstruire cette liste.
-    `connect-src 'self' ${ORIGINE_MESURE} https://oauth2.googleapis.com https://www.googleapis.com${api ? ` ${api}` : ''}`,
+    `connect-src 'self' https://oauth2.googleapis.com https://www.googleapis.com${api ? ` ${api}` : ''}`,
     // L'écran de consentement Google est une navigation, pas une inclusion : seule
     // `form-action` doit s'ouvrir, et uniquement vers Google.
     "form-action 'self' https://accounts.google.com",
