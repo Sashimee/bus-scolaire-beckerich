@@ -91,8 +91,9 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   les derniers espaces à code personnel (`/commune`, `/traductions`) sont repliés sur les
   comptes à capacités — un seul mécanisme d'authentification, tout passe par `/edition`
   (voir la section « Consolidation » du plan). L'application est **déployée sur
-  `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). Restent les
-  lots 26 à 28 (journal des rappels, mesure auto-hébergée). **À consulter avant d'entamer
+  `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). **Lot 26 fait le
+  2026-08-24** : les rappels ont un journal de livraison, lisible à l'onglet « Journal » de
+  `/edition`. Restent les lots 27 à 28 (mesure auto-hébergée). **À consulter avant d'entamer
   une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section

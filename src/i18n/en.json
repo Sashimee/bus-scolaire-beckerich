@@ -786,11 +786,18 @@
     "journalAide": "Who published what, and when. Kept for 90 days, then deleted automatically.",
     "journalVide": "Nothing published yet.",
     "journalEchec": "The log could not be read. Close and reopen it.",
+    "journalRecharger": "Reload",
     "journalAction": {
       "publication": "Published",
       "retrait": "Withdrawn",
       "horaires": "Timetable",
-      "traductions": "Wording"
+      "traductions": "Wording",
+      "rappel": "Reminder",
+      "credits": "Credits",
+      "correction-arret": "Stop corrected",
+      "correction-retrait": "Correction removed",
+      "compte-cree": "Account created",
+      "compte-modifie": "Account changed"
     },
     "messageObligatoire": "Write the message parents will receive first."
   },

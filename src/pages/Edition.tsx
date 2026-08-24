@@ -7,6 +7,7 @@ import { EditeurArrets } from '../composants/EditeurArrets'
 import { EditeurPerturbations } from '../composants/EditeurPerturbations'
 import { EditeurHoraires } from '../composants/EditeurHoraires'
 import { EditeurTraductions } from '../composants/EditeurTraductions'
+import { JournalEdition } from '../composants/JournalEdition'
 import {
   chargerSession,
   comptesConfigures,
@@ -95,6 +96,13 @@ export function Edition() {
       contenu: <EditeurArrets session={session} />,
     })
   }
+  // Le journal est ouvert à TOUTE session, sans capacité — voir qui a publié quoi (et ce
+  // que les rappels ont envoyé, lot 26) n'est pas un droit d'édition. Toujours en dernier.
+  onglets.push({
+    cle: 'journal',
+    libelle: t('commune.journal'),
+    contenu: <JournalEdition session={session} />,
+  })
 
   return (
     <div className="pile pile--large">
@@ -105,11 +113,7 @@ export function Edition() {
         </Link>
       </header>
 
-      {onglets.length === 0 ? (
-        <div className="encart encart--attention">{t('comptes.aucunDroit')}</div>
-      ) : (
-        <Onglets onglets={onglets} />
-      )}
+      <Onglets onglets={onglets} />
     </div>
   )
 }

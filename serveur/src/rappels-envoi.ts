@@ -6,8 +6,10 @@
  * les états, envoyer, réécrire les états.
  *
  * C'est la chaîne visée par la réserve R7 : elle a été corrigée une fois mais jamais
- * exercée un vrai matin d'école. Le lot 26 lui ajoutera un journal de livraison, sans
- * lequel il n'existe aucun moyen de VOIR ce qui est parti à 06:45.
+ * exercée un vrai matin d'école. Le lot 26 lui a ajouté un **journal de livraison**
+ * (chaque envoi inscrit dans la table `journal`, sous l'auteur « système »), sans lequel
+ * il n'existait aucun moyen de VOIR ce qui était parti à 06:45. Il se lit avec le reste
+ * du journal, à l'onglet « Journal » de `/edition`.
  */
 import { rappelsDus } from './rappels.js'
 import { etatDuJour } from '../../src/lib/calendrier.ts'
@@ -15,11 +17,19 @@ import { plan } from '../../src/lib/donnees.ts'
 import { envoyerATous } from './envois.ts'
 import { ecrireEphemere, lireEphemere } from './stockage/ephemeres.ts'
 import { listerPerturbations } from './stockage/publications.ts'
+import { journaliser } from './stockage/journal.ts'
 import { baseConfiguree } from './stockage/client.ts'
 
 const PREFIXE_RAPPEL = 'rappel:'
 /** L'état survit à la perturbation le temps qu'elle expire, puis disparaît seul. */
 const DUREE_ETAT_RAPPEL_S = 30 * 24 * 3600
+
+/**
+ * L'auteur inscrit au journal pour un rappel. Ce n'est personne : le rappel part tout
+ * seul, décidé par l'horloge et l'état, sans qu'un agent l'ait demandé. Le nommer
+ * « système » le distingue d'un envoi provoqué par une publication.
+ */
+const AUTEUR_RAPPELS = { nom: 'système', service: 'rappels' }
 
 const TITRES: Record<string, string> = {
   annulation: 'Bus annulé',
@@ -52,8 +62,7 @@ interface EtatRappel {
  * regroupent les deux notifications et la seconde passe inaperçue, ce qui vide le
  * rappel de son seul intérêt.
  */
-export async function envoyerRappels(): Promise<{ rappels: number }> {
-  const maintenant = new Date()
+export async function envoyerRappels(maintenant = new Date()): Promise<{ rappels: number }> {
   const perturbations = await lireUrgencesPubliees()
   if (!perturbations.length) return { rappels: 0 }
 
@@ -97,6 +106,17 @@ export async function envoyerRappels(): Promise<{ rappels: number }> {
         dernier: maintenant.toISOString(),
       },
       DUREE_ETAT_RAPPEL_S,
+    )
+
+    // Le journal de livraison (lot 26). Écrit APRÈS l'état : ce qui compte est de savoir
+    // ce qui est réellement parti. Il porte le compte des envois et des échecs — un
+    // rappel « 0 envoyée, 0 échec » dit qu'aucun téléphone n'était abonné à ce créneau,
+    // ce qui est une information, pas une panne.
+    await journaliser(
+      AUTEUR_RAPPELS,
+      'rappel',
+      `${p.id} · rappel ${du.numero}/${du.total} · ${du.creneau} · ` +
+        `${resultat.envoyees} envoyée(s), ${resultat.echecs} échec(s)`,
     )
 
     envoyes++

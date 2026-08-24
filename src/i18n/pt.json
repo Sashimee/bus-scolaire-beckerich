@@ -786,11 +786,18 @@
     "journalAide": "Quem publicou o quê, e quando. Guardado 90 dias, depois apagado automaticamente.",
     "journalVide": "Nada publicado por enquanto.",
     "journalEchec": "Não foi possível ler o registo. Feche e volte a abrir.",
+    "journalRecharger": "Recarregar",
     "journalAction": {
       "publication": "Publicação",
       "retrait": "Retirada",
       "horaires": "Horários",
-      "traductions": "Textos"
+      "traductions": "Textos",
+      "rappel": "Lembrete",
+      "credits": "Créditos",
+      "correction-arret": "Paragem corrigida",
+      "correction-retrait": "Correção removida",
+      "compte-cree": "Conta criada",
+      "compte-modifie": "Conta alterada"
     },
     "messageObligatoire": "Escreva primeiro a mensagem que os pais vão receber."
   },

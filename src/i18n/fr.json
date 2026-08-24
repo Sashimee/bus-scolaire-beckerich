@@ -786,11 +786,18 @@
     "journalAide": "Qui a publié quoi, et quand. Conservé 90 jours, puis effacé automatiquement.",
     "journalVide": "Rien de publié pour l'instant.",
     "journalEchec": "Le journal n'a pas pu être lu. Réessayez en repliant puis rouvrant.",
+    "journalRecharger": "Recharger",
     "journalAction": {
       "publication": "Publication",
       "retrait": "Retrait",
       "horaires": "Horaires",
-      "traductions": "Textes"
+      "traductions": "Textes",
+      "rappel": "Rappel",
+      "credits": "Crédits",
+      "correction-arret": "Arrêt corrigé",
+      "correction-retrait": "Correction retirée",
+      "compte-cree": "Compte créé",
+      "compte-modifie": "Compte modifié"
     },
     "messageObligatoire": "Écrivez d'abord le message que les parents recevront."
   },

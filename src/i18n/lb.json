@@ -786,11 +786,18 @@
     "journalAide": "Wien wat wéini publizéiert huet. 90 Deeg opbewahrt, duerno automatesch geläscht.",
     "journalVide": "Bis elo näischt publizéiert.",
     "journalEchec": "De Journal konnt net gelies ginn. Zoumaachen a rëm opmaachen.",
+    "journalRecharger": "Nei lueden",
     "journalAction": {
       "publication": "Publikatioun",
       "retrait": "Réckzuch",
       "horaires": "Fahrplang",
-      "traductions": "Texter"
+      "traductions": "Texter",
+      "rappel": "Erënnerung",
+      "credits": "Creduen",
+      "correction-arret": "Arrêt korrigéiert",
+      "correction-retrait": "Korrektur ewechgeholl",
+      "compte-cree": "Konto erstallt",
+      "compte-modifie": "Konto geännert"
     },
     "messageObligatoire": "Schreift fir d'éischt d'Noriicht, déi d'Elteren kréien."
   },

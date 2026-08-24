@@ -43,7 +43,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R3~~ | 8 | ~~Le Worker n'avait jamais écrit sur GitHub, et il ne le pouvait pas.~~ **Levée le 2026-08-09** : `cache: 'no-store'`, refusé par le runtime Cloudflare, faisait échouer toute publication depuis le lot 8. Corrigé, puis éprouvé — une correction publiée depuis `/traductions` a bien atteint le dépôt. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
 | ~~R5~~ | 9 | ~~Aucun aller-retour réel avec le Worker.~~ **Levée le 2026-08-09** : connexion par code, session, publication et écriture GitHub exercées de bout en bout depuis un téléphone. |
-| R7 | 10 | **Aucun rappel réel n'a été envoyé, et le cron ne pouvait pas aboutir** : il relisait `urgences.json` avec le même `cache: 'no-store'` interdit côté Workers. Corrigé le 2026-08-09 en même temps que R3, mais toujours pas exercé. | Publier une alerte de test un matin d'école, vérifier dans `npx wrangler tail` que le rappel part au bon créneau, puis la retirer. |
+| R7 | 10 | **Aucun rappel réel n'a été envoyé un vrai matin d'école.** Le cron Cloudflare qui ne pouvait pas aboutir a été remplacé par le planificateur en processus (lot 21), et le lot 26 a ajouté un **journal de livraison** — chaque rappel envoyé laisse une trace lisible à l'onglet « Journal » de `/edition`. La chaîne est testée de bout en bout (envoi simulé), mais elle n'a toujours pas tourné contre de vrais téléphones à 06:45. | Publier une alerte de test la veille d'un jour d'école, puis vérifier le lendemain matin dans le journal de `/edition` que le rappel est parti au bon créneau (et, si un téléphone est abonné, qu'il a sonné). Retirer l'alerte ensuite. |
 | ~~R8~~ | 10 | ~~Le sélecteur de préférence n'a pas été vu à l'écran.~~ **Levée le 2026-08-09** sur iPhone, notifications actives. |
 | ~~R9~~ | 11 | ~~La CSP avait été déclarée vérifiée à tort.~~ **Levée le 2026-08-09**, pour de bon cette fois : `connect-src` omettait `https://api.github.com`, ce qui rendait tout `/admin` muet en production depuis le lot 11. Corrigé, puis éprouvé par deux publications réelles de l'auteur — `Crédits : mise à jour` et `Urgence : annulation`, toutes deux passées par l'API GitHub depuis le navigateur. Leçon inscrite : une CSP n'est pas vérifiée tant que chaque origine qu'elle autorise n'a pas été exercée. |
 | ~~R10~~ | 12 | ~~Aucun `.ics` de la nouvelle chaîne n'a été importé dans un vrai agenda.~~ **Levée le 2026-08-09** : importé dans Apple Calendrier depuis l'iPhone. |
@@ -2572,3 +2572,33 @@ La migration 004 est jouée par le banc de test (schéma neuf : tables créées 
 déployé, et la migration 004 n'a tourné que sur des schémas de test. `importer-kv.mjs` ne
 reprend plus les codes d'agents (tables supprimées) — il faut recréer chaque agent en
 compte ; c'est documenté (ADMIN.md) mais pas exercé sur de vraies données.
+
+## Lot 26 — Le journal des rappels (2026-08-24)
+
+> **Fait le 2026-08-24.** Les rappels de perturbation partaient sans laisser de trace : le
+> planificateur envoyait, écrivait dans `console.log`, et rien ne survivait au conteneur.
+> Un rappel manqué ou parti au mauvais créneau ne se voyait donc nulle part. Le lot lui
+> donne un **journal de livraison**, lisible avec le reste.
+
+### Ce qui a été fait
+
+- **Serveur** : `envoyerRappels` inscrit chaque envoi dans la table `journal` (celle des
+  publications), sous l'auteur `système` / service `rappels`, action `rappel`, avec le
+  détail « `id` · rappel n/N · créneau · X envoyée(s), Y échec(s) ». Écrit **après** l'état
+  du rappel, pour ne journaliser que ce qui est réellement parti. La fonction prend
+  désormais une horloge injectable (`maintenant`), ce qui la rend testable au créneau
+  près.
+- **Client** : un onglet **Journal** dans `/edition`, ouvert à **toute session** sans
+  capacité (voir n'est pas éditer). Il rouvre la vue du journal, que la consolidation avait
+  emportée avec `Commune.tsx`, et y montre du même coup les rappels automatiques. Chaque
+  action porte un libellé traduit ; une action inconnue retombe sur son identifiant brut.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : app 334 tests (dont 4 sur l'onglet Journal), serveur 148 tests (dont 4 sur le
+journal de livraison : envoi simulé, un jour d'école réel, avance de l'état, pas de double
+rappel à la même minute, rien pour une simple information). **Où s'arrête la preuve** : R7
+reste ouverte — la chaîne n'a toujours pas tourné contre de vrais téléphones un matin
+d'école ; ce que le lot change, c'est qu'on pourra désormais le VOIR quand elle le fera.
+
+*Reste, dans le fil des lots, la mesure auto-hébergée (lots 27-28) — voir R35/R36.*

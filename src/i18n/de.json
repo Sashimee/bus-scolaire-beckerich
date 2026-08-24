@@ -786,11 +786,18 @@
     "journalAide": "Wer was wann veröffentlicht hat. 90 Tage aufbewahrt, dann automatisch gelöscht.",
     "journalVide": "Bisher nichts veröffentlicht.",
     "journalEchec": "Das Protokoll konnte nicht gelesen werden. Zuklappen und wieder öffnen.",
+    "journalRecharger": "Neu laden",
     "journalAction": {
       "publication": "Veröffentlichung",
       "retrait": "Rücknahme",
       "horaires": "Fahrplan",
-      "traductions": "Texte"
+      "traductions": "Texte",
+      "rappel": "Erinnerung",
+      "credits": "Impressum",
+      "correction-arret": "Haltestelle korrigiert",
+      "correction-retrait": "Korrektur entfernt",
+      "compte-cree": "Konto erstellt",
+      "compte-modifie": "Konto geändert"
     },
     "messageObligatoire": "Schreiben Sie zuerst die Nachricht, die die Eltern erhalten."
   },
