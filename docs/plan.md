@@ -76,11 +76,12 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R31 | 13 | **Le rafraîchissement de session n'a pas été exercé contre le vrai Google.** La session survit désormais à la fermeture grâce à un jeton de rafraîchissement (`access_type=offline`), relayé par le Worker. 6 tests à `fetch` simulé côté navigateur, 6 côté Worker, mais **le premier vrai rafraîchissement n'a jamais eu lieu** : il faut un jeton d'accès réellement périmé, donc une heure d'attente ou une réouverture le lendemain. Le cas qui inquiète est celui où Google n'accorderait pas de `refresh_token` — il ne le donne qu'à un consentement redemandé, ce que `prompt=consent` impose déjà. | Se connecter, fermer l'application, la rouvrir plus d'une heure après : on doit rester connecté sans rien redemander. Si le bouton « Connecter mon compte Google » revient, c'est que le `refresh_token` n'a pas été accordé. |
 | ~~R6~~ | 3 | ~~Une arrivée après la sonnerie est affichée sans être signalée.~~ **Levée le 2026-08-08** : le signal a été écrit puis retiré. Mesure faite au lot 14 : il se déclenchait sur 14 arrêts sur 16 en c1 et 15 sur 16 en c2 — le plan fait arriver les bus à Oberpallen à 07:58 et à Noerdange à 08:00 pour une sonnerie annoncée à 07:55. Décision de l'auteur : c'est un transport scolaire, l'école intègre ces quelques minutes ; le signaler chaque jour à deux cycles entiers serait du bruit. |
 | R38 | — | **Le dossier de commercialisation est un instantané, et ses chiffres ne se vérifient pas tout seuls.** `docs/dossier-commercialisation.md` (2026-08-19) décrit le dépôt au commit `578a1db` : il ignore donc l'évolution « la langue avant tout le reste », encore non commitée au moment de sa rédaction. Ses chiffres (17 341 lignes, 751 clés par langue, ~365 cas de test, 188 occurrences de `dillendapp` dans le moteur, 1 162 adresses) ont été recomptés à la main ce jour-là ; rien ne les recomptera ensuite. Il ne contient **aucune donnée de marché** — 26 questions y sont marquées `[À VÉRIFIER]` au lieu d'être estimées, notamment le nombre de communes concernées, les seuils de marchés publics, le cadre CNPD et l'assurance responsabilité. | Recompter les chiffres avant tout usage externe du dossier (`wc -l`, taille des JSON, `git log`). Répondre aux `[À VÉRIFIER]` par recherche, jamais par estimation. |
-| R39 | 21 | **La reprise de l'état clé-valeur vers PostgreSQL n'a jamais été exécutée sur les vraies données.** `serveur/exporter-kv.mjs` et `serveur/importer-kv.mjs` sont écrits et l'import est idempotent, mais il n'a tourné que contre une base vide. Un import raté invalide **tous** les codes d'agents communaux et désabonne **tous** les parents, sans que rien ne le signale : l'espace commune répondrait « code inconnu », et les notifications ne partiraient plus. | Exporter le KV réel, importer dans la base de préproduction, puis **se connecter à `/commune` avec un vrai code d'agent**. Compter les lignes ne prouve rien : seule la connexion prouve que l'empreinte a été reprise à l'identique. |
+| R39 | 21 | **La reprise de l'état clé-valeur vers PostgreSQL n'a jamais été exécutée sur les vraies données.** `serveur/exporter-kv.mjs` et `serveur/importer-kv.mjs` sont écrits et l'import est idempotent, mais il n'a tourné que contre une base vide. Un import raté désabonne **tous** les parents, sans que rien ne le signale : les notifications ne partiraient plus. (Les codes d'agents, eux, ne sont plus repris depuis la consolidation — ils sont à recréer en comptes ; voir R45.) | Exporter le KV réel, importer dans la base de préproduction, puis vérifier qu'un **envoi d'essai atteint un abonné repris**. Compter les lignes ne prouve rien. |
 | R40 | 21 | **L'extraction de l'adresse cliente derrière Traefik n'a pas été vue à l'œuvre.** Le Worker lisait `CF-Connecting-IP` ; le serveur lit `X-Forwarded-For` en partant de la fin, sur `NB_PROXYS_FIABLES` rangs. 7 tests couvrent la fonction et 3 tests de route la traversent, mais **aucun vrai proxy n'a encore été devant**. Une erreur ici transforme la limitation de débit en un seul seau global : cinq tentatives pour la planète entière, puis plus personne ne se connecte. Aucun signe extérieur. | Deux connexions échouées depuis deux réseaux différents (par exemple domicile et 4G) contre le serveur déployé : la seconde ne doit pas hériter du compteur de la première. Si un second relais s'ajoute un jour devant Traefik, `NB_PROXYS_FIABLES` doit passer à 2. |
 | R41 | 21 | **Le paquet a été construit et l'image exercée, mais jamais sous charge.** L'envoi des notifications est passé d'un découpage en lots de 10 à une boucle à 20 envois simultanés. La nouvelle valeur n'est pas plus mesurée que ne l'était `TAILLE_LOT` — elle est seulement libre du plafond qui justifiait l'ancienne. | Regarder le journal du conteneur au premier envoi réel de plus de cinquante abonnés. Ce qui compte n'est pas la durée mais le nombre d'échecs : un service de push qui répond `429` dit que la concurrence est trop haute. |
 | ~~R42~~ | 22 | ~~La chaîne de déploiement n'a jamais été montée par le vrai Dokploy.~~ **Levée le 2026-08-24** : déployée sur le vrai Dokploy (`dok.seil.pro`, projet Schoulbus), Traefik a routé `app.schoulbus.lu/api` et émis le certificat, `/api/sante` répond `base: true`, `push: true`, `commune: true`, `comptes: true`, `courriel: true`. Le site rend un 200 à la racine, une route profonde retombe sur `index.html`, les quatre lectures publiques (`/urgences /horaires /credits /traductions`) répondent 200. **Nuance** : les images ont été construites SUR la VPS et non tirées de GHCR — le chemin GHCR (paquet privé, identifiant de registre) reste donc à éprouver le jour où la CI publiera les images. Le reste — Dokploy, Traefik, certificat, chemin `/api` non tronqué — est confirmé. Reste l'ancien texte pour trace : `compose.deploiement.yaml`, la poussée d'image sur GHCR et le routage Traefik (`Host(app.schoulbus.lu) && PathPrefix(/api)`, certificat Let's Encrypt) sont vérifiés en local — `docker build`, la pile montée depuis l'image construite, `/api/sante` au vert avec `base: true`, la sonde de l'image qui passe, `docker compose config` qui résout le fichier — mais **aucun Dokploy, aucun Traefik, aucun certificat réel** n'a été devant. Trois choses ne se voient qu'au premier déploiement : que Dokploy sait tirer l'image (paquet privé → identifiant de registre requis), que Traefik émet bien le certificat (DNS à résoudre d'abord), et que le chemin `/api` arrive non tronqué au serveur. | Pousser sur `main`, créer l'application Compose dans Dokploy sur `compose.deploiement.yaml`, poser les variables, déployer, puis `curl https://app.schoulbus.lu/api/sante`. Voir [docs/deploiement.md](deploiement.md). C'est le même déploiement qui lèvera R39 (reprise clé-valeur) et R40 (adresse client derrière Traefik). |
 | R43 | 23 | **Partiellement levée le 2026-08-24.** Le site EST servi par le vrai Traefik sous `app.schoulbus.lu` : racine 200, en-têtes `X-Frame-Options: DENY`/`nosniff`, repli SPA vérifié, CSP portant `app.schoulbus.lu/api`, et le partage d'origine site↔API confirmé (les routeurs priorité 100/1 départagent `/api` du reste). **Restent invérifiés** : l'installation de la PWA depuis la nouvelle origine sur un appareil réel, et le fait qu'une PWA déjà installée depuis GitHub Pages ne migre pas seule. Ancien texte pour trace : L'image `bus-site` (Caddy) est vérifiée en local — racine qui rend un 200, en-têtes `X-Frame-Options: DENY`/`nosniff`/`Referrer-Policy`, repli SPA d'une route profonde vers `index.html`, chemins d'actifs à la racine (`BASE_PATH=/`), CSP portant `app.schoulbus.lu/api`. Restent invérifiés : le partage d'origine site↔API à travers Traefik (les deux routeurs, priorité 100 contre 1), l'installation de la PWA depuis la nouvelle origine (dont `start_url`/`scope` passent à `/`), et le fait qu'une PWA déjà installée depuis GitHub Pages (portée `/bus-scolaire-beckerich/`) **ne migre pas toute seule** — c'est une autre origine, un autre service worker ; le parent garde l'ancienne installation jusqu'à réinstaller depuis `app.schoulbus.lu`. | Après le déploiement : ouvrir `https://app.schoulbus.lu`, vérifier que le site s'affiche et qu'une route profonde rechargée ne rend pas un 404, installer la PWA depuis cette origine, et confirmer que l'espace commune et les notifications répondent (même origine, sans CORS). Prévoir un mot aux parents déjà installés : réinstaller depuis la nouvelle adresse. |
+| R45 | Consolidation | **Le repli sur les capacités est prouvé par les tests, pas par le serveur déployé.** Les routes `/edition/perturbations · /horaires · /traductions · /journal` et les onglets par capacité passent 144 tests serveur (dont les propriétés de sécurité) et 330 tests app, mais **aucun vrai compte n'a encore publié une perturbation, un plan ou une traduction depuis `app.schoulbus.lu`** par ce chemin. De plus, la migration `004-retrait-agents.sql` (`drop table agent_commune, agent_traduction`) n'a tourné que sur des schémas de test neufs — jamais sur la base de production, où ces tables existent depuis la migration 001. | Après redéploiement : se connecter à `/connexion` avec un vrai compte, publier une perturbation d'essai depuis `/edition`, la voir arriver dans l'app, puis la retirer. Vérifier au passage que le démarrage a bien appliqué la migration 004 (`\dt` ne doit plus lister `agent_commune` ni `agent_traduction`). |
 
 ### Mise en service — faite
 
@@ -2510,8 +2511,9 @@ n'atteindrait plus les parents. Ordre :
      référence — n'ayant plus sa place dans une page web). `api.github.com` retiré de la
      CSP ; l'OAuth GitHub serveur (`authentification-github.ts`, champ `oauth` de `/sante`,
      `GITHUB_CLIENT_ID/SECRET`) supprimé ; les constantes GitHub de `config.ts` avec.
-     Lot 25 **complet**. Reste, pour plus tard et hors lot 25, de replier `/commune` et
-     `/traductions` (code personnel) sur les capacités — les deux systèmes cohabitent.
+     Lot 25 **complet**. Restait, hors lot 25, à replier `/commune` et `/traductions`
+     (code personnel) sur les capacités — **fait le 2026-08-24**, voir la section
+     « Consolidation » ci-dessous.
 
 ### Réserves attendues
 
@@ -2520,4 +2522,53 @@ n'atteindrait plus les parents. Ordre :
   traduction publiées et les crédits repartent de l'embarqué. À documenter avec la
   bascule.
 
-*Dépend des lots 21–24. Les sept tranches sont faites : plus aucune écriture dans le dépôt, ni serveur ni client. Reste, hors lot, le repli de `/commune`/`/traductions` sur les capacités.*
+*Dépend des lots 21–24. Les sept tranches sont faites : plus aucune écriture dans le dépôt, ni serveur ni client. Le repli de `/commune`/`/traductions` sur les capacités, laissé hors lot, est fait — voir « Consolidation » ci-dessous.*
+
+## Consolidation — une seule porte, un seul compte (2026-08-24)
+
+> **Fait le 2026-08-24.** Repli des deux derniers espaces à **code personnel** — `/commune`
+> (perturbations, horaires) et `/traductions` — sur les **comptes à capacités** du lot 24.
+> Il ne reste qu'un seul mécanisme d'authentification, là où trois cohabitaient (jeton
+> GitHub d'`/admin` retiré au lot 25, puis les deux codes personnels ici).
+
+### Ce qui bascule
+
+Chaque publication qui passait par un code personnel passe désormais par une **capacité**,
+revérifiée en base à chaque requête :
+
+- `POST /commune/perturbations` + `DELETE …/:id` → `/edition/perturbations` (capacité `perturbations`).
+- `POST /commune/horaires` → `/edition/horaires` (capacité `horaires`).
+- `POST /traductions/publier` → `/edition/traductions` (capacité `traductions`).
+- `GET /commune/journal` → `/edition/journal` (toute session connectée : lire qui a publié
+  quoi n'est pas un droit d'édition).
+
+Le rôle figé (`commune` = perturbations + horaires ; `traductions` = traductions) est ainsi
+**subsumé** par le modèle de capacités — un compte reçoit exactement ce qu'on lui accorde.
+La séparation qui tenait à *deux tables et un rôle dans le jeton* tient maintenant à la
+capacité : un traducteur (capacité `traductions` seule) ne peut toujours pas annuler un bus.
+
+### Ce qui disparaît
+
+- **Serveur** : `routes/commune.ts` (les deux `monter…`), `stockage/agents.ts`,
+  `creer-agent.mjs`, la connexion par code, le type `Role`, le champ `commune` de `/sante`
+  (redondant avec `comptes`). Migration `004-retrait-agents.sql` : `drop table agent_commune,
+  agent_traduction` — départ à neuf, tables vides en production.
+- **Client** : `lib/commune.ts` (code + session), les pages `Commune.tsx`, `CommuneAlertes.tsx`,
+  `CommuneHoraires.tsx`, `Traductions.tsx`. Les éditeurs deviennent des **onglets de
+  `/edition`** (`EditeurPerturbations`, `EditeurHoraires`, `EditeurTraductions`), chacun
+  visible seulement à qui porte la capacité. `/commune`, `/commune/alertes`,
+  `/commune/horaires` et `/traductions` **redirigent** vers `/edition` (bookmarks préservés).
+- Nouveau `lib/edition.ts` : porte un `SessionCompte` déjà obtenu vers `/edition/*`, sans
+  connaître ni code ni stockage de session.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : app 330 tests + typecheck + build ; serveur 144 tests (dont les propriétés de
+sécurité portées de l'ancien `commune.test.ts` : bon droit passe, mauvais droit 403, sans
+session 401, charge revalidée, auteur = session) + typecheck + build contre une vraie base.
+La migration 004 est jouée par le banc de test (schéma neuf : tables créées puis droppées).
+
+**Où s'arrête la preuve** : voir R45 — aucun vrai compte n'a encore publié depuis le serveur
+déployé, et la migration 004 n'a tourné que sur des schémas de test. `importer-kv.mjs` ne
+reprend plus les codes d'agents (tables supprimées) — il faut recréer chaque agent en
+compte ; c'est documenté (ADMIN.md) mais pas exercé sur de vraies données.

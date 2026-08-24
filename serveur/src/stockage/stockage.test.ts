@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { avecBase, fermerSchema, ouvrirSchema } from './aide-tests.ts'
 import type { Sql } from './client.ts'
 import * as abonnements from './abonnements.ts'
-import * as agents from './agents.ts'
 import * as journal from './journal.ts'
 import { balayerEphemeres, ecrireEphemere, lireEphemere, supprimerEphemere } from './ephemeres.ts'
 import { debitDepasse, reussite, TENTATIVES_MAX } from './debit.ts'
@@ -28,8 +27,6 @@ describe.skipIf(!avecBase)('migrations', () => {
     ).map((l) => l.tablename)
     expect(tables).toEqual([
       'abonnement',
-      'agent_commune',
-      'agent_traduction',
       'correction_arret',
       'debit',
       'document',
@@ -68,27 +65,6 @@ describe.skipIf(!avecBase)('abonnements', () => {
  * en changeant de stockage : sur le clé-valeur, elle tenait à ce qu'un code de l'un
  * n'existe LITTÉRALEMENT PAS là où l'autre le cherchait.
  */
-describe.skipIf(!avecBase)('étanchéité des deux espaces', () => {
-  it("un code de traducteur n'ouvre rien côté commune, et réciproquement", async () => {
-    const codeTrad = await empreinte('trad-1234')
-    const codeCommune = await empreinte('commune-1234')
-    await agents.creerAgent('traductions', codeTrad, 'Traductrice', 'bénévole', db)
-    await agents.creerAgent('commune', codeCommune, 'Agent', 'technique', db)
-
-    expect(await agents.lireAgent('commune', codeTrad, db)).toBeNull()
-    expect(await agents.lireAgent('traductions', codeCommune, db)).toBeNull()
-    expect((await agents.lireAgent('commune', codeCommune, db))?.nom).toBe('Agent')
-    expect((await agents.lireAgent('traductions', codeTrad, db))?.nom).toBe('Traductrice')
-  })
-
-  it('les deux rôles vivent bien dans deux tables distinctes', () => {
-    expect(agents.tableDuRole('commune')).toBe('agent_commune')
-    expect(agents.tableDuRole('traductions')).toBe('agent_traduction')
-    // Un rôle inventé ne doit désigner aucune table, jamais celle par défaut.
-    expect(agents.tableDuRole('administrateur')).toBeNull()
-    expect(agents.tableDuRole('constructor')).toBeNull()
-  })
-})
 
 describe.skipIf(!avecBase)('éphémères', () => {
   it('une valeur périmée ne ressort pas, même avant le balayage', async () => {

@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { useT } from './i18n'
 import { plan } from './lib/donnees'
 import { PileBandeaux } from './composants/Bandeaux'
@@ -14,11 +14,7 @@ import { Installer } from './pages/Installer'
 import { Agenda } from './pages/Agenda'
 import { Reglages } from './pages/Reglages'
 import { Edition } from './pages/Edition'
-import { Commune } from './pages/Commune'
-import { Traductions } from './pages/Traductions'
 import { Credits } from './pages/Credits'
-import { CommuneAlertes } from './pages/CommuneAlertes'
-import { CommuneHoraires } from './pages/CommuneHoraires'
 import { Connexion } from './pages/Connexion'
 import { Comptes } from './pages/Comptes'
 import { Reinitialiser } from './pages/Reinitialiser'
@@ -57,13 +53,16 @@ export default function App() {
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/reglages" element={<Reglages />} />
           <Route path="/edition" element={<Edition />} />
-          <Route path="/traductions" element={<Traductions />} />
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/comptes" element={<Comptes />} />
           <Route path="/reinitialiser" element={<Reinitialiser />} />
-          <Route path="/commune" element={<Commune />} />
-          <Route path="/commune/alertes" element={<CommuneAlertes />} />
-          <Route path="/commune/horaires" element={<CommuneHoraires />} />
+          {/* Les espaces à code personnel ont été repliés sur les comptes à capacités :
+              leurs anciennes adresses mènent désormais à l'édition unique, pour ne pas
+              casser un lien noté ou mis en favori. */}
+          <Route path="/commune" element={<Navigate to="/edition" replace />} />
+          <Route path="/commune/alertes" element={<Navigate to="/edition" replace />} />
+          <Route path="/commune/horaires" element={<Navigate to="/edition" replace />} />
+          <Route path="/traductions" element={<Navigate to="/edition" replace />} />
           <Route path="*" element={<Accueil />} />
         </Routes>
 

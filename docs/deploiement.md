@@ -82,14 +82,16 @@ figés au moment du build (Vite les inline dans le JavaScript) — c'est pourquo
    curl https://app.schoulbus.lu/api/sante
    ```
 
-   `"base"`, `"push"`, `"commune"` et `"depot"` au vert. Le détail de ce que chaque
-   champ prouve est dans ADMIN.md.
+   `"base"`, `"push"` et `"comptes"` au vert (il n'y a plus de champ `"depot"` ni
+   `"commune"` depuis le lot 25). Le détail de ce que chaque champ prouve est dans ADMIN.md.
 
-6. **Reprendre l'état de l'ancien serveur.** L'étape la plus facile à oublier, et la
-   plus lourde de conséquences : sans elle, tous les codes d'agents sont invalidés et
-   tous les parents désabonnés, en silence. La procédure (`exporter-kv.mjs` →
-   `importer-kv.mjs`) et son seul vrai contrôle — se connecter à `/commune` avec un vrai
-   code d'agent — sont dans [ADMIN.md § « Reprendre l'état de l'ancien serveur »](../ADMIN.md).
+6. **Reprendre les abonnés de l'ancien serveur.** L'étape la plus facile à oublier, et
+   la plus lourde de conséquences : sans elle, tous les parents sont désabonnés en
+   silence. La procédure (`exporter-kv.mjs` → `importer-kv.mjs`) reprend les abonnements
+   et les états de rappel ; les anciens **codes d'agents ne sont plus repris** (les
+   espaces à code personnel ont été retirés — recréer chaque agent en compte à capacités,
+   voir ADMIN.md). Son seul vrai contrôle est qu'un **envoi d'essai atteigne un abonné
+   repris**. Voir [ADMIN.md § « Reprendre l'état de l'ancien serveur »](../ADMIN.md).
    La base de production n'ayant pas de port exposé, l'import se lance depuis un conteneur
    *sur le réseau interne* (un terminal Dokploy sur le service, ou un conteneur jetable
    attaché au réseau `interne`), avec `DATABASE_URL` pointant sur `bus-postgres:5432`.
@@ -100,8 +102,9 @@ Le paquet, l'image et le compose sont vérifiés en local (`docker build`, la pi
 `/api/sante` au vert, la sonde de l'image qui passe). Restent trois choses qu'aucun banc
 local ne peut prouver, et qui se lèvent au premier déploiement réel :
 
-- **R39 — la reprise clé-valeur → PostgreSQL.** N'a tourné que contre une base vide. Se
-  connecter à `/commune` avec un vrai code d'agent après l'import (voir ci-dessus).
+- **R39 — la reprise clé-valeur → PostgreSQL.** N'a tourné que contre une base vide.
+  Après l'import, vérifier qu'un **envoi d'essai atteint un abonné repris** (les codes
+  d'agents, eux, ne sont plus repris — voir ci-dessus).
 - **R40 — l'adresse du client derrière Traefik.** Le serveur lit `X-Forwarded-For` en
   partant de la fin, sur `NB_PROXYS_FIABLES` rangs (défaut 1). À vérifier par **deux
   connexions échouées depuis deux réseaux différents** (domicile et 4G) : la seconde ne
@@ -126,7 +129,7 @@ poussé.
 Premier déploiement en production, sur le vrai Dokploy (`dok.seil.pro`, projet
 **Schoulbus**, service Compose `bus-app`). **En service** sur `https://app.schoulbus.lu` :
 site à la racine, API sous `/api`, PostgreSQL interne, Traefik + certificat automatique.
-`/api/sante` répond `base/push/commune/comptes/courriel/rappels` au vert.
+`/api/sante` répond `base/push/comptes/courriel/rappels` au vert.
 
 Choix de ce premier jet, à connaître :
 

@@ -72,13 +72,11 @@ for (const { cle, valeur } of entrees) {
       `
       compte.abonnement++
     } else if (prefixe === 'agent' || prefixe === 'traducteur') {
-      const table = prefixe === 'agent' ? db('agent_commune') : db('agent_traduction')
-      await db`
-        insert into ${table} (code_hash, nom, service, cree_le)
-        values (${reste}, ${donnees.nom ?? '?'}, ${donnees.service ?? ''},
-                ${donnees.cree ? new Date(donnees.cree) : new Date()})
-        on conflict (code_hash) do nothing
-      `
+      // Les espaces à code personnel ont été retirés : ces codes n'authentifient plus
+      // rien (leurs tables sont supprimées par la migration 004). On les compte pour le
+      // rapport, mais on ne les reprend pas — il faut recréer chaque agent en COMPTE à
+      // capacités (`creer-utilisateur.mjs`).
+      console.error(`  code d'agent retiré, non repris : ${cle} (${donnees.nom ?? '?'})`)
       compte[prefixe]++
     } else if (prefixe === 'journal') {
       // Le journal était clé par horodatage : on le reprend tel quel plutôt que de
@@ -115,14 +113,15 @@ console.log(`
   Import terminé.
 
     abonnements ....... ${compte.abonnement}
-    agents commune .... ${compte.agent}
-    agents traduction . ${compte.traducteur}
+    codes retirés ..... ${compte.agent + compte.traducteur}   (agents commune + traduction : à RECRÉER en comptes)
     journal ........... ${compte.journal}
     états de rappel ... ${compte.rappel}
     non repris ........ ${compte.ignore}   (états OAuth, essais, compteurs de débit)
     en échec .......... ${compte.illisible}
 
-  Contrôle : se connecter à /commune avec un VRAI code d'agent. C'est le seul test
-  qui prouve la reprise (réserve R39). Compter les lignes ne suffit pas.
+  Les codes d'agent ne sont PAS repris : les espaces à code personnel ont été retirés.
+  Recréer chaque agent en COMPTE à capacités avec creer-utilisateur.mjs, puis vérifier
+  la reprise des ABONNÉS (réserve R39) en s'assurant qu'un envoi d'essai les atteint.
+  Compter les lignes ne suffit pas.
 `)
 if (compte.illisible) process.exitCode = 1

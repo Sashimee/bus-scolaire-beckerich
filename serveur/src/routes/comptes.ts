@@ -161,8 +161,8 @@ async function moi(c: Context) {
   return c.json(vue(r.compte))
 }
 
-/** Session valide, sans exiger de capacité — pour « mon compte » et le changement de mot de passe. */
-async function exigerSession(c: Context): Promise<{ compte: Utilisateur } | { refus: Response }> {
+/** Session valide, sans exiger de capacité — pour « mon compte », le mot de passe, et le journal. */
+export async function exigerSession(c: Context): Promise<{ compte: Utilisateur } | { refus: Response }> {
   if (!enConfigure()) return { refus: nonConfigure(c) }
   const compte = await compteDeLaRequete(c)
   if (!compte) return { refus: c.json({ erreur: 'session-expiree' }, 401) }

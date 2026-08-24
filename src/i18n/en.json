@@ -766,7 +766,8 @@
     "erreur": {
       "codeInconnu": "This code is not recognised. Check it, or ask for a new one.",
       "tropDeTentatives": "Too many attempts. Try again in {minutes} minutes.",
-      "sessionExpiree": "Your session has expired. Sign in again with your code.",
+      "sessionExpiree": "Your session has expired. Please sign in again.",
+      "capaciteRefusee": "You no longer have permission to publish this.",
       "conflit": "Someone published in the meantime. Reload the page and start again.",
       "reseau": "Could not reach the server. Check your connection.",
       "inconnu": "Publishing failed. Try again in a moment.",

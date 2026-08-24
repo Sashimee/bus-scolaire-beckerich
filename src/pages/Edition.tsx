@@ -4,22 +4,26 @@ import { useT } from '../i18n'
 import { Onglets } from '../composants/Onglets'
 import { EditeurCredits } from '../composants/EditeurCredits'
 import { EditeurArrets } from '../composants/EditeurArrets'
+import { EditeurPerturbations } from '../composants/EditeurPerturbations'
+import { EditeurHoraires } from '../composants/EditeurHoraires'
+import { EditeurTraductions } from '../composants/EditeurTraductions'
 import {
   chargerSession,
   comptesConfigures,
   lireCreditsEnLigne,
   publierCredits,
 } from '../lib/comptes'
+import { publierTraductions } from '../lib/edition'
 
 /**
- * Édition gardée par CAPACITÉ (lot 25, 7b) : crédits et corrections d'arrêts, ce que
- * l'ancien `/admin` faisait par jeton GitHub personnel. Chaque onglet n'apparaît qu'à
- * qui porte la capacité correspondante — et le serveur le revérifie de toute façon à
- * chaque requête. Les perturbations, horaires et traductions restent dans `/commune` et
- * `/traductions`.
+ * Édition gardée par CAPACITÉ. Un seul espace, un seul compte : crédits, corrections
+ * d'arrêts, perturbations, horaires et traductions y vivent en onglets, chacun visible
+ * seulement à qui porte la capacité correspondante — et le serveur la revérifie de toute
+ * façon à chaque requête. C'est ici que se sont repliés l'ancien `/admin` (jeton GitHub)
+ * ET les espaces `/commune` et `/traductions` (code personnel) : plus qu'une porte.
  */
 export function Edition() {
-  const { t } = useT()
+  const { t, surcouche } = useT()
   const [session] = useState(chargerSession)
 
   if (!comptesConfigures()) {
@@ -46,6 +50,32 @@ export function Edition() {
   }
 
   const onglets = []
+  if (session.capacites.includes('perturbations')) {
+    onglets.push({
+      cle: 'perturbations',
+      libelle: t('comptes.capacite.perturbations'),
+      contenu: <EditeurPerturbations session={session} />,
+    })
+  }
+  if (session.capacites.includes('horaires')) {
+    onglets.push({
+      cle: 'horaires',
+      libelle: t('comptes.capacite.horaires'),
+      contenu: <EditeurHoraires session={session} />,
+    })
+  }
+  if (session.capacites.includes('traductions')) {
+    onglets.push({
+      cle: 'traductions',
+      libelle: t('comptes.capacite.traductions'),
+      contenu: (
+        <EditeurTraductions
+          surcouche={surcouche}
+          publier={(langue, modifications) => publierTraductions(session, langue, modifications)}
+        />
+      ),
+    })
+  }
   if (session.capacites.includes('credits')) {
     onglets.push({
       cle: 'credits',

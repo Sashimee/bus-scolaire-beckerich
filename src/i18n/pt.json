@@ -766,7 +766,8 @@
     "erreur": {
       "codeInconnu": "Este código não é reconhecido. Verifique-o ou peça um novo.",
       "tropDeTentatives": "Demasiadas tentativas. Tente novamente dentro de {minutes} minutos.",
-      "sessionExpiree": "A sua sessão expirou. Volte a iniciar sessão com o seu código.",
+      "sessionExpiree": "A sua sessão expirou. Volte a iniciar sessão.",
+      "capaciteRefusee": "Já não tem permissão para publicar isto.",
       "conflit": "Alguém publicou entretanto. Recarregue a página e recomece.",
       "reseau": "Não foi possível contactar o servidor. Verifique a sua ligação.",
       "inconnu": "A publicação falhou. Tente novamente daqui a instantes.",

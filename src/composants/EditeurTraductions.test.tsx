@@ -10,7 +10,7 @@ import { act, render, screen } from '@testing-library/react'
 import { EditeurTraductions } from './EditeurTraductions'
 import { FournisseurTraduction } from '../i18n'
 import { FournisseurRechargement } from '../rechargement-contexte'
-import { ErreurCommune } from '../lib/commune'
+import { ErreurEdition } from '../lib/edition'
 import fr from '../i18n/fr.json'
 import de from '../i18n/de.json'
 import en from '../i18n/en.json'
@@ -125,7 +125,7 @@ describe('brouillon du traducteur', () => {
   })
 
   it('survit à un échec de publication', async () => {
-    const publier = vi.fn().mockRejectedValue(new ErreurCommune('session-expiree'))
+    const publier = vi.fn().mockRejectedValue(new ErreurEdition('session-expiree'))
     monter(publier)
     corriger('assistant.terminer', 'Erledigt')
 

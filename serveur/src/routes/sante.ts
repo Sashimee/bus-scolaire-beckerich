@@ -47,10 +47,11 @@ export function monterSante(app: Hono): void {
       ok: true,
       ...(await santePush()),
       ...(await santeBase()),
-      commune: Boolean(process.env.SECRET_SESSION),
-      // Comptes utilisateurs (lot 24) : le secret qui signe les jetons suffit à activer
-      // l'espace ; `courriel` dit à part si vérification et réinitialisation peuvent
-      // partir — un espace comptes sans relai ne peut créer aucun compte activable.
+      // Comptes utilisateurs à capacités (lot 24-25), qui servent désormais toute
+      // l'édition — perturbations, horaires, traductions, crédits, arrêts : le secret
+      // qui signe les jetons suffit à activer l'espace. `courriel` dit à part si
+      // vérification et réinitialisation peuvent partir — un espace comptes sans relai ne
+      // peut créer aucun compte activable.
       comptes: Boolean(process.env.SECRET_SESSION),
       courriel: courrielConfigure(),
       google: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),

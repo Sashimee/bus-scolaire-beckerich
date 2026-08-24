@@ -1,20 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { useT } from '../i18n'
-import { Assistant, type Etape } from '../composants/Assistant'
-import { ResumePerturbation } from '../composants/BandeauUrgences'
+import { Assistant, type Etape } from './Assistant'
+import { ResumePerturbation } from './BandeauUrgences'
 import { useUrgences } from '../urgences-contexte'
 import { useBlocageRechargement } from '../rechargement-contexte'
 import { arrets, plan } from '../lib/donnees'
 import { nomArret } from '../lib/affichage'
 import {
   cleErreur,
-  ErreurCommune,
-  chargerSession,
+  ErreurEdition,
   publierPerturbation,
   retirerPerturbation,
-  type MotifCommune,
-} from '../lib/commune'
+  type MotifEdition,
+} from '../lib/edition'
+import type { SessionCompte } from '../lib/comptes'
 import type { Gravite, Perturbation, TypePerturbation } from '../lib/urgences'
 
 /**
@@ -46,11 +45,9 @@ const jourIso = (decalage = 0) => {
  * écran, dans l'ordre où on y pense — quoi, qui, quand, quelle gravité, et enfin ce
  * que verront les parents.
  */
-export function CommuneAlertes() {
+export function EditeurPerturbations({ session }: { session: SessionCompte }) {
   const { t, langue } = useT()
-  const naviguer = useNavigate()
   const { urgences, rafraichir } = useUrgences()
-  const session = chargerSession()
 
   const [indice, setIndice] = useState(0)
   const [situation, setSituation] = useState(SITUATIONS[0])
@@ -68,17 +65,13 @@ export function CommuneAlertes() {
   const [rappels, setRappels] = useState(3)
   const [message, setMessage] = useState('')
   const [occupe, setOccupe] = useState(false)
-  const [motif, setMotif] = useState<MotifCommune | null>(null)
+  const [motif, setMotif] = useState<MotifEdition | null>(null)
   // Ce que le serveur dit de sa propre panne. Sans lui, une erreur reste indiagnosticable.
   const [detail, setDetail] = useState<string | null>(null)
   const [publiee, setPubliee] = useState(false)
 
   // Une saisie en cours ne doit pas disparaître sous un rechargement automatique.
   useBlocageRechargement(message.trim().length > 0 && !publiee, 'commune-alerte')
-
-  useEffect(() => {
-    if (!session) naviguer('/commune')
-  }, [session, naviguer])
 
   const servicesDeLaLigne = useMemo(
     () => plan.lignes.find((l) => l.id === ligne)?.services ?? [],
@@ -105,14 +98,12 @@ export function CommuneAlertes() {
       : {}),
     message: { [langue]: message.trim(), fr: message.trim() },
     publieLe: new Date().toISOString(),
-    publiePar: session?.nom ?? '',
+    publiePar: session.nom,
     gravite,
     // Les rappels ne valent que pour une alerte : ailleurs, insister n'apporte rien
     // et use la confiance dans la notification.
     ...(gravite === 'alerte' ? { rappels } : {}),
   })
-
-  if (!session) return null
 
   const publier = async () => {
     setOccupe(true)
@@ -122,8 +113,8 @@ export function CommuneAlertes() {
       setPubliee(true)
       rafraichir()
     } catch (erreur) {
-      setMotif(erreur instanceof ErreurCommune ? erreur.motif : 'inconnu')
-      setDetail(erreur instanceof ErreurCommune && erreur.detail ? String(erreur.detail) : null)
+      setMotif(erreur instanceof ErreurEdition ? erreur.motif : 'inconnu')
+      setDetail(erreur instanceof ErreurEdition && erreur.detail ? String(erreur.detail) : null)
     } finally {
       setOccupe(false)
     }
@@ -136,8 +127,8 @@ export function CommuneAlertes() {
       await retirerPerturbation(session, id)
       rafraichir()
     } catch (erreur) {
-      setMotif(erreur instanceof ErreurCommune ? erreur.motif : 'inconnu')
-      setDetail(erreur instanceof ErreurCommune && erreur.detail ? String(erreur.detail) : null)
+      setMotif(erreur instanceof ErreurEdition ? erreur.motif : 'inconnu')
+      setDetail(erreur instanceof ErreurEdition && erreur.detail ? String(erreur.detail) : null)
     } finally {
       setOccupe(false)
     }
@@ -401,11 +392,6 @@ export function CommuneAlertes() {
 
   return (
     <div className="pile pile--large">
-      <header className="rangee rangee--espacee">
-        <h2>{t('commune.alertesTitre')}</h2>
-        <span className="etiquette">{session.nom}</span>
-      </header>
-
       <div className="encart encart--attention">
         <div className="encart__titre">{t('commune.responsabilite')}</div>
         {t('commune.responsabiliteDetail')}
@@ -451,10 +437,6 @@ export function CommuneAlertes() {
           </div>
         ))}
       </section>
-
-      <Link to="/commune" className="bouton bouton--discret">
-        {t('commune.retourAccueil')}
-      </Link>
     </div>
   )
 }

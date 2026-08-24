@@ -39,7 +39,7 @@ la commune ni avec l'école**.
 | `src/composants/`, `src/pages/` | Affichage uniquement. Aucune règle métier. |
 | `src/data/` | Toutes les données : plan de bus, arrêts, écoles, vacances, adresses. |
 | `src/i18n/` | Dictionnaires de traduction. |
-| `serveur/` | Serveur Node (Hono + PostgreSQL), conteneurisé : OAuth GitHub, abonnements, envoi des notifications push, espaces commune et traductions, comptes utilisateurs à capacités (courriel + mot de passe argon2id, `src/comptes/`, `src/routes/comptes.ts`, `creer-utilisateur.mjs`). |
+| `serveur/` | Serveur Node (Hono + PostgreSQL), conteneurisé : abonnements, envoi des notifications push, OAuth Google (agenda), et **toute la publication par comptes à capacités** — courriel + mot de passe argon2id (`src/comptes/`, `src/routes/comptes.ts`, `creer-utilisateur.mjs`), chaque nature de donnée gardée par une capacité et servie par `src/routes/edition.ts`. |
 | `serveur/src/migrations/` | Schéma de la base, en fichiers `.sql` numérotés, appliqués au démarrage. Ajouter une migration : créer le fichier **et** l'inscrire dans `migrations/index.ts`. |
 | `public/urgences.json` | Perturbations ponctuelles, relues à chaque ouverture, hors bundle. |
 
@@ -87,7 +87,10 @@ implémentation des règles de validation aurait divergé au premier ajustement.
 - **[docs/plan.md](docs/plan.md) — feuille de route détaillée.** Les lots 0 à 25 sont
   faits (25 : toute la publication — perturbations, traductions, horaires, crédits,
   corrections d'arrêts — vit en base et se fait par capacité ; plus aucune écriture dans
-  le dépôt, `/admin` et le chemin GitHub retirés). L'application est **déployée sur
+  le dépôt, `/admin` et le chemin GitHub retirés). **Consolidation faite le 2026-08-24** :
+  les derniers espaces à code personnel (`/commune`, `/traductions`) sont repliés sur les
+  comptes à capacités — un seul mécanisme d'authentification, tout passe par `/edition`
+  (voir la section « Consolidation » du plan). L'application est **déployée sur
   `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). Restent les
   lots 26 à 28 (journal des rappels, mesure auto-hébergée). **À consulter avant d'entamer
   une évolution.**

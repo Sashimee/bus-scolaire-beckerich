@@ -2,8 +2,8 @@
  * Client de l'espace comptes (lot 24).
  *
  * Un compte — courriel + mot de passe — échangé contre un jeton de session signé, qui
- * porte les CAPACITÉS accordées. Même esprit que `lib/commune.ts`, mais l'identité est
- * réutilisable et les droits ne sont plus un rôle figé.
+ * porte les CAPACITÉS accordées. L'identité est réutilisable et les droits ne sont plus
+ * un rôle figé : ce compte a remplacé les anciens espaces à code personnel.
  *
  * La session vit en `sessionStorage` par défaut : fermer l'onglet déconnecte d'un poste
  * partagé. « Rester connecté » la range en `localStorage`, où elle survit à la fermeture

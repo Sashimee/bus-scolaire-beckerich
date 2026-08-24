@@ -70,91 +70,43 @@ Pour l'utiliser, il faut se connecter, de l'une des deux façons :
 Plus la portée est précise, moins on alarme de parents inutilement. Une perturbation
 sans `ligne` ni `arret` s'affiche chez **tout le monde**.
 
-### Donner accès à un agent communal
+### Donner accès à un agent
 
-**C'est la voie normale depuis l'espace commune.** L'agent n'a besoin d'aucun compte
-GitHub, ne voit aucun JSON, et ne détient aucun jeton : il se connecte avec un code
-personnel sur `/commune`, et c'est le serveur qui publie en son nom.
+**C'est la voie normale.** Un agent se connecte par **compte** — courriel et mot de
+passe — sur `/connexion`, et publie depuis `/edition`. Il n'a besoin d'aucun compte
+GitHub, ne voit aucun JSON, et ne détient aucun jeton : le serveur publie en son nom, et
+ne lui montre que les onglets correspondant à ses **capacités**.
 
-Prérequis, une seule fois : deux variables d'environnement posées sur le service
-`bus-api` dans Dokploy, puis un redéploiement.
+Prérequis, une seule fois : la variable `SECRET_SESSION` posée sur le service `bus-api`
+dans Dokploy — une longue chaîne au hasard, à ne pas réutiliser. Sans elle, l'édition et
+les comptes répondent 503, et le reste du serveur fonctionne normalement. Un relai SMTP
+est aussi nécessaire pour les liens d'activation (voir le tableau des variables plus bas).
+`/api/sante` doit ensuite répondre `"comptes": true`.
 
-| Variable | Contenu |
+Une capacité = le droit d'éditer **une** nature de donnée. Les six :
+
+| Capacité | Ce qu'elle ouvre |
 | --- | --- |
-| `SECRET_SESSION` | Une longue chaîne au hasard, à ne pas réutiliser. Sans elle, `/commune` et `/traductions` répondent 503 et le reste du serveur fonctionne normalement. |
-| `GITHUB_PAT` | Jeton **fine-grained** (`Settings → Developer settings → Personal access tokens → Fine-grained tokens`), limité à **ce seul dépôt**, avec la permission `Contents: Read and write` et rien d'autre. C'est lui qui écrit ; il ne quitte jamais le serveur. |
+| `perturbations` | Annoncer et retirer une perturbation (notification comprise). |
+| `horaires` | Publier un nouveau plan, revalidé côté serveur. |
+| `traductions` | Corriger les textes de l'application, dans les cinq langues. |
+| `arrets` | Corriger la position d'un arrêt sur la carte. |
+| `credits` | Modifier la page des crédits et remerciements. |
+| `comptes` | Créer, modifier et désactiver les comptes eux-mêmes. |
 
-`/api/sante` doit ensuite répondre `"commune": true` **et** `"depot": {"urgences":"ok", …}`.
-Le premier dit que les secrets sont posés, le second qu'ils fonctionnent : un jeton
-révoqué passe le premier contrôle et échoue le second.
+On n'accorde que ce qu'il faut : confier la relecture des cinq langues à un bénévole
+(`traductions` seule) ne lui donne jamais le droit d'annuler un bus. Le serveur revérifie
+la capacité **en base à chaque requête** — la retirer prend effet tout de suite, sans
+attendre l'expiration du jeton. C'est ce qui a remplacé les anciens espaces à code
+personnel (`/commune`, `/traductions`) et l'ancienne page `/admin` : une seule porte, un
+seul compte, des droits à la carte.
 
-Puis, pour chaque agent :
+Le premier compte s'amorce par la CLI ; ensuite tout se gère depuis l'application. Voir
+[« Amorcer les comptes utilisateurs »](#amorcer-les-comptes-utilisateurs) plus bas.
 
-```bash
-DATABASE_URL=… node serveur/creer-agent.mjs "Marie Weber" "service technique"
-```
-
-Le script engendre un code au format `xxxx-xxxx`, en stocke **l'empreinte SHA-256** en
-base et affiche le code **une seule fois**. Il n'est récupérable nulle part ensuite :
-en cas de perte, on en crée un autre et on retire l'ancien. Transmettez-le de vive voix
-ou par un canal distinct de celui du lien.
-
-Le serveur limite les tentatives à **5 par quart d'heure et par adresse IP**, sans quoi
-un code de huit caractères se forcerait en quelques heures. Cette limite est désormais
-**stricte** : elle tient dans un seul énoncé atomique de PostgreSQL. Sur l'ancien
-stockage clé-valeur, la cohérence différée laissait passer quelques tentatives de plus
-(c'était la réserve R4). Chaque publication est inscrite au journal, consultable sur
-`/commune` : qui a publié quoi, et quand.
-
-Pour retirer un accès, la commande est affichée à la création. On peut aussi lister les
-agents des deux espaces, avec leur date de dernier accès — de quoi repérer un code
-oublié :
-
-```bash
-DATABASE_URL=… node serveur/creer-agent.mjs --lister
-DATABASE_URL=… node serveur/creer-agent.mjs --retirer <empreinte> [commune|traductions]
-```
-
-### Donner accès aux traductions (`/traductions`)
-
-Même mécanique, mais un espace à part : le code n'ouvre **que** la correction des textes
-de l'application. Un traducteur ne peut ni annuler un bus, ni toucher au plan.
-
-```bash
-DATABASE_URL=… node serveur/creer-agent.mjs "Jean Muller" "bénévole" traductions
-```
-
-La séparation ne tient pas à une seule ligne de code. Les codes de traduction vivent
-dans la table `agent_traduction` et non `agent_commune` — un code de l'un n'existe
-littéralement pas là où l'autre le cherche — et le jeton de session porte son rôle,
-revérifié à chaque route. **Deux tables et non une colonne `role`** : une table unique
-ne laisserait qu'une seule barrière, suspendue à une clause de filtrage qu'un jour
-quelqu'un oubliera d'écrire.
-
-Ce que le traducteur peut faire : choisir une langue, corriger n'importe quel texte de
-l'application, et publier. Les corrections vont dans `public/traductions.json`, relu à
-chaque ouverture — elles sont visibles **sans reconstruction du site**, contrairement au
-plan ou aux crédits. Une correction ne peut viser qu'une clé existante, du même type et
-avec les mêmes repères `{…}` que le français ; le reste est refusé, côté navigateur comme
-côté serveur.
-
-### Donner accès au mainteneur (`/admin`)
-
-La page `/admin` reste réservée au mainteneur, avec les outils avancés, répartis en
-cinq onglets : perturbations, position des arrêts sur carte, plan complet en JSON,
-textes de l'application, et crédits. Inviter le compte GitHub concerné en **Write** sur
-le dépôt (`Settings → Collaborators`) ; la page le reconnaîtra.
-
-L'onglet actif est dans l'adresse (`?onglet=credits`) : un lien envoyé ouvre le bon.
-
-L'onglet **Crédits** modifie `src/data/credits.json`, qui est dans le site : sa
-publication déclenche une reconstruction, contrairement aux textes. N'y inscrire que des
-noms dont l'accord est acquis — c'est la seule donnée personnelle que ce projet publie,
-et la page `/credits` le dit à ses lecteurs.
-
-Préférez cependant un jeton **fine-grained** saisi à la main dans le champ prévu par
-`/admin` : la connexion OAuth demande la portée `repo`, très large, que GitHub n'offre
-pas plus étroite en OAuth classique.
+Le serveur limite les connexions à **5 par quart d'heure et par adresse IP**. Chaque
+publication est inscrite au journal, consultable par toute session connectée : qui a
+publié quoi, et quand.
 
 ---
 
@@ -249,7 +201,7 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 | `ORIGINES_AUTORISEES` | Les origines qui ont le droit d'appeler le serveur, séparées par des virgules. Pendant la transition, **les deux** : `https://sashimee.github.io,https://app.schoulbus.lu` — le site de Pages (repli) comme celui de la VPS doivent pouvoir appeler l'API. Une fois Pages retiré, `https://app.schoulbus.lu` seule suffit. | Aucune origine n'est autorisée. Le serveur le dit au démarrage. |
 | `URL_API_PUBLIQUE` | L'origine publique, pour fabriquer le `redirect_uri` d'OAuth | Déduite des en-têtes du proxy — ce qui produit `http://bus-api:3000/…` et un échange refusé sans qu'on comprenne pourquoi. **À poser.** |
 | `VAPID_JWK`, `CONTACT_VAPID` | Notifications | `/api/sante` répond `"push": false` avec le motif. |
-| `SECRET_SESSION` | Espaces commune, traductions ET comptes (il signe les jetons de session) | Ils répondent 503, et le reste fonctionne. |
+| `SECRET_SESSION` | Comptes et édition (il signe les jetons de session) | Ils répondent 503, et le reste fonctionne. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Relais Google Agenda | L'intégration disparaît de l'interface, l'export `.ics` reste. |
 | `URL_SITE` | Site publié, relu pour les rappels ; sert aussi de base aux liens d'activation et de réinitialisation des comptes | Aucun rappel n'est programmé ; les liens de compte seraient malformés. |
 | `SMTP_HOTE`, `SMTP_PORT`, `SMTP_EXPEDITEUR` | Relai courriel pour les comptes utilisateurs (vérification, réinitialisation) — vise le conteneur de relai sur le réseau interne | La création de compte et la réinitialisation répondent 503 avec un motif clair ; la connexion aux comptes existants marche quand même. `SMTP_TLS`, `SMTP_UTILISATEUR`, `SMTP_MOTDEPASSE` sont facultatifs. |
@@ -276,7 +228,7 @@ l'image `bus-site` de la VPS.
 curl https://app.schoulbus.lu/api/sante
 ```
 
-`"base"`, `"push"` et `"commune"` doivent être au vert. Depuis le lot 25, la publication
+`"base"`, `"push"` et `"comptes"` doivent être au vert. Depuis le lot 25, la publication
 ne passe plus par le dépôt : il n'y a plus de champ `"depot"`, plus de `GITHUB_PAT`, tout
 s'écrit en base.
 
@@ -294,8 +246,8 @@ L'import est idempotent : le relancer ne crée pas de doublon. Les états OAuth,
 verrous d'essai et les compteurs de tentatives ne sont **pas** repris — ils auront
 expiré avant la fin de la bascule.
 
-Le seul contrôle qui prouve quelque chose est de **se connecter à `/commune` avec un
-vrai code d'agent**. Compter les lignes ne suffit pas.
+Le seul contrôle qui prouve quelque chose est de **se connecter à `/connexion` avec un
+vrai compte**, puis de publier depuis `/edition`. Compter les lignes ne suffit pas.
 
 ### Amorcer les comptes utilisateurs
 

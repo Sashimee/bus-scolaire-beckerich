@@ -20,7 +20,6 @@ import { entetesCors, originesPermises } from './http.ts'
 import { monterSante } from './routes/sante.ts'
 import { monterAbonnements } from './routes/abonnements.ts'
 import { monterGoogle } from './routes/google.ts'
-import { monterCommune, monterTraductions } from './routes/commune.ts'
 import { monterComptes } from './routes/comptes.ts'
 import { monterPubliques } from './routes/publiques.ts'
 import { monterEdition } from './routes/edition.ts'
@@ -28,25 +27,20 @@ import { demarrerPlanificateur } from './planificateur.ts'
 import { baseConfiguree, fermerBase, migrer } from './stockage/client.ts'
 
 /**
- * Les espaces à code personnel envoient un en-tête `Authorization`, et leur préflight
- * doit donc l'autoriser — sans quoi le navigateur refuse la requête avant même de
- * l'émettre, et l'espace commune est inutilisable sans qu'aucune erreur serveur ne
- * l'explique.
+ * Les espaces authentifiés — comptes et édition — envoient un en-tête `Authorization`,
+ * et leur préflight doit donc l'autoriser : sans quoi le navigateur refuse la requête
+ * avant même de l'émettre, et l'édition est inutilisable sans qu'aucune erreur serveur
+ * ne l'explique.
  *
  * Le chemin est comparé APRÈS retrait de `BASE_API`. `c.req.path` rend l'URL entière,
- * `/api/commune/connexion`, alors que les routes sont déclarées `/commune/connexion` :
- * comparer les deux sans retirer le préfixe faisait passer tout l'espace commune pour
- * une route ordinaire. Constaté au premier essai de préflight.
+ * `/api/edition/horaires`, alors que les routes sont déclarées `/edition/horaires` :
+ * comparer les deux sans retirer le préfixe faisait passer tout l'espace pour une route
+ * ordinaire. Constaté au premier essai de préflight.
  */
 export function aJeton(chemin: string, base = process.env.BASE_API ?? '/api'): boolean {
   const prefixe = base.replace(/\/$/, '')
   const relatif = prefixe && chemin.startsWith(prefixe) ? chemin.slice(prefixe.length) : chemin
-  return (
-    relatif.startsWith('/commune/') ||
-    relatif.startsWith('/traductions/') ||
-    relatif.startsWith('/comptes/') ||
-    relatif.startsWith('/edition/')
-  )
+  return relatif.startsWith('/comptes/') || relatif.startsWith('/edition/')
 }
 
 export function creerApplication(): Hono {
@@ -84,10 +78,6 @@ export function creerApplication(): Hono {
   monterSante(api)
   monterAbonnements(api)
   monterGoogle(api)
-  // Les deux espaces AVANT rien d'autre : leurs chemins leur sont propres, mais les
-  // monter en dernier laisserait `notFound` les rattraper si un préfixe changeait.
-  monterCommune(api)
-  monterTraductions(api)
   monterComptes(api)
   monterPubliques(api)
   monterEdition(api)

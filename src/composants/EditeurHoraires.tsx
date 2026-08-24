@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { useT } from '../i18n'
 import { useBlocageRechargement } from '../rechargement-contexte'
 import { plan } from '../lib/donnees'
 import { nomArretParId } from '../lib/affichage'
 import { validerPlan, type Probleme } from '../lib/validation'
-import { ErreurCommune, chargerSession, publierPlan, type MotifCommune } from '../lib/commune'
+import { ErreurEdition, publierPlan, type MotifEdition } from '../lib/edition'
+import type { SessionCompte } from '../lib/comptes'
 import type { Plan } from '../lib/types'
 
 /** Une heure modifiée, repérée par sa place exacte dans le plan. */
@@ -31,23 +31,17 @@ const HEURE = /^([01]\d|2[0-3]):[0-5]\d$/
  * `validerPlan()` que celui utilisé ici. La validation côté navigateur sert à montrer
  * les problèmes tout de suite ; c'est celle du serveur qui fait autorité.
  */
-export function CommuneHoraires() {
+export function EditeurHoraires({ session }: { session: SessionCompte }) {
   const { t } = useT()
-  const naviguer = useNavigate()
-  const session = chargerSession()
 
   const [ligneId, setLigneId] = useState(plan.lignes[0]?.id ?? '')
   const [retouches, setRetouches] = useState<Retouche[]>([])
   const [occupe, setOccupe] = useState(false)
-  const [motif, setMotif] = useState<MotifCommune | null>(null)
+  const [motif, setMotif] = useState<MotifEdition | null>(null)
   const [problemes, setProblemes] = useState<Probleme[]>([])
   const [publie, setPublie] = useState(false)
 
   useBlocageRechargement(retouches.length > 0 && !publie, 'commune-horaires')
-
-  useEffect(() => {
-    if (!session) naviguer('/commune')
-  }, [session, naviguer])
 
   const ligne = plan.lignes.find((l) => l.id === ligneId)
 
@@ -86,8 +80,6 @@ export function CommuneHoraires() {
 
   const invalides = retouches.filter((r) => !HEURE.test(r.apres))
 
-  if (!session) return null
-
   const publier = async () => {
     setOccupe(true)
     setMotif(null)
@@ -111,7 +103,7 @@ export function CommuneHoraires() {
       setPublie(true)
       setRetouches([])
     } catch (erreur) {
-      if (erreur instanceof ErreurCommune) {
+      if (erreur instanceof ErreurEdition) {
         setMotif(erreur.motif)
         if (erreur.motif === 'plan-invalide') setProblemes((erreur.detail as Probleme[]) ?? [])
       } else {
@@ -124,11 +116,6 @@ export function CommuneHoraires() {
 
   return (
     <div className="pile pile--large">
-      <header className="rangee rangee--espacee">
-        <h2>{t('commune.horairesTitre')}</h2>
-        <span className="etiquette">{session.nom}</span>
-      </header>
-
       <div className="encart encart--attention">
         <div className="encart__titre">{t('commune.horairesAvertissement')}</div>
         {t('commune.horairesAvertissementDetail')}
@@ -273,10 +260,6 @@ export function CommuneHoraires() {
           </button>
         )}
       </section>
-
-      <Link to="/commune" className="bouton bouton--discret">
-        {t('commune.retourAccueil')}
-      </Link>
     </div>
   )
 }

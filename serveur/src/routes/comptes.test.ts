@@ -56,7 +56,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate utilisateur, debit, journal, ephemere, document, correction_arret`
+  await db`truncate utilisateur, debit, journal, ephemere, document, correction_arret, perturbation`
   courrielsCaptures.length = 0
 })
 
@@ -510,5 +510,168 @@ describe.skipIf(!avecBase)('édition gardée par capacité — corrections d\'ar
     expect(del.status).toBe(200)
     const pub = (await (await app.request('/api/urgences')).json()) as any
     expect(pub.correctionsArrets).toHaveLength(0)
+  })
+})
+
+/**
+ * Perturbations, horaires et traductions repliés sur les capacités (consolidation des
+ * espaces `/commune` et `/traductions`). Ce que la connexion par code garantissait — un
+ * traducteur ne publie pas d'horaires — est désormais garanti par la capacité, revérifiée
+ * en base à chaque requête. Ces tests portent les propriétés de sécurité de l'ancien
+ * `commune.test.ts` sur le nouveau système : bon droit passe, mauvais droit est refusé,
+ * la charge est revalidée, et l'auteur inscrit est celui de la session.
+ */
+describe.skipIf(!avecBase)('édition — perturbations gardées par capacité', () => {
+  const perturbation = (sur: Record<string, unknown> = {}) => ({
+    id: 'u-1',
+    type: 'annulation',
+    gravite: 'alerte',
+    du: '2026-08-10',
+    au: '2026-08-10',
+    message: { fr: 'Le bus de 07:25 ne circule pas.' },
+    ...sur,
+  })
+
+  const publier = async (p: Record<string, unknown>, capacites = ['perturbations']) => {
+    await creerCompte({ courriel: 'pert@ville.lu', capacites })
+    const jeton = await connecter('pert@ville.lu', 'motdepasse-solide')
+    return poster('/edition/perturbations', { perturbation: p }, avecJeton(jeton))
+  }
+
+  it("écrit sous l'auteur de la session, jamais celui que le client prétend", async () => {
+    const rep = await publier(perturbation({ publiePar: 'Pirate' }))
+    expect(rep.status).toBe(200)
+    const lignes = await db`select donnees from perturbation where id = 'u-1'`
+    expect(lignes[0].donnees.publiePar).toBe('Agent Test')
+    const j = await db`select * from journal order by quand desc limit 1`
+    expect(j[0].qui).toBe('Agent Test')
+    expect(j[0].action).toBe('publication')
+  })
+
+  it('notifie à la première pose, pas à la reprise du même identifiant', async () => {
+    await creerCompte({ courriel: 'pert@ville.lu', capacites: ['perturbations'] })
+    const jeton = await connecter('pert@ville.lu', 'motdepasse-solide')
+    const pub = (p: Record<string, unknown>) =>
+      poster('/edition/perturbations', { perturbation: p }, avecJeton(jeton))
+
+    expect(((await (await pub(perturbation())).json()) as any).notifiee).toBe(true)
+    const deux = await pub(perturbation({ message: { fr: 'Correction : le bus circule.' } }))
+    expect(((await deux.json()) as any).notifiee).toBe(false)
+    const lignes = await db`select donnees from perturbation where id = 'u-1'`
+    expect(lignes[0].donnees.message.fr).toBe('Correction : le bus circule.')
+  })
+
+  it('refuse une charge sans message français, avant même la notification', async () => {
+    const rep = await publier(perturbation({ type: 'message', message: { de: 'Nur Deutsch' } }))
+    expect(rep.status).toBe(400)
+  })
+
+  it('retire une perturbation', async () => {
+    await creerCompte({ courriel: 'pert@ville.lu', capacites: ['perturbations'] })
+    const jeton = await connecter('pert@ville.lu', 'motdepasse-solide')
+    await poster('/edition/perturbations', { perturbation: perturbation() }, avecJeton(jeton))
+    const del = await app.request('/api/edition/perturbations/u-1', {
+      method: 'DELETE',
+      headers: { ...avecJeton(jeton), 'X-Forwarded-For': '203.0.113.9' },
+    })
+    expect(del.status).toBe(200)
+    expect(await db`select 1 from perturbation where id = 'u-1'`).toHaveLength(0)
+  })
+
+  it('refuse un compte sans la capacité `perturbations`', async () => {
+    const rep = await publier(perturbation(), ['credits'])
+    expect(rep.status).toBe(403)
+  })
+
+  it('refuse une publication sans session', async () => {
+    const rep = await poster('/edition/perturbations', { perturbation: perturbation() })
+    expect(rep.status).toBe(401)
+  })
+})
+
+describe.skipIf(!avecBase)('édition — horaires gardés par capacité', () => {
+  it('publie le plan validé, servi versionné par /horaires', async () => {
+    const planBundle = (await import('../../../src/data/plan-2025-2026.json')).default
+    await creerCompte({ courriel: 'hor@ville.lu', capacites: ['horaires'] })
+    const jeton = await connecter('hor@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/horaires', { plan: planBundle, resume: 'rentrée' }, avecJeton(jeton))
+    expect(rep.status).toBe(200)
+
+    const doc = await db`select version from document where nom = 'horaires'`
+    expect(doc[0].version).not.toBe('embarque')
+    const pub = (await (await app.request('/api/horaires')).json()) as any
+    expect(pub.version).toBe(doc[0].version)
+    expect(pub.plan.lignes.length).toBe((planBundle as any).lignes.length)
+  })
+
+  it('refuse un plan invalide sans rien écrire', async () => {
+    await creerCompte({ courriel: 'hor@ville.lu', capacites: ['horaires'] })
+    const jeton = await connecter('hor@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/horaires', { plan: { lignes: 'pas une liste' } }, avecJeton(jeton))
+    expect(rep.status).toBe(400)
+    expect(await db`select 1 from document where nom = 'horaires'`).toHaveLength(0)
+  })
+
+  it('refuse un compte sans la capacité `horaires`', async () => {
+    await creerCompte({ courriel: 'sans@ville.lu', capacites: ['perturbations'] })
+    const jeton = await connecter('sans@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/horaires', { plan: { lignes: [] } }, avecJeton(jeton))
+    expect(rep.status).toBe(403)
+  })
+})
+
+describe.skipIf(!avecBase)('édition — traductions gardées par capacité', () => {
+  const jetonTrad = async (courriel: string) => {
+    await creerCompte({ courriel, capacites: ['traductions'] })
+    return connecter(courriel, 'motdepasse-solide')
+  }
+
+  it('fusionne deux publications successives au lieu de les écraser', async () => {
+    const publier = (jeton: string, langue: string, modifications: unknown) =>
+      poster('/edition/traductions', { langue, modifications }, avecJeton(jeton))
+
+    expect((await publier(await jetonTrad('a@ville.lu'), 'de', { 'assistant.terminer': 'Fertig' })).status).toBe(200)
+    const rep = await publier(await jetonTrad('b@ville.lu'), 'pt', { 'assistant.terminer': 'Terminado' })
+    expect(rep.status).toBe(200)
+
+    const lignes = await db`select contenu from document where nom = 'traductions'`
+    expect(lignes[0].contenu.langues.de).toEqual({ 'assistant.terminer': 'Fertig' })
+    expect(lignes[0].contenu.langues.pt).toEqual({ 'assistant.terminer': 'Terminado' })
+    expect(((await rep.json()) as any).surcouche.de).toEqual({ 'assistant.terminer': 'Fertig' })
+  })
+
+  it('est servie telle quelle par la lecture publique /traductions', async () => {
+    const jeton = await jetonTrad('a@ville.lu')
+    await poster('/edition/traductions', { langue: 'de', modifications: { 'nav.limites': 'Grenzen' } }, avecJeton(jeton))
+    const pub = await (await app.request('/api/traductions')).json()
+    expect((pub as any).langues.de['nav.limites']).toBe('Grenzen')
+  })
+
+  it('refuse une publication sans langue reconnue', async () => {
+    const jeton = await jetonTrad('a@ville.lu')
+    const rep = await poster('/edition/traductions', { langue: 'es', modifications: {} }, avecJeton(jeton))
+    expect(rep.status).toBe(400)
+  })
+
+  it('refuse un compte sans la capacité `traductions`', async () => {
+    await creerCompte({ courriel: 'sans@ville.lu', capacites: ['credits'] })
+    const jeton = await connecter('sans@ville.lu', 'motdepasse-solide')
+    const rep = await poster('/edition/traductions', { langue: 'de', modifications: {} }, avecJeton(jeton))
+    expect(rep.status).toBe(403)
+  })
+})
+
+describe.skipIf(!avecBase)('édition — journal lisible par toute session', () => {
+  it('ouvre le journal à une session valide, sans exiger de capacité', async () => {
+    await creerCompte({ courriel: 'lecteur@ville.lu', capacites: [] })
+    const jeton = await connecter('lecteur@ville.lu', 'motdepasse-solide')
+    const rep = await app.request('/api/edition/journal', { headers: avecJeton(jeton) })
+    expect(rep.status).toBe(200)
+    expect(await rep.json()).toHaveProperty('entrees')
+  })
+
+  it('refuse le journal sans session', async () => {
+    const rep = await app.request('/api/edition/journal')
+    expect(rep.status).toBe(401)
   })
 })

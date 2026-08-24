@@ -95,11 +95,11 @@ describe('retourAutorise', () => {
 })
 
 describe('aJeton', () => {
-  it("reconnaît les espaces à code personnel une fois montés sous /api", async () => {
+  it("reconnaît les espaces authentifiés une fois montés sous /api", async () => {
     const { aJeton } = await import('./index.ts')
-    expect(aJeton('/api/commune/connexion')).toBe(true)
-    expect(aJeton('/api/commune/perturbations/abc')).toBe(true)
-    expect(aJeton('/api/traductions/publier')).toBe(true)
+    expect(aJeton('/api/comptes/connexion')).toBe(true)
+    expect(aJeton('/api/edition/perturbations/abc')).toBe(true)
+    expect(aJeton('/api/edition/traductions')).toBe(true)
   })
 
   it('ne les confond pas avec les routes ordinaires', async () => {
@@ -107,12 +107,12 @@ describe('aJeton', () => {
     expect(aJeton('/api/sante')).toBe(false)
     expect(aJeton('/api/abonner')).toBe(false)
     // Un chemin qui contient le mot sans être l'espace ne doit pas déclencher.
-    expect(aJeton('/api/notifier/commune/x')).toBe(false)
+    expect(aJeton('/api/notifier/edition/x')).toBe(false)
   })
 
   it("suit BASE_API quand il change, plutôt que de supposer /api", async () => {
     const { aJeton } = await import('./index.ts')
-    expect(aJeton('/commune/journal', '/')).toBe(true)
-    expect(aJeton('/serveur/commune/journal', '/serveur')).toBe(true)
+    expect(aJeton('/edition/journal', '/')).toBe(true)
+    expect(aJeton('/serveur/edition/journal', '/serveur')).toBe(true)
   })
 })

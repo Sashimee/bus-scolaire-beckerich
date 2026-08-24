@@ -766,7 +766,8 @@
     "erreur": {
       "codeInconnu": "Dieser Code wird nicht erkannt. Bitte prüfen oder einen neuen anfordern.",
       "tropDeTentatives": "Zu viele Versuche. Bitte in {minutes} Minuten erneut versuchen.",
-      "sessionExpiree": "Ihre Sitzung ist abgelaufen. Bitte erneut mit Ihrem Code anmelden.",
+      "sessionExpiree": "Ihre Sitzung ist abgelaufen. Bitte erneut anmelden.",
+      "capaciteRefusee": "Sie haben keine Berechtigung mehr, dies zu veröffentlichen.",
       "conflit": "Jemand hat zwischenzeitlich veröffentlicht. Seite neu laden und noch einmal versuchen.",
       "reseau": "Der Server ist nicht erreichbar. Bitte Verbindung prüfen.",
       "inconnu": "Die Veröffentlichung ist fehlgeschlagen. Bitte gleich noch einmal versuchen.",

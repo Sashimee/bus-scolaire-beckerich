@@ -8,7 +8,7 @@ import {
   type Modifications,
   type Surcouche,
 } from '../lib/traductions'
-import { cleErreur, ErreurCommune } from '../lib/commune'
+import { cleErreur, ErreurEdition } from '../lib/edition'
 import { useBlocageRechargement } from '../rechargement-contexte'
 
 /**
@@ -48,7 +48,7 @@ const TOTAL_CLES = SECTIONS.reduce((n, s) => n + s.cles.length, 0)
  * perdu — ici, il ne l'est jamais, le brouillon reste en mémoire.
  */
 function motifAffichable(e: unknown): { cle: string; detail?: string } {
-  if (e instanceof ErreurCommune) {
+  if (e instanceof ErreurEdition) {
     return { cle: cleErreur(e.motif), detail: e.detail ? String(e.detail) : undefined }
   }
   // `/admin` passe par l'API GitHub, qui lève des `Error` ordinaires.

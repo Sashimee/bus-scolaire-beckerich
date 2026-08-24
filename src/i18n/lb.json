@@ -766,7 +766,8 @@
     "erreur": {
       "codeInconnu": "Dëse Code gëtt net erkannt. Kuckt nach eng Kéier no, oder frot e neien un.",
       "tropDeTentatives": "Ze vill Versich. Probéiert an {minutes} Minutten nach eng Kéier.",
-      "sessionExpiree": "Är Sëtzung ass ofgelaf. Mellt Iech mat Ärem Code nei un.",
+      "sessionExpiree": "Är Sëtzung ass ofgelaf. Mellt Iech w.e.g. nei un.",
+      "capaciteRefusee": "Dir hutt net méi d'Recht, dëst ze verëffentlechen.",
       "conflit": "Iergendeen huet an der Tëschenzäit publizéiert. Luet d'Säit nei a fänkt nach eng Kéier un.",
       "reseau": "De Server ass net erreechbar. Kuckt Är Verbindung no.",
       "inconnu": "D'Verëffentlechung ass feelgeschloen. Probéiert gläich nach eng Kéier.",
