@@ -500,14 +500,45 @@
    * capitales espacées, il se lit comme un bandeau de marque et cesse de concurrencer le
    * `<h2>` de l'écran, qui est la vraie entrée en matière.
    */
+  /*
+   * L'en-tête ne porte pas le titre de l'écran : il porte la MARQUE, comme la vitrine.
+   * Il était une enseigne en petites capitales espacées, ce qui suffisait tant que
+   * l'application n'avait pas de dessin. Elle en a un maintenant — le même bus que le
+   * favicon —, et une enseigne à côté d'un logo fait deux marques au lieu d'une.
+   */
   .entete__titre {
-    font-size: var(--texte-xs);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--encre-douce);
+    font-size: var(--texte-m);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--encre);
     margin-inline-end: auto;
     min-inline-size: 0;
+  }
+
+  .marque {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espace-2);
+  }
+
+  .marque__logo {
+    flex: none;
+    inline-size: 28px;
+    block-size: 28px;
+  }
+
+  /*
+   * Le dessin en jetons, donc au thème. La pastille porte l'accent et la carrosserie le
+   * fond ; les creux (vitres, roues) sont des trous qui laissent voir la pastille. Le
+   * sens était inversé avant la refonte — voir `scripts/build-icones.mjs`.
+   */
+  .marque__pastille,
+  .marque__creux {
+    fill: var(--accent);
+  }
+
+  .marque__caisse {
+    fill: var(--fond);
   }
 
   /*
@@ -598,7 +629,6 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--espace-1);
     }
     .nav-basse {
       display: none;
@@ -1320,8 +1350,32 @@
     grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
   }
 
+  /*
+   * Dans l'en-tête, les options prennent leur largeur au lieu de se partager la place :
+   * quatre colonnes égales y étiraient « Plan » sur autant de large qu'« Aujourd'hui ».
+   */
+  .segments--nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .segments--nav a {
+    display: inline-flex;
+    align-items: center;
+    padding-inline: var(--espace-3);
+    text-decoration: none;
+  }
+
+  /*
+   * Les options du rail. Ce sont des `<button>` partout sauf dans la navigation haute,
+   * où ce sont des liens : une entrée de navigation doit rester ouvrable dans un nouvel
+   * onglet et copiable. D'où le sélecteur en deux temps plutôt qu'une classe posée sur
+   * chaque option — l'un des deux jeux d'éléments ne peut pas la porter sans que le
+   * composant se mette à décrire son apparence.
+   */
   .bascule button,
-  .segments button {
+  .segments button,
+  .segments--nav a {
     padding: var(--espace-2) var(--espace-1);
     min-block-size: var(--cible);
     background: none;
@@ -1337,14 +1391,17 @@
   }
 
   .bascule button:hover,
-  .segments button:hover {
+  .segments button:hover,
+  .segments--nav a:hover {
     background: var(--surface-haute);
     color: var(--encre);
+    text-decoration: none;
   }
 
   .bascule button[aria-pressed='true'],
   .segments button[aria-pressed='true'],
-  .segments button[aria-selected='true'] {
+  .segments button[aria-selected='true'],
+  .segments--nav a[aria-current='page'] {
     background: var(--plein);
     color: var(--encre-sur-plein);
     font-weight: 700;
@@ -2336,7 +2393,13 @@
     display: grid;
     gap: var(--trait);
     background: var(--bord);
-    border: var(--trait) solid var(--bord);
+    /*
+     * Un `padding` et non un `border` : `--bord` est translucide, et une bordure posée
+     * PAR-DESSUS un fond de la même couleur superpose deux fois la même transparence.
+     * Le pourtour ressortait alors plus sombre que les filets intérieurs, ce qui se voit
+     * tout de suite et ne s'explique pas. Ici, le tour et les filets sont le même fond.
+     */
+    padding: var(--trait);
     border-radius: var(--rayon-m);
     overflow: hidden;
   }
@@ -2347,9 +2410,35 @@
     min-inline-size: 0;
   }
 
+  /*
+   * Dans une carte, les cases prennent le creux. Sur la vitrine, la grille est posée
+   * sur le fond de page et ses cases sont à la couleur de surface : le bloc se détache
+   * de lui-même. Ici elle vit à l'intérieur d'une carte, qui EST déjà cette couleur —
+   * on n'y voyait donc plus un bloc mais deux traits qui flottent au milieu du texte.
+   */
+  .carte .filets__case {
+    background: var(--fond-creux);
+  }
+
   /* Une case qui dit une absence — « zéro cookie », « aucun compte ». */
+  .filets--chiffres {
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+
+  .filets--chiffres .filets__case {
+    padding: var(--espace-3) var(--espace-4);
+  }
+
   .filets__case--creuse {
     background: var(--fond-creux);
+  }
+
+  /* Une case dont la valeur est un mot et non un nombre : pas de chasse fixe. */
+  .filets__nom {
+    display: block;
+    font-size: var(--texte-l);
+    font-weight: 600;
+    line-height: 1.25;
   }
 
   .filets__valeur {
@@ -2382,8 +2471,17 @@
    * rembourrage sur un écran étroit.
    */
   .bande {
-    margin-inline: calc(var(--gouttiere) * -1);
+    /*
+     * `.page` rembourre ses côtés d'au moins `--gouttiere`, davantage sur un écran à
+     * encoche. La bande reprend la même expression en négatif — et non `--gouttiere`
+     * seul —, sans quoi elle s'arrêterait avant le bord en paysage sur iPhone, et le
+     * filet du dessus se terminerait en l'air.
+     */
+    margin-inline-start: calc(max(var(--gouttiere), env(safe-area-inset-left)) * -1);
+    margin-inline-end: calc(max(var(--gouttiere), env(safe-area-inset-right)) * -1);
     padding: var(--espace-6) var(--gouttiere);
+    padding-inline-start: max(var(--gouttiere), env(safe-area-inset-left));
+    padding-inline-end: max(var(--gouttiere), env(safe-area-inset-right));
     background: var(--surface-haute);
     border-block: var(--trait) solid var(--bord);
   }
@@ -2394,8 +2492,8 @@
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
+    /* Pas de marge basse : l'entête vit toujours dans une `.pile`, dont l'écart règne. */
     gap: var(--espace-3) var(--espace-6);
-    margin-block-end: var(--espace-4);
   }
 
   .entete-bande__note {
@@ -2407,9 +2505,11 @@
   /*
    * Le panneau : le seul aplat de marque de l'application.
    *
-   * Un écran n'en porte qu'un — le prochain départ. Un second panneau et plus rien ne
-   * se détache : c'est exactement ce que la couleur est là pour faire. Son encre ne
-   * suit pas `--encre` mais `--sur-panneau`, mesuré sur ce fond-là.
+   * Il est réservé au prochain départ, et à lui seul. Un foyer de deux enfants en voit
+   * donc deux — un par carte —, et c'est la limite : le poser aussi sur un encart ou un
+   * bouton et plus rien ne se détacherait, ce qui est exactement ce que la couleur est
+   * là pour faire. Son encre ne suit pas `--encre` mais `--sur-panneau`, mesuré sur ce
+   * fond-là.
    */
   .panneau {
     background: var(--panneau);
@@ -2446,8 +2546,13 @@
    * lignes. Elle sert aux listes de principes, là où une liste à puces se lit comme un
    * mode d'emploi et non comme un propos.
    */
+  /*
+   * 17rem et non les 12rem de la vitrine : celle-ci met deux lignes par tuile, alors
+   * qu'ici elles portent un paragraphe entier. Trois colonnes de paragraphe sur 46rem
+   * de page donnent des lignes de six mots, qu'on ne lit pas.
+   */
   .tuiles {
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
   }
 
   .tuile__puce {

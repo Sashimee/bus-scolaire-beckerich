@@ -56,14 +56,14 @@ export function Installer() {
 
   return (
     <div className="pile pile--large">
-      <header className="pile pile--serre">
+      <header className="entete-bande">
         <h2>{t('installer.titre')}</h2>
-        <p>{t('installer.intro')}</p>
+        <p className="entete-bande__note">{t('installer.intro')}</p>
       </header>
 
       {/* Ce que l'installation apporte concrètement, avant la manière de s'y prendre :
           c'est la seule question que le parent se pose vraiment. */}
-      <section className="carte pile pile--serre">
+      <section className="bande pile pile--serre">
         <h3 className="titre-carte">{t('installer.pourquoiTitre')}</h3>
         <ul className="liste-puces pile pile--serre">
           <li>{t('installer.atoutHorsLigne')}</li>

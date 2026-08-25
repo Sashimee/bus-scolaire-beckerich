@@ -104,17 +104,21 @@ function ProchainDepart({ etape, minutesAvant }: { etape: Etape; minutesAvant: n
   const decale = etape.effective !== etape.heure
 
   return (
-    <div className="prochain">
-      {decale && <s className="trajet__heure trajet__heure--secondaire">{etape.heure}</s>}
-      <strong className="prochain__heure">{etape.effective}</strong>
-      {minutesAvant > 0 ? (
-        <span className="prochain__delai">{t('aujourdhui.dans', { minutes: minutesAvant })}</span>
-      ) : (
-        <span className="prochain__maintenant">
-          <span className="prochain__signal" aria-hidden="true" />
-          {t('aujourdhui.partirMaintenant')}
-        </span>
-      )}
+    <div className="panneau pile pile--serre">
+      <span className="etiquette etiquette--mono">{t('aujourdhui.prochainTrajet')}</span>
+      <div className="prochain">
+        {decale && <s className="trajet__heure trajet__heure--secondaire">{etape.heure}</s>}
+        <strong className="prochain__heure">{etape.effective}</strong>
+        {minutesAvant > 0 ? (
+          <span className="prochain__delai">{t('aujourdhui.dans', { minutes: minutesAvant })}</span>
+        ) : (
+          <span className="prochain__maintenant">
+            <span className="prochain__signal" aria-hidden="true" />
+            {t('aujourdhui.partirMaintenant')}
+          </span>
+        )}
+      </div>
+      <p className="panneau__glose">{t(`trajets.${etape.trajet.type}`)}</p>
     </div>
   )
 }
@@ -236,23 +240,30 @@ function CarteEnfant({
         <>
           {ecole &&
             (suivante ? (
-              <>
-                <ProchainDepart etape={suivante} minutesAvant={minutesAvant} />
-                <p>{t(`trajets.${suivante.trajet.type}`)}</p>
-              </>
+              <ProchainDepart etape={suivante} minutesAvant={minutesAvant} />
             ) : (
               <div className="rangee">
                 <span className="etiquette etiquette--succes">{t('aujourdhui.plusDeBus')}</span>
               </div>
             ))}
 
-          <p>
-            <strong>{nomArret(ctx.arretDomicile, t)}</strong>{' '}
-            <span className="champ__aide">
-              · {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })} ·{' '}
-              {distanceLisible(ctx.distance)}
-            </span>
-          </p>
+          {/*
+              L'arrêt, la marche et la distance étaient une seule phrase ponctuée de
+              points médians. Elles répondent à trois questions différentes ; la grille
+              au filet leur donne trois cases, et le parent lit celle qu'il cherche.
+          */}
+          <div className="filets filets--chiffres">
+            <div className="filets__case">
+              <span className="filets__nom">{nomArret(ctx.arretDomicile, t)}</span>
+              <span className="filets__glose">{t('enfant.arretLePlusProche')}</span>
+            </div>
+            <div className="filets__case">
+              <span className="filets__nom">
+                {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
+              </span>
+              <span className="filets__glose">{distanceLisible(ctx.distance)}</span>
+            </div>
+          </div>
 
           {ctx.arretDomicile.precision === 'approximative' && (
             <p className="champ__aide">⚠ {t('arrets.precisionApproximative')}</p>

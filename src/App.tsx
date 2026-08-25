@@ -4,6 +4,7 @@ import { plan } from './lib/donnees'
 import { PileBandeaux } from './composants/Bandeaux'
 import { InvitationInstallation } from './composants/InvitationInstallation'
 import { NavigationBasse, NavigationHaute } from './composants/Navigation'
+import { LogoBus } from './composants/LogoBus'
 import { Accueil } from './pages/Accueil'
 import { Configurer } from './pages/Configurer'
 import { Semaine } from './pages/Semaine'
@@ -32,7 +33,10 @@ export default function App() {
       <header className="entete">
         <div className="entete__interne">
           <h1 className="entete__titre">
-            <Link to="/">{t('app.court')}</Link>
+            <Link className="marque" to="/">
+              <LogoBus />
+              <span>{t('app.court')}</span>
+            </Link>
           </h1>
           <NavigationHaute />
         </div>

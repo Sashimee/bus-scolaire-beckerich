@@ -70,9 +70,12 @@ export function NavigationHaute() {
   const { t } = useT()
 
   return (
-    <nav className="nav-haute" aria-label={t('nav.principale')}>
+    <nav
+      className="nav-haute segments segments--nav"
+      aria-label={t('nav.principale')}
+    >
       {ENTREES.map((e) => (
-        <NavLink key={e.vers} to={e.vers} end={e.exact} className="bouton bouton--discret">
+        <NavLink key={e.vers} to={e.vers} end={e.exact}>
           {t(`nav.${e.cle}`)}
         </NavLink>
       ))}

@@ -74,8 +74,10 @@ export function PagePlan() {
   return (
     <div className="pile pile--large">
       <header className="pile pile--serre">
-        <h2>{t('plan.titre')}</h2>
-        <p>{t('plan.intro')}</p>
+        <div className="entete-bande">
+          <h2>{t('plan.titre')}</h2>
+          <p className="entete-bande__note">{t('plan.intro')}</p>
+        </div>
         <p className="champ__aide">
           {t('plan.anneeScolaire', { annee: plan.anneesCouvertes.join(' · ') })} ·{' '}
           {t('validite.releve', { date: plan.source.dateReleve })}

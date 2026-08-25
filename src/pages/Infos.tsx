@@ -20,9 +20,14 @@ export function Limites() {
 
   return (
     <div className="pile pile--large">
-      <header className="pile pile--serre">
+      {/*
+          Le titre à gauche, ce qu'il annonce à droite : la mise en page d'entrée de
+          section de la vitrine. Elle sépare le propos de sa mise en garde, qui se
+          lisaient jusqu'ici comme deux paragraphes de même poids.
+      */}
+      <header className="entete-bande">
         <h2>{t('limites.titre')}</h2>
-        <p>{t('limites.intro')}</p>
+        <p className="entete-bande__note">{t('limites.intro')}</p>
       </header>
 
       {/* En tête des limites, parce que c'est la première : un horaire n'est pas une
@@ -32,14 +37,21 @@ export function Limites() {
         <p>{t('plan.avertissementHorairesDetail')}</p>
       </div>
 
-      {sections.map((cle) => (
-        <section className="carte pile pile--serre" key={cle}>
-          <h3 className="titre-carte">{t(`limites.${cle}Titre`)}</h3>
-          <p>{t(`limites.${cle}Corps`)}</p>
-        </section>
-      ))}
+      {/*
+          Neuf cartes empilées se lisaient comme neuf annonces successives, et on
+          abandonnait à la quatrième. En grille au filet, elles redeviennent ce
+          qu'elles sont : une liste de ce que le site ne sait pas faire, qu'on parcourt.
+      */}
+      <ul className="filets tuiles liste-nue">
+        {sections.map((cle) => (
+          <li className="filets__case" key={cle}>
+            <h3 className="tuile__titre">{t(`limites.${cle}Titre`)}</h3>
+            <p className="tuile__texte">{t(`limites.${cle}Corps`)}</p>
+          </li>
+        ))}
+      </ul>
 
-      <section className="carte pile pile--serre">
+      <section className="bande pile pile--serre">
         <h3 className="titre-carte">{t('reglages.donnees')}</h3>
         <ul className="liste-puces">
           <li>
@@ -66,6 +78,7 @@ export function Independance() {
   return (
     <div className="pile pile--large">
       <header className="pile pile--serre">
+        <span className="etiquette etiquette--mono">{t('app.titre')}</span>
         <h2>{t('independance.titre')}</h2>
       </header>
 

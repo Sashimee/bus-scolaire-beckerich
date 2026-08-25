@@ -62,9 +62,9 @@ export function Credits() {
 
   return (
     <div className="pile pile--large">
-      <header className="pile pile--serre">
+      <header className="entete-bande">
         <h2>{t('credits.titre')}</h2>
-        <p>{t('credits.intro')}</p>
+        <p className="entete-bande__note">{t('credits.intro')}</p>
       </header>
 
       {donnees.developpement.length > 0 && (
