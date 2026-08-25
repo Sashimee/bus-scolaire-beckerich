@@ -28,7 +28,9 @@ la commune ni avec l'école**.
   couleurs, tailles de texte, espacements, rayons et ombres passent par les jetons de la
   couche `tokens`. Un composant ne porte que des classes. Toute cible tactile fait
   ≥ 44 px (`--cible`), et chaque couple encre/fond se vérifie à un contraste ≥ 4.5:1
-  avant d'entrer dans la palette.
+  avant d'entrer dans la palette. Ces trois règles ne tiennent plus par relecture seule :
+  `src/style.test.ts` refuse une couleur hors des jetons et un `style={{…}}` dans un
+  composant, `src/contraste.test.ts` mesure tous les couples encre/fond des deux thèmes.
 - Les commentaires expliquent **pourquoi**, pas quoi.
 
 ## Carte du dépôt
@@ -94,8 +96,11 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   `app.schoulbus.lu`** (voir [docs/deploiement.md](docs/deploiement.md)). **Lot 26 fait le
   2026-08-24** : les rappels ont un journal de livraison, lisible à l'onglet « Journal » de
   `/edition`. **Lots 27-28 faits le 2026-08-24** : la mesure de fréquentation est
-  auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Tous les
-  lots planifiés (0 à 28) sont faits.** **À consulter avant d'entamer une évolution.**
+  auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Lot 29 fait
+  le 2026-08-25, sur la branche `dev` seule** : l'application prend la charte de la vitrine
+  `www.schoulbus.lu` — crème, sarcelle, corail ; surfaces opaques, plus de verre — et la
+  branche `dev` a sa propre pile sur `dev.schoulbus.lu`. **Tous les lots planifiés (0 à 29)
+  sont faits.** **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une
@@ -104,5 +109,9 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   lot, et pourquoi.
 - [DONNEES.md](DONNEES.md) — mettre à jour horaires, arrêts, cycles et vacances.
 - [ADMIN.md](ADMIN.md) — publier une urgence, activer les notifications push.
-- [docs/deploiement.md](docs/deploiement.md) — déployer le serveur sur la VPS (Dokploy, image GHCR, DNS).
+- [docs/deploiement.md](docs/deploiement.md) — déployer le serveur sur la VPS (Dokploy,
+  image GHCR, DNS). **Deux piles depuis le lot 29** : `main` → `app.schoulbus.lu`,
+  `dev` → `dev.schoulbus.lu`, sur le même Dokploy et le même Traefik, bases et secrets
+  séparés. Un seul `compose.deploiement.yaml`, trois variables (`SUFFIXE`, `DOMAINE`,
+  `PROJET`) dont les défauts sont ceux de la production.
 - [README.md](README.md) — présentation publique et sources des données.

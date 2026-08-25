@@ -14,8 +14,24 @@
 #   Lot 23 : le site (service bus-site) vit sous la RACINE d'app.schoulbus.lu, à la même
 #   origine que l'API — la bascule d'origine. Le déploiement GitHub Pages reste vivant
 #   le temps de la transition (filet de repli), jusqu'à ce que le DNS bascule.
+#
+# UN FICHIER, DEUX PILES (lot 29). Le même compose sert la production et la pile de la
+# branche `dev`, sur la même VPS et derrière le même Traefik. Trois variables les
+# distinguent, et elles ont toutes un défaut qui est celui de la PRODUCTION :
+#
+#   SUFFIXE   vide en production, `-dev` sur l'autre pile. Il suffixe le NOM des
+#             routeurs et des services Traefik. C'est le point le plus facile à
+#             manquer : les noms de routeur sont globaux à l'instance Traefik, deux
+#             piles qui déclarent `bus-api` se marchent dessus, et la seconde est
+#             ignorée sans le dire — on cherche alors la panne dans le certificat.
+#   DOMAINE   le nom d'hôte servi.
+#   PROJET    le nom de projet Compose. Dokploy en impose un par application, mais si
+#             la pile est montée à la main, c'est lui qui sépare les volumes.
+#
+# Sans aucune de ces trois, le fichier produit exactement les étiquettes qu'il produisait
+# avant le lot 29 : la production ne bouge pas.
 
-name: bus-beckerich
+name: ${PROJET:-bus-beckerich}
 
 services:
   bus-postgres:
@@ -62,7 +78,7 @@ services:
       # Déclarée, et non devinée : derrière Traefik, l'URL vue par le serveur porte le
       # nom du conteneur (`http://bus-api:3000/…`). La déduire casserait le `redirect_uri`
       # d'OAuth, que GitHub et Google comparent caractère par caractère. Voir http.ts.
-      URL_API_PUBLIQUE: ${URL_API_PUBLIQUE:-https://app.schoulbus.lu/api}
+      URL_API_PUBLIQUE: ${URL_API_PUBLIQUE:-https://${DOMAINE:-app.schoulbus.lu}/api}
       # Origine du site, pour les liens des notifications de rappel.
       URL_SITE: ${URL_SITE:?}
 
@@ -109,17 +125,23 @@ services:
       # garantit que cette règle l'emporte sur celle du site, qui capte la racine : sans
       # elle, Traefik les départage par longueur de règle, ce qui tomberait juste ici
       # mais qu'on ne veut pas laisser au hasard sur un chemin aussi sensible.
-      - traefik.http.routers.bus-api.rule=Host(`app.schoulbus.lu`) && PathPrefix(`/api`)
-      - traefik.http.routers.bus-api.priority=100
-      - traefik.http.routers.bus-api.entrypoints=websecure
-      - traefik.http.routers.bus-api.tls.certresolver=letsencrypt
-      - traefik.http.services.bus-api.loadbalancer.server.port=3000
+      - traefik.http.routers.bus-api${SUFFIXE:-}.rule=Host(`${DOMAINE:-app.schoulbus.lu}`) && PathPrefix(`/api`)
+      - traefik.http.routers.bus-api${SUFFIXE:-}.priority=100
+      - traefik.http.routers.bus-api${SUFFIXE:-}.entrypoints=websecure
+      - traefik.http.routers.bus-api${SUFFIXE:-}.tls.certresolver=letsencrypt
+      # Le lien routeur → service, écrit alors qu'il était implicite. Il ne l'est plus
+      # dès que le nom porte un suffixe : Traefik n'associe d'office que les noms égaux.
+      - traefik.http.routers.bus-api${SUFFIXE:-}.service=bus-api${SUFFIXE:-}
+      - traefik.http.services.bus-api${SUFFIXE:-}.loadbalancer.server.port=3000
 
   bus-site:
     # Le site construit (lot 23), servi par Caddy sous la RACINE d'app.schoulbus.lu, à
     # la même origine que l'API. C'est la bascule d'origine : le CORS n'a plus d'objet,
     # et la CSP se resserre. L'image est construite et poussée par la CI, comme bus-api ;
     # l'origine et le chemin de base y sont figés au build (voir Dockerfile.site).
+    # `:latest` en production ; la pile `dev` vise `:dev`, que la CI pousse sur un
+    # push de cette branche. Les deux étiquettes ne se croisent jamais — voir
+    # `.github/workflows/deploy.yml`, où `latest` est réservé à la branche par défaut.
     image: ${IMAGE_SITE:-ghcr.io/sashimee/bus-site:latest}
     restart: unless-stopped
     # Le site est purement statique : il ne touche ni la base ni aucun secret. Il ne
@@ -131,11 +153,12 @@ services:
       - traefik.docker.network=dokploy-network
       # La racine du domaine, tout ce que `/api` ne capte pas. Priority basse : l'API
       # passe devant.
-      - traefik.http.routers.bus-site.rule=Host(`app.schoulbus.lu`)
-      - traefik.http.routers.bus-site.priority=1
-      - traefik.http.routers.bus-site.entrypoints=websecure
-      - traefik.http.routers.bus-site.tls.certresolver=letsencrypt
-      - traefik.http.services.bus-site.loadbalancer.server.port=8080
+      - traefik.http.routers.bus-site${SUFFIXE:-}.rule=Host(`${DOMAINE:-app.schoulbus.lu}`)
+      - traefik.http.routers.bus-site${SUFFIXE:-}.priority=1
+      - traefik.http.routers.bus-site${SUFFIXE:-}.entrypoints=websecure
+      - traefik.http.routers.bus-site${SUFFIXE:-}.tls.certresolver=letsencrypt
+      - traefik.http.routers.bus-site${SUFFIXE:-}.service=bus-site${SUFFIXE:-}
+      - traefik.http.services.bus-site${SUFFIXE:-}.loadbalancer.server.port=8080
 
 networks:
   # Réseau privé serveur↔base, invisible de Traefik : la base n'y est jamais exposée.

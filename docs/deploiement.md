@@ -116,6 +116,83 @@ local ne peut prouver, et qui se lèvent au premier déploiement réel :
   plus de cinquante abonnés : ce qui compte n'est pas la durée mais le nombre d'échecs.
   Un service de push qui répond `429` dit que la concurrence est trop haute.
 
+## Second déploiement — la branche `dev` (lot 29)
+
+`dev.schoulbus.lu` est une pile **entièrement séparée** sur la même VPS, derrière le même
+Traefik : sa propre base, ses propres secrets, ses propres images. Rien n'est partagé avec
+la production, pas même la paire VAPID.
+
+### Un fichier, deux piles
+
+`compose.deploiement.yaml` sert les deux. Trois variables les distinguent, et **leurs
+défauts sont ceux de la production** — sans elles, le fichier produit exactement les
+étiquettes d'avant le lot 29 :
+
+| Variable | Production | `dev` |
+| --- | --- | --- |
+| `SUFFIXE` | *(vide)* | `-dev` |
+| `DOMAINE` | `app.schoulbus.lu` | `dev.schoulbus.lu` |
+| `PROJET` | `bus-beckerich` | `bus-beckerich-dev` |
+
+`SUFFIXE` est le piège de l'affaire : il suffixe le **nom des routeurs et services
+Traefik**, qui sont globaux à l'instance. Deux piles qui déclarent toutes deux
+`traefik.http.routers.bus-api` se marchent dessus, et la seconde est ignorée **sans le
+dire** — on cherche alors la panne dans le certificat, où elle n'est pas.
+
+### Les images
+
+La CI construit et pousse `ghcr.io/sashimee/bus-{api,site}:dev` sur un push de la branche.
+L'étiquette `latest` est **réservée à la branche par défaut** : un push sur `dev` ne peut
+pas mettre son image en production. Voir `.github/workflows/deploy.yml`, travail
+« Identité de la pile visée » — c'est là que l'origine du site est choisie, et elle est
+**inlinée par Vite dans le bundle** : une image de dev bâtie sur les valeurs de production
+appellerait la base de production, et rien ne le laisserait voir.
+
+### Mise en place
+
+1. **DNS.** `dev.schoulbus.lu` → l'adresse de la VPS, en `A` (et `AAAA` s'il y a de
+   l'IPv6). **Doit résoudre avant le premier déploiement**, sinon Let's Encrypt échoue.
+2. **Une paire VAPID neuve** : `node scripts/generer-vapid.mjs`. La moitié privée va dans
+   `VAPID_JWK` côté Dokploy, la moitié **publique** dans la variable de dépôt
+   `CLE_VAPID_DEV` — d'où elle entre dans l'image. Si les deux ne concordent pas,
+   l'abonnement est accepté et rien n'arrive (réserve R49).
+3. **Un second service Compose dans Dokploy**, projet Schoulbus, nommé `bus-app-dev`,
+   fichier `compose.deploiement.yaml`, avec les variables ci-dessous.
+
+| Variable | Valeur pour `dev` |
+| --- | --- |
+| `SUFFIXE` | `-dev` |
+| `DOMAINE` | `dev.schoulbus.lu` |
+| `PROJET` | `bus-beckerich-dev` |
+| `IMAGE_SERVEUR` | `ghcr.io/sashimee/bus-api:dev` |
+| `IMAGE_SITE` | `ghcr.io/sashimee/bus-site:dev` |
+| `POSTGRES_PASSWORD` | **neuf**, distinct de la production |
+| `SECRET_SESSION` | **neuf** |
+| `VAPID_JWK`, `CONTACT_VAPID` | la paire neuve de l'étape 2 |
+| `ORIGINES_AUTORISEES` | `https://dev.schoulbus.lu` |
+| `URL_API_PUBLIQUE` | `https://dev.schoulbus.lu/api` |
+| `URL_SITE` | `https://dev.schoulbus.lu` |
+| `NB_PROXYS_FIABLES` | `1` |
+| `SMTP_*` | **vides.** La création de compte est alors refusée avec un motif clair plutôt qu'échouée en silence. À poser le jour où l'on veut y éprouver un envoi réel. |
+
+4. **Avant le premier `up`, vérifier les volumes** (réserve R50) : `docker volume ls`. Une
+   collision de volume mettrait les données de production dans dev, et cela ne se verrait
+   pas tout de suite.
+5. **Contrôler, puis amorcer un compte :**
+
+   ```bash
+   curl https://dev.schoulbus.lu/api/sante        # base/push/comptes au vert, compteurs à zéro
+   sudo docker exec <conteneur bus-api de dev> \
+     node creer-utilisateur.mjs "…@…" "Nom" \
+     "comptes,perturbations,arrets,horaires,traductions,credits"
+   ```
+
+> **Cette machine est l'hôte de production.** Toute commande `docker compose` lancée à la
+> main doit porter le `-p` de la pile visée. Sans lui, `name:` du fichier décide — et il
+> vaut `bus-beckerich`, qui est aussi le nom de la pile de développement locale
+> (`compose.yaml`, port 5433). Trois piles, un seul nom par défaut : le `-p` n'est pas
+> facultatif.
+
 ## Relancer un déploiement
 
 Un push sur `main` reconstruit tout. Pour ne redéployer que le serveur sans changer

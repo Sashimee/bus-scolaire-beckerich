@@ -8,9 +8,16 @@ name: Déploiement — site et image du serveur
 #    `bus-api` (le serveur) et `bus-site` (le site sous app.schoulbus.lu, lot 23).
 #    Ainsi ce qui tourne en production est CE que les tests ont validé, jamais une
 #    seconde construction faite ailleurs. Voir `compose.deploiement.yaml`.
+#
+# Depuis le lot 29, la branche `dev` a sa PROPRE pile sur la même VPS
+# (dev.schoulbus.lu). Elle passe par le même travail, avec trois différences, toutes
+# gardées ci-dessous : elle ne déploie PAS GitHub Pages (un dépôt n'a qu'un site), elle
+# n'écrit JAMAIS l'étiquette `latest` (c'est celle que la production tire), et son image
+# de site est construite sur son propre domaine — Vite fige l'origine dans le bundle,
+# une image de dev bâtie sur les valeurs de prod appellerait la base de production.
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 permissions:
@@ -19,9 +26,11 @@ permissions:
   id-token: write
 
 # On laisse toujours finir un déploiement en cours plutôt que de l'annuler : une
-# interruption laisserait le site dans un état intermédiaire.
+# interruption laisserait le site dans un état intermédiaire. Le groupe porte la
+# référence : sans elle, un push sur `dev` attendrait la fin d'un déploiement de
+# production, et inversement — deux piles indépendantes qui se mettent en file.
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -86,8 +95,11 @@ jobs:
         working-directory: serveur
 
   construction:
-    name: Construction du site
+    name: Construction du site (GitHub Pages)
     needs: controle
+    # Pages n'a qu'un déploiement par dépôt : seule la branche par défaut y va. La pile
+    # `dev` se regarde sur dev.schoulbus.lu, pas sur Pages.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -122,8 +134,9 @@ jobs:
           path: dist
 
   deploiement:
-    name: Mise en ligne
+    name: Mise en ligne (GitHub Pages)
     needs: construction
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -159,8 +172,14 @@ jobs:
           # `latest` pour le suivi courant, et le condensat du commit pour épingler un
           # redéploiement à une version précise depuis Dokploy (`…@sha256:` ou le tag
           # `sha-…`). Voir `IMAGE_SERVEUR` dans compose.deploiement.yaml.
+          # `latest` UNIQUEMENT sur la branche par défaut : c'est l'étiquette que tire
+          # la production. Un push sur `dev` qui l'écraserait mettrait la refonte en
+          # ligne chez les parents au prochain redéploiement, sans que personne l'ait
+          # demandé. `type=ref,event=branch` donne `:main` et `:dev` ; le condensat du
+          # commit reste là pour épingler une version précise depuis Dokploy.
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
             type=sha,prefix=sha-
       - name: Construire et pousser
         uses: docker/build-push-action@v6
@@ -194,13 +213,43 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      #
+      # Quelle pile cette image sert-elle ? La question se pose une fois, ici, et non
+      # trois fois dans les `build-args` : l'idiome ternaire de GitHub (`A && B || C`)
+      # retombe sur `C` dès que `B` est VIDE, si bien qu'une variable de dépôt non
+      # renseignée sur `main` y aurait silencieusement chargé la valeur de `dev`. Une
+      # clé VAPID de dev servie en production ne casse rien à l'ouverture : elle rend
+      # seulement les notifications inopérantes, des semaines plus tard.
+      - name: Identité de la pile visée
+        id: pile
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            {
+              echo "url_publique=${{ vars.URL_PUBLIQUE || 'https://app.schoulbus.lu' }}"
+              echo "url_api=${{ vars.URL_API || 'https://app.schoulbus.lu/api' }}"
+              echo "cle_vapid=${{ vars.CLE_VAPID }}"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "url_publique=https://dev.schoulbus.lu"
+              echo "url_api=https://dev.schoulbus.lu/api"
+              echo "cle_vapid=${{ vars.CLE_VAPID_DEV }}"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Étiquettes de l'image
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/bus-site
+          # `latest` UNIQUEMENT sur la branche par défaut : c'est l'étiquette que tire
+          # la production. Un push sur `dev` qui l'écraserait mettrait la refonte en
+          # ligne chez les parents au prochain redéploiement, sans que personne l'ait
+          # demandé. `type=ref,event=branch` donne `:main` et `:dev` ; le condensat du
+          # commit reste là pour épingler une version précise depuis Dokploy.
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
             type=sha,prefix=sha-
       - name: Construire et pousser
         uses: docker/build-push-action@v6
@@ -214,11 +263,16 @@ jobs:
           # build. Cette image est celle d'app.schoulbus.lu, à la racine — d'où
           # `BASE_PATH=/`, distinct du `/bus-scolaire-beckerich/` du build Pages. Les
           # clés publiques viennent des variables de dépôt, comme pour Pages.
+          #
+          # L'origine, le chemin de base et la clé publique VAPID sont INLINÉS par Vite
+          # dans le bundle : ils font partie de l'image et ne se corrigent pas au
+          # déploiement. Se tromper ici ne casse rien de visible — le site de dev
+          # s'ouvre, et c'est la base de PRODUCTION qu'il écrit.
           build-args: |
             BASE_PATH=/
-            URL_PUBLIQUE=${{ vars.URL_PUBLIQUE || 'https://app.schoulbus.lu' }}
-            VITE_URL_API=${{ vars.URL_API || 'https://app.schoulbus.lu/api' }}
-            VITE_CLE_VAPID=${{ vars.CLE_VAPID }}
+            URL_PUBLIQUE=${{ steps.pile.outputs.url_publique }}
+            VITE_URL_API=${{ steps.pile.outputs.url_api }}
+            VITE_CLE_VAPID=${{ steps.pile.outputs.cle_vapid }}
             VITE_ID_CLIENT_GOOGLE=${{ vars.ID_CLIENT_GOOGLE }}
             GITHUB_SHA=${{ github.sha }}
           cache-from: type=gha

@@ -82,6 +82,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R41 | 21 | **Le paquet a été construit et l'image exercée, mais jamais sous charge.** L'envoi des notifications est passé d'un découpage en lots de 10 à une boucle à 20 envois simultanés. La nouvelle valeur n'est pas plus mesurée que ne l'était `TAILLE_LOT` — elle est seulement libre du plafond qui justifiait l'ancienne. | Regarder le journal du conteneur au premier envoi réel de plus de cinquante abonnés. Ce qui compte n'est pas la durée mais le nombre d'échecs : un service de push qui répond `429` dit que la concurrence est trop haute. |
 | ~~R42~~ | 22 | ~~La chaîne de déploiement n'a jamais été montée par le vrai Dokploy.~~ **Levée le 2026-08-24** : déployée sur le vrai Dokploy (`dok.seil.pro`, projet Schoulbus), Traefik a routé `app.schoulbus.lu/api` et émis le certificat, `/api/sante` répond `base: true`, `push: true`, `commune: true`, `comptes: true`, `courriel: true`. Le site rend un 200 à la racine, une route profonde retombe sur `index.html`, les quatre lectures publiques (`/urgences /horaires /credits /traductions`) répondent 200. **Nuance** : les images ont été construites SUR la VPS et non tirées de GHCR — le chemin GHCR (paquet privé, identifiant de registre) reste donc à éprouver le jour où la CI publiera les images. Le reste — Dokploy, Traefik, certificat, chemin `/api` non tronqué — est confirmé. Reste l'ancien texte pour trace : `compose.deploiement.yaml`, la poussée d'image sur GHCR et le routage Traefik (`Host(app.schoulbus.lu) && PathPrefix(/api)`, certificat Let's Encrypt) sont vérifiés en local — `docker build`, la pile montée depuis l'image construite, `/api/sante` au vert avec `base: true`, la sonde de l'image qui passe, `docker compose config` qui résout le fichier — mais **aucun Dokploy, aucun Traefik, aucun certificat réel** n'a été devant. Trois choses ne se voient qu'au premier déploiement : que Dokploy sait tirer l'image (paquet privé → identifiant de registre requis), que Traefik émet bien le certificat (DNS à résoudre d'abord), et que le chemin `/api` arrive non tronqué au serveur. | Pousser sur `main`, créer l'application Compose dans Dokploy sur `compose.deploiement.yaml`, poser les variables, déployer, puis `curl https://app.schoulbus.lu/api/sante`. Voir [docs/deploiement.md](deploiement.md). C'est le même déploiement qui lèvera R39 (reprise clé-valeur) et R40 (adresse client derrière Traefik). |
 | R43 | 23 | **Partiellement levée le 2026-08-24.** Le site EST servi par le vrai Traefik sous `app.schoulbus.lu` : racine 200, en-têtes `X-Frame-Options: DENY`/`nosniff`, repli SPA vérifié, CSP portant `app.schoulbus.lu/api`, et le partage d'origine site↔API confirmé (les routeurs priorité 100/1 départagent `/api` du reste). **Restent invérifiés** : l'installation de la PWA depuis la nouvelle origine sur un appareil réel, et le fait qu'une PWA déjà installée depuis GitHub Pages ne migre pas seule. Ancien texte pour trace : L'image `bus-site` (Caddy) est vérifiée en local — racine qui rend un 200, en-têtes `X-Frame-Options: DENY`/`nosniff`/`Referrer-Policy`, repli SPA d'une route profonde vers `index.html`, chemins d'actifs à la racine (`BASE_PATH=/`), CSP portant `app.schoulbus.lu/api`. Restent invérifiés : le partage d'origine site↔API à travers Traefik (les deux routeurs, priorité 100 contre 1), l'installation de la PWA depuis la nouvelle origine (dont `start_url`/`scope` passent à `/`), et le fait qu'une PWA déjà installée depuis GitHub Pages (portée `/bus-scolaire-beckerich/`) **ne migre pas toute seule** — c'est une autre origine, un autre service worker ; le parent garde l'ancienne installation jusqu'à réinstaller depuis `app.schoulbus.lu`. | Après le déploiement : ouvrir `https://app.schoulbus.lu`, vérifier que le site s'affiche et qu'une route profonde rechargée ne rend pas un 404, installer la PWA depuis cette origine, et confirmer que l'espace commune et les notifications répondent (même origine, sans CORS). Prévoir un mot aux parents déjà installés : réinstaller depuis la nouvelle adresse. |
+| R48 | 29 | **La charte n'a été vue que sur un navigateur de bureau.** Les écrans ont été rendus et regardés en clair et en sombre sur Chromium à 1100 px. Rien n'a été vu sur un téléphone, et surtout pas dans la seule condition qui compte : un écran au soleil, un matin, à bout de bras. Le contraste est mesuré (`src/contraste.test.ts`), mais un ratio de 4,5:1 sur un crème très clair ne dit pas si l'heure se lit dehors. | Ouvrir `dev.schoulbus.lu` sur un vrai téléphone, dehors, un matin. Regarder d'abord le panneau du prochain départ et la grille au filet — c'est là que le crème et le sarcelle jouent leur lisibilité. |
+| R49 | 29 | **La pile `dev` n'a jamais reçu de notification push réelle.** Elle a sa propre paire VAPID ; la moitié publique doit être posée en variable de dépôt `CLE_VAPID_DEV` et se retrouver dans l'image, la moitié privée dans `VAPID_JWK` côté Dokploy. Si les deux ne concordent pas, l'abonnement est accepté et **rien n'arrive** — sans message d'erreur. | Après déploiement : s'abonner depuis `dev.schoulbus.lu` et publier un rappel d'essai. Vérifier l'onglet « Journal » de `/edition` sur la pile de dev. |
+| R50 | 29 | **La pile `dev` partage le Traefik et la machine de la production.** Les routeurs sont suffixés et les volumes préfixés par Dokploy, mais rien dans le dépôt ne l'impose : un `docker compose` lancé à la main sans `-p` viserait la mauvaise pile. La base de dev doit être **vide et distincte** — une collision de volume mettrait les données de production dans dev, ce qui ne se verrait pas tout de suite. | Avant le premier `up` : `docker volume ls` et vérifier qu'aucun volume de dev ne porte le préfixe de la pile de production. Après : `curl https://dev.schoulbus.lu/api/sante` et confirmer que les compteurs sont à zéro. |
 | R45 | Consolidation | **Le repli sur les capacités est prouvé par les tests, pas par le serveur déployé.** Les routes `/edition/perturbations · /horaires · /traductions · /journal` et les onglets par capacité passent 144 tests serveur (dont les propriétés de sécurité) et 330 tests app, mais **aucun vrai compte n'a encore publié une perturbation, un plan ou une traduction depuis `app.schoulbus.lu`** par ce chemin. De plus, la migration `004-retrait-agents.sql` (`drop table agent_commune, agent_traduction`) n'a tourné que sur des schémas de test neufs — jamais sur la base de production, où ces tables existent depuis la migration 001. | Après redéploiement : se connecter à `/connexion` avec un vrai compte, publier une perturbation d'essai depuis `/edition`, la voir arriver dans l'app, puis la retirer. Vérifier au passage que le démarrage a bien appliqué la migration 004 (`\dt` ne doit plus lister `agent_commune` ni `agent_traduction`). |
 
 ### Mise en service — faite
@@ -2646,3 +2649,73 @@ R47 — le compteur public reste approximatif (gonflable à la main, comme l'ét
 c'est un ordre de grandeur, pas une métrique de confiance, et on l'assume.
 
 *Tous les lots planifiés (0 à 28) sont faits.*
+
+---
+
+## Lot 29 — La charte de la vitrine, et une pile pour la branche `dev` (2026-08-25)
+
+> **Fait le 2026-08-25**, sur la branche `dev` uniquement — `main` et la production n'ont
+> pas bougé.
+
+### Pourquoi
+
+`www.schoulbus.lu` (la vitrine) et `app.schoulbus.lu` ne se ressemblaient plus. La vitrine
+a été refondue sur une charte **crème / sarcelle / corail** ; l'application était restée sur
+sa charte **bleu nuit sous verre** — dégradé radial, halos, voiles blancs translucides,
+`backdrop-filter`. Un parent qui clique « Ouvrir l'application » depuis la vitrine changeait
+visiblement de produit.
+
+Le constat qui a rendu la bascule simple : **la vitrine partage la couche `tokens` de cette
+application** (`--fond`, `--encre`, `--accent`, `--espace-*`, `--texte-*`, `--police` =
+IBM Plex Sans/Mono) et obtient sa charte en insérant une couche `vitrine` qui redéfinit ces
+mêmes jetons. C'est exactement ce que l'en-tête d'`index.css` promettait depuis le début.
+
+### Ce qui a été fait
+
+- **Jetons.** Les trois blocs de palette réécrits sur la charte de la vitrine. Les surfaces
+  deviennent **opaques** ; `--degrade`, `--halo` et `--flou` disparaissent. Nouveaux jetons :
+  `--encre-faible`, `--panneau` / `--sur-panneau` / `--sur-panneau-douce`, `--ligne`,
+  `--voile`, `--rayon-plein`, `--rayon-xs`, `--espace-0`, `--flou-rail` — les cinq derniers
+  ramassent des valeurs qui traînaient en dur dans `composants`.
+- **Trois décisions que la vitrine ne tranchait pas.** Elle ne redéfinit ni `--danger` ni
+  `--succes` (elle n'en a pas l'usage) : le danger prend la famille **corail**, qui est déjà
+  sa couleur d'alerte, et le succès garde ses teintes, remesurées. Et `--accent-2` change de
+  rôle — il servait à distinguer une ligne de bus, il sert maintenant aux survols ; la ligne
+  de bus prend `--ligne`, en corail, parce qu'un lien et une ligne de bus ne doivent pas
+  porter la même couleur.
+- **L'accent change de charge.** Il désignait à la fois une heure de départ et un bouton.
+  Le bouton d'action étant devenu une pastille sarcelle pleine, les heures reviennent à
+  l'encre : l'accent ne désigne plus qu'une chose, ce sur quoi on appuie.
+- **Formes et écrans.** Boutons en pilule, rail segmenté teinté, et les quatre partis de
+  mise en page de la vitrine : le sur-titre en chasse fixe (`.etiquette--mono`), la grille
+  au filet (`.filets`), la bande teintée (`.bande`), le panneau (`.panneau`, réservé au
+  prochain départ). L'en-tête porte désormais une **marque** — le même bus que le favicon,
+  en jetons, donc au thème — au lieu d'une enseigne en petites capitales.
+- **Marque et métadonnées.** `scripts/build-icones.mjs` recoloré et rejoué ; le sens du
+  dessin s'inverse, comme sur la vitrine (pastille sarcelle, carrosserie crème) — à 16 px
+  sur un onglet clair, une pastille crème était un carré blanc. `theme-color`, manifeste PWA
+  et le repli Leaflet de `CarteTrajet` suivent.
+- **Deux garde-fous qui manquaient.** La règle « aucune couleur hors des jetons, aucun
+  `style={{…}}` » ne tenait que par relecture : ni oxlint, ni la CI, ni un test ne la
+  gardaient. `src/style.test.ts` la met sous test, y compris la `theme-color` d'`index.html`
+  qui doit recopier `--fond`. Et `src/contraste.test.ts` **mesure** les 80 couples
+  encre/fond de la palette dans les deux thèmes — l'ancien commentaire « mesurées sur les 24
+  compositions » était une affirmation qu'aucun test ne rattrapait.
+- **Une pile `dev`.** `compose.deploiement.yaml` prend trois variables — `SUFFIXE`,
+  `DOMAINE`, `PROJET` — dont les défauts sont ceux de la production : sans elles, le fichier
+  produit exactement les étiquettes d'avant. Le suffixe porte sur le **nom des routeurs
+  Traefik**, qui sont globaux à l'instance : deux piles qui déclarent `bus-api` se marchent
+  dessus, et la seconde est ignorée sans le dire. La CI construit et pousse
+  `ghcr.io/sashimee/bus-{api,site}:dev`, ne touche **jamais** `:latest` hors branche par
+  défaut, et saute GitHub Pages sur `dev`.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : 422 tests (337 + 85 nouveaux), typage, lint, build, et le rendu des écrans
+regardé en clair **et** en sombre sur Chromium. `docker compose config` montre que la
+production sans variables produit les étiquettes d'avant, et que `SUFFIXE=-dev
+DOMAINE=dev.schoulbus.lu` produit des routeurs distincts. L'image `bus-site` de dev a été
+construite : sa CSP porte bien `https://dev.schoulbus.lu/api` et non l'origine de prod.
+
+**Où s'arrête la preuve** : R48, R49, R50 ci-dessous.
+
