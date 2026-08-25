@@ -193,6 +193,28 @@ appellerait la base de production, et rien ne le laisserait voir.
 > (`compose.yaml`, port 5433). Trois piles, un seul nom par défaut : le `-p` n'est pas
 > facultatif.
 
+### Déploiement réel — 2026-08-25
+
+Fait. Service Compose **`bus-app-dev`** dans le projet Schoulbus, `composeId`
+`JrHQ4zU5QlxKEmfSAjI2u`, appName `compose-index-neural-capacitor-cfbh54`, `sourceType: raw`.
+Conteneurs : `compose-index-neural-capacitor-cfbh54-{bus-api,bus-site,bus-postgres}-1`.
+
+C'est le **premier déploiement du projet qui tire ses images de GHCR** plutôt que de les
+construire sur la VPS. Le paquet étant public, aucun identifiant de registre n'a été
+nécessaire.
+
+Volumes, pour mémoire — trois piles, trois bases, aucune ne se touche :
+
+| Pile | Volume |
+| --- | --- |
+| production | `compose-hack-neural-pixel-ai3w3f_postgres` |
+| `dev` | `compose-index-neural-capacitor-cfbh54_postgres` |
+| développement local (`compose.yaml`) | `bus-beckerich_postgres` |
+
+`/api/sante` sur dev : `base`, `push`, `comptes`, `rappels` au vert, `courriel: false`
+(SMTP laissé vide), `origines: https://dev.schoulbus.lu`. La `clePubliqueVapid` servie est
+bien celle de `CLE_VAPID_DEV`. Un premier compte est amorcé et sa connexion exercée.
+
 ## Relancer un déploiement
 
 Un push sur `main` reconstruit tout. Pour ne redéployer que le serveur sans changer
