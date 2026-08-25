@@ -37,6 +37,14 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=construction /chantier/serveur/dist ./dist
 
+# Les outils d'exploitation qui tournent CONTRE LA BASE, pour qu'ils soient à portée d'un
+# `docker exec` sur le conteneur — sans quoi amorcer le premier compte ou reprendre les
+# abonnés exigerait de copier le script à la main (ce qui fut le cas au premier
+# déploiement). Ils sont autonomes : leurs seules dépendances (`postgres`, `@node-rs/argon2`)
+# sont déjà dans `node_modules`. `exporter-kv.mjs` n'y est PAS : il appelle `wrangler` et
+# se lance depuis un poste connecté à Cloudflare, pas depuis l'image.
+COPY serveur/creer-utilisateur.mjs serveur/importer-kv.mjs ./
+
 # Utilisateur non root. L'image `node` en fournit un, inutile d'en créer un autre.
 USER node
 

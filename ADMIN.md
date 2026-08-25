@@ -234,12 +234,19 @@ s'écrit en base.
 
 ### Reprendre l'état de l'ancien serveur
 
-À faire **une seule fois**, au moment de la bascule. Sans cette étape, tous les codes
-d'agents sont invalidés et tous les parents désabonnés, sans que rien ne le signale.
+À faire **une seule fois**, au moment de la bascule. Sans cette étape, tous les parents
+sont désabonnés, sans que rien ne le signale. (Les **codes d'agents ne sont plus repris** :
+les espaces à code personnel ont été retirés — chaque agent est à recréer en compte, voir
+« Donner accès à un agent » plus haut.)
+
+L'export se fait depuis un poste connecté à Cloudflare ; l'import, **dans le conteneur**
+`bus-api` (où `importer-kv.mjs` est embarqué et `DATABASE_URL` déjà posé), après y avoir
+copié le fichier :
 
 ```bash
-node serveur/exporter-kv.mjs > /tmp/kv.json          # depuis un poste connecté à Cloudflare
-DATABASE_URL=… node serveur/importer-kv.mjs /tmp/kv.json
+node serveur/exporter-kv.mjs > kv.json                      # poste connecté à Cloudflare
+docker cp kv.json <conteneur bus-api>:/tmp/kv.json
+docker exec <conteneur bus-api> node importer-kv.mjs /tmp/kv.json
 ```
 
 L'import est idempotent : le relancer ne crée pas de doublon. Les états OAuth, les
@@ -257,26 +264,33 @@ avec des **capacités** — `perturbations`, `arrets`, `horaires`, `traductions`
 `SECRET_SESSION`, l'espace est éteint et l'application parent tourne comme avant.
 
 Le premier administrateur ne peut pas être créé depuis l'application — il n'y a encore
-personne pour le créer. On l'amorce par la CLI, sur la VPS (un terminal Dokploy sur le
-service `bus-api`, ou un conteneur jetable sur le réseau interne) :
+personne pour le créer. On l'amorce par la CLI, **dans le conteneur `bus-api`**, où le
+script `creer-utilisateur.mjs` est embarqué et où `DATABASE_URL` est déjà posé (un
+terminal Dokploy sur le service, ou `docker exec` sur la VPS) :
 
 ```bash
-DATABASE_URL=… node serveur/creer-utilisateur.mjs "agent@ville.lu" "Marie Weber" comptes
+docker exec <conteneur bus-api> \
+  node creer-utilisateur.mjs "agent@ville.lu" "Marie Weber" comptes
 ```
+
+Une capacité par nature de donnée, séparées par des virgules ou des espaces — pour
+amorcer un administrateur qui peut **tout** faire :
+`"comptes,perturbations,horaires,traductions,credits,arrets"`.
 
 Le compte naît **déjà vérifié** (l'opérateur en répond) avec un mot de passe tiré au
 hasard, **affiché une seule fois**. Ensuite, toute personne portant `comptes` crée et
-gère les autres depuis l'application (l'interface web arrive au lot suivant ; d'ici là,
-l'espace répond à l'API). Les comptes créés dans l'application reçoivent un **lien
+gère les autres **depuis l'application** (page `/comptes`, atteinte par le lien « Espace
+agents » en pied de page). Les comptes créés dans l'application reçoivent un **lien
 d'activation** par courriel qui pose leur mot de passe et vérifie leur adresse d'un même
 geste — d'où l'exigence d'un relai SMTP configuré (voir le tableau des variables).
 
-En secours, sans relai ou pour une personne verrouillée dehors :
+En secours, sans relai ou pour une personne verrouillée dehors, les mêmes commandes dans
+le conteneur :
 
 ```bash
-DATABASE_URL=… node serveur/creer-utilisateur.mjs --lister
-DATABASE_URL=… node serveur/creer-utilisateur.mjs --mot-de-passe "agent@ville.lu"
-DATABASE_URL=… node serveur/creer-utilisateur.mjs --desactiver "agent@ville.lu"
+docker exec <conteneur bus-api> node creer-utilisateur.mjs --lister
+docker exec <conteneur bus-api> node creer-utilisateur.mjs --mot-de-passe "agent@ville.lu"
+docker exec <conteneur bus-api> node creer-utilisateur.mjs --desactiver "agent@ville.lu"
 ```
 
 > On ne peut ni se retirer à soi-même la capacité `comptes`, ni se désactiver soi-même :
