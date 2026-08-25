@@ -80,7 +80,9 @@
      */
     --heure-geante: clamp(3rem, 15vw, 3.875rem);
 
-    /* Espacement : une seule échelle, multiples de 4 px. */
+    /* Espacement : une seule échelle, multiples de 4 px. `--espace-0` est le seul cran
+       en dessous — le creux d'un rail segmenté, où 4 px sépareraient déjà trop. */
+    --espace-0: 0.1875rem;
     --espace-1: 0.25rem;
     --espace-2: 0.5rem;
     --espace-3: 0.75rem;
@@ -90,17 +92,24 @@
     --espace-7: 3rem;
 
     /*
-     * Rayons et épaisseurs de trait. Les rayons se sont élargis
-     * avec la refonte : une surface de verre à angle vif se lit comme un défaut de
-     * rendu, pas comme une carte posée sur le fond.
+     * Rayons et épaisseurs de trait. `--rayon-plein` n'est pas un rayon mais la pilule :
+     * un nombre assez grand pour que le rayon vaille toujours la moitié de la hauteur,
+     * quelle qu'elle soit. Il traînait en `999px` brut en quatre endroits.
      */
+    --rayon-xs: 4px; /* le liseré du focus, et rien d'autre */
     --rayon-s: 12px;
     --rayon-m: 16px;
     --rayon-l: 24px;
-    /* `--lustre` porte l'ombre des surfaces posées ; il ne reste que deux ombres
-       portées, pour ce qui flotte au-dessus d'elles et pour ce qui bloque la page. */
-    --ombre-2: 0 2px 6px -1px rgb(0 0 0 / 0.22), 0 8px 24px -14px rgb(0 0 0 / 0.4);
-    --ombre-3: 0 4px 12px -2px rgb(0 0 0 / 0.28), 0 20px 48px -20px rgb(0 0 0 / 0.5);
+    --rayon-plein: 999px;
+
+    /*
+     * Les ombres sont longues et très diffuses. Sur le bleu nuit, une ombre courte et
+     * dense passait pour l'arête d'une vitre ; sur un fond crème, elle se lit comme une
+     * salissure. `--lustre` porte les surfaces posées, les deux autres ce qui flotte
+     * au-dessus d'elles et ce qui bloque la page.
+     */
+    --ombre-2: 0 26px 60px -40px rgb(0 0 0 / 0.5);
+    --ombre-3: 0 30px 70px -40px rgb(0 0 0 / 0.6);
     --trait: 1px;
     --trait-fort: 2px;
 
@@ -114,56 +123,81 @@
     /* La navigation bascule de bas en haut à 48rem. En dur dans les media queries,
        qui ne savent pas lire une variable. */
 
-    /* Le flou d'arrière-plan des surfaces de verre, en un seul endroit. */
-    --flou: blur(28px) saturate(140%);
+    /*
+     * `--degrade`, `--halo` et `--flou` ont disparu avec la charte de verre : les
+     * surfaces sont opaques, il n'y a plus rien à laisser transparaître. Ne reste que
+     * le flou de l'en-tête et du rail — voir `--rail`.
+     */
+    --flou-rail: blur(14px);
     --sortie: cubic-bezier(0.22, 0.61, 0.36, 1);
     --ressort: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     /*
-     * Palette sombre (défaut).
+     * Palette sombre (défaut) — la charte de la vitrine `www.schoulbus.lu`, dont cette
+     * application partage la couche `tokens` depuis toujours et qu'elle rejoint ici.
      *
-     * Les surfaces ne sont plus opaques : ce sont des voiles blancs posés sur un
-     * dégradé. Un couple encre/fond ne se vérifie donc plus sur une couleur unie mais
-     * sur la COMPOSITION réelle — arrêt du dégradé, halo décoratif, une ou deux
-     * couches de verre. Toutes les encres ci-dessous ont été mesurées ainsi, sur les
-     * 24 compositions possibles, et tiennent ≥ 4,58:1 (voir docs/plan.md, lot 18).
-     * Ne pas éclaircir un voile ni un arrêt du dégradé sans refaire le calcul :
-     * éclaircir le fond abaisse toutes les encres d'un coup.
+     * Les surfaces sont OPAQUES. C'est le changement de fond de cette refonte : plus de
+     * voile blanc posé sur un dégradé, donc plus de composition à simuler pour vérifier
+     * un contraste — un couple encre/fond se mesure de nouveau sur deux couleurs unies.
+     * `src/contraste.test.ts` les mesure toutes à chaque exécution des tests ; c'est lui
+     * qui tient la promesse, pas ce commentaire.
      */
-    --degrade: radial-gradient(120% 80% at 15% 0%, #142b47 0%, #0e1a2e 45%, #080d19 100%);
-    --halo: rgb(47 127 184 / 0.1);
-    --fond: #0e1a2e; /* repli uni : barre système, impression, `color-scheme` */
-    --fond-creux: rgb(255 255 255 / 0.05); /* creux d'un champ, d'une puce */
-    --surface: rgb(255 255 255 / 0.07); /* le verre ordinaire */
-    --surface-haute: rgb(255 255 255 / 0.12); /* verre appuyé : survol, en-tête de tableau */
-    --surface-accent: rgb(169 220 245 / 0.1); /* verre teinté : ce qui appelle une décision */
-    --rail: rgb(255 255 255 / 0.12); /* la barre de navigation flottante */
+    --fond: #121a19;
+    --fond-creux: #1d2725; /* creux d'un champ, d'une puce */
+    --surface: #1a2422; /* la carte posée */
+    --surface-haute: #171f1e; /* la bande qui rythme une page longue */
+    --surface-accent: #16302f; /* ce qui appelle une décision */
+    /* En-tête et rail : les deux seuls voiles restants, parce qu'ils passent vraiment
+       au-dessus d'un contenu qui défile. */
+    --rail: rgb(18 26 25 / 0.86);
 
-    --bord: rgb(255 255 255 / 0.18);
-    --bord-accent: rgb(169 220 245 / 0.34);
-    /* L'arête de la vitre : un filet de lumière en haut, une ombre portée en dessous. */
-    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+    /* Les filets restent TRANSLUCIDES, eux : un filet se pose sur trois fonds
+       différents (crème, carte, bande) et doit s'accorder aux trois. */
+    --bord: rgb(242 236 227 / 0.14);
+    --bord-accent: rgb(111 195 198 / 0.32);
+    /* Plus d'arête de lumière en `inset` : une ombre longue, qui pose la carte sur le
+       fond au lieu de la vitrer. */
+    --lustre: 0 18px 40px -30px rgb(0 0 0 / 0.55);
 
-    --encre: #e9eff6;
-    --encre-douce: #c2cdda;
+    --encre: #f2ece3;
+    --encre-douce: #c4ccc9;
+    --encre-faible: #9ba6a3; /* la glose sous un chiffre, la note d'une section */
 
-    --accent: #a9dcf5;
-    --accent-2: #d5bdf7; /* seul usage : distinguer une ligne de bus */
-    /* Le bouton d'action : un galet clair, pas une pastille colorée. */
-    --plein: rgb(255 255 255 / 0.92);
-    --encre-sur-plein: #10233d;
+    --accent: #6fc3c6; /* le sarcelle de la vitrine */
+    --accent-2: #a5dedf; /* sarcelle appuyé : survol, état retenu */
+    /* Le bouton d'action redevient une pastille de couleur : sur un fond crème ou
+       vert-nuit, le galet blanc de l'ancienne charte ne se distinguait plus d'une carte. */
+    --plein: #6fc3c6;
+    --encre-sur-plein: #0b2a2e;
 
-    --danger: #f4aab6;
-    --danger-fond: rgb(232 121 140 / 0.14);
-    --danger-bord: rgb(232 121 140 / 0.38);
-    --attention: #ecc386;
-    --attention-fond: rgb(224 169 90 / 0.14);
-    --attention-bord: rgb(224 169 90 / 0.38);
+    /* Le panneau : le seul aplat de marque de l'application. Réservé au prochain
+       départ — c'est l'équivalent applicatif du héros de la vitrine, et il ne vaut que
+       s'il reste unique sur l'écran. */
+    --panneau: #0d3a40;
+    --sur-panneau: #eaf2f0;
+    --sur-panneau-douce: #9cc7c6;
+
+    /*
+     * La ligne de bus. Elle empruntait `--accent-2`, qui sert maintenant aux survols.
+     * Le corail de la vitrine la distingue bien mieux : un lien et une ligne de bus ne
+     * doivent pas porter la même couleur.
+     */
+    --ligne: #ff8c66;
+
+    --danger: #ffae91;
+    --danger-fond: #3a2018;
+    --danger-bord: rgb(255 140 102 / 0.4);
+    --attention: #e0a44e;
+    --attention-fond: #33280f;
+    --attention-bord: rgb(224 164 78 / 0.4);
     --succes: #b3d3ad;
-    --succes-fond: rgb(147 197 140 / 0.14);
-    --succes-bord: rgb(147 197 140 / 0.38);
+    --succes-fond: #1c2a1a;
+    --succes-bord: rgb(179 211 173 / 0.4);
     --info-fond: var(--surface-accent);
     --info-bord: var(--bord-accent);
+
+    /* Le fond du dialogue modal, qui traînait en `rgb(0 0 0 / 0.5)` dans `composants`. */
+    --voile: rgb(9 13 13 / 0.62);
 
     color-scheme: dark;
   }
@@ -173,78 +207,99 @@
    * préférence système — parce qu'une media query ne peut pas figurer dans un
    * sélecteur : c'est la seule duplication acceptée de la couche `tokens`.
    *
-   * Le principe s'inverse : les voiles sont blancs sur un fond gris-bleu, et le bouton
-   * d'action redevient sombre. La bordure, elle, ne peut pas rester blanche comme dans
-   * la maquette — un filet blanc sur un fond clair ne sépare rien. Elle passe à l'encre
-   * translucide, et c'est `--lustre` seul qui garde l'arête de verre.
+   * Le principe ne s'inverse plus : les surfaces sont opaques dans les deux thèmes, et
+   * seules les valeurs changent. `--info-fond` et `--info-bord` ne sont pas redéclarés
+   * ici — ils suivent `--surface-accent` et `--bord-accent` par `var()`.
    */
   :root[data-theme='clair'] {
-    --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
-    --halo: rgb(47 127 184 / 0.05);
-    --fond: #e1e7ee;
-    --fond-creux: rgb(255 255 255 / 0.5);
-    --surface: rgb(255 255 255 / 0.55);
-    --surface-haute: rgb(255 255 255 / 0.75);
-    --surface-accent: rgb(157 196 232 / 0.38);
-    --rail: rgb(255 255 255 / 0.6);
+    --fond: #fbf6ef; /* le crème de la vitrine */
+    --fond-creux: #f3ebdf; /* creux d'un champ, d'une puce */
+    --surface: #fffdf9; /* la carte posée */
+    --surface-haute: #f6efe4; /* la bande qui rythme une page longue */
+    --surface-accent: #e3edeb; /* ce qui appelle une décision */
+    /* En-tête et rail : les deux seuls voiles restants, parce qu'ils passent vraiment
+       au-dessus d'un contenu qui défile. */
+    --rail: rgb(251 246 239 / 0.86);
 
-    --bord: rgb(21 26 32 / 0.14);
-    --bord-accent: rgb(18 57 95 / 0.3);
-    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
+    /* Les filets restent TRANSLUCIDES, eux : un filet se pose sur trois fonds
+       différents (crème, carte, bande) et doit s'accorder aux trois. */
+    --bord: rgb(28 39 37 / 0.12);
+    --bord-accent: rgb(15 90 97 / 0.28);
+    --lustre: 0 18px 40px -30px rgb(11 63 69 / 0.55);
 
-    --encre: #151a20;
-    --encre-douce: #4a5262;
+    --encre: #1c2725;
+    --encre-douce: #4a5654;
+    --encre-faible: #5a6664; /* la glose sous un chiffre, la note d'une section */
 
-    --accent: #12395f;
-    --accent-2: #553094;
-    --plein: #12395f;
-    --encre-sur-plein: #eef2f7;
+    --accent: #0f5a61; /* le sarcelle de la vitrine */
+    --accent-2: #0b3f45; /* sarcelle appuyé : survol, état retenu */
+    --plein: #0f5a61;
+    --encre-sur-plein: #fbf6ef;
 
-    --danger: #8f1f2b;
-    --danger-fond: rgb(156 39 51 / 0.1);
-    --danger-bord: rgb(156 39 51 / 0.28);
-    --attention: #6b4300;
-    --attention-fond: rgb(125 80 0 / 0.1);
-    --attention-bord: rgb(125 80 0 / 0.28);
+    --panneau: #0b3f45;
+    --sur-panneau: #eaf2f0;
+    --sur-panneau-douce: #9cc7c6;
+
+    --ligne: #a9381f;
+
+    --danger: #a9381f;
+    --danger-fond: #fcede7;
+    --danger-bord: rgb(217 80 47 / 0.4);
+    --attention: #8f5a0b;
+    --attention-fond: #f8eeda;
+    --attention-bord: rgb(143 90 11 / 0.32);
     --succes: #215424;
-    --succes-fond: rgb(44 107 34 / 0.1);
-    --succes-bord: rgb(44 107 34 / 0.28);
+    --succes-fond: #e6efe3;
+    --succes-bord: rgb(33 84 36 / 0.3);
+
+    --voile: rgb(28 39 37 / 0.45);
 
     color-scheme: light;
   }
 
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='sombre']) {
-      --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
-      --halo: rgb(47 127 184 / 0.05);
-      --fond: #e1e7ee;
-      --fond-creux: rgb(255 255 255 / 0.5);
-      --surface: rgb(255 255 255 / 0.55);
-      --surface-haute: rgb(255 255 255 / 0.75);
-      --surface-accent: rgb(157 196 232 / 0.38);
-      --rail: rgb(255 255 255 / 0.6);
+      --fond: #fbf6ef; /* le crème de la vitrine */
+      --fond-creux: #f3ebdf; /* creux d'un champ, d'une puce */
+      --surface: #fffdf9; /* la carte posée */
+      --surface-haute: #f6efe4; /* la bande qui rythme une page longue */
+      --surface-accent: #e3edeb; /* ce qui appelle une décision */
+      /* En-tête et rail : les deux seuls voiles restants, parce qu'ils passent vraiment
+         au-dessus d'un contenu qui défile. */
+      --rail: rgb(251 246 239 / 0.86);
 
-      --bord: rgb(21 26 32 / 0.14);
-      --bord-accent: rgb(18 57 95 / 0.3);
-      --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
+      /* Les filets restent TRANSLUCIDES, eux : un filet se pose sur trois fonds
+         différents (crème, carte, bande) et doit s'accorder aux trois. */
+      --bord: rgb(28 39 37 / 0.12);
+      --bord-accent: rgb(15 90 97 / 0.28);
+      --lustre: 0 18px 40px -30px rgb(11 63 69 / 0.55);
 
-      --encre: #151a20;
-      --encre-douce: #4a5262;
+      --encre: #1c2725;
+      --encre-douce: #4a5654;
+      --encre-faible: #5a6664; /* la glose sous un chiffre, la note d'une section */
 
-      --accent: #12395f;
-      --accent-2: #553094;
-      --plein: #12395f;
-      --encre-sur-plein: #eef2f7;
+      --accent: #0f5a61; /* le sarcelle de la vitrine */
+      --accent-2: #0b3f45; /* sarcelle appuyé : survol, état retenu */
+      --plein: #0f5a61;
+      --encre-sur-plein: #fbf6ef;
 
-      --danger: #8f1f2b;
-      --danger-fond: rgb(156 39 51 / 0.1);
-      --danger-bord: rgb(156 39 51 / 0.28);
-      --attention: #6b4300;
-      --attention-fond: rgb(125 80 0 / 0.1);
-      --attention-bord: rgb(125 80 0 / 0.28);
+      --panneau: #0b3f45;
+      --sur-panneau: #eaf2f0;
+      --sur-panneau-douce: #9cc7c6;
+
+      --ligne: #a9381f;
+
+      --danger: #a9381f;
+      --danger-fond: #fcede7;
+      --danger-bord: rgb(217 80 47 / 0.4);
+      --attention: #8f5a0b;
+      --attention-fond: #f8eeda;
+      --attention-bord: rgb(143 90 11 / 0.32);
       --succes: #215424;
-      --succes-fond: rgb(44 107 34 / 0.1);
-      --succes-bord: rgb(44 107 34 / 0.28);
+      --succes-fond: #e6efe3;
+      --succes-bord: rgb(33 84 36 / 0.3);
+
+      --voile: rgb(28 39 37 / 0.45);
 
       color-scheme: light;
     }
@@ -257,25 +312,15 @@
   }
 
   /*
-   * Le fond : un dégradé, et deux halos posés par-dessus.
+   * Le fond : un aplat, et rien d'autre.
    *
-   * Les halos sont des couches du `background` et non des éléments : une div décorative
-   * en `position: fixed` aurait demandé un `z-index` sur toute la coquille, et un
-   * pseudo-élément de `body` se serait glissé entre le fond et le contenu. Ici il n'y a
-   * rien à empiler et rien à masquer aux lecteurs d'écran.
-   *
-   * Le décor s'étale sur toute la hauteur du document et NON sur le seul cadre visible.
-   * `background-attachment: fixed` donnait le rendu de la maquette, mais il force le fond
-   * dans sa propre couche composée, à recomposer à chaque défilement — c'est une cause
-   * connue de saccade sur téléphone, et iOS l'ignore de toute façon. Étalé, le dégradé
-   * devient un lavis très lent : à l'œil, sur une page qui tient en deux ou trois écrans,
-   * la différence ne se voit pas.
+   * Il portait un dégradé radial et deux halos décoratifs. Ils avaient un sens sous la
+   * charte de verre — un voile blanc translucide n'a d'existence que si quelque chose
+   * varie dessous. Sur des surfaces opaques, ils ne se voient plus qu'aux endroits nus,
+   * où ils salissent le crème. La couche composée qu'ils imposaient au défilement s'en
+   * va avec eux, ce qui est autant de gagné sur téléphone.
    */
   body {
-    background:
-      radial-gradient(58% 40% at 88% 2%, var(--halo) 0%, transparent 70%),
-      radial-gradient(50% 36% at -8% 64%, var(--halo) 0%, transparent 70%), var(--degrade);
-    background-repeat: no-repeat;
     background-color: var(--fond);
     color: var(--encre);
     font-family: var(--police);
@@ -327,7 +372,7 @@
   :focus-visible {
     outline: var(--trait-fort) solid var(--accent);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: var(--rayon-xs);
   }
 
   /*
@@ -431,9 +476,9 @@
     position: sticky;
     inset-block-start: 0;
     z-index: 10;
-    background: color-mix(in oklab, var(--fond) 72%, transparent);
-    backdrop-filter: var(--flou);
-    -webkit-backdrop-filter: var(--flou);
+    background: var(--rail);
+    backdrop-filter: var(--flou-rail);
+    -webkit-backdrop-filter: var(--flou-rail);
     border-block-end: var(--trait) solid var(--bord);
     padding-block-start: env(safe-area-inset-top);
   }
@@ -501,8 +546,8 @@
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
     background: var(--rail);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: var(--flou-rail);
+    -webkit-backdrop-filter: var(--flou-rail);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-l);
     box-shadow: var(--lustre);
@@ -714,18 +759,24 @@
   }
 
   /* --- Bouton ---------------------------------------------------------------- */
+  /*
+   * Le bouton est une pilule. Le rayon ne vaut pas `--rayon-s` mais la moitié de la
+   * hauteur : c'est ce qui le distingue au premier coup d'œil d'une carte ou d'un champ,
+   * qui ont le même fond et le même filet.
+   */
   .bouton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--espace-2);
-    padding: var(--espace-2) var(--espace-4);
+    padding-block: var(--espace-2);
+    padding-inline: var(--espace-5);
     min-block-size: var(--cible);
     border: var(--trait) solid var(--bord);
-    border-radius: var(--rayon-s);
-    background: var(--fond-creux);
+    border-radius: var(--rayon-plein);
+    background: var(--surface);
     color: var(--encre);
-    font-size: var(--texte-m);
+    font-size: var(--texte-l);
     font-weight: 600;
     text-align: center;
     text-decoration: none;
@@ -754,19 +805,20 @@
   }
 
   /*
-   * L'action principale : un galet plein, clair sur fond sombre et sombre sur fond
-   * clair. Elle ne prend pas la couleur d'accent — celle-ci sert à lire les heures, et
-   * un bouton de la même couleur qu'une heure de départ crée une hésitation.
+   * L'action principale : une pastille sarcelle pleine. Elle PREND la couleur d'accent,
+   * contrairement à l'ancienne charte où c'était un galet neutre — l'accent y servait
+   * aussi à lire les heures, et deux choses de la même couleur créaient une hésitation.
+   * Les heures se lisent maintenant à l'encre ordinaire, sur le panneau ou sur la carte,
+   * et l'accent ne désigne plus qu'une chose : ce sur quoi on appuie.
    */
   .bouton--primaire {
     background: var(--plein);
     border-color: transparent;
     color: var(--encre-sur-plein);
-    font-weight: 700;
   }
 
   .bouton--primaire:hover {
-    background: color-mix(in oklab, var(--plein) 88%, var(--accent));
+    background: var(--accent-2);
   }
 
   /*
@@ -775,14 +827,14 @@
    * téléphone en plein soleil.
    */
   .bouton--discret {
-    background: transparent;
-    border-color: transparent;
-    color: var(--accent);
+    background: var(--surface);
+    border-color: var(--bord);
+    color: var(--encre);
     box-shadow: none;
   }
   .bouton--discret:hover {
     background: var(--surface-haute);
-    border-color: var(--bord);
+    border-color: var(--bord-accent);
   }
 
   .bouton--danger {
@@ -921,8 +973,6 @@
     border-radius: var(--rayon-s);
     overflow: hidden;
     background: var(--surface);
-    backdrop-filter: var(--flou);
-    -webkit-backdrop-filter: var(--flou);
     box-shadow: var(--lustre), var(--ombre-2);
   }
 
@@ -1081,7 +1131,7 @@
     content: '';
     align-self: stretch;
     block-size: 4px;
-    border-radius: 999px;
+    border-radius: var(--rayon-plein);
     background: var(--bord);
   }
 
@@ -1250,16 +1300,16 @@
   .bascule,
   .segments {
     display: grid;
-    border: var(--trait) solid var(--bord);
-    border-radius: var(--rayon-s);
-    background: var(--fond-creux);
+    border: var(--trait) solid transparent;
+    border-radius: var(--rayon-plein);
+    background: var(--surface-accent);
     /*
-     * Un rail creux, et le choix retenu posé dedans comme un galet. L'ancienne version
-     * découpait le rail en cases jointives séparées par un filet ; sur verre, ces
-     * filets se lisaient comme des fentes.
+     * Un rail teinté, et le choix retenu posé dedans comme un galet clair. Le filet a
+     * disparu du pourtour : sur une pilule, il redouble le contour du galet intérieur
+     * et le rail se met à ressembler à deux boutons emboîtés.
      */
-    padding: 3px;
-    gap: 3px;
+    padding: var(--espace-0);
+    gap: var(--espace-0);
   }
 
   .bascule {
@@ -1276,7 +1326,7 @@
     min-block-size: var(--cible);
     background: none;
     border: 0;
-    border-radius: calc(var(--rayon-s) - 3px);
+    border-radius: var(--rayon-plein);
     cursor: pointer;
     font-size: var(--texte-m);
     font-weight: 600;
@@ -1341,7 +1391,12 @@
     /* Une interligne inférieure à 1 : le chiffre remplit sa boîte au lieu de flotter. */
     line-height: 0.86;
     letter-spacing: -0.04em;
-    color: var(--accent);
+    /*
+     * À l'encre, et non à l'accent. Depuis que le bouton d'action est une pastille
+     * sarcelle, l'accent ne désigne plus qu'une chose : ce sur quoi on appuie. Une
+     * heure de départ n'est pas une action — c'est ce qu'on vient lire.
+     */
+    color: var(--encre);
   }
 
   /* Le délai qui accompagne l'heure : il s'aligne sur la ligne de base des chiffres. */
@@ -1381,7 +1436,7 @@
   .prochain__signal::before,
   .prochain__signal::after {
     content: '';
-    border-radius: 999px;
+    border-radius: var(--rayon-plein);
   }
 
   .prochain__signal::before {
@@ -1468,35 +1523,24 @@
   }
 
   /*
-   * Une tuile éteinte devient du verre dépoli : presque opaque, et floutée.
+   * Une tuile éteinte s'éteint vraiment : elle prend le creux du fond.
    *
-   * Le creux `--fond-creux` est un voile de 5 % — posé sur le dégradé du fond et
-   * traversé par des horaires eux-mêmes translucides, il ne faisait pas un rectangle
-   * mais une bavure. À 88 %, plus rien ne transparaît du dégradé, et le flou d'arrière-
-   * plan garde la matière : c'est une vitre givrée, pas un aplat. Les heures restent
-   * dessous pour donner sa hauteur à la tuile et dire ce qui aurait eu lieu — elles ne
-   * sont pas faites pour être lues ce jour-là.
-   *
-   * L'un des rares endroits où `backdrop-filter` gagne son coût : ici, il y a vraiment
-   * quelque chose à brouiller dessous.
+   * Elle était une vitre givrée — un voile de 88 % plus un `backdrop-filter` —, ce qui
+   * n'avait de sens qu'au-dessus d'un dégradé. Sur un aplat, brouiller un aplat ne
+   * produit rien et coûte une couche composée. Les heures restent dessous pour donner
+   * sa hauteur à la tuile et dire ce qui aurait eu lieu ; c'est le flou posé sur ELLES
+   * (ci-dessous) qui dit qu'elles ne sont pas à lire ce jour-là.
    */
   .sous-tuile--eteinte {
-    background: color-mix(in oklab, var(--fond) 88%, transparent);
-    backdrop-filter: var(--flou);
-    -webkit-backdrop-filter: var(--flou);
+    background: var(--fond-creux);
   }
 
   /*
-   * Les heures éteintes sont floutées ELLES-MÊMES, et non par le verre posé dessus.
+   * Les heures éteintes sont floutées ELLES-MÊMES.
    *
-   * Première tentative : un `backdrop-filter` sur la plaque, censé brouiller ce qui
-   * passe dessous. Deux `backdrop-filter` imbriqués — la tuile puis la plaque — avec un
-   * groupe d'opacité entre les deux, et le rendu s'inverse : flou tout autour, net juste
-   * sous la plaque. Un `backdrop-filter` établit une racine d'arrière-plan pour ses
-   * descendants, qui n'échantillonnent plus ce qu'on croit.
-   *
-   * `filter` sur le contenu lui-même n'a pas cette subtilité : le texte devient une
-   * texture, partout pareil, et il n'y a plus rien à lire par transparence.
+   * `filter` sur le contenu le rend texture, partout pareil : il n'y a plus rien à lire
+   * par transparence, et rien à brouiller par-dessus. C'est ce qui permet à la plaque
+   * ci-dessous d'être un simple aplat.
    */
   .sous-tuile--eteinte .sous-tuile__contenu {
     opacity: 0.35;
@@ -1513,11 +1557,9 @@
   }
 
   /*
-   * La plaque du message, posée sur une tuile déjà opaque : `--surface-haute` y est un
-   * voile appuyé qui se compose proprement, et non un verre de plus sur un dégradé.
-   * Elle se détache sans que rien ne transparaisse à travers les lettres — c'est le
-   * défaut qu'elle corrige : un message translucide sur des horaires translucides
-   * laissait les chiffres traverser le texte, les deux devenant illisibles.
+   * La plaque du message. Le défaut qu'elle corrige : un message translucide sur des
+   * horaires translucides laissait les chiffres traverser le texte, les deux devenant
+   * illisibles.
    */
   .sous-tuile__plaque {
     display: grid;
@@ -1525,17 +1567,11 @@
     justify-items: center;
     text-align: center;
     /*
-     * Deux couches, et pas de `backdrop-filter` : la tuile en porte déjà un, et le texte
-     * du dessous est flouté à la source. Rien ne doit traverser ces lettres.
-     *
-     * Dessous, un aplat presque opaque qui masque ; dessus, le voile appuyé du système,
-     * qui rend la plaque plus claire que la tuile et la fait lire comme une lame de
-     * verre POSÉE, et non comme un trou. Sans lui, plaque et tuile ont la même teinte et
-     * seule l'arête les sépare.
+     * Un aplat, et rien qui traverse ces lettres. `--surface-haute` la rend plus claire
+     * que la tuile éteinte, qui porte le creux : la plaque se lit comme POSÉE dessus et
+     * non comme un trou. Sans cette différence de teinte, seule l'arête les sépare.
      */
-    background:
-      linear-gradient(var(--surface-haute), var(--surface-haute)),
-      color-mix(in oklab, var(--fond) 96%, transparent);
+    background: var(--surface-haute);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-s);
     padding: var(--espace-2) var(--espace-3);
@@ -1580,7 +1616,7 @@
     font-weight: 600;
     font-size: var(--texte-2xl);
     letter-spacing: -0.02em;
-    color: var(--accent);
+    color: var(--encre);
   }
 
   .trajet__heure--secondaire {
@@ -1615,7 +1651,7 @@
   .etiquette {
     display: inline-block;
     padding: var(--espace-1) var(--espace-3);
-    border-radius: 999px;
+    border-radius: var(--rayon-plein);
     font-size: var(--texte-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1653,9 +1689,15 @@
     color: var(--encre);
   }
 
+  /*
+   * La ligne de bus prend le corail, et non plus la seconde couleur d'accent : celle-ci
+   * sert maintenant aux survols, et une ligne de bus ne doit pas porter la teinte d'un
+   * lien. Le corail est la seconde teinte de la charte — il se distingue du sarcelle
+   * même pour un œil qui confond le bleu et le vert.
+   */
   .etiquette--ligne {
-    color: var(--accent-2);
-    border-color: color-mix(in oklab, var(--accent-2) 45%, var(--bord));
+    color: var(--ligne);
+    border-color: color-mix(in oklab, var(--ligne) 45%, var(--bord));
   }
 
   .etiquette--danger {
@@ -1763,8 +1805,7 @@
   }
 
   .dialogue::backdrop {
-    background: rgb(0 0 0 / 0.5);
-    backdrop-filter: blur(4px);
+    background: var(--voile);
     animation: fondu 0.24s var(--sortie) both;
   }
 
@@ -1841,8 +1882,6 @@
   /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
     background: var(--fond-creux);
-    backdrop-filter: var(--flou);
-    -webkit-backdrop-filter: var(--flou);
     border-block: var(--trait) solid var(--bord);
     padding: var(--espace-2) var(--gouttiere);
     font-size: var(--texte-m);
@@ -2189,7 +2228,7 @@
     flex: 0 0 auto;
     inline-size: 1.5rem;
     block-size: 1.5rem;
-    border-radius: 999px;
+    border-radius: var(--rayon-plein);
     background: var(--fond-creux);
     border: var(--trait) solid var(--bord);
     /* Le chevron proprement dit, tracé au centre de la pastille. */
@@ -2259,6 +2298,188 @@
     border-end-start-radius: 0;
     border-end-end-radius: 0;
   }
+
+  /* ===========================================================================
+   * Les compositions de la vitrine
+   *
+   * `www.schoulbus.lu` et cette application partagent la couche `tokens` ; ce bloc-ci
+   * reprend en plus ses quatre partis de mise en page, pour qu'un parent qui passe de
+   * l'une à l'autre ne change pas de produit : le sur-titre en chasse fixe, la grille
+   * au filet, la bande teintée, et le panneau.
+   * =========================================================================== */
+
+  /*
+   * Le sur-titre. En chasse fixe, capitales très espacées, couleur d'accent : il annonce
+   * la section sans lui voler son titre. C'est le seul usage décoratif de la police à
+   * chasse fixe — partout ailleurs elle ne sert qu'à ce qui se compare colonne par
+   * colonne (une heure, un code).
+   */
+  .etiquette--mono {
+    background: none;
+    border: 0;
+    padding-inline: 0;
+    color: var(--accent);
+    font-family: var(--police-chiffres);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  /*
+   * La grille au filet — la signature visuelle de la vitrine.
+   *
+   * Il n'y a aucune bordure ici : le conteneur est peint à la couleur du filet, les
+   * cases sont peintes à la couleur de surface, et l'écart d'un pixel entre elles
+   * laisse voir le fond. On obtient des séparateurs parfaitement continus, sans les
+   * doubles traits d'un `border` par case ni le calcul de qui porte quel côté.
+   */
+  .filets {
+    display: grid;
+    gap: var(--trait);
+    background: var(--bord);
+    border: var(--trait) solid var(--bord);
+    border-radius: var(--rayon-m);
+    overflow: hidden;
+  }
+
+  .filets__case {
+    background: var(--surface);
+    padding: var(--espace-5);
+    min-inline-size: 0;
+  }
+
+  /* Une case qui dit une absence — « zéro cookie », « aucun compte ». */
+  .filets__case--creuse {
+    background: var(--fond-creux);
+  }
+
+  .filets__valeur {
+    display: block;
+    font-family: var(--police-chiffres);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--texte-3xl);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--encre);
+  }
+
+  .filets__case--creuse .filets__valeur {
+    color: var(--ligne);
+  }
+
+  .filets__glose {
+    display: block;
+    margin-block-start: var(--espace-1);
+    font-size: var(--texte-m);
+    color: var(--encre-faible);
+  }
+
+  /*
+   * La bande teintée : une section qui prend toute la largeur de la coquille et change
+   * de fond pour marquer un changement de propos. `.page` borne le contenu à
+   * `--largeur` ; la bande le déborde par des marges négatives plutôt que par un
+   * `position` — c'est ce qui lui permet de rester dans le flux et de garder son
+   * rembourrage sur un écran étroit.
+   */
+  .bande {
+    margin-inline: calc(var(--gouttiere) * -1);
+    padding: var(--espace-6) var(--gouttiere);
+    background: var(--surface-haute);
+    border-block: var(--trait) solid var(--bord);
+  }
+
+  /* L'en-tête d'une section : le titre à gauche, sa mise en garde à droite. */
+  .entete-bande {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--espace-3) var(--espace-6);
+    margin-block-end: var(--espace-4);
+  }
+
+  .entete-bande__note {
+    max-inline-size: 24em;
+    font-size: var(--texte-m);
+    color: var(--encre-faible);
+  }
+
+  /*
+   * Le panneau : le seul aplat de marque de l'application.
+   *
+   * Un écran n'en porte qu'un — le prochain départ. Un second panneau et plus rien ne
+   * se détache : c'est exactement ce que la couleur est là pour faire. Son encre ne
+   * suit pas `--encre` mais `--sur-panneau`, mesuré sur ce fond-là.
+   */
+  .panneau {
+    background: var(--panneau);
+    color: var(--sur-panneau);
+    border-radius: var(--rayon-l);
+    padding: var(--espace-5);
+    box-shadow: var(--lustre);
+  }
+
+  .panneau .texte-doux,
+  .panneau__glose {
+    color: var(--sur-panneau-douce);
+  }
+
+  /* Sur le panneau, l'heure est à l'encre du panneau : l'accent y disparaîtrait. */
+  .panneau .prochain__heure {
+    color: var(--sur-panneau);
+  }
+
+  .panneau .prochain__delai {
+    color: var(--sur-panneau-douce);
+  }
+
+  .panneau .prochain__signal::before {
+    border-color: var(--sur-panneau);
+  }
+
+  .panneau .prochain__signal::after {
+    background: var(--sur-panneau);
+  }
+
+  /*
+   * Les tuiles : une grille au filet dont chaque case porte une puce, un titre et deux
+   * lignes. Elle sert aux listes de principes, là où une liste à puces se lit comme un
+   * mode d'emploi et non comme un propos.
+   */
+  .tuiles {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+
+  .tuile__puce {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: var(--rayon-s);
+    background: var(--surface-accent);
+    color: var(--accent);
+    font-size: var(--texte-xl);
+  }
+
+  .tuile__puce--alerte {
+    background: var(--danger-fond);
+    color: var(--ligne);
+  }
+
+  .tuile__titre {
+    margin-block-start: var(--espace-3);
+    font-size: var(--texte-l);
+    font-weight: 600;
+  }
+
+  .tuile__texte {
+    margin-block-start: var(--espace-1);
+    font-size: var(--texte-m);
+    line-height: 1.45;
+    color: var(--encre-faible);
+  }
+
 }
 
 @layer utilitaires {
@@ -2331,13 +2552,11 @@
     }
 
     /*
-     * Le papier n'a ni dégradé, ni verre, ni halo : tous les jetons redeviennent opaques.
-     * Sans cela, une carte translucide s'imprimait en gris moucheté et le dégradé du
-     * fond partait en aplat de toner sur la moitié de la feuille.
+     * Le papier n'a pas de couleur de marque : tous les jetons redeviennent noir sur
+     * blanc. Sans cela, le crème partait en aplat de toner sur la feuille entière et le
+     * sarcelle sortait d'une imprimante noir et blanc en gris illisible.
      */
     :root {
-      --degrade: none;
-      --halo: transparent;
       --fond: #fff;
       --fond-creux: #fff;
       --surface: #fff;
@@ -2347,13 +2566,19 @@
       --bord: #767676;
       --bord-accent: #767676;
       --lustre: none;
-      --flou: none;
+      --flou-rail: none;
       --encre: #000;
       --encre-douce: #333;
+      --encre-faible: #333;
       --accent: #000;
       --accent-2: #000;
       --plein: #000;
       --encre-sur-plein: #fff;
+      --panneau: #fff;
+      --sur-panneau: #000;
+      --sur-panneau-douce: #333;
+      --ligne: #000;
+      --voile: transparent;
       --danger: #000;
       --danger-fond: #fff;
       --danger-bord: #767676;

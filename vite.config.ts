@@ -252,8 +252,10 @@ export default defineConfig({
           "Horaires du bus scolaire de la commune de Beckerich, personnalisés par enfant. Site indépendant, sans lien avec la commune.",
         lang: 'fr',
         dir: 'ltr',
-        theme_color: '#0e1a2e',
-        background_color: '#0e1a2e',
+        // La marque, puis le fond de l'écran de démarrage : `--accent` et `--fond` du
+        // thème clair. Un manifeste ne porte qu'un couple — pas de variante sombre.
+        theme_color: '#0f5a61',
+        background_color: '#fbf6ef',
         display: 'standalone',
         orientation: 'portrait',
         start_url: base,

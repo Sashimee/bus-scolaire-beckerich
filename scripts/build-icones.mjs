@@ -10,6 +10,11 @@
  * Les couleurs suivent la couche `tokens` de `src/index.css`. Elles y sont recopiées
  * à la main, sharp ne sachant pas lire une variable CSS : à réaligner si la palette
  * change — c'est ce qui avait été oublié lors de la refonte visuelle.
+ *
+ * LE SENS DU DESSIN S'EST INVERSÉ avec la charte de la vitrine. La pastille portait la
+ * couleur du fond et la carrosserie l'accent ; c'est le contraire à présent. Un favicon
+ * est vu à 16 px sur l'onglet d'un navigateur dont le fond est presque toujours clair :
+ * une pastille crème y était un carré blanc avec quelque chose de vaguement vert dedans.
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -18,10 +23,13 @@ import sharp from 'sharp'
 const SORTIE = resolve(import.meta.dirname, '../public/icones')
 mkdirSync(SORTIE, { recursive: true })
 
-const FOND = '#14161f'
-const ACCENT = '#82a9ff'
-const CLAIR = '#dfe3f2'
-const DOUX = '#9aa3c2'
+// La pastille : `--accent` du thème clair, le sarcelle de la charte.
+const FOND = '#0f5a61'
+// La carrosserie et les vitres : `--fond` du thème clair, le crème.
+const ACCENT = '#fbf6ef'
+const CLAIR = '#fbf6ef'
+// Le texte secondaire de la vignette de partage, sur le sarcelle : `--sur-panneau-douce`.
+const DOUX = '#9cc7c6'
 
 /** Un bus stylisé, lisible jusqu'en 48 px. `marge` réserve la zone sûre des icônes maskable. */
 const svg = (marge) => `
@@ -74,7 +82,7 @@ const partage = `
   <text x="404" y="284" font-family="system-ui, -apple-system, Segoe UI, sans-serif"
         font-size="72" font-weight="700" fill="${CLAIR}">Bus scolaire</text>
   <text x="404" y="356" font-family="system-ui, -apple-system, Segoe UI, sans-serif"
-        font-size="52" font-weight="600" fill="${ACCENT}">Beckerich</text>
+        font-size="52" font-weight="600" fill="${DOUX}">Beckerich</text>
   <text x="404" y="424" font-family="system-ui, -apple-system, Segoe UI, sans-serif"
         font-size="30" fill="${DOUX}">Les horaires de vos enfants, arrêt par arrêt.</text>
   <rect x="96" y="500" width="1008" height="2" fill="${DOUX}" opacity="0.35"/>
