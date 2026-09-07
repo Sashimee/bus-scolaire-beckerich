@@ -16,7 +16,7 @@
 import { Component } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 import { langueInitiale } from '../i18n'
-import { valeurCompilee } from '../i18n/dictionnaires'
+import { chercher, dictionnaire } from '../i18n/dictionnaires'
 import { toutEffacer } from '../lib/stockage'
 
 /**
@@ -27,7 +27,7 @@ import { toutEffacer } from '../lib/stockage'
  * perdue, ce qui est sans conséquence pour cinq phrases de secours.
  */
 function traduire(cle: string): string {
-  const valeur = valeurCompilee(langueInitiale(), cle)
+  const valeur = chercher(dictionnaire(langueInitiale()), cle)
   return typeof valeur === 'string' ? valeur : cle
 }
 

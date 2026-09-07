@@ -10,6 +10,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { BarriereErreur } from './BarriereErreur'
+import { chargerDictionnaire } from '../i18n/dictionnaires'
 import fr from '../i18n/fr.json'
 import de from '../i18n/de.json'
 
@@ -70,8 +71,11 @@ describe('barrière d’erreur', () => {
    * stockage. Servir le message de secours en français à qui a choisi l'allemand, ce
    * serait manquer le seul moment où il compte.
    */
-  it('parle la langue choisie par le parent, sans le contexte de traduction', () => {
+  it('parle la langue choisie par le parent, sans le contexte de traduction', async () => {
     memoire.set('bus-beckerich.langue', JSON.stringify('de'))
+    // `main.tsx` charge le dictionnaire de la langue du parent avant le premier rendu :
+    // au moment d'une panne, il est là.
+    await chargerDictionnaire('de')
 
     render(
       <BarriereErreur page>

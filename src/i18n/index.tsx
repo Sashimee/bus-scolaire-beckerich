@@ -2,14 +2,14 @@
  * Traduction.
  *
  * Pas de bibliothèque : un dictionnaire JSON par langue et une recherche par chemin
- * pointé suffisent. Ajouter une langue = un import et une entrée dans `DICTIONNAIRES`.
+ * pointé suffisent. Ajouter une langue = une entrée dans `SOURCES` (`dictionnaires.ts`).
  * Aucune chaîne visible ne doit être écrite en dur dans un composant.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import fr from './fr.json'
 import { chargerLangue, enregistrerLangue } from '../lib/stockage'
-import { chercher, DICTIONNAIRES } from './dictionnaires'
+import { chargerDictionnaire, chercher, dictionnaire, dictionnaireCharge } from './dictionnaires'
 import { SURCOUCHE_VIDE, type Surcouche } from '../lib/traductions'
 import { chargerTraductions } from './surcouche'
 import { LANGUES, NOMS_LANGUES, type Langue } from './langues'
@@ -78,6 +78,18 @@ export function FournisseurTraduction({ children }: { children: ReactNode }) {
   const [langue, setLangue] = useState<Langue>(langueInitiale)
   const [langueChoisie, setLangueChoisie] = useState(() => langueEnregistree() !== null)
   const [surcouche, setSurcouche] = useState<Surcouche>(SURCOUCHE_VIDE)
+  /** Compte les dictionnaires arrivés : sert uniquement à refaire le rendu. */
+  const [charge, setCharge] = useState(0)
+
+  /*
+   * Filet de sécurité : `main.tsx` attend le dictionnaire de la langue devinée avant
+   * le premier rendu. Ce fournisseur peut pourtant être monté ailleurs — un test, un
+   * futur point d'entrée — et doit alors se procurer sa langue lui-même.
+   */
+  useEffect(() => {
+    if (dictionnaireCharge(langue)) return
+    void chargerDictionnaire(langue).finally(() => setCharge((n) => n + 1))
+  }, [langue])
 
   useEffect(() => {
     document.documentElement.lang = langue
@@ -92,17 +104,28 @@ export function FournisseurTraduction({ children }: { children: ReactNode }) {
     return () => ctrl.abort()
   }, [])
 
+  /*
+   * Le dictionnaire arrive avant le changement : basculer d'abord ferait clignoter la
+   * page en français le temps du chargement. En cas d'échec — hors ligne, morceau
+   * absent — on bascule quand même : la langue est choisie, et le repli français est
+   * déjà la règle pour une clé manquante.
+   */
   const changerLangue = useCallback((l: Langue) => {
-    setLangue(l)
-    setLangueChoisie(true)
     enregistrerLangue(l)
+    void chargerDictionnaire(l).finally(() => {
+      setLangue(l)
+      setLangueChoisie(true)
+      setCharge((n) => n + 1)
+    })
   }, [])
 
   /** Surcouche d'abord, puis la langue demandée, puis le français. */
   const brut = useCallback(
     (cle: string) =>
-      surcouche[langue]?.[cle] ?? chercher(DICTIONNAIRES[langue], cle) ?? chercher(fr, cle),
-    [langue, surcouche],
+      surcouche[langue]?.[cle] ?? chercher(dictionnaire(langue), cle) ?? chercher(fr, cle),
+    // `charge` n'entre pas dans le calcul : il dit seulement que le dictionnaire vient
+    // d'arriver, et qu'il faut refaire la traduction avec.
+    [langue, surcouche, charge],
   )
 
   const t = useCallback(
