@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { BarriereErreur } from './composants/BarriereErreur'
 import { initialiserHoraires } from './lib/horaires'
 import { mesurer } from './lib/mesure'
 import { FournisseurTraduction } from './i18n'
@@ -32,21 +33,25 @@ if (redirection) {
 initialiserHoraires().finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      {/* Le préfixe vient de la configuration de build : le site doit pouvoir être
-          servi sous n'importe quel chemin sans modification du code. */}
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <FournisseurTraduction>
-          <FournisseurRechargement>
-            <FournisseurUrgences>
-              <FournisseurFoyer>
-                <FournisseurInstallation>
-                  <App />
-                </FournisseurInstallation>
-              </FournisseurFoyer>
-            </FournisseurUrgences>
-          </FournisseurRechargement>
-        </FournisseurTraduction>
-      </BrowserRouter>
+      {/* Au-dehors de tout : un fournisseur qui échoue au montage — foyer illisible,
+          dictionnaire absent — laisserait sinon un écran blanc sans issue. */}
+      <BarriereErreur page>
+        {/* Le préfixe vient de la configuration de build : le site doit pouvoir être
+            servi sous n'importe quel chemin sans modification du code. */}
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <FournisseurTraduction>
+            <FournisseurRechargement>
+              <FournisseurUrgences>
+                <FournisseurFoyer>
+                  <FournisseurInstallation>
+                    <App />
+                  </FournisseurInstallation>
+                </FournisseurFoyer>
+              </FournisseurUrgences>
+            </FournisseurRechargement>
+          </FournisseurTraduction>
+        </BrowserRouter>
+      </BarriereErreur>
     </StrictMode>,
   )
   // Un relevé de visite, une seule fois, après le rendu : auto-hébergé, il ne part que

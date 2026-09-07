@@ -546,6 +546,16 @@
     "version": "Versão {version}",
     "horsLigne": "Sem rede — os horários continuam consultáveis."
   },
+  "panne": {
+    "titre": "A aplicação foi interrompida",
+    "explication": "Uma falha de apresentação interrompeu a página. Os seus dados não se perderam: estão neste aparelho e nada foi enviado.",
+    "recharger": "Recarregar a página",
+    "horaires": "Ver os horários oficiais",
+    "detail": "Detalhe técnico",
+    "effacer": "Se a falha voltar sempre que abre a aplicação",
+    "effacerConfirmation": "Apagar a morada, as crianças e as preferências guardadas neste aparelho? Será preciso preencher tudo de novo.",
+    "effacerConfirmer": "Apagar e recomeçar"
+  },
   "commun": {
     "fermer": "Fechar",
     "modifier": "Alterar",

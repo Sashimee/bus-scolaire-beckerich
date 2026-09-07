@@ -1,7 +1,8 @@
-import { Link, Navigate, Route, Routes } from 'react-router-dom'
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useT } from './i18n'
 import { plan } from './lib/donnees'
 import { PileBandeaux } from './composants/Bandeaux'
+import { BarriereErreur } from './composants/BarriereErreur'
 import { InvitationInstallation } from './composants/InvitationInstallation'
 import { NavigationBasse, NavigationHaute } from './composants/Navigation'
 import { Accueil } from './pages/Accueil'
@@ -22,6 +23,7 @@ import { comptesConfigures } from './lib/comptes'
 
 export default function App() {
   const { t } = useT()
+  const { pathname } = useLocation()
 
   return (
     <>
@@ -41,31 +43,39 @@ export default function App() {
       <PileBandeaux />
 
       <main className="page" id="contenu">
-        <Routes>
-          <Route path="/" element={<Accueil />} />
-          <Route path="/configurer" element={<Configurer />} />
-          <Route path="/enfant/:id" element={<Semaine />} />
-          <Route path="/enfant/:id/assistant" element={<AssistantEnfant />} />
-          <Route path="/plan" element={<PagePlan />} />
-          <Route path="/limites" element={<Limites />} />
-          <Route path="/independance" element={<Independance />} />
-          <Route path="/credits" element={<Credits />} />
-          <Route path="/installer" element={<Installer />} />
-          <Route path="/agenda" element={<Agenda />} />
-          <Route path="/reglages" element={<Reglages />} />
-          <Route path="/edition" element={<Edition />} />
-          <Route path="/connexion" element={<Connexion />} />
-          <Route path="/comptes" element={<Comptes />} />
-          <Route path="/reinitialiser" element={<Reinitialiser />} />
-          {/* Les espaces à code personnel ont été repliés sur les comptes à capacités :
-              leurs anciennes adresses mènent désormais à l'édition unique, pour ne pas
-              casser un lien noté ou mis en favori. */}
-          <Route path="/commune" element={<Navigate to="/edition" replace />} />
-          <Route path="/commune/alertes" element={<Navigate to="/edition" replace />} />
-          <Route path="/commune/horaires" element={<Navigate to="/edition" replace />} />
-          <Route path="/traductions" element={<Navigate to="/edition" replace />} />
-          <Route path="*" element={<Accueil />} />
-        </Routes>
+        {/*
+            Une seconde barrière, autour du contenu seul : l'écran d'un enfant peut
+            tomber sans emporter l'en-tête ni la navigation, et le parent s'en va vers
+            un autre enfant plutôt que de rester bloqué. La clé la remet à zéro à chaque
+            changement d'adresse, sans quoi le message de panne survivrait au départ.
+        */}
+        <BarriereErreur key={pathname}>
+          <Routes>
+            <Route path="/" element={<Accueil />} />
+            <Route path="/configurer" element={<Configurer />} />
+            <Route path="/enfant/:id" element={<Semaine />} />
+            <Route path="/enfant/:id/assistant" element={<AssistantEnfant />} />
+            <Route path="/plan" element={<PagePlan />} />
+            <Route path="/limites" element={<Limites />} />
+            <Route path="/independance" element={<Independance />} />
+            <Route path="/credits" element={<Credits />} />
+            <Route path="/installer" element={<Installer />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/reglages" element={<Reglages />} />
+            <Route path="/edition" element={<Edition />} />
+            <Route path="/connexion" element={<Connexion />} />
+            <Route path="/comptes" element={<Comptes />} />
+            <Route path="/reinitialiser" element={<Reinitialiser />} />
+            {/* Les espaces à code personnel ont été repliés sur les comptes à capacités :
+                leurs anciennes adresses mènent désormais à l'édition unique, pour ne pas
+                casser un lien noté ou mis en favori. */}
+            <Route path="/commune" element={<Navigate to="/edition" replace />} />
+            <Route path="/commune/alertes" element={<Navigate to="/edition" replace />} />
+            <Route path="/commune/horaires" element={<Navigate to="/edition" replace />} />
+            <Route path="/traductions" element={<Navigate to="/edition" replace />} />
+            <Route path="*" element={<Accueil />} />
+          </Routes>
+        </BarriereErreur>
 
         <footer className="pied">
           <nav aria-label={t('nav.menu')}>

@@ -546,6 +546,16 @@
     "version": "Versioun {version}",
     "horsLigne": "Offline — d'Ziichte bleiwen ofrufbar."
   },
+  "panne": {
+    "titre": "D'Applikatioun ass ofgebrach",
+    "explication": "E Feeler beim Uweisen huet d'Säit ofgebrach. Är Donnéeë sinn onverännert: si leien op dësem Apparat, a näischt gouf geschéckt.",
+    "recharger": "Säit nei lueden",
+    "horaires": "Offiziell Ziichte kucken",
+    "detail": "Technesch Detailer",
+    "effacer": "Wann de Feeler bei all Opmaachen erëmkënnt",
+    "effacerConfirmation": "Adress, Kanner an Astellungen op dësem Apparat läschen? Alles muss dann nei agitipt ginn.",
+    "effacerConfirmer": "Läschen an nei ufänken"
+  },
   "commun": {
     "fermer": "Zoumaachen",
     "modifier": "Änneren",

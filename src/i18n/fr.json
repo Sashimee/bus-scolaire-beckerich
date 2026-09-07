@@ -546,6 +546,16 @@
     "version": "Version {version}",
     "horsLigne": "Hors ligne — les horaires restent consultables."
   },
+  "panne": {
+    "titre": "L'application s'est arrêtée",
+    "explication": "Un défaut d'affichage a interrompu la page. Vos données n'ont pas bougé : elles sont sur cet appareil, et rien n'a été envoyé.",
+    "recharger": "Recharger la page",
+    "horaires": "Voir les horaires officiels",
+    "detail": "Détail technique",
+    "effacer": "Si la panne revient à chaque ouverture",
+    "effacerConfirmation": "Effacer l'adresse, les enfants et les préférences enregistrés sur cet appareil ? La saisie sera à refaire.",
+    "effacerConfirmer": "Effacer et repartir de zéro"
+  },
   "commun": {
     "fermer": "Fermer",
     "modifier": "Modifier",

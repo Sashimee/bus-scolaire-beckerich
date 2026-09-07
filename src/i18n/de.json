@@ -546,6 +546,16 @@
     "version": "Version {version}",
     "horsLigne": "Offline — die Fahrzeiten bleiben abrufbar."
   },
+  "panne": {
+    "titre": "Die Anwendung wurde unterbrochen",
+    "explication": "Ein Anzeigefehler hat die Seite unterbrochen. Ihre Daten sind unverändert: Sie liegen auf diesem Gerät, und es wurde nichts gesendet.",
+    "recharger": "Seite neu laden",
+    "horaires": "Offizielle Fahrzeiten ansehen",
+    "detail": "Technische Angabe",
+    "effacer": "Wenn der Fehler bei jedem Öffnen wiederkehrt",
+    "effacerConfirmation": "Adresse, Kinder und Einstellungen auf diesem Gerät löschen? Die Eingabe muss dann neu gemacht werden.",
+    "effacerConfirmer": "Löschen und neu beginnen"
+  },
   "commun": {
     "fermer": "Schließen",
     "modifier": "Ändern",

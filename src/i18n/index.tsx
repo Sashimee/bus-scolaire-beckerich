@@ -57,8 +57,13 @@ function langueEnregistree(): Langue | null {
   return null
 }
 
-/** Devine la langue à partir des préférences du navigateur, français par défaut. */
-function langueInitiale(): Langue {
+/**
+ * Devine la langue à partir des préférences du navigateur, français par défaut.
+ *
+ * Exportée pour la barrière d'erreur : elle s'affiche hors du fournisseur — c'est
+ * précisément lui qui peut avoir échoué — et n'a donc pas accès au contexte.
+ */
+export function langueInitiale(): Langue {
   const enregistree = langueEnregistree()
   if (enregistree) return enregistree
   for (const pref of navigator.languages ?? [navigator.language]) {

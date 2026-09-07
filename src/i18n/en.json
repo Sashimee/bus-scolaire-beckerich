@@ -546,6 +546,16 @@
     "version": "Version {version}",
     "horsLigne": "Offline — the timetables remain available."
   },
+  "panne": {
+    "titre": "The app stopped",
+    "explication": "A display fault interrupted the page. Your data is untouched: it lives on this device, and nothing was sent anywhere.",
+    "recharger": "Reload the page",
+    "horaires": "See the official timetable",
+    "detail": "Technical detail",
+    "effacer": "If the fault comes back every time you open the app",
+    "effacerConfirmation": "Erase the address, the children and the preferences saved on this device? Everything will have to be entered again.",
+    "effacerConfirmer": "Erase and start over"
+  },
   "commun": {
     "fermer": "Close",
     "modifier": "Change",
