@@ -75,23 +75,56 @@ export function validerPlan(brut: unknown): Probleme[] {
   if (!estObjet(horaires)) {
     erreur('horairesEcole', 'Bloc absent : sans lui, impossible de savoir quels jours ont cours.')
   } else {
-    for (const demi of ['matin', 'apresMidi']) {
-      const d = horaires[demi]
-      if (!estObjet(d)) {
-        erreur(`horairesEcole › ${demi}`, 'Bloc absent.')
-        continue
-      }
-      for (const champ of ['debut', 'fin']) {
-        if (typeof d[champ] !== 'string' || !HEURE.test(d[champ] as string)) {
-          erreur(`horairesEcole › ${demi}`, `« ${champ} » doit être une heure HH:MM.`)
+    const jours = horaires.jours
+    if (!estObjet(jours)) {
+      erreur(
+        'horairesEcole › jours',
+        'Bloc absent : sans lui, impossible de savoir quels jours ont cours.',
+      )
+    } else {
+      for (const demi of ['matin', 'apresMidi']) {
+        const liste = jours[demi]
+        if (!Array.isArray(liste) || liste.length === 0) {
+          erreur(`horairesEcole › jours › ${demi}`, 'Aucun jour de cours indiqué.')
+          continue
+        }
+        for (const j of liste) {
+          if (!JOURS.includes(j as Jour)) {
+            erreur(`horairesEcole › jours › ${demi}`, `Jour inconnu : « ${String(j)} ».`)
+          }
         }
       }
-      if (!Array.isArray(d.jours) || d.jours.length === 0) {
-        erreur(`horairesEcole › ${demi}`, 'Aucun jour de cours indiqué.')
-      } else {
-        for (const j of d.jours) {
-          if (!JOURS.includes(j as Jour)) {
-            erreur(`horairesEcole › ${demi}`, `Jour inconnu : « ${String(j)} ».`)
+    }
+
+    // Les heures de sortie décident de l'heure proposée par défaut à la maison relais :
+    // un cycle sans horaire laisserait un parent déclarer une présence qui n'existe pas.
+    const parCycle = horaires.parCycle
+    if (!estObjet(parCycle)) {
+      erreur('horairesEcole › parCycle', 'Bloc absent : chaque cycle a ses propres heures.')
+    } else {
+      for (const c of cycles) {
+        const h = parCycle[c.id]
+        if (!estObjet(h)) {
+          erreur(`horairesEcole › parCycle › ${c.id}`, 'Heures de cours absentes pour ce cycle.')
+          continue
+        }
+        for (const demi of ['matin', 'apresMidi']) {
+          const creneau = h[demi]
+          if (!estObjet(creneau)) {
+            erreur(`horairesEcole › parCycle › ${c.id} › ${demi}`, 'Bloc absent.')
+            continue
+          }
+          const ou = `horairesEcole › parCycle › ${c.id} › ${demi}`
+          let bornes = 0
+          for (const champ of ['debut', 'fin']) {
+            if (typeof creneau[champ] === 'string' && HEURE.test(creneau[champ] as string)) {
+              bornes++
+            } else {
+              erreur(ou, `« ${champ} » doit être une heure HH:MM.`)
+            }
+          }
+          if (bornes === 2 && minutes(creneau.debut as string) >= minutes(creneau.fin as string)) {
+            erreur(ou, 'La fin des cours doit suivre leur début.')
           }
         }
       }

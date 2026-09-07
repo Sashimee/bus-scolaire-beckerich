@@ -99,7 +99,12 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   l'exécution sur `/sante` au lieu d'être figée au build, un jeton de session refusé
   s'efface, `pull_policy: always` sur les deux images — et **l'ouverture à la commune est
   faite** : le premier compte d'agent est créé et le courriel d'accès envoyé (les
-  identités restent hors dépôt, il est public). **À consulter avant d'entamer une évolution.**
+  identités restent hors dépôt, il est public). **Le 2026-09-08** : la brochure 2026/2027
+  est relue — **aucun horaire de bus n'a changé**, mais les horaires de COURS passent par
+  cycle (ils ne l'étaient pas : l'application affichait à tout le monde ceux du précoce,
+  le seul cycle sans bus), la validité s'arrête au 2026-12-18 à cause du nouveau campus
+  annoncé pour janvier 2027, et la note « hall sportif le vendredi » devient une
+  incertitude. **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

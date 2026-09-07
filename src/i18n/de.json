@@ -312,11 +312,11 @@
     "voir-aller-3": "Huttange wird von dieser Linie nicht bedient: siehe Fahrplan „Aller Bus 3“.",
     "huttange-retour-dillendapp-1345": "Kinder aus Huttange können den Bus „Retour Bus Dillendapp“ um 13:45 Uhr in Huttange nehmen.",
     "depart-non-precise": "Der offizielle Plan nennt die genaue Haltestelle dieser Abfahrt in Beckerich nicht.",
-    "vendredi-hall-sportif": "Freitags erfolgt die Abfahrt an der Sporthalle statt an der Schule.",
     "horaire-intermediaire-non-publie": "Der offizielle Plan veröffentlicht für diese Haltestelle keine Uhrzeit."
   },
   "incertitudes": {
-    "titre": "Vom offiziellen Plan nicht geklärt"
+    "titre": "Vom offiziellen Plan nicht geklärt",
+    "depart-midi-vendredi-hall-sportif": "Der vorherige Plan nannte freitags eine Abfahrt an der Sporthalle; der Plan 2026/2027 sagt das nicht mehr. Die Anwendung folgt dem geltenden Plan: Abfahrt an der Schule Noerdange. Bei der Gemeinde nachzufragen."
   },
   "calendrier": {
     "titre": "Zum Kalender hinzufügen",
@@ -442,7 +442,9 @@
     "circule": "Verkehrt",
     "reserve": "Linie vorbehalten",
     "horairesEcole": "Schulzeiten",
-    "horairesEcoleDetail": "Unterricht von {matinDebut} bis {matinFin} von Montag bis Freitag, sowie von {apresMidiDebut} bis {apresMidiFin} montags, mittwochs und freitags.",
+    "horairesEcoleJours": "Unterricht morgens: {matin}. Unterricht nachmittags: {apresMidi}. Die Schlusszeiten unterscheiden sich von Schule zu Schule.",
+    "cycle": "Zyklus",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Richtwerte",
     "avertissementHorairesDetail": "Die Fahrzeiten sind Richtwerte und können je nach Verkehrslage leicht abweichen. Wir empfehlen, 5 Minuten vor der angegebenen Zeit an der Haltestelle zu sein. Bei außerplanmäßigen Änderungen (Unwetter, Bauarbeiten usw.) werden die Eltern per E-Mail oder über die Schule informiert."
   },

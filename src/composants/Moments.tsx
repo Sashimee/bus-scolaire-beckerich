@@ -5,7 +5,7 @@ import { ChampAdresse } from './ChampAdresse'
 import { ChoixSemaine, HeureSemaine, type OptionChoix } from './ChoixSemaine'
 import { coursApresMidi, trajetsDuJour } from '../lib/plan'
 import { nomArret, sensTrajet } from '../lib/affichage'
-import { maisonRelais, plan } from '../lib/donnees'
+import { horairesDuCycle, maisonRelais } from '../lib/donnees'
 import {
   JOURS_MIDI,
   adresseProposable,
@@ -263,7 +263,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
       valeur: 'maison',
       libelle: t('midi.maison'),
       court: t('midi.maisonCourt'),
-      aide: t('midi.maisonAide', { heure: plan.horairesEcole.apresMidi.debut }),
+      aide: t('midi.maisonAide', { heure: horairesDuCycle(enfant.cycle).apresMidi.debut }),
     },
     {
       valeur: 'relais',
@@ -274,7 +274,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
   ]
 
   // Les jours sans cours l'après-midi ne sont pas dans la grille : la classe s'y
-  // arrête à 11:45 et c'est la question suivante qui décide du repas. Le dire, plutôt
+  // arrête à midi et c'est la question suivante qui décide du repas. Le dire, plutôt
   // que de laisser croire à un oubli.
   const sansApresMidi = JOURS.filter((j) => !coursApresMidi(j))
 
@@ -292,7 +292,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
       <p className="champ__aide">
         {t('midi.sansApresMidi', {
           jours: sansApresMidi.map((j) => t(`jours.${j}`)).join(' · '),
-          heure: plan.horairesEcole.matin.fin,
+          heure: horairesDuCycle(enfant.cycle).matin.fin,
         })}
       </p>
 

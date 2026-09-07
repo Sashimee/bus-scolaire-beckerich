@@ -312,11 +312,11 @@
     "voir-aller-3": "Huttange não é servida por esta linha: consulte o horário «Aller Bus 3».",
     "huttange-retour-dillendapp-1345": "As crianças de Huttange podem apanhar o autocarro «Retour Bus Dillendapp» às 13:45 em Huttange.",
     "depart-non-precise": "O plano oficial não indica a paragem exata desta partida em Beckerich.",
-    "vendredi-hall-sportif": "À sexta-feira, a partida faz-se a partir do pavilhão desportivo e não da escola.",
     "horaire-intermediaire-non-publie": "O plano oficial não publica a hora de passagem nesta paragem."
   },
   "incertitudes": {
-    "titre": "Ponto não esclarecido pelo plano oficial"
+    "titre": "Ponto não esclarecido pelo plano oficial",
+    "depart-midi-vendredi-hall-sportif": "O plano anterior indicava uma partida do pavilhão desportivo à sexta-feira; o de 2026/2027 já não o diz. A aplicação segue o plano em vigor: partida da escola de Noerdange. A confirmar junto do município."
   },
   "calendrier": {
     "titre": "Adicionar a um calendário",
@@ -442,7 +442,9 @@
     "circule": "Circula",
     "reserve": "Linha reservada",
     "horairesEcole": "Horário da escola",
-    "horairesEcoleDetail": "Aulas das {matinDebut} às {matinFin} de segunda a sexta-feira, e das {apresMidiDebut} às {apresMidiFin} às segundas, quartas e sextas-feiras.",
+    "horairesEcoleJours": "Aulas de manhã: {matin}. Aulas à tarde: {apresMidi}. As horas de saída diferem de escola para escola.",
+    "cycle": "Ciclo",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Horários indicativos",
     "avertissementHorairesDetail": "Os horários são indicativos e podem variar ligeiramente consoante as condições de trânsito. Recomendamos estar na paragem 5 minutos antes da hora prevista. Em caso de alteração excecional dos horários (mau tempo, obras, etc.), os pais são informados por email ou através da escola."
   },

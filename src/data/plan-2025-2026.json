@@ -4,34 +4,71 @@
   "anneeScolaire": "2025/2026",
   "anneesCouvertes": ["2025/2026", "2026/2027"],
   "valideDu": "2025-09-15",
-  "valideAu": "2027-07-15",
+  "valideAu": "2026-12-18",
 
   "source": {
-    "document": "SUEBELMOUK SPEZIAL — Rentrée scolaire 2025 | 2026, pages 12 à 16",
+    "document": "D'Suebelmouk — Schoulorganisatioun 2026 | 2027, pages 14 à 18",
     "url": "https://kanner.beckerich.lu/infos/horaires-de-bus",
     "pdf": "plan-bus-2025-2026.pdf",
-    "dateReleve": "2026-08-07",
+    "$notePdf": "Le PDF joint à l'application reste l'extrait des pages bus de la brochure 2025/2026 : les sept tableaux de la brochure 2026/2027 lui sont identiques ligne pour ligne, vérifié le 2026-09-08 en comparant les deux documents. Seule différence de fond, la mention « hall sportif le vendredi » du bus Dillendapp de midi, qui a disparu — voir l'incertitude depart-midi-vendredi-hall-sportif.",
+    "dateReleve": "2026-09-08",
     "confirmePar": "la commune de Beckerich",
-    "confirmeLe": "2026-08",
-    "confirmationOrale": true,
-    "noteConfirmation": "Confirmé par téléphone : le plan est inchangé pour l'année scolaire 2026/2027. Cette confirmation étant orale, la validité affichée reste à vérifier à chaque rentrée."
+    "confirmeLe": "2026-09",
+    "confirmationOrale": false,
+    "noteConfirmation": "Confirmation écrite, et non plus orale : la brochure de rentrée 2026/2027 publie les mêmes tableaux que celle de 2025/2026. Elle annonce en revanche que l'ouverture du nouveau campus scolaire, prévue en janvier 2027, changera horaires et itinéraires — d'où une validité arrêtée à la fin du premier trimestre."
   },
 
   "horairesEcole": {
-    "$commentaire": "Rythme de l'école fondamentale de Beckerich. C'est lui qui détermine combien de trajets un enfant fait chaque jour.",
-    "matin": {
-      "debut": "07:55",
-      "fin": "11:45",
-      "jours": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"]
+    "$commentaire": "Rythme de l'école fondamentale de Beckerich. Les JOURS sont communs à tous les cycles — la brochure énonce une seule fois qu'il n'y a pas cours les mardis et jeudis après-midi. Les HEURES, elles, diffèrent d'un site à l'autre : c'est le cycle qui décide à quelle heure l'enfant sort, et donc l'heure proposée par défaut à la maison relais. Source : D'Suebelmouk 2026/2027, pages 4, 5 et 6.",
+    "jours": {
+      "matin": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+      "apresMidi": ["lundi", "mercredi", "vendredi"]
     },
-    "apresMidi": {
-      "debut": "14:00",
-      "fin": "15:45",
-      "jours": ["lundi", "mercredi", "vendredi"]
+    "parCycle": {
+      "precoce": {
+        "$site": "Beckerich — aucun transport scolaire n'est assuré pour ce cycle.",
+        "matin": { "debut": "07:55", "fin": "11:45" },
+        "apresMidi": { "debut": "14:00", "fin": "15:45" }
+      },
+      "c1": {
+        "$site": "Oberpallen",
+        "matin": { "debut": "08:00", "fin": "11:50" },
+        "apresMidi": { "debut": "14:00", "fin": "15:45" }
+      },
+      "c2": {
+        "$site": "Noerdange",
+        "matin": { "debut": "08:00", "fin": "12:05" },
+        "apresMidi": { "debut": "14:00", "fin": "15:55" }
+      },
+      "c3": {
+        "$site": "Elvange",
+        "matin": { "debut": "08:00", "fin": "12:10" },
+        "apresMidi": { "debut": "14:05", "fin": "15:55" }
+      },
+      "c4": {
+        "$site": "Beckerich",
+        "matin": { "debut": "07:55", "fin": "12:00" },
+        "apresMidi": { "debut": "13:55", "fin": "15:50" }
+      }
     }
   },
 
-  "incertitudes": [],
+  "incertitudes": [
+    {
+      "id": "nouveau-campus-janvier-2027",
+      "portee": "plan",
+      "question": "La brochure 2026/2027 annonce que, sous réserve de l'ouverture du nouveau campus scolaire prévue en janvier 2027, les horaires ET les itinéraires du transport scolaire seront adaptés. Ni la date exacte ni le futur plan ne sont publiés ; les parents doivent être informés au cours du premier trimestre.",
+      "hypothese": "Le plan ci-dessous est tenu pour valable jusqu'à la fin du premier trimestre, le 18 décembre 2026. Au-delà, l'application se déclare périmée plutôt que d'afficher des horaires qui pourraient ne plus exister.",
+      "aVerifierAupres": "Commune de Beckerich"
+    },
+    {
+      "id": "depart-midi-vendredi-hall-sportif",
+      "portee": "aller-dillendapp.midi",
+      "question": "Le plan 2025/2026 précisait que le départ de 12:10 se faisait depuis le hall sportif le vendredi, et non depuis l'école de Noerdange. La brochure 2026/2027 ne le dit plus — sans dire non plus que cela a changé.",
+      "hypothese": "Départ de l'école de Noerdange tous les jours, comme l'écrit le plan en vigueur.",
+      "aVerifierAupres": "Commune de Beckerich / Maison relais Dillendapp"
+    }
+  ],
 
   "reglesConfirmees": [
     {
@@ -50,7 +87,6 @@
     "voir-aller-3": {},
     "huttange-retour-dillendapp-1345": {},
     "depart-non-precise": {},
-    "vendredi-hall-sportif": {},
     "horaire-intermediaire-non-publie": {}
   },
 
@@ -211,12 +247,9 @@
           "periode": "midi",
           "jours": ["lundi", "mercredi", "vendredi"],
           "horaireComplet": false,
+          "incertitude": "depart-midi-vendredi-hall-sportif",
           "arrets": [
-            {
-              "arret": "noerdange-ecole",
-              "heure": "12:10",
-              "notes": ["vendredi-hall-sportif"]
-            },
+            { "arret": "noerdange-ecole", "heure": "12:10" },
             {
               "arret": "huttange",
               "heure": null,

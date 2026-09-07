@@ -330,8 +330,8 @@ describe('absence de retour les mardi et jeudi', () => {
     expect(mardi.manquants).toHaveLength(0)
   })
 
-  it("ne déclare plus aucune incertitude dans le plan", () => {
-    expect(plan.incertitudes).toHaveLength(0)
+  it("ne déclare plus l’incertitude sur les retours du mardi et du jeudi", () => {
+    expect(plan.incertitudes.map((i) => i.id)).not.toContain('retours-apres-midi-mardi-jeudi')
   })
 })
 
@@ -714,8 +714,9 @@ describe('bornes des heures de présence au Dillendapp', () => {
 
   it('place ce plancher à la navette de midi les jours sans cours l’après-midi', () => {
     expect(bornes('c2', 'mardi').jusqua!.min).toBe('12:31')
-    // Sans navette, c'est la fin des cours.
-    expect(bornes('c4', 'mardi').jusqua!.min).toBe('11:45')
+    // Sans navette, c'est la fin des cours DU CYCLE : un C4 sort à 12:00 à Beckerich,
+    // et non à l'heure d'un autre site.
+    expect(bornes('c4', 'mardi').jusqua!.min).toBe('12:00')
   })
 })
 

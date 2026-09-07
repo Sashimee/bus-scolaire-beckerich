@@ -5,6 +5,8 @@ import planReel from '../data/plan-2025-2026.json'
 const erreurs = (brut: unknown) =>
   validerPlan(brut).filter((p) => p.gravite === 'erreur')
 
+const creneau = (debut: string, fin: string) => ({ debut, fin })
+
 /** Un plan minimal mais valide, à dégrader dans chaque test. */
 function planValide() {
   return {
@@ -12,8 +14,17 @@ function planValide() {
     valideDu: '2026-09-15',
     valideAu: '2027-07-15',
     horairesEcole: {
-      matin: { debut: '07:55', fin: '11:45', jours: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'] },
-      apresMidi: { debut: '14:00', fin: '15:45', jours: ['lundi', 'mercredi', 'vendredi'] },
+      jours: {
+        matin: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'],
+        apresMidi: ['lundi', 'mercredi', 'vendredi'],
+      },
+      parCycle: {
+        precoce: { matin: creneau('07:55', '11:45'), apresMidi: creneau('14:00', '15:45') },
+        c1: { matin: creneau('08:00', '11:50'), apresMidi: creneau('14:00', '15:45') },
+        c2: { matin: creneau('08:00', '12:05'), apresMidi: creneau('14:00', '15:55') },
+        c3: { matin: creneau('08:00', '12:10'), apresMidi: creneau('14:05', '15:55') },
+        c4: { matin: creneau('07:55', '12:00'), apresMidi: creneau('13:55', '15:50') },
+      },
     },
     lignes: [
       {
@@ -87,6 +98,25 @@ describe('structure', () => {
 })
 
 describe('valeurs', () => {
+  it('refuse un cycle sans heures de cours', () => {
+    // Sans elles, la maison relais proposerait une heure de sortie qui n'existe pas.
+    const p = planValide()
+    delete (p.horairesEcole.parCycle as Record<string, unknown>).c3
+    expect(erreurs(p).some((e) => e.ou.includes('parCycle › c3'))).toBe(true)
+  })
+
+  it('refuse des cours qui se termineraient avant de commencer', () => {
+    const p = planValide()
+    p.horairesEcole.parCycle.c2.matin = creneau('12:05', '08:00')
+    expect(erreurs(p).some((e) => e.message.includes('doit suivre leur début'))).toBe(true)
+  })
+
+  it('refuse un jour de cours inventé', () => {
+    const p = planValide()
+    p.horairesEcole.jours.apresMidi = ['lundi', 'dimanche']
+    expect(erreurs(p).some((e) => e.ou.includes('jours › apresMidi'))).toBe(true)
+  })
+
   it('refuse un arrêt qui n’existe pas', () => {
     const p = planValide()
     p.lignes[0].services[0].arrets[1].arret = 'gare-de-lyon'

@@ -11,6 +11,7 @@ import vacancesJson from '../data/vacances-lu.json'
 import transportJson from '../data/transport-a-la-demande.json'
 import type {
   Arret,
+  Creneau,
   Cycle,
   CycleScolaire,
   MaisonRelais,
@@ -112,6 +113,14 @@ export function cyclesProposes(actuel: Cycle): Cycle[] {
 /** L'arrêt « école » desservi pour un cycle donné. */
 export function arretEcoleDuCycle(id: Cycle): Arret {
   return arret(cycleScolaire(id).arretEcole)
+}
+
+/** Les heures de cours d'un cycle. Elles varient d'un site à l'autre : un enfant de
+ *  Noerdange sort à 12:05, un enfant de Beckerich à 12:00. */
+export function horairesDuCycle(id: Cycle): { matin: Creneau; apresMidi: Creneau } {
+  const h = plan.horairesEcole.parCycle[id]
+  if (!h) throw new Error(`Horaires de cours inconnus pour le cycle : ${id}`)
+  return h
 }
 
 /** L'incertitude déclarée dans le plan, si elle existe. */

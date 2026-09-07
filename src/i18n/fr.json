@@ -312,11 +312,11 @@
     "voir-aller-3": "Huttange n'est pas desservi par cette ligne : voir l'horaire « Aller Bus 3 ».",
     "huttange-retour-dillendapp-1345": "Les enfants de Huttange peuvent prendre le bus « Retour Bus Dillendapp » à 13:45 à Huttange.",
     "depart-non-precise": "Le plan officiel ne précise pas l'arrêt exact de ce départ à Beckerich.",
-    "vendredi-hall-sportif": "Le vendredi, le départ se fait depuis le hall sportif et non depuis l'école.",
     "horaire-intermediaire-non-publie": "Le plan officiel ne publie pas l'heure de passage à cet arrêt."
   },
   "incertitudes": {
-    "titre": "Point non tranché par le plan officiel"
+    "titre": "Point non tranché par le plan officiel",
+    "depart-midi-vendredi-hall-sportif": "Le plan précédent indiquait un départ depuis le hall sportif le vendredi ; celui de 2026/2027 ne le dit plus. L'application suit le plan en vigueur : départ de l'école de Noerdange. À vérifier auprès de la commune."
   },
   "calendrier": {
     "titre": "Ajouter à un agenda",
@@ -442,7 +442,9 @@
     "circule": "Circule",
     "reserve": "Ligne réservée",
     "horairesEcole": "Horaires de l'école",
-    "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi.",
+    "horairesEcoleJours": "Cours le matin : {matin}. Cours l'après-midi : {apresMidi}. Les heures de sortie diffèrent d'une école à l'autre.",
+    "cycle": "Cycle",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Horaires indicatifs",
     "avertissementHorairesDetail": "Les horaires sont donnés à titre indicatif et peuvent varier légèrement en fonction des conditions de circulation. Nous vous recommandons d'être à l'arrêt 5 minutes avant l'heure prévue. En cas de modification exceptionnelle des horaires (intempéries, travaux, etc.), les parents sont informés par email ou via l'école."
   },

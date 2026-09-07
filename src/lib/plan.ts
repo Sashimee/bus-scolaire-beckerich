@@ -6,7 +6,14 @@
  * Une erreur ici ferait rater un bus à un enfant : c'est le fichier le plus testé.
  */
 import { distanceMarche, distanceVolOiseau, tempsMarche } from './distance'
-import { arret, arretEcoleDuCycle, arrets, maisonRelais, plan } from './donnees'
+import {
+  arret,
+  arretEcoleDuCycle,
+  arrets,
+  horairesDuCycle,
+  maisonRelais,
+  plan,
+} from './donnees'
 import type {
   Adresse,
   Arret,
@@ -347,9 +354,10 @@ export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant
   }
 }
 
-/** Y a-t-il cours l'après-midi ce jour-là ? */
+/** Y a-t-il cours l'après-midi ce jour-là ? Les jours sont les mêmes pour tous les
+ *  cycles, seules les heures diffèrent d'un site à l'autre. */
 export function coursApresMidi(jour: Jour): boolean {
-  return plan.horairesEcole.apresMidi.jours.includes(jour)
+  return plan.horairesEcole.jours.apresMidi.includes(jour)
 }
 
 /**
@@ -651,8 +659,9 @@ export function bornesDillendapp(ctx: ContexteEnfant, jour: Jour): BornesDillend
     return h !== null && (tard === null || h > tard) ? h : tard
   }, null)
 
+  const horaires = horairesDuCycle(ctx.enfant.cycle)
   const ouvre = enMinutes(ouverture) ?? 0
-  const limiteMatin = (dernierDepart ?? enMinutes(plan.horairesEcole.matin.debut) ?? 0) -
+  const limiteMatin = (dernierDepart ?? enMinutes(horaires.matin.debut) ?? 0) -
     margeAvantBusMinutes
   // Une heure d'arrivée reste une heure d'arrivée : au-delà d'une heure après
   // l'ouverture, ce n'est plus un accueil du matin.
@@ -669,7 +678,7 @@ export function bornesDillendapp(ctx: ContexteEnfant, jour: Jour): BornesDillend
         periodes: [apresMidi ? 'soir' : 'midi'],
         directions: ['vers-domicile', 'vers-dillendapp'],
       })
-  const finDesCours = apresMidi ? plan.horairesEcole.apresMidi.fin : plan.horairesEcole.matin.fin
+  const finDesCours = apresMidi ? horaires.apresMidi.fin : horaires.matin.fin
   const arriveeSurPlace =
     enMinutes(versLaMaisonRelais[0]?.arrivee.heure ?? null) ?? enMinutes(finDesCours) ?? 0
   const ferme = enMinutes(fermeture) ?? 24 * 60 - 1

@@ -312,11 +312,11 @@
     "voir-aller-3": "Hüttingen gëtt vun dëser Linn net bedéngt: kuckt den Horaire „Aller Bus 3“.",
     "huttange-retour-dillendapp-1345": "Kanner aus Hüttingen kënnen de Bus „Retour Bus Dillendapp“ um 13:45 zu Hüttingen huelen.",
     "depart-non-precise": "Den offizielle Plang nennt déi genee Statioun vun dëser Offahrt zu Biekerech net.",
-    "vendredi-hall-sportif": "Freides ass d'Offahrt bei der Sportshal an net bei der Schoul.",
     "horaire-intermediaire-non-publie": "Den offizielle Plang publizéiert fir dës Statioun keng Auerzäit."
   },
   "incertitudes": {
-    "titre": "Vum offizielle Plang net gekläert"
+    "titre": "Vum offizielle Plang net gekläert",
+    "depart-midi-vendredi-hall-sportif": "De virege Plang huet freides eng Offahrt bei der Sportshal genannt; de Plang 2026/2027 seet dat net méi. D'Applikatioun follegt dem gëltege Plang: Offahrt bei der Schoul zu Noerdange. Bei der Gemeng nozefroen."
   },
   "calendrier": {
     "titre": "An e Kalenner derbäisetzen",
@@ -442,7 +442,9 @@
     "circule": "Fiert",
     "reserve": "Linn reservéiert",
     "horairesEcole": "Schoulziichten",
-    "horairesEcoleDetail": "Cours vun {matinDebut} bis {matinFin} vu méindes bis freides, a vun {apresMidiDebut} bis {apresMidiFin} méindes, mëttwochs a freides.",
+    "horairesEcoleJours": "Cours moies: {matin}. Cours nomëttes: {apresMidi}. D'Schlusszäite sinn net an all Schoul déiselwecht.",
+    "cycle": "Zyklus",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Indikativ Zäiten",
     "avertissementHorairesDetail": "D'Auerzäite si just indikativ a kënne liicht variéieren no de Verkéiersbedéngungen. Mir recommandéieren, 5 Minutte virun der virgesinner Zäit op der Arrêt ze sinn. Bei aussergewéinlechen Ännerungen (schlecht Wieder, Aarbechten asw.) ginn d'Eltere per E-Mail oder iwwer d'Schoul informéiert."
   },

@@ -85,6 +85,9 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R45~~ | Consolidation | ~~Le repli sur les capacités est prouvé par les tests, pas par le serveur déployé.~~ **Levée le 2026-09-07.** Un vrai compte a publié une perturbation depuis `/edition` sur `app.schoulbus.lu`, elle est arrivée dans l'application, et elle a été retirée. Et la table `migration` de la base de PRODUCTION porte bien les cinq lignes, `004-retrait-agents.sql` comprise — le runner inscrivant le nom dans la même transaction que le fichier, `agent_commune` et `agent_traduction` sont donc tombées. Deux enseignements au passage : la publication échouait d'abord sur une **session expirée**, refusée avant même d'être journalisée (d'où un journal vide qui laissait croire à une panne d'écriture), et le jeton mort survivait à son refus — corrigé le même jour. **Leçon inscrite** : la première vérification a été faite dans le mauvais conteneur (`bus-beckerich-bus-postgres-1`, voir R50), qui n'affichait que deux migrations. Un terminal de base de données ne dit pas de quelle pile il est ; vérifier le nom du conteneur avant de conclure. |
 | R50 | — | **Une pile orpheline tourne encore sur la VPS.** Le projet Compose `bus-beckerich` (`bus-beckerich-bus-postgres-1`) est resté allumé depuis le déploiement à la main d'il y a deux semaines, en parallèle de la pile Dokploy `bus-app` (`compose-hack-neural-pixel-ai3w3f-*`) qui est la vraie production. Plus rien ne l'alimente — sa base s'est arrêtée aux migrations 001 et 002 —, mais elle consomme mémoire et disque, et son volume PostgreSQL détient l'état d'alors : abonnements et comptes d'avant la reprise par Dokploy. | Regarder ce que ce volume contient (`select count(*) from abonnement`, `select courriel from compte`) AVANT de supprimer quoi que ce soit. S'il porte de vrais abonnés, c'est peut-être là que se joue R39. Ne pas confondre les deux piles en arrêtant l'une pour l'autre : leurs noms se ressemblent, et l'une des deux sert les parents. |
 | ~~R48~~ | 2026-09-07 | ~~La reprise automatique d'un abonnement périmé n'a jamais tourné.~~ **Levée le 2026-09-07** par l'auteur, sur un téléphone abonné avant le correctif : le site lit `clePubliqueVapid` sur `/sante` et refait de lui-même l'abonnement lié à une clé morte. C'est ce silence qui avait rendu les notifications muettes pendant des semaines — un abonnement se crée sans la moindre erreur avec une clé morte. **Reste vrai** : aucun test automatisé ne couvre ce chemin, ni jsdom ni le banc n'ayant de Push API. Une régression ici serait de nouveau silencieuse. |
+| R51 | 2026-09-08 | **La date d'ouverture du nouveau campus n'est pas connue, et elle changera tout.** La brochure 2026/2027 écrit que « sous réserve de l'ouverture du nouveau campus scolaire, prévue en janvier 2027, les horaires et les itinéraires du transport scolaire seront adaptés », et que les parents seront informés au cours du premier trimestre. Ni la date, ni le futur plan ne sont publiés. `valideAu` a donc été ramené de `2027-07-15` à `2026-12-18`, dernier jour de classe du premier trimestre : à partir du 19 décembre 2026, l'application affiche son bandeau « plan périmé » plutôt que des horaires qui pourraient ne plus exister. Un chantier qui glisse — le cas ordinaire — fera donc crier au périmé un plan encore valable. C'est le sens du compromis : un faux « vérifiez » coûte moins cher qu'un vrai bus raté. | Récupérer la communication de la commune au premier trimestre, puis soit repousser `valideAu` si l'ouverture glisse, soit saisir le nouveau plan. |
+| R52 | 2026-09-08 | **Le départ du vendredi depuis le hall sportif n'est ni confirmé ni infirmé.** Le plan 2025/2026 précisait que le bus Dillendapp de midi partait « du hall sportif le vendredi » et non de l'école de Noerdange. La brochure 2026/2027 a supprimé cette mention — sans dire que la pratique a changé. La note affirmative a été retirée et remplacée par une incertitude (`depart-midi-vendredi-hall-sportif`), visible sur la page Plan et dans la journée des enfants concernés (C2 inscrits au Dillendapp, et Huttange). | Une question à la commune ou à la maison relais : le vendredi à 12:10, le bus part-il de l'école ou du hall sportif ? Puis note affirmative ou incertitude levée. |
+| R53 | 2026-09-08 | **Un plan publié en base à l'ancien format sera rejeté, sans que personne l'ait vu se produire.** `horairesEcole` a changé de forme (heures désormais par cycle) et `validerPlan()` l'exige. Le garde-fou fait exactement ce pour quoi il existe : `initialiserHoraires()` refuse le plan servi par `/horaires` s'il est à l'ancien format et garde celui du bundle — dont les horaires sont justes. Mais l'onglet « Horaires » de `/edition` montrera alors des erreurs de validation sur le plan publié, et personne n'a vérifié s'il existe une publication en base sur `app.schoulbus.lu`. | Ouvrir l'onglet « Horaires » de `/edition` après déploiement. S'il porte un plan à l'ancien format, y coller le contenu de `src/data/plan-2025-2026.json` et republier. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -2715,3 +2718,47 @@ R47 — le compteur public reste approximatif (gonflable à la main, comme l'ét
 c'est un ordre de grandeur, pas une métrique de confiance, et on l'assume.
 
 *Tous les lots planifiés (0 à 28) sont faits.*
+
+---
+
+## Rentrée 2026/2027 — la brochure relue, les horaires par cycle (2026-09-08)
+
+La commune a publié *D'Suebelmouk — Schoulorganisatioun 2026 | 2027* (35 pages, les bus
+aux pages 14 à 18). Les deux documents ont été comparés page à page après extraction du
+texte, et non lus en diagonale.
+
+### Les horaires de bus n'ont pas changé
+
+Les sept tableaux — Aller 1, 2, 3, Aller Dillendapp, Retour 1, 2, Retour Dillendapp —
+sont **identiques caractère pour caractère** à ceux de 2025/2026. Pas une heure, pas un
+arrêt, pas un ordre de passage. Seule la pagination bouge (12–16 → 14–18). Le fichier
+`plan-2025-2026.json` garde donc ses horaires tels quels, et le PDF joint à l'application
+reste l'extrait de l'an dernier : il dit la même chose, pour 27 Mo de moins.
+
+Une seule différence de fond sur ces pages : la mention « (hall sportif le vendredi) » du
+bus Dillendapp de midi a disparu. Voir R52.
+
+### Ce qui a changé autour
+
+- **Le nouveau campus, janvier 2027.** Horaires et itinéraires seront adaptés. `valideAu`
+  passe à `2026-12-18`. Voir R51.
+- **Les horaires de cours étaient faux pour tous les cycles qui prennent le bus.** La
+  brochure les publie site par site — Noerdange 08:00–12:05, Elvange 08:00–12:10,
+  Beckerich 07:55–12:00, Oberpallen 08:00–11:50 — alors que le plan n'en portait qu'un
+  seul jeu, `07:55–11:45`, qui est celui du **précoce**, précisément le seul cycle sans
+  transport scolaire. L'application annonçait donc à chaque parent une fin de cours qui
+  n'était pas la sienne, sur la page Plan comme dans la question du midi, et s'en servait
+  comme plancher de récupération à la maison relais les mardis et jeudis. `horairesEcole`
+  sépare désormais les **jours** (communs : pas de cours les mardis et jeudis après-midi)
+  des **heures** (par cycle), `validerPlan()` exige les cinq cycles et refuse une fin de
+  cours antérieure à son début, et la page Plan affiche un tableau cycle par cycle.
+- **Les vacances 2026/2027 et la rentrée du 15 septembre** correspondent exactement à
+  `vacances-lu.json` : rien à corriger.
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : 346 tests d'application (dont trois nouveaux sur la validation des horaires par
+cycle), `typecheck`, `lint` et `build` ; côté serveur, `typecheck`, `build` et 68 tests.
+**Où s'arrête la preuve** : les 83 tests de stockage du serveur se sont sautés faute de
+Postgres — Docker n'est pas lançable dans cette session. Rien n'a été déployé, et R53
+reste ouverte sur l'état du plan publié en base.
