@@ -95,7 +95,11 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   2026-08-24** : les rappels ont un journal de livraison, lisible à l'onglet « Journal » de
   `/edition`. **Lots 27-28 faits le 2026-08-24** : la mesure de fréquentation est
   auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Tous les
-  lots planifiés (0 à 28) sont faits.** **À consulter avant d'entamer une évolution.**
+  lots planifiés (0 à 28) sont faits.** **Le 2026-09-07** : la clé VAPID se lit à
+  l'exécution sur `/sante` au lieu d'être figée au build, un jeton de session refusé
+  s'efface, `pull_policy: always` sur les deux images — et la section « Ouverture à la
+  commune » ouvre la mise en service du premier compte d'agent (les identités restent
+  hors dépôt, il est public). **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

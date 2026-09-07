@@ -83,6 +83,8 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R42~~ | 22 | ~~La chaîne de déploiement n'a jamais été montée par le vrai Dokploy.~~ **Levée le 2026-08-24** : déployée sur le vrai Dokploy (`dok.seil.pro`, projet Schoulbus), Traefik a routé `app.schoulbus.lu/api` et émis le certificat, `/api/sante` répond `base: true`, `push: true`, `commune: true`, `comptes: true`, `courriel: true`. Le site rend un 200 à la racine, une route profonde retombe sur `index.html`, les quatre lectures publiques (`/urgences /horaires /credits /traductions`) répondent 200. **Nuance** : les images ont été construites SUR la VPS et non tirées de GHCR — le chemin GHCR (paquet privé, identifiant de registre) reste donc à éprouver le jour où la CI publiera les images. Le reste — Dokploy, Traefik, certificat, chemin `/api` non tronqué — est confirmé. Reste l'ancien texte pour trace : `compose.deploiement.yaml`, la poussée d'image sur GHCR et le routage Traefik (`Host(app.schoulbus.lu) && PathPrefix(/api)`, certificat Let's Encrypt) sont vérifiés en local — `docker build`, la pile montée depuis l'image construite, `/api/sante` au vert avec `base: true`, la sonde de l'image qui passe, `docker compose config` qui résout le fichier — mais **aucun Dokploy, aucun Traefik, aucun certificat réel** n'a été devant. Trois choses ne se voient qu'au premier déploiement : que Dokploy sait tirer l'image (paquet privé → identifiant de registre requis), que Traefik émet bien le certificat (DNS à résoudre d'abord), et que le chemin `/api` arrive non tronqué au serveur. | Pousser sur `main`, créer l'application Compose dans Dokploy sur `compose.deploiement.yaml`, poser les variables, déployer, puis `curl https://app.schoulbus.lu/api/sante`. Voir [docs/deploiement.md](deploiement.md). C'est le même déploiement qui lèvera R39 (reprise clé-valeur) et R40 (adresse client derrière Traefik). |
 | R43 | 23 | **Partiellement levée le 2026-08-24.** Le site EST servi par le vrai Traefik sous `app.schoulbus.lu` : racine 200, en-têtes `X-Frame-Options: DENY`/`nosniff`, repli SPA vérifié, CSP portant `app.schoulbus.lu/api`, et le partage d'origine site↔API confirmé (les routeurs priorité 100/1 départagent `/api` du reste). **Restent invérifiés** : l'installation de la PWA depuis la nouvelle origine sur un appareil réel, et le fait qu'une PWA déjà installée depuis GitHub Pages ne migre pas seule. Ancien texte pour trace : L'image `bus-site` (Caddy) est vérifiée en local — racine qui rend un 200, en-têtes `X-Frame-Options: DENY`/`nosniff`/`Referrer-Policy`, repli SPA d'une route profonde vers `index.html`, chemins d'actifs à la racine (`BASE_PATH=/`), CSP portant `app.schoulbus.lu/api`. Restent invérifiés : le partage d'origine site↔API à travers Traefik (les deux routeurs, priorité 100 contre 1), l'installation de la PWA depuis la nouvelle origine (dont `start_url`/`scope` passent à `/`), et le fait qu'une PWA déjà installée depuis GitHub Pages (portée `/bus-scolaire-beckerich/`) **ne migre pas toute seule** — c'est une autre origine, un autre service worker ; le parent garde l'ancienne installation jusqu'à réinstaller depuis `app.schoulbus.lu`. | Après le déploiement : ouvrir `https://app.schoulbus.lu`, vérifier que le site s'affiche et qu'une route profonde rechargée ne rend pas un 404, installer la PWA depuis cette origine, et confirmer que l'espace commune et les notifications répondent (même origine, sans CORS). Prévoir un mot aux parents déjà installés : réinstaller depuis la nouvelle adresse. |
 | R45 | Consolidation | **Le repli sur les capacités est prouvé par les tests, pas par le serveur déployé.** Les routes `/edition/perturbations · /horaires · /traductions · /journal` et les onglets par capacité passent 144 tests serveur (dont les propriétés de sécurité) et 330 tests app, mais **aucun vrai compte n'a encore publié une perturbation, un plan ou une traduction depuis `app.schoulbus.lu`** par ce chemin. De plus, la migration `004-retrait-agents.sql` (`drop table agent_commune, agent_traduction`) n'a tourné que sur des schémas de test neufs — jamais sur la base de production, où ces tables existent depuis la migration 001. | Après redéploiement : se connecter à `/connexion` avec un vrai compte, publier une perturbation d'essai depuis `/edition`, la voir arriver dans l'app, puis la retirer. Vérifier au passage que le démarrage a bien appliqué la migration 004 (`\dt` ne doit plus lister `agent_commune` ni `agent_traduction`). |
+| R48 | 2026-09-07 | **La reprise automatique d'un abonnement périmé n'a jamais tourné.** Le site ne porte plus de clé VAPID figée à la construction : il lit `clePubliqueVapid` sur `/sante` et, si l'abonnement du navigateur est lié à une AUTRE clé, il le résilie et le refait sur place. C'est ce qui a rendu les notifications muettes pendant des semaines — un abonnement se crée sans la moindre erreur avec une clé morte, et rien ne le signale. Mais ce chemin ne s'exécute que dans un vrai navigateur : ni jsdom ni les tests n'ont de Push API, et **aucun test ne le couvre**. | Ouvrir `app.schoulbus.lu` sur un téléphone déjà abonné avant le 2026-09-07, sans rien désactiver, puis presser « tester les notifications ». Si le téléphone vibre, la reprise a eu lieu toute seule. Si le bouton « activer » est réapparu, la reprise a échoué proprement — c'est le repli prévu, et il faut alors réactiver à la main. |
+| R49 | 2026-09-07 | **La charte graphique n'est pas déployée, et `dev` ne la porte plus.** La branche `dev` a été écrasée par `main` à la demande de l'auteur ; ses quatre commits — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, et la pile dev du compose — sont conservés sur **`charte-et-pile-dev-2026-08-25`**, poussée sur GitHub. Ce travail n'a jamais été mis en ligne : `app.schoulbus.lu` sert toujours l'apparence d'avant. | Décider avant d'ouvrir l'application à la commune : fusionner la branche de sauvegarde, ou la supprimer. Une branche de sauvegarde qu'on oublie de trancher finit par être supprimée par erreur. |
 
 ### Mise en service — faite
 
@@ -111,6 +113,57 @@ npx wrangler deploy
 ./creer-agent.sh "Prénom Nom" "service"
 curl https://<worker>/sante              # doit renvoyer "commune": true
 ```
+
+---
+
+## Ouverture à la commune — en cours (2026-09-07)
+
+Le premier agent communal doit recevoir un accès à `/edition`. Ce n'est pas un lot de
+développement : tout le mécanisme existe depuis le lot 25. Ce qui reste est une mise en
+service, et elle a un ordre.
+
+**Les identités ne sont pas dans le dépôt.** Le compte à créer — adresse, nom, capacités
+retenues — et le courriel prêt à envoyer vivent dans `~/schoulbus-acces-commune.md`, sur
+la machine de l'auteur. Ce dépôt est public : l'adresse professionnelle d'un agent
+communal et un numéro de téléphone personnel n'ont rien à y faire. On ne garde ici que la
+démarche.
+
+1. **Éprouver le chemin avant de l'ouvrir.** Publier une perturbation d'essai depuis
+   `/edition`, la voir arriver dans l'application, la retirer. C'est la réserve R45 :
+   aucun compte réel n'a encore publié en production par le chemin des capacités. L'agent
+   ne doit pas être celui qui essuie les plâtres.
+2. **Créer le compte** depuis l'onglet Comptes de `/edition`, avec les seules capacités
+   utiles. `comptes` — créer et désactiver d'autres comptes — est une administration des
+   accès, pas des données : on ne l'accorde que sur demande.
+3. **Vérifier que le courriel d'activation arrive.** Il permet à l'agent de choisir
+   lui-même son mot de passe, que personne d'autre ne connaît jamais. Le relai SMTP
+   (`admin@schoulbus.lu` chez OVH, SPF + DKIM + DMARC vérifiés le 2026-09-07) est éprouvé.
+4. **Trancher la charte graphique** (R49) : elle n'est pas en ligne, et c'est l'apparence
+   que l'agent verra.
+5. **Écrire**, en dernier, une fois l'accès en place.
+
+**Ce que le courriel doit dire, et qui n'est pas confortable :** les traductions
+allemande, luxembourgeoise, portugaise et anglaise n'ont eu **aucune vérification
+humaine**. Seul le français a été écrit et relu par une personne. Le taire ferait
+découvrir le défaut à la commune par un parent mécontent ; le dire en ouvrant l'accès aux
+textes en fait une invitation à corriger. C'est le sens de la capacité `traductions`
+accordée dès le premier compte.
+
+### Ce qui a changé le 2026-09-07
+
+Trois corrections de production, hors lots :
+
+- **La clé VAPID ne vit plus qu'à un seul endroit.** Le site la lisait dans une variable
+  de dépôt figée à la construction ; elle avait divergé de celle avec laquelle le serveur
+  signe, et les notifications étaient muettes depuis. Le site la demande désormais à
+  `/sante` et refait de lui-même les abonnements liés à une clé morte (R48). La variable
+  de dépôt `CLE_VAPID` et l'argument de construction `VITE_CLE_VAPID` ont disparu.
+- **Un jeton de session refusé s'efface** au lieu de survivre à son refus, et l'écran
+  d'édition mène à la connexion. C'est ce qui avait fait croire à une publication perdue :
+  le serveur refusait avant même de journaliser.
+- **`pull_policy: always`** sur `bus-api` et `bus-site` : un redéploiement rejouait
+  l'image déjà en cache sans rien dire, et l'on cherchait la panne dans le code qu'on
+  venait de pousser.
 
 ---
 
