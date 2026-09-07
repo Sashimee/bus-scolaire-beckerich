@@ -46,6 +46,10 @@ services:
     # imposer un condensat précis (`@sha256:…`) pour qu'un redéploiement rejoue la même
     # image et non « la dernière en date ».
     image: ${IMAGE_SERVEUR:-ghcr.io/sashimee/bus-api:latest}
+    # Sans ce tirage forcé, `latest` déjà présent localement est réutilisé : un
+    # redéploiement rejoue alors l'image précédente sans rien dire, et l'on cherche la
+    # panne dans le code qu'on vient pourtant de pousser.
+    pull_policy: always
     restart: unless-stopped
     environment:
       PORT: 3000
@@ -121,6 +125,7 @@ services:
     # et la CSP se resserre. L'image est construite et poussée par la CI, comme bus-api ;
     # l'origine et le chemin de base y sont figés au build (voir Dockerfile.site).
     image: ${IMAGE_SITE:-ghcr.io/sashimee/bus-site:latest}
+    pull_policy: always
     restart: unless-stopped
     # Le site est purement statique : il ne touche ni la base ni aucun secret. Il ne
     # tient donc que sur le réseau de Traefik.
