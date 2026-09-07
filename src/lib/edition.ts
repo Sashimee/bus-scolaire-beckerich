@@ -12,7 +12,7 @@
  * refus du serveur en motifs affichables.
  */
 import { URL_API } from '../config'
-import type { SessionCompte } from './comptes'
+import { oublierSession, type SessionCompte } from './comptes'
 import type { Modifications, Surcouche } from './traductions'
 import type { Perturbation } from './urgences'
 
@@ -97,7 +97,13 @@ async function appeler<T>(
   if (reponse.ok) return donnees as T
 
   const motif = String(donnees.erreur ?? '')
-  if (motif === 'session-expiree') throw new ErreurEdition('session-expiree')
+  // Un jeton que le serveur refuse ne vaut plus rien : le garder ferait rouvrir
+  // l'édition comme si l'on était connecté, pour échouer de nouveau à la publication
+  // suivante. On l'efface ici, si bien qu'un simple rechargement mène à la connexion.
+  if (motif === 'session-expiree') {
+    oublierSession()
+    throw new ErreurEdition('session-expiree')
+  }
   if (motif === 'capacite-refusee') throw new ErreurEdition('capacite-refusee')
   // Sans `SECRET_SESSION`, le serveur répond 503 à toute l'édition. Le dire franchement
   // vaut mieux qu'une « erreur inconnue » devant laquelle personne ne sait quoi faire.

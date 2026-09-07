@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { Assistant, type Etape } from './Assistant'
 import { ResumePerturbation } from './BandeauUrgences'
@@ -382,6 +383,16 @@ export function EditeurPerturbations({ session }: { session: SessionCompte }) {
                 <p className="champ__aide">
                   <code>{detail}</code>
                 </p>
+              )}
+              {/*
+                  « Reconnectez-vous » sans porte où le faire laisse chercher : la
+                  session vient d'être effacée, et le brouillon en cours ne survivrait
+                  pas à une navigation à l'aveugle dans le menu.
+              */}
+              {motif === 'session-expiree' && (
+                <Link to="/connexion" className="bouton">
+                  {t('comptes.allerConnexion')}
+                </Link>
               )}
             </div>
           )}
