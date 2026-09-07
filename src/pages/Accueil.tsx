@@ -5,8 +5,15 @@ import { FicheFoyer } from '../composants/FicheFoyer'
 import { useFoyer } from '../etat'
 import { useUrgences } from '../urgences-contexte'
 import { etatDuJour, jourDeSemaine } from '../lib/calendrier'
-import { enMinutes, trajetsDuJour } from '../lib/plan'
-import { distanceLisible, nomArret, sensTrajet } from '../lib/affichage'
+import { trajetsDuJour } from '../lib/plan'
+import {
+  estPassee,
+  etapesDuJour,
+  minutesAvantDepart,
+  restantes,
+  type EtapeDuJour,
+} from '../lib/aujourdhui'
+import { distanceLisible, nomArret } from '../lib/affichage'
 import { siteDuCycle } from '../lib/donnees'
 import {
   dateSimulee,
@@ -15,71 +22,10 @@ import {
   valeurSimulee,
 } from '../lib/simulation'
 import { useMaintenant } from '../horloge'
-import {
-  heureArriveeEffective,
-  heureEffective,
-  perturbationsDuJour,
-  perturbationsDuTrajet,
-  type Perturbation,
-} from '../lib/urgences'
+import { perturbationsDuJour } from '../lib/urgences'
 import type { EtatJour } from '../lib/calendrier'
 import type { ContexteEnfant } from '../lib/plan'
-import type { Trajet } from '../lib/types'
 import type { Traduction } from '../i18n'
-
-/**
- * L'heure que le parent doit retenir d'un trajet.
- *
- * À l'aller, c'est le départ : c'est là qu'il faut être à l'arrêt. Au retour, c'est
- * l'arrivée — savoir quand le bus quitte l'école ne dit rien à qui attend au bout de la
- * rue. La page « semaine » applique déjà cette règle ; l'écran d'accueil s'en écartait,
- * ce qui n'avait guère de conséquence tant que l'heure y était petite.
- */
-function heureUtile(trajet: Trajet): string | null {
-  return sensTrajet(trajet.type) === 'retour' ? trajet.arrivee.heure : trajet.depart.heure
-}
-
-/** La même heure, une fois les perturbations du jour appliquées. */
-function heureUtileEffective(trajet: Trajet, perturbations: Perturbation[]): string | null {
-  return sensTrajet(trajet.type) === 'retour'
-    ? heureArriveeEffective(trajet, perturbations)
-    : heureEffective(trajet, perturbations)
-}
-
-interface Etape {
-  trajet: Trajet
-  /** L'heure telle qu'elle est publiée au plan. */
-  heure: string
-  /** La même, décalée par un retard éventuel. Identique à `heure` en temps normal. */
-  effective: string
-}
-
-/**
- * Les trajets du jour qui concernent le parent, dans l'ordre.
- *
- * Un trajet annulé disparaît de la liste : afficher l'heure d'un bus qui ne passera pas
- * est pire que ne rien afficher, et le bandeau de perturbation en tête de page dit déjà
- * ce qui se passe.
- */
-function etapesDuJour(trajets: Trajet[], perturbations: Perturbation[]): Etape[] {
-  return trajets
-    .filter((x) => x.concerneParent)
-    .flatMap((trajet) => {
-      const concernees = perturbationsDuTrajet(perturbations, trajet)
-      if (concernees.some((p) => p.type === 'annulation')) return []
-
-      const heure = heureUtile(trajet)
-      const effective = heureUtileEffective(trajet, concernees) ?? heure
-      if (heure === null || effective === null) return []
-      return [{ trajet, heure, effective }]
-    })
-}
-
-/** Ce qui reste à venir : tout ce dont l'heure n'est pas encore passée. */
-function restantes(etapes: Etape[], maintenant: Date): Etape[] {
-  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
-  return etapes.filter((e) => (enMinutes(e.effective) ?? 0) >= minutes)
-}
 
 /** Pourquoi il n'y a pas école, en une phrase. */
 function raisonSansEcole(etat: EtatJour, t: Traduction['t']): string {
@@ -99,7 +45,7 @@ function raisonSansEcole(etat: EtatJour, t: Traduction['t']): string {
  * « dans 24 min » signifie « il reste 24 minutes avant de devoir sortir », pas « le bus
  * passe dans 24 minutes ».
  */
-function ProchainDepart({ etape, minutesAvant }: { etape: Etape; minutesAvant: number }) {
+function ProchainDepart({ etape, minutesAvant }: { etape: EtapeDuJour; minutesAvant: number }) {
   const { t } = useT()
   const decale = etape.effective !== etape.heure
 
@@ -138,13 +84,12 @@ function HoraireDuJour({
   ecole,
   raison,
 }: {
-  etapes: Etape[]
+  etapes: EtapeDuJour[]
   maintenant: Date
   ecole: boolean
   raison: string
 }) {
   const { t } = useT()
-  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes()
 
   return (
     <div className={`sous-tuile${ecole ? '' : ' sous-tuile--eteinte'}`}>
@@ -171,7 +116,7 @@ function HoraireDuJour({
             {etapes.map((e, i) => (
               <li
                 className={`sous-tuile__ligne${
-                  ecole && (enMinutes(e.effective) ?? 0) < minutes ? ' sous-tuile__ligne--passee' : ''
+                  ecole && estPassee(e, maintenant) ? ' sous-tuile__ligne--passee' : ''
                 }`}
                 key={`${e.trajet.type}-${i}`}
               >
@@ -206,9 +151,7 @@ function CarteEnfant({
   const etapes = journee ? etapesDuJour(journee.trajets, perturbations) : []
   const [suivante] = ecole ? restantes(etapes, maintenant) : []
 
-  const minutesAvant = suivante
-    ? enMinutes(suivante.effective)! - (maintenant.getHours() * 60 + maintenant.getMinutes()) - ctx.temps
-    : 0
+  const minutesAvant = suivante ? minutesAvantDepart(suivante, maintenant, ctx.temps) : 0
 
   // Un enfant qui va à pied n'a pas d'horaire : sa tuile n'aurait rien à éteindre les
   // jours d'école. Elle reparaît sans école, pour porter la raison comme les autres.
