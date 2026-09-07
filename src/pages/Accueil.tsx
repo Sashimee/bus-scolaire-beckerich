@@ -11,10 +11,10 @@ import { siteDuCycle } from '../lib/donnees'
 import {
   dateSimulee,
   definirValeurSimulee,
-  maintenantSimule,
   simulationActive,
   valeurSimulee,
 } from '../lib/simulation'
+import { useMaintenant } from '../horloge'
 import {
   heureArriveeEffective,
   heureEffective,
@@ -315,7 +315,10 @@ export function Accueil() {
     setSimulation(v)
   }
 
-  const maintenant = simulable ? maintenantSimule() : new Date()
+  // L'horloge avance seule ; la date simulée, elle, est relue à chaque rendu — c'est
+  // ce qui la fait prendre effet dès la frappe et non à la minute suivante.
+  const horloge = useMaintenant()
+  const maintenant = dateSimulee() ?? horloge
   const etat = etatDuJour(maintenant)
   const raison = raisonSansEcole(etat, t)
 
