@@ -35,7 +35,7 @@ la commune ni avec l'école**.
 
 | Chemin | Rôle |
 | --- | --- |
-| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `moments.ts` (la journée telle qu'un parent la décrit ↔ les champs du stockage), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
+| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `aujourdhui.ts` (ce que l'écran du jour retient d'une journée), `moments.ts` (la journée telle qu'un parent la décrit ↔ les champs du stockage), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
 | `src/composants/`, `src/pages/` | Affichage uniquement. Aucune règle métier. |
 | `src/data/` | Toutes les données : plan de bus, arrêts, écoles, vacances, adresses. |
 | `src/i18n/` | Dictionnaires de traduction. |
@@ -104,7 +104,12 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   cycle (ils ne l'étaient pas : l'application affichait à tout le monde ceux du précoce,
   le seul cycle sans bus), la validité s'arrête au 2026-12-18 à cause du nouveau campus
   annoncé pour janvier 2027, et la note « hall sportif le vendredi » devient une
-  incertitude. **À consulter avant d'entamer une évolution.**
+  incertitude. **Le 2026-09-08 (suite)** : une barrière d'erreur remplace l'écran blanc
+  qu'une exception au rendu laissait, l'écran « Aujourd'hui » a son horloge (son compte à
+  rebours dépendait d'un `fetch` pour avancer), ses règles sont passées dans
+  `src/lib/aujourdhui.ts`, les trois écrans qu'un parent utilise ont des tests, et le
+  paquet principal tombe de 728 à 488 ko — `/edition` et les quatre dictionnaires non
+  français sont chargés à la demande. **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

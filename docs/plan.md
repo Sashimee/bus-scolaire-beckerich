@@ -88,6 +88,10 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R51 | 2026-09-08 | **La date d'ouverture du nouveau campus n'est pas connue, et elle changera tout.** La brochure 2026/2027 écrit que « sous réserve de l'ouverture du nouveau campus scolaire, prévue en janvier 2027, les horaires et les itinéraires du transport scolaire seront adaptés », et que les parents seront informés au cours du premier trimestre. Ni la date, ni le futur plan ne sont publiés. `valideAu` a donc été ramené de `2027-07-15` à `2026-12-18`, dernier jour de classe du premier trimestre : à partir du 19 décembre 2026, l'application affiche son bandeau « plan périmé » plutôt que des horaires qui pourraient ne plus exister. Un chantier qui glisse — le cas ordinaire — fera donc crier au périmé un plan encore valable. C'est le sens du compromis : un faux « vérifiez » coûte moins cher qu'un vrai bus raté. | Récupérer la communication de la commune au premier trimestre, puis soit repousser `valideAu` si l'ouverture glisse, soit saisir le nouveau plan. |
 | R52 | 2026-09-08 | **Le départ du vendredi depuis le hall sportif n'est ni confirmé ni infirmé.** Le plan 2025/2026 précisait que le bus Dillendapp de midi partait « du hall sportif le vendredi » et non de l'école de Noerdange. La brochure 2026/2027 a supprimé cette mention — sans dire que la pratique a changé. La note affirmative a été retirée et remplacée par une incertitude (`depart-midi-vendredi-hall-sportif`), visible sur la page Plan et dans la journée des enfants concernés (C2 inscrits au Dillendapp, et Huttange). | Une question à la commune ou à la maison relais : le vendredi à 12:10, le bus part-il de l'école ou du hall sportif ? Puis note affirmative ou incertitude levée. |
 | R53 | 2026-09-08 | **Un plan publié en base à l'ancien format sera rejeté, sans que personne l'ait vu se produire.** `horairesEcole` a changé de forme (heures désormais par cycle) et `validerPlan()` l'exige. Le garde-fou fait exactement ce pour quoi il existe : `initialiserHoraires()` refuse le plan servi par `/horaires` s'il est à l'ancien format et garde celui du bundle — dont les horaires sont justes. Mais l'onglet « Horaires » de `/edition` montrera alors des erreurs de validation sur le plan publié, et personne n'a vérifié s'il existe une publication en base sur `app.schoulbus.lu`. | Ouvrir l'onglet « Horaires » de `/edition` après déploiement. S'il porte un plan à l'ancien format, y coller le contenu de `src/data/plan-2025-2026.json` et republier. |
+| R54 | 2026-09-08 (bis) | **Rien de ce lot n'a tourné dans un vrai navigateur.** Barrière d'erreur, horloge, découpage en morceaux : la preuve s'arrête à 386 tests jsdom et à la sortie du build. Aucun navigateur n'est installable dans cette session. Trois chemins ne sont donc éprouvés nulle part : le PREMIER lancement d'un parent en allemand, portugais, luxembourgeois ou anglais — son dictionnaire est désormais un morceau séparé, attendu avant le premier rendu ; un changement de langue **hors ligne** ; et l'ouverture de `/edition` hors ligne, dont le morceau doit venir du préchargement. Un morceau qui n'arriverait pas laisse la page en français (langue) ou fait tomber la barrière d'erreur (édition) — jamais un écran blanc, mais jamais vérifié non plus. | Ouvrir l'application sur l'iPhone, une fois en ligne et une fois en mode avion : changer de langue, aller sur `/edition`. Puis vider le stockage du site et recharger en allemand. |
+| R55 | 2026-09-08 (bis) | **Le gain de poids est un gain de chemin critique, pas d'octets.** Le paquet principal passe de 728 à 488 ko (224 → 147 ko compressés), mais le service worker précharge tout de même les quatre dictionnaires et les morceaux d'édition : 31 entrées, 1123 Kio, contre 22 et 1111 Kio avant. Le premier affichage a donc moins à analyser, le téléchargement total ne baisse pas. Personne n'a mesuré ce que cela change sur le réseau du village — la mesure est celle de `vite build`, pas d'un téléphone. | Chronométrer une première ouverture sur données mobiles, avant et après. Ou l'assumer : le raisonnement tient sans la mesure. |
+| R56 | 2026-09-08 (bis) | **La barrière d'erreur n'a jamais rattrapé une vraie panne.** Elle est éprouvée par un composant qui lève à dessein. Ce qu'aucun test ne dit : ce qui s'affiche quand la panne vient d'un fournisseur au montage — le cas qui a motivé la barrière extérieure — et si le bouton « Effacer et repartir de zéro » suffit vraiment à rendre l'application utilisable après un stockage corrompu. Le contenu du stockage n'a pas été maltraité pour voir. | Poser une valeur illisible dans `bus-beckerich.foyer` depuis la console du navigateur, recharger, et suivre ce que la barrière propose jusqu'au bout. |
+| R57 | 2026-09-08 (bis) | **Les deux raccourcis du manifeste ne sont pas vérifiés, et la moitié des parents ne les verra jamais.** `shortcuts` est lu par Android ; iOS l'ignore, et l'application est installée sur iPhone chez l'auteur. Aucune capture d'écran n'a été ajoutée au manifeste — `screenshots` enrichit l'invite d'installation sur Chrome, mais demande de vraies images, donc un vrai navigateur. | Installer depuis Chrome sur Android et faire un appui long sur l'icône. Les captures viendront avec le premier navigateur disponible. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -2762,3 +2766,72 @@ cycle), `typecheck`, `lint` et `build` ; côté serveur, `typecheck`, `build` et
 **Où s'arrête la preuve** : les 83 tests de stockage du serveur se sont sautés faute de
 Postgres — Docker n'est pas lançable dans cette session. Rien n'a été déployé, et R53
 reste ouverte sur l'état du plan publié en base.
+
+
+---
+
+## Le lendemain de la brochure — ce que l'usage réel réclamait (2026-09-08)
+
+Cinq chantiers, dans l'ordre où ils comptent pour un parent. Aucun n'ajoute de
+fonctionnalité : ils ferment des pannes silencieuses et allègent ce qu'on télécharge.
+
+### La correction des horaires par cycle est livrée
+
+Elle attendait dans l'arbre de travail, non commitée. En production, chaque parent
+lisait encore la fin de cours du précoce. C'est le premier commit du lot.
+
+### Une exception au rendu ne laisse plus un écran blanc
+
+`src/composants/BarriereErreur.tsx` — la seule classe React du dépôt, parce que React
+n'offre ce mécanisme qu'aux classes. Elle est doublée : une barrière autour de tout,
+dans `main.tsx`, qui rattrape un fournisseur qui échoue au montage ; une autour du
+contenu de page dans `App.tsx`, remise à zéro à chaque changement d'adresse, pour que
+l'en-tête et la navigation survivent à la panne d'un seul écran.
+
+Elle s'affiche hors du fournisseur de traduction — qui peut être la cause de la panne —
+et lit donc le dictionnaire compilé directement, dans la langue enregistrée par le
+parent. Elle propose : recharger, voir les horaires officiels (lien ordinaire, le
+routeur fait partie de ce qui vient de tomber), déplier le message technique, et en
+dernier recours effacer les données locales — geste que `/reglages` porte déjà, mais
+`/reglages` se rend à partir du foyer et tombe avec lui.
+
+### L'horloge de l'écran « Aujourd'hui » bat toute seule
+
+`new Date()` au fil du rendu donnait une heure juste au premier affichage et fausse
+ensuite. L'écran s'en accommodait **par accident** : la relecture des perturbations,
+toutes les dix minutes, le rafraîchissait au passage. Autrement dit le compte à rebours
+dépendait d'un `fetch` — donc s'arrêtait hors ligne, et pouvait désigner en grand un bus
+déjà parti. `src/horloge.ts` bat désormais au changement de minute, et se rattrape au
+retour au premier plan : iOS gèle les minuteries d'un onglet en arrière-plan, et une
+application installée passe son temps en arrière-plan.
+
+### Les règles de l'accueil ont quitté la page
+
+`heureUtile`, `etapesDuJour`, `restantes`, le calcul du délai avant de sortir : des
+règles, pas de l'affichage, et la carte du dépôt les interdit dans une page. Elles sont
+dans `src/lib/aujourdhui.ts`, avec neuf tests. Dans la foulée, les trois écrans qu'un
+parent utilise vraiment — aujourd'hui, la semaine, la configuration — ont enfin les
+leurs : le moteur était couvert, la couche qui le donne à lire ne l'était pas.
+
+### Ce qu'un parent télécharge a fondu d'un tiers
+
+Paquet principal : **728 → 488 ko (224 → 147 ko compressés)**.
+
+- Les écrans de publication — six éditeurs, comptes, connexion, quelques milliers de
+  lignes pour une poignée de personnes — passent par `React.lazy`.
+- Les cinq dictionnaires étaient tous embarqués : un parent francophone téléchargeait
+  l'allemand, le luxembourgeois, le portugais et l'anglais. Le français reste dans le
+  paquet (langue de référence et repli de toutes les autres) ; les quatre autres sont
+  chargées à la demande. `main.tsx` attend celle du parent avant le premier rendu, sans
+  quoi la page s'afficherait en français avant de se retraduire sous ses yeux.
+- L'éditeur de traductions, lui, a besoin des cinq d'un bloc : il les prend dans
+  `src/i18n/tous-dictionnaires.ts`, atteint depuis `/edition` seulement.
+
+Le manifeste gagne deux raccourcis (plan officiel, saisie des enfants).
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : **386 tests d'application** (346 avant le lot), `typecheck`, `lint`, `build`.
+**Où s'arrête la preuve** : aucun navigateur dans cette session — voir R54 à R57. Le
+serveur n'a pas été touché ; rien n'a été déployé. R51, R52 et R53 restent ouvertes
+telles quelles.
