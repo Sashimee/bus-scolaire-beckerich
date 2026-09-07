@@ -103,17 +103,15 @@ jobs:
           # le site déménage sous un autre préfixe ou un domaine propre.
           BASE_PATH: /${{ github.event.repository.name }}/
           GITHUB_SHA: ${{ github.sha }}
-          # Notifications et connexion GitHub. Variables de dépôt, pas des secrets :
-          # ces deux valeurs sont publiques par nature (l'URL du Worker et la clé
-          # publique VAPID se retrouvent de toute façon dans le code servi).
-          # Vides, l'application fonctionne à l'identique, sans ces fonctionnalités.
+          # L'URL du serveur. Variable de dépôt, pas un secret : elle se retrouve de
+          # toute façon dans le code servi. Vide, l'application fonctionne à
+          # l'identique, sans notifications ni espace agents.
           # Deux noms le temps de la bascule : `URL_API` est le nouveau, `URL_WORKER`
           # l'ancien. `src/config.ts` lit le premier qui n'est pas vide, si bien qu'une
           # construction faite avant ou après le renommage de la variable de dépôt
           # produit la même application.
           VITE_URL_API: ${{ vars.URL_API }}
           VITE_URL_WORKER: ${{ vars.URL_WORKER }}
-          VITE_CLE_VAPID: ${{ vars.CLE_VAPID }}
           # Vide, l'intégration Google Agenda disparaît de l'interface et l'export .ics
           # reste seul — c'est le comportement voulu tant qu'aucun ID client n'existe.
           VITE_ID_CLIENT_GOOGLE: ${{ vars.ID_CLIENT_GOOGLE }}
@@ -213,12 +211,12 @@ jobs:
           # L'origine et le chemin de base sont FIGÉS dans l'image, Vite les inlinant au
           # build. Cette image est celle d'app.schoulbus.lu, à la racine — d'où
           # `BASE_PATH=/`, distinct du `/bus-scolaire-beckerich/` du build Pages. Les
-          # clés publiques viennent des variables de dépôt, comme pour Pages.
+          # clés publiques viennent des variables de dépôt, comme pour Pages — sauf la
+          # clé VAPID, que le site demande maintenant au serveur à l'exécution.
           build-args: |
             BASE_PATH=/
             URL_PUBLIQUE=${{ vars.URL_PUBLIQUE || 'https://app.schoulbus.lu' }}
             VITE_URL_API=${{ vars.URL_API || 'https://app.schoulbus.lu/api' }}
-            VITE_CLE_VAPID=${{ vars.CLE_VAPID }}
             VITE_ID_CLIENT_GOOGLE=${{ vars.ID_CLIENT_GOOGLE }}
             GITHUB_SHA=${{ github.sha }}
           cache-from: type=gha

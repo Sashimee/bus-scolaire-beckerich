@@ -181,9 +181,10 @@ Dokploy elle-même — image GHCR, fichier Compose, DNS et routage — est dans
 node scripts/generer-vapid.mjs
 ```
 
-Il rend deux choses : une clé publique (87 caractères, à poser en variable de dépôt
-`CLE_VAPID`) et un JWK privé (à poser en variable `VAPID_JWK` sur `bus-api`). **La clé
-privée ne doit jamais être affichée ailleurs ni écrite dans le dépôt.**
+Il rend deux choses : un JWK privé, à poser en variable `VAPID_JWK` sur `bus-api`, et
+la clé publique correspondante, qu'il n'y a **rien à reporter nulle part** — le site la
+demande à `/sante`, donc au serveur qui signe. **La clé privée ne doit jamais être
+affichée ailleurs ni écrite dans le dépôt.**
 
 La préproduction a ses **propres** clés. Sans quoi une notification d'essai lancée
 depuis la préproduction réveille les vrais téléphones des vrais parents.
@@ -216,7 +217,7 @@ compare caractère par caractère. Reporter l'identifiant et le secret en
 > signalerait.
 
 **d. Les variables de dépôt GitHub.** `Settings → Secrets and variables → Actions` :
-variables `URL_API` (`https://app.schoulbus.lu/api`), `CLE_VAPID`, `ID_CLIENT_GOOGLE`.
+variables `URL_API` (`https://app.schoulbus.lu/api`) et `ID_CLIENT_GOOGLE`.
 Ces variables servent aux deux constructions du site — celle de GitHub Pages (repli) et
 l'image `bus-site` de la VPS.
 `URL_PUBLIQUE` est facultative : sans elle, l'image `bus-site` se déclare sous
@@ -325,24 +326,19 @@ Le résultat de l'envoi dit exactement ce qui s'est passé :
 > retrouves dans un ancien journal, c'est un envoi d'avant la bascule.
 
 Ce n'est **que si `details` montre un refus de signature** (`401`, `403`, ou un motif du
-genre `BadJwtToken`, `VapidPkHashMismatch`) que la paire VAPID est en cause : la clé
-publique du site ne correspond alors plus à la clé privée du serveur. Régénérer la paire
-avec `node scripts/generer-vapid.mjs`, reposer les deux moitiés — `CLE_VAPID` côté dépôt,
-`VAPID_JWK` côté serveur — puis redéployer les deux. Les appareils déjà abonnés doivent
-ensuite réactiver les notifications : ne le fais donc pas sans raison.
-
-Une vérification rapide, avant tout soupçon sur les clés : la clé publique servie par le
-site doit être identique à la variable du dépôt.
+genre `BadJwtToken`, `VapidPkHashMismatch`) que la paire VAPID est en cause. Régénérer
+la paire avec `node scripts/generer-vapid.mjs` et reposer `VAPID_JWK` sur `bus-api`
+suffit : le site relit la clé publique sur `/sante` et refait de lui-même les
+abonnements liés à l'ancienne clé, sans que personne ait à réactiver quoi que ce soit.
 
 ```bash
-gh variable list | grep CLE_VAPID
 curl -s https://app.schoulbus.lu/api/sante | grep -o '"clePubliqueVapid":"[^"]*"'
 ```
 
-`/api/sante` importe réellement le JWK privé et en dérive la clé publique : si elle
-concorde avec la variable du dépôt, les clés ne sont pas le problème. Constater que le
-secret « existe » ne prouvait rien — c'est précisément ainsi qu'un `VAPID_JWK` présent
-mais illisible avait pu passer pour valide.
+`/api/sante` importe réellement le JWK privé et en dérive la clé publique : une réponse
+sans `clePubliqueVapid` dit que le JWK est absent ou illisible, et c'est là qu'est la
+panne. Constater que le secret « existe » ne prouvait rien — c'est précisément ainsi
+qu'un `VAPID_JWK` présent mais illisible avait pu passer pour valide.
 
 > **L'URL de l'API est publique.** Elle est compilée dans le JavaScript servi à tous
 > les parents : elle apparaît donc en clair dans le code du site. C'est sans

@@ -21,9 +21,10 @@ ARG URL_PUBLIQUE=https://app.schoulbus.lu
 # L'API partage l'origine : `/api` sur le même hôte. Déclarée en absolu pour que la CSP
 # engendrée la nomme comme une source valide — un chemin nu n'est pas une source CSP.
 ARG VITE_URL_API=https://app.schoulbus.lu/api
-# Publiques par nature (elles finissent dans le code servi). Vides, l'application
-# fonctionne sans notifications ni Google Agenda — exactement comme un build sans elles.
-ARG VITE_CLE_VAPID=
+# Publique par nature (elle finit dans le code servi). Vide, l'intégration Google
+# Agenda disparaît — exactement comme un build sans elle. La clé VAPID, elle, n'est
+# plus un `ARG` : le site la demande à `/sante` au moment de s'abonner, pour qu'elle ne
+# puisse plus diverger de celle avec laquelle le serveur signe.
 ARG VITE_ID_CLIENT_GOOGLE=
 # Empreinte de version, pour que la webapp installée détecte le déploiement.
 ARG GITHUB_SHA=
@@ -34,8 +35,7 @@ RUN npm ci
 
 COPY . .
 RUN BASE_PATH="$BASE_PATH" URL_PUBLIQUE="$URL_PUBLIQUE" GITHUB_SHA="$GITHUB_SHA" \
-    VITE_URL_API="$VITE_URL_API" VITE_CLE_VAPID="$VITE_CLE_VAPID" \
-    VITE_ID_CLIENT_GOOGLE="$VITE_ID_CLIENT_GOOGLE" \
+    VITE_URL_API="$VITE_URL_API" VITE_ID_CLIENT_GOOGLE="$VITE_ID_CLIENT_GOOGLE" \
     npm run build
 
 # — Exécution ————————————————————————————————————————————————————————

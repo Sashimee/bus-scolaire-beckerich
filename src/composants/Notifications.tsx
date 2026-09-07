@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useT } from '../i18n'
-import { CLE_VAPID_PUBLIQUE, URL_API, notificationsConfigurees } from '../config'
+import { URL_API, notificationsConfigurees } from '../config'
 
 type Etat = 'indisponible' | 'non-configure' | 'proposable' | 'active' | 'refusee' | 'erreur'
 
@@ -34,6 +34,60 @@ function cleEnOctets(base64url: string): Uint8Array<ArrayBuffer> {
   return octets
 }
 
+/** L'inverse, pour relire la clé d'un abonnement DÉJÀ créé et la comparer à celle du serveur. */
+function octetsEnCle(tampon: ArrayBuffer | null): string {
+  if (!tampon) return ''
+  let binaire = ''
+  for (const octet of new Uint8Array(tampon)) binaire += String.fromCharCode(octet)
+  return btoa(binaire).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+/**
+ * La clé publique du serveur, demandée à ce même serveur.
+ *
+ * Elle était autrefois figée dans le paquet à la construction. Un abonnement se crée
+ * pourtant sans la moindre erreur avec une clé que le serveur n'a jamais eue : il ne
+ * reçoit simplement jamais rien. Demander la clé à celui qui signe supprime la seule
+ * chose qui pouvait diverger.
+ */
+async function lireCleServeur(): Promise<string> {
+  try {
+    const rep = await fetch(`${URL_API}/sante`)
+    if (!rep.ok) return ''
+    const { clePubliqueVapid } = (await rep.json()) as { clePubliqueVapid?: string }
+    return clePubliqueVapid ?? ''
+  } catch {
+    return ''
+  }
+}
+
+/** Résilie côté serveur PUIS côté navigateur : l'ordre inverse perdrait l'identifiant à supprimer. */
+async function resilier(abonnement: PushSubscription): Promise<void> {
+  await fetch(`${URL_API}/desabonner`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ endpoint: abonnement.endpoint }),
+  }).catch(() => undefined)
+  await abonnement.unsubscribe()
+}
+
+async function abonner(
+  sw: ServiceWorkerRegistration,
+  cle: string,
+  preference: Preference,
+): Promise<boolean> {
+  const abonnement = await sw.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: cleEnOctets(cle),
+  })
+  const rep = await fetch(`${URL_API}/abonner`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...abonnement.toJSON(), preference }),
+  })
+  return rep.ok
+}
+
 /**
  * Abonnement aux notifications de perturbation.
  *
@@ -47,6 +101,7 @@ export function Notifications() {
   const [occupe, setOccupe] = useState(false)
   const [preference, setPreference] = useState<Preference>(preferenceInitiale)
   const [essai, setEssai] = useState<'envoye' | 'trop-frequent' | 'echec' | null>(null)
+  const [cleServeur, setCleServeur] = useState('')
 
   useEffect(() => {
     if (!notificationsConfigurees()) return setEtat('non-configure')
@@ -55,10 +110,39 @@ export function Notifications() {
     }
     if (Notification.permission === 'denied') return setEtat('refusee')
 
-    void navigator.serviceWorker.ready
-      .then((sw) => sw.pushManager.getSubscription())
-      .then((abonnement) => setEtat(abonnement ? 'active' : 'proposable'))
-      .catch(() => setEtat('indisponible'))
+    let vivant = true
+    void (async () => {
+      const cle = await lireCleServeur()
+      if (!vivant) return
+      setCleServeur(cle)
+      // Serveur joignable mais sans clé : il ne peut envoyer aucune notification. Le
+      // dire par l'absence de la carte vaut mieux qu'un bouton qui ne mène à rien.
+      if (!cle) return setEtat('non-configure')
+
+      try {
+        const sw = await navigator.serviceWorker.ready
+        const abonnement = await sw.pushManager.getSubscription()
+        if (!vivant) return
+        if (!abonnement) return setEtat('proposable')
+        if (octetsEnCle(abonnement.options.applicationServerKey) === cle) {
+          return setEtat('active')
+        }
+
+        // Abonnement lié à une clé que le serveur n'a plus : il ne recevra jamais rien,
+        // et rien ne le signale — ni erreur, ni changement d'état. On le refait sur
+        // place. La permission est déjà accordée, donc rien n'est redemandé au parent,
+        // qui autrement se croirait couvert jusqu'au matin où il ne le serait pas.
+        await resilier(abonnement)
+        const refait = await abonner(sw, cle, preferenceInitiale())
+        if (vivant) setEtat(refait ? 'active' : 'proposable')
+      } catch {
+        if (vivant) setEtat('indisponible')
+      }
+    })()
+
+    return () => {
+      vivant = false
+    }
   }, [])
 
   async function activer() {
@@ -70,16 +154,7 @@ export function Notifications() {
         return
       }
       const sw = await navigator.serviceWorker.ready
-      const abonnement = await sw.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: cleEnOctets(CLE_VAPID_PUBLIQUE),
-      })
-      const rep = await fetch(`${URL_API}/abonner`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...abonnement.toJSON(), preference }),
-      })
-      if (!rep.ok) throw new Error('abonnement-refuse')
+      if (!(await abonner(sw, cleServeur, preference))) throw new Error('abonnement-refuse')
       setEtat('active')
     } catch {
       setEtat('erreur')
@@ -130,16 +205,7 @@ export function Notifications() {
     try {
       const sw = await navigator.serviceWorker.ready
       const abonnement = await sw.pushManager.getSubscription()
-      if (abonnement) {
-        // On prévient le serveur avant de résilier : une fois l'abonnement détruit
-        // côté navigateur, on n'aurait plus l'identifiant à supprimer.
-        await fetch(`${URL_API}/desabonner`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endpoint: abonnement.endpoint }),
-        }).catch(() => undefined)
-        await abonnement.unsubscribe()
-      }
+      if (abonnement) await resilier(abonnement)
       setEtat('proposable')
     } finally {
       setOccupe(false)

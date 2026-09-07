@@ -32,9 +32,6 @@ export const URL_API: string = (
   ''
 ).replace(/\/$/, '')
 
-/** Clé publique VAPID, nécessaire pour s'abonner aux notifications. */
-export const CLE_VAPID_PUBLIQUE: string = import.meta.env.VITE_CLE_VAPID ?? ''
-
 /**
  * ID client OAuth Google, pour l'écriture dans Google Agenda.
  *
@@ -44,4 +41,16 @@ export const CLE_VAPID_PUBLIQUE: string = import.meta.env.VITE_CLE_VAPID ?? ''
  */
 export const ID_CLIENT_GOOGLE: string = import.meta.env.VITE_ID_CLIENT_GOOGLE ?? ''
 
-export const notificationsConfigurees = () => Boolean(URL_API && CLE_VAPID_PUBLIQUE)
+/**
+ * La clé publique VAPID n'est PLUS figée à la construction.
+ *
+ * Elle l'a été, et c'est ce qui a rendu les notifications muettes pendant des semaines :
+ * le site portait la clé d'un serveur qui n'existait plus, le serveur signait avec une
+ * autre, et rien ne le disait — un abonnement se crée sans erreur avec n'importe quelle
+ * clé, il ne reçoit simplement jamais rien. Deux copies d'un même secret dans deux
+ * chaînes de déploiement différentes finissent toujours par diverger.
+ *
+ * Le serveur qui signe est désormais le seul à dire avec quoi il signe : la clé se lit
+ * sur `/sante` au moment de s'abonner. Voir `composants/Notifications.tsx`.
+ */
+export const notificationsConfigurees = () => Boolean(URL_API)
