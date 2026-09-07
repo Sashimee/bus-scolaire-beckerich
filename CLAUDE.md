@@ -97,9 +97,9 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Tous les
   lots planifiés (0 à 28) sont faits.** **Le 2026-09-07** : la clé VAPID se lit à
   l'exécution sur `/sante` au lieu d'être figée au build, un jeton de session refusé
-  s'efface, `pull_policy: always` sur les deux images — et la section « Ouverture à la
-  commune » ouvre la mise en service du premier compte d'agent (les identités restent
-  hors dépôt, il est public). **À consulter avant d'entamer une évolution.**
+  s'efface, `pull_policy: always` sur les deux images — et **l'ouverture à la commune est
+  faite** : le premier compte d'agent est créé et le courriel d'accès envoyé (les
+  identités restent hors dépôt, il est public). **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

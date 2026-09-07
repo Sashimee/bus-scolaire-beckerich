@@ -117,11 +117,11 @@ curl https://<worker>/sante              # doit renvoyer "commune": true
 
 ---
 
-## Ouverture à la commune — en cours (2026-09-07)
+## Ouverture à la commune — faite (2026-09-07)
 
-Le premier agent communal doit recevoir un accès à `/edition`. Ce n'est pas un lot de
-développement : tout le mécanisme existe depuis le lot 25. Ce qui reste est une mise en
-service, et elle a un ordre.
+Le premier agent communal a reçu son accès à `/edition`. Ce n'était pas un lot de
+développement : tout le mécanisme existait depuis le lot 25. C'était une mise en service,
+et elle avait un ordre — les cinq étapes ci-dessous sont franchies.
 
 **Les identités ne sont pas dans le dépôt.** Le compte à créer — adresse, nom, capacités
 retenues — et le courriel prêt à envoyer vivent dans `~/schoulbus-acces-commune.md`, sur
@@ -133,16 +133,24 @@ démarche.
    perturbation d'essai a été publiée depuis `/edition` par un vrai compte, vue dans
    l'application, puis retirée. L'agent ne sera pas celui qui essuie les plâtres. Voir
    R45, désormais entièrement levée.
-2. **Créer le compte** depuis l'onglet Comptes de `/edition`, avec les seules capacités
-   utiles. `comptes` — créer et désactiver d'autres comptes — est une administration des
-   accès, pas des données : on ne l'accorde que sur demande.
-3. **Vérifier que le courriel d'activation arrive.** Il permet à l'agent de choisir
-   lui-même son mot de passe, que personne d'autre ne connaît jamais. Le relai SMTP
-   (`admin@schoulbus.lu` chez OVH, SPF + DKIM + DMARC vérifiés le 2026-09-07) est éprouvé.
+2. ~~**Créer le compte**~~ **Fait le 2026-09-07** depuis l'onglet Comptes de `/edition`,
+   avec les seules capacités utiles : perturbations, horaires, arrêts, traductions,
+   crédits. `comptes` — créer et désactiver d'autres comptes — est une administration des
+   accès, pas des données : elle n'a pas été accordée, et ne le sera que sur demande.
+3. ~~**Vérifier que le courriel d'activation arrive.**~~ **Fait le 2026-09-07** : un
+   compte d'essai créé depuis l'onglet Comptes sur une adresse personnelle — le courriel
+   est arrivé, le lien d'activation a posé le mot de passe, la connexion a suivi. Le relai
+   SMTP (`admin@schoulbus.lu` chez OVH, SPF + DKIM + DMARC) est donc éprouvé de bout en
+   bout, et non plus seulement en envoi. L'agent choisit lui-même son mot de passe, que
+   personne d'autre ne connaît jamais. Le compte d'essai reste à désactiver.
 4. ~~**Trancher la charte graphique** (R49).~~ **Fait le 2026-09-07** : la charte est
    abandonnée, `dev` remise sur `main`. L'agent verra l'apparence actuelle, celle qui est
    en ligne — plus rien n'attend d'être déployé avant de lui ouvrir l'accès.
-5. **Écrire**, en dernier, une fois l'accès en place.
+5. ~~**Écrire**, en dernier, une fois l'accès en place.~~ **Fait le 2026-09-07** : le
+   courriel est parti, une fois le compte créé. Il renvoie aux deux adresses — la vitrine
+   `www.schoulbus.lu` et l'application `app.schoulbus.lu` —, énumère les cinq capacités
+   accordées, et dit sans détour que les traductions non françaises n'ont eu aucune
+   vérification humaine. **Ce qui reste ouvert n'est plus technique : c'est sa réponse.**
 
 **Ce que le courriel doit dire, et qui n'est pas confortable :** les traductions
 allemande, luxembourgeoise, portugaise et anglaise n'ont eu **aucune vérification
