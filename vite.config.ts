@@ -259,6 +259,16 @@ export default defineConfig({
         start_url: base,
         scope: base,
         categories: ['education', 'travel', 'utilities'],
+        /*
+         * Ce qu'on atteint par un appui long sur l'icône. Deux raccourcis, pas six :
+         * la page d'accueil répond déjà à la question du jour, et n'a rien à faire ici.
+         * Restent les deux détours — le plan officiel, qu'on va vérifier quand un doute
+         * survient, et la saisie des enfants, qu'on rouvre à chaque changement de rythme.
+         */
+        shortcuts: [
+          { name: 'Horaires officiels', url: `${base}plan` },
+          { name: 'Mes enfants', url: `${base}configurer` },
+        ],
         icons: [
           { src: 'icones/icone-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icones/icone-512.png', sizes: '512x512', type: 'image/png' },
