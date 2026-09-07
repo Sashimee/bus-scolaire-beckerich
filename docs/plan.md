@@ -162,6 +162,12 @@ Trois corrections de production, hors lots :
 - **Un jeton de session refusé s'efface** au lieu de survivre à son refus, et l'écran
   d'édition mène à la connexion. C'est ce qui avait fait croire à une publication perdue :
   le serveur refusait avant même de journaliser.
+- **Le précoce n'est plus proposé à la saisie.** Ces enfants ne prennent pas le bus
+  scolaire ; le cycle reste dans `ecoles.json` et dans le format des liens de partage —
+  un lien ancien peut en porter un, et l'enfant garde alors son cycle affiché — mais
+  `cyclesProposes()` ne l'offre plus au choix d'un parent. L'ordre de la liste `CYCLES`
+  de `partage.ts` est un format de fil : y retirer le précoce décalerait tous les indices
+  et ferait relire chaque lien déjà partagé avec un cycle de trop.
 - **`pull_policy: always`** sur `bus-api` et `bus-site` : un redéploiement rejouait
   l'image déjà en cache sans rien dire, et l'on cherchait la panne dans le code qu'on
   venait de pousser.

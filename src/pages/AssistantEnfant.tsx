@@ -11,10 +11,8 @@ import { JourneeTrajets } from '../composants/Trajets'
 import { semaineEnfant } from '../lib/plan'
 import { semaineReglee } from '../lib/moments'
 import { distanceLisible, nomArret } from '../lib/affichage'
-import { siteDuCycle } from '../lib/donnees'
+import { cyclesProposes, siteDuCycle } from '../lib/donnees'
 import type { Cycle } from '../lib/types'
-
-const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 
 /** Les trois moments, dans l'ordre où l'assistant les demande. */
 const ETAPE_DU_MOMENT = { matin: 2, midi: 3, soir: 4 } as const
@@ -54,7 +52,7 @@ export function AssistantEnfant() {
   // sans permettre d'y toucher, et renvoie à l'écran qui la règle pour tout le monde.
   const adressePartagee = foyer.enfants.length > 1
 
-  const cycles: OptionChoix<Cycle>[] = CYCLES.map((c) => ({
+  const cycles: OptionChoix<Cycle>[] = cyclesProposes(enfant.cycle).map((c) => ({
     valeur: c,
     libelle: t(`cycles.${c}`),
     court: t(`cycles.${c}`),

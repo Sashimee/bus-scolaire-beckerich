@@ -4,10 +4,8 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from '../composants/ChampAdresse'
 import { MomentsSemaine } from '../composants/Moments'
-import { siteDuCycle } from '../lib/donnees'
+import { cyclesProposes, siteDuCycle } from '../lib/donnees'
 import type { Cycle } from '../lib/types'
-
-const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 
 /** Saisie et modification de l'adresse et des enfants. Sert d'accueil au premier lancement. */
 export function Configurer() {
@@ -98,7 +96,7 @@ export function Configurer() {
                     modifierEnfant(enfant.id, { cycle: e.target.value as Cycle })
                   }
                 >
-                  {CYCLES.map((c) => (
+                  {cyclesProposes(enfant.cycle).map((c) => (
                     <option key={c} value={c}>
                       {t(`cycles.${c}`)}
                     </option>
@@ -161,7 +159,7 @@ export function Configurer() {
               value={cycle}
               onChange={(e) => setCycle(e.target.value as Cycle)}
             >
-              {CYCLES.map((c) => (
+              {cyclesProposes(cycle).map((c) => (
                 <option key={c} value={c}>
                   {t(`cycles.${c}`)}
                 </option>

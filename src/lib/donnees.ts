@@ -97,6 +97,18 @@ export function siteDuCycle(id: Cycle): SiteScolaire {
   return site(cycleScolaire(id).site)
 }
 
+/** Les cycles qui n'empruntent pas le bus scolaire, et qu'on ne propose donc pas. Ils
+ *  restent dans `ecoles.json` : un lien de partage ancien peut en porter un, et il faut
+ *  alors savoir où l'enfant est scolarisé. */
+const CYCLES_SANS_BUS: Cycle[] = ['precoce']
+
+/** Les cycles offerts au choix d'un parent, `actuel` en tête s'il n'en fait plus partie
+ *  — sans quoi une liste déroulante afficherait un cycle que l'enfant n'a pas. */
+export function cyclesProposes(actuel: Cycle): Cycle[] {
+  const proposes = cycles.map((c) => c.id).filter((id) => !CYCLES_SANS_BUS.includes(id))
+  return proposes.includes(actuel) ? proposes : [actuel, ...proposes]
+}
+
 /** L'arrêt « école » desservi pour un cycle donné. */
 export function arretEcoleDuCycle(id: Cycle): Arret {
   return arret(cycleScolaire(id).arretEcole)

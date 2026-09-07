@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arretEcoleDuCycle, plan, siteDuCycle } from './donnees'
+import { arretEcoleDuCycle, cyclesProposes, plan, siteDuCycle } from './donnees'
 import {
   ajusterDillendapp,
   bornesDillendapp,
@@ -51,6 +51,15 @@ describe('répartition des cycles', () => {
   it("change d'arrêt d'école quand l'enfant change de cycle", () => {
     expect(arretEcoleDuCycle('c2').id).toBe('noerdange-ecole')
     expect(arretEcoleDuCycle('c3').id).toBe('elvange-ecole')
+  })
+
+  it('ne propose pas le précoce : ces enfants ne prennent pas le bus', () => {
+    expect(cyclesProposes('c1')).toEqual(['c1', 'c2', 'c3', 'c4'])
+    expect(cyclesProposes('c4')).not.toContain('precoce')
+  })
+
+  it('garde le précoce en tête pour un enfant qui en vient déjà', () => {
+    expect(cyclesProposes('precoce')).toEqual(['precoce', 'c1', 'c2', 'c3', 'c4'])
   })
 })
 

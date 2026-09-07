@@ -27,6 +27,10 @@ import { deduireInscriptions } from './plan'
  *  Les liens plus anciens restent lisibles. */
 const VERSION = 5
 
+/** L'ordre de cette liste EST le format du lien : un cycle y est encodé par son indice.
+ *  Ne rien y retirer ni y réordonner — le précoce n'est plus proposé à la saisie, mais
+ *  l'ôter d'ici décalerait tous les indices et ferait relire chaque lien déjà partagé
+ *  avec un cycle de trop. */
 const CYCLES: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
 
 /**
