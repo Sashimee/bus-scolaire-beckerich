@@ -417,6 +417,8 @@
   "carte": {
     "titre": "Wee zu Fouss",
     "domicile": "Doheem",
+    "afficher": "D’Kaart vum Wee weisen",
+    "avertissement": "D’Kaart gëtt nëmme gelueden, wann Dir se ufrot: hir Kachele kommen dann vun OpenStreetMap, dat de gewisene Beräich gesäit — also d’Ëmgéigend vun Ärer Wunneng. Weder Är Adress nach d’Virnimm gi geschéckt.",
     "horsLigne": "D'Kaart brauch eng Verbindung. De Rescht vun der App funktionéiert offline.",
     "ouvrirItineraire": "Streck opmaachen"
   },
@@ -477,7 +479,7 @@
     "adressesTitre": "Adresse pro Dag funktionéieren nëmmen an der Gemeng",
     "adressesCorps": "Dir kënnt fir e bestëmmten Dag eng aner Ufanks- oder Ukunftsadress wéi Äre Wunnsëtz uginn. D'Adressiche kennt awer nëmmen d'Gemeng Biekerech: fir e Plaz baussent der Gemeng gitt direkt den Arrêt un, deen Dir benotzt, amplaz d'Säit roden ze loossen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
-    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert: kee Konto, kee Server, deen se kritt. E Besucherzieler op eisem eegene Server (kee Drëttdéngscht) kritt déi opgeruff Säit an soss näischt — kee Cookie a keng vun de Donnéeën, déi Dir aginn hutt. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparat-Kennung fir d'Dauer vum Abonnement op engem Server gespäichert a beim Ausschalte geläscht.",
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert: kee Konto, kee Server, deen se kritt. E Besucherzieler op eisem eegene Server (kee Drëttdéngscht) kritt déi opgeruff Säit an soss näischt — kee Cookie a keng vun de Donnéeën, déi Dir aginn hutt. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparat-Kennung fir d'Dauer vum Abonnement op engem Server gespäichert a beim Ausschalte geläscht. D'Weekaart gëtt nëmme gelueden, wann Dir se ufrot: hir Kachele kommen dann vun OpenStreetMap, dat de gewisene Beräich gesäit — also d'Ëmgéigend vun Ärer Wunneng — mee weder Är Adress nach d'Virnimm.",
     "notificationsTitre": "Notifikatiounen",
     "notificationsCorps": "Si mellen eng Annulatioun oder e Retard, mä näischt garantéiert, datt se ukommen: Telefon aus, Net stéieren, Panne beim Push-Déngscht. Eng Web-Applikatioun kann sech och net selwer als prioritär deklaréieren. D'Schoul an d'Gemeng bleiwen den offiziellen Informatiounswee; dës Applikatioun ersetzt se net."
   },
@@ -596,7 +598,7 @@
     "nonSupportees": "Dëse Browser ënnerstëtzt keng Notifikatiounen.",
     "nonConfigurees": "D'Notifikatioune sinn op dëser Säit nach net ariicht.",
     "iosNote": "Um iPhone an iPad funktionéieren d'Notifikatioune nëmmen, wann d'App op den Home-Bildschierm gesat gouf.",
-    "confidentialite": "D'Aschalte späichert eng anonym Apparatkennung op engem Server, sou laang wéi den Abonnement dauert. Dat ass déi eenzeg Donnée, déi Äert Telefon verléisst, a si gëtt beim Ofmelle geläscht.",
+    "confidentialite": "D'Aschalte späichert eng anonym Apparatkennung op engem Server, sou laang wéi den Abonnement dauert. Ausser der Weekaart, déi Dir nëmmen op Ufro weist, ass dat déi eenzeg Donnée, déi Äert Telefon verléisst, a si gëtt beim Ofmelle geläscht.",
     "erreur": "Den Abonnement huet net geklappt. Probéiert w.e.g. méi spéit nach eng Kéier.",
     "recevoir": "Wat ech kréie wëll",
     "preference": {

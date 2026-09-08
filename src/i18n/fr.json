@@ -417,6 +417,8 @@
   "carte": {
     "titre": "Trajet à pied",
     "domicile": "Domicile",
+    "afficher": "Afficher la carte du trajet",
+    "avertissement": "La carte n’est chargée que si vous la demandez : ses tuiles viennent alors d’OpenStreetMap, qui voit la zone affichée — donc les environs de votre domicile. Ni votre adresse ni les prénoms ne lui sont envoyés.",
     "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne.",
     "ouvrirItineraire": "Ouvrir l'itinéraire"
   },
@@ -477,7 +479,7 @@
     "adressesTitre": "Les adresses par jour ne fonctionnent que dans la commune",
     "adressesCorps": "Vous pouvez indiquer, pour un jour donné, une adresse de départ ou d'arrivée différente de votre domicile. La recherche d'adresse ne connaît toutefois que la commune de Beckerich : pour un lieu situé en dehors, indiquez directement l'arrêt utilisé, plutôt que de laisser le site deviner.",
     "donneesTitre": "Vos données restent chez vous",
-    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement : ni compte, ni serveur qui les reçoive. Un compteur de visites, hébergé sur notre propre serveur (aucun service tiers), reçoit la page consultée et rien d'autre — ni cookie, ni aucune des données que vous avez saisies. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez.",
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement : ni compte, ni serveur qui les reçoive. Un compteur de visites, hébergé sur notre propre serveur (aucun service tiers), reçoit la page consultée et rien d'autre — ni cookie, ni aucune des données que vous avez saisies. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez. La carte du trajet, elle, n'est chargée que si vous la demandez : ses tuiles viennent alors d'OpenStreetMap, qui voit la zone affichée — donc les environs de votre domicile — mais ni votre adresse, ni les prénoms.",
     "notificationsTitre": "Notifications",
     "notificationsCorps": "Elles préviennent d'une annulation ou d'un retard, mais rien ne garantit qu'elles arrivent : téléphone éteint, mode Ne pas déranger, service de notification en panne. Une application web ne peut pas non plus se déclarer prioritaire d'elle-même. L'école et la commune restent la voie d'information officielle ; cette application ne les remplace pas."
   },
@@ -596,7 +598,7 @@
     "nonSupportees": "Ce navigateur ne prend pas en charge les notifications.",
     "nonConfigurees": "Les notifications ne sont pas encore activées sur ce site.",
     "iosNote": "Sur iPhone et iPad, les notifications ne fonctionnent que si l'application a été ajoutée à l'écran d'accueil.",
-    "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. C'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
+    "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. En dehors de la carte du trajet, que vous n'affichez que si vous la demandez, c'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
     "erreur": "L'abonnement a échoué. Réessayez plus tard.",
     "recevoir": "Ce que je veux recevoir",
     "preference": {

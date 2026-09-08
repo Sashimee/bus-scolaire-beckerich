@@ -417,6 +417,8 @@
   "carte": {
     "titre": "Fußweg",
     "domicile": "Zuhause",
+    "afficher": "Karte des Wegs anzeigen",
+    "avertissement": "Die Karte wird nur geladen, wenn Sie es verlangen: ihre Kacheln kommen dann von OpenStreetMap, das den angezeigten Bereich sieht — also die Umgebung Ihrer Wohnung. Weder Ihre Adresse noch die Vornamen werden übermittelt.",
     "horsLigne": "Die Karte benötigt eine Verbindung. Der Rest der App funktioniert offline.",
     "ouvrirItineraire": "Route öffnen"
   },
@@ -477,7 +479,7 @@
     "adressesTitre": "Adressen pro Tag funktionieren nur innerhalb der Gemeinde",
     "adressesCorps": "Sie können für einen bestimmten Tag eine andere Start- oder Zieladresse als Ihren Wohnsitz angeben. Die Adresssuche kennt jedoch nur die Gemeinde Beckerich: Für einen Ort außerhalb geben Sie bitte direkt die genutzte Haltestelle an, statt die Website raten zu lassen.",
     "donneesTitre": "Ihre Daten bleiben bei Ihnen",
-    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert: kein Konto, kein Server, der sie erhält. Ein Besuchszähler auf unserem eigenen Server (kein Drittdienst) erhält die aufgerufene Seite und sonst nichts — kein Cookie und keine der von Ihnen eingegebenen Daten. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht.",
+    "donneesCorps": "Adresse und Vornamen werden ausschließlich auf Ihrem Gerät gespeichert: kein Konto, kein Server, der sie erhält. Ein Besuchszähler auf unserem eigenen Server (kein Drittdienst) erhält die aufgerufene Seite und sonst nichts — kein Cookie und keine der von Ihnen eingegebenen Daten. Ein Teilen-Link trägt die Daten in seinem Fragment, das der Server nie erhält. Wenn Sie Benachrichtigungen aktivieren, wird für die Dauer des Abonnements eine anonyme Gerätekennung auf einem Server gespeichert und beim Deaktivieren wieder gelöscht. Die Wegkarte wird nur geladen, wenn Sie es verlangen: ihre Kacheln kommen dann von OpenStreetMap, das den angezeigten Bereich sieht — also die Umgebung Ihrer Wohnung — aber weder Ihre Adresse noch die Vornamen.",
     "notificationsTitre": "Benachrichtigungen",
     "notificationsCorps": "Sie melden eine Absage oder Verspätung, aber nichts garantiert, dass sie ankommen: Telefon aus, Nicht stören, Ausfall des Push-Dienstes. Eine Webanwendung kann sich auch nicht selbst als vorrangig einstufen. Schule und Gemeinde bleiben der offizielle Informationsweg; diese Anwendung ersetzt sie nicht."
   },
@@ -596,7 +598,7 @@
     "nonSupportees": "Dieser Browser unterstützt keine Benachrichtigungen.",
     "nonConfigurees": "Benachrichtigungen sind auf dieser Website noch nicht eingerichtet.",
     "iosNote": "Auf iPhone und iPad funktionieren Benachrichtigungen nur, wenn die App zum Home-Bildschirm hinzugefügt wurde.",
-    "confidentialite": "Das Aktivieren speichert eine anonyme Gerätekennung auf einem Server, solange das Abonnement besteht. Es ist die einzige Angabe, die Ihr Telefon verlässt, und sie wird beim Abmelden gelöscht.",
+    "confidentialite": "Das Aktivieren speichert eine anonyme Gerätekennung auf einem Server, solange das Abonnement besteht. Abgesehen von der Wegkarte, die Sie nur auf Verlangen anzeigen, ist es die einzige Angabe, die Ihr Telefon verlässt, und sie wird beim Abmelden gelöscht.",
     "erreur": "Das Abonnement ist fehlgeschlagen. Bitte später erneut versuchen.",
     "recevoir": "Was ich erhalten möchte",
     "preference": {
