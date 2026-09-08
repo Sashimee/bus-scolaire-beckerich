@@ -71,6 +71,11 @@ npm run typecheck && npm run build
 Sans `DATABASE_URL_TEST`, les tests de stockage **se sautent** au lieu d'échouer : la
 boucle courte doit rester lançable sans Docker. C'est aussi pourquoi la CI, elle, la
 pose toujours — un test qui se saute en silence ne protège rien s'il se saute partout.
+**88 tests sur 162 en dépendent**, et ce sont ceux de l'authentification, des capacités,
+de la limitation de débit, du SQL et du journal. Les lancer n'est pas optionnel avant de
+toucher au serveur : c'est en les lançant qu'on a découvert, le 2026-09-09, qu'un test
+de limitation de débit était faux. Sans Docker, voir la recette `embedded-postgres` à la
+fin de [docs/plan.md](docs/plan.md) — elle n'ajoute aucune dépendance au dépôt.
 
 ```bash
 docker compose up                            # la pile entière en local
