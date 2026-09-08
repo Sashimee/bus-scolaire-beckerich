@@ -193,6 +193,19 @@ export function validerPlan(brut: unknown): Probleme[] {
     }
   }
 
+  // — Notes ————————————————————————————————————————————————
+  // Même piège que les incertitudes : un arrêt porte des identifiants de note, dont le
+  // texte vit dans les dictionnaires. Une note qui n'est pas déclarée ici affiche sa
+  // CLÉ au parent, à côté d'une heure de bus. R70.
+  const idsNotes = new Set<string>()
+  if (brut.notes !== undefined && !estObjet(brut.notes)) {
+    erreur('notes', "Ce n'est pas un objet.")
+  } else {
+    for (const cle of Object.keys((brut.notes as Record<string, unknown>) ?? {})) {
+      if (!cle.startsWith('$')) idsNotes.add(cle)
+    }
+  }
+
   // — Lignes ——————————————————————————————————————————————
   if (!Array.isArray(brut.lignes) || brut.lignes.length === 0) {
     erreur('lignes', 'Aucune ligne : le plan serait vide.')
@@ -302,6 +315,18 @@ export function validerPlan(brut: unknown): Probleme[] {
           // ligne recopiée en trop, et elle ferait un trajet de zéro minute.
           if (idArret === arretPrecedent) {
             erreur(ouA, `L'arrêt « ${idArret} » est répété deux fois de suite.`)
+          }
+        }
+
+        if (arretBrut.notes !== undefined) {
+          if (!Array.isArray(arretBrut.notes)) {
+            erreur(ouA, '« notes » doit être une liste d’identifiants.')
+          } else {
+            for (const n of arretBrut.notes) {
+              if (!idsNotes.has(n as string)) {
+                erreur(ouA, `Note inconnue : « ${String(n)} ». Déclarez-la dans « notes ».`)
+              }
+            }
           }
         }
 

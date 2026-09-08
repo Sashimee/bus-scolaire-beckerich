@@ -419,8 +419,7 @@
     "domicile": "Zuhause",
     "afficher": "Karte des Wegs anzeigen",
     "avertissement": "Die Karte wird nur geladen, wenn Sie es verlangen: ihre Kacheln kommen dann von OpenStreetMap, das den angezeigten Bereich sieht — also die Umgebung Ihrer Wohnung. Weder Ihre Adresse noch die Vornamen werden übermittelt.",
-    "horsLigne": "Die Karte benötigt eine Verbindung. Der Rest der App funktioniert offline.",
-    "ouvrirItineraire": "Route öffnen"
+    "horsLigne": "Die Karte benötigt eine Verbindung. Der Rest der App funktioniert offline."
   },
   "reglages": {
     "titre": "Einstellungen",

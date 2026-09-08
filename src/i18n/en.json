@@ -419,8 +419,7 @@
     "domicile": "Home",
     "afficher": "Show the walking map",
     "avertissement": "The map is only loaded if you ask for it: its tiles then come from OpenStreetMap, which sees the area shown — that is, the surroundings of your home. Neither your address nor the first names are sent to it.",
-    "horsLigne": "The map needs a connection. The rest of the app works offline.",
-    "ouvrirItineraire": "Open the route"
+    "horsLigne": "The map needs a connection. The rest of the app works offline."
   },
   "reglages": {
     "titre": "Settings",

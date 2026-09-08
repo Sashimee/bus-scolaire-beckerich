@@ -419,8 +419,7 @@
     "domicile": "Casa",
     "afficher": "Mostrar o mapa do percurso",
     "avertissement": "O mapa só é carregado se o pedir: os seus mosaicos vêm então do OpenStreetMap, que vê a zona apresentada — ou seja, os arredores da sua casa. Nem a sua morada nem os nomes lhe são enviados.",
-    "horsLigne": "O mapa necessita de ligação. O resto da aplicação funciona sem rede.",
-    "ouvrirItineraire": "Abrir o itinerário"
+    "horsLigne": "O mapa necessita de ligação. O resto da aplicação funciona sem rede."
   },
   "reglages": {
     "titre": "Definições",

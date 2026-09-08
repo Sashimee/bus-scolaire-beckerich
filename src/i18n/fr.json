@@ -419,8 +419,7 @@
     "domicile": "Domicile",
     "afficher": "Afficher la carte du trajet",
     "avertissement": "La carte n’est chargée que si vous la demandez : ses tuiles viennent alors d’OpenStreetMap, qui voit la zone affichée — donc les environs de votre domicile. Ni votre adresse ni les prénoms ne lui sont envoyés.",
-    "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne.",
-    "ouvrirItineraire": "Ouvrir l'itinéraire"
+    "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne."
   },
   "reglages": {
     "titre": "Réglages",

@@ -254,6 +254,17 @@ describe('cohérence des courses (R70)', () => {
     expect(planPubliable(validerPlan(planReel))).toBe(true)
   })
 
+  it('refuse une note d’arrêt qui n’est pas déclarée', () => {
+    // Même piège que les incertitudes : le texte de la note vit dans les dictionnaires,
+    // et un identifiant inconnu affiche sa clé au parent, à côté d'une heure de bus.
+    const q = planValide() as Record<string, any>
+    q.lignes[0].services[0].arrets[0].notes = ['note-fantome']
+    expect(erreurs(q).some((e) => e.message.includes('Note inconnue'))).toBe(true)
+
+    q.notes = { 'note-fantome': {} }
+    expect(erreurs(q)).toEqual([])
+  })
+
   it('avertit d’une vitesse impossible entre deux arrêts, sans bloquer', () => {
     const q = planValide() as Record<string, any>
     // Levelange → Schweich-Peiffer : 5,1 km. En une minute, 308 km/h.
