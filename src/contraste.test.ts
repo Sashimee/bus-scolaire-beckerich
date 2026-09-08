@@ -226,4 +226,15 @@ describe('contraste de la palette', () => {
   it('lit bien les deux palettes, et non deux fois la même', () => {
     expect(jetons(THEMES.sombre)['--fond']).not.toBe(jetons(THEMES.clair)['--fond'])
   })
+
+  it('ne confond pas le galet plein avec la couleur d’accent', () => {
+    // Intention écrite dans la feuille : « elle ne prend pas la couleur d'accent —
+    // celle-ci sert à lire les heures, et un bouton de la même couleur qu'une heure de
+    // départ crée une hésitation ». La palette claire les avait pourtant strictement
+    // égales. R70.
+    for (const selecteur of Object.values(THEMES)) {
+      const table = jetons(selecteur)
+      expect(couleur(table['--plein'], table)).not.toEqual(couleur(table['--accent'], table))
+    }
+  })
 })

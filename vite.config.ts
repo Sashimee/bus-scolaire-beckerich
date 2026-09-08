@@ -2,8 +2,31 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+
+/**
+ * Les deux fonds de la charte, LUS dans `src/index.css`.
+ *
+ * La barre système du navigateur et l'écran de démarrage de l'application installée ne
+ * peuvent pas lire une variable CSS : il leur faut une couleur en dur, dans une balise
+ * `<meta>` et dans le manifeste. Elle y était recopiée à la main, ce qui rendait fausse
+ * la promesse de la couche `tokens` — « réaligner la charte en changeant `tokens` et
+ * rien d'autre ». On l'extrait donc du jeton, à la construction. R70.
+ */
+function fondsDeLaCharte(): { sombre: string; clair: string } {
+  const css = readFileSync(resolve(import.meta.dirname, 'src/index.css'), 'utf8')
+  const fonds = [...css.matchAll(/--fond:\s*(#[0-9a-f]{6})/gi)].map((m) => m[1])
+  if (fonds.length < 2) {
+    throw new Error(
+      "Impossible de lire les jetons --fond dans src/index.css : la barre système et " +
+        'le manifeste en dépendent.',
+    )
+  }
+  // Ordre d'écriture dans la feuille : la palette sombre d'abord (le défaut), la claire
+  // ensuite. Un troisième bloc répète la claire pour la préférence système.
+  return { sombre: fonds[0], clair: fonds[1] }
+}
 
 // Le chemin de base n'est jamais codé en dur : GitHub Pages sert le site sous
 // /bus-scolaire-beckerich/, mais la commune pourrait un jour l'héberger sous un autre
@@ -136,6 +159,26 @@ function pluginCsp() {
   };
 }
 
+/**
+ * Reporte les fonds de la charte dans `index.html`.
+ *
+ * Sans `apply: 'build'`, contrairement à la CSP : un gabarit qui garderait ses
+ * marque-pages en développement afficherait une couleur de barre invalide, et c'est
+ * exactement le genre d'écart entre `dev` et le build que la réserve R12 a coûté cher
+ * à trouver.
+ */
+function pluginCharte() {
+  return {
+    name: 'bus-charte',
+    transformIndexHtml(html: string) {
+      const fonds = fondsDeLaCharte()
+      return html
+        .replaceAll('CHARTE_FOND_SOMBRE', fonds.sombre)
+        .replaceAll('CHARTE_FOND_CLAIR', fonds.clair)
+    },
+  }
+}
+
 /** Écrit version.json dans le build pour que l'app installée détecte les nouveaux déploiements. */
 function pluginVersion() {
   return {
@@ -157,6 +200,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    pluginCharte(),
     pluginCsp(),
     pluginVersion(),
     VitePWA({
@@ -252,8 +296,8 @@ export default defineConfig({
           "Horaires du bus scolaire de la commune de Beckerich, personnalisés par enfant. Site indépendant, sans lien avec la commune.",
         lang: 'fr',
         dir: 'ltr',
-        theme_color: '#0e1a2e',
-        background_color: '#0e1a2e',
+        theme_color: fondsDeLaCharte().sombre,
+        background_color: fondsDeLaCharte().sombre,
         display: 'standalone',
         orientation: 'portrait',
         start_url: base,
