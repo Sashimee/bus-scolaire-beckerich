@@ -453,7 +453,7 @@
     "avertissementHorairesDetail": "Os horários são indicativos e podem variar ligeiramente consoante as condições de trânsito. Recomendamos estar na paragem 5 minutos antes da hora prevista. Em caso de alteração excecional dos horários (mau tempo, obras, etc.), os pais são informados por email ou através da escola."
   },
   "validite": {
-    "couverte": "Plano válido para {annees}",
+    "jusquau": "Plano válido até {date}",
     "confirme": "Confirmado por {personne} em {date}.",
     "confirmeOral": "Sendo esta confirmação verbal, deve ser reverificada no início de cada ano letivo.",
     "perime": "Atenção: este plano ultrapassou o seu período de validade declarado ({fin}). Verifique o plano oficial antes de confiar nele.",

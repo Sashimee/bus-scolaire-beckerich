@@ -453,7 +453,7 @@
     "avertissementHorairesDetail": "D'Auerzäite si just indikativ a kënne liicht variéieren no de Verkéiersbedéngungen. Mir recommandéieren, 5 Minutte virun der virgesinner Zäit op der Arrêt ze sinn. Bei aussergewéinlechen Ännerungen (schlecht Wieder, Aarbechten asw.) ginn d'Eltere per E-Mail oder iwwer d'Schoul informéiert."
   },
   "validite": {
-    "couverte": "Plang gëlteg fir {annees}",
+    "jusquau": "Plang gëlteg bis den {date}",
     "confirme": "Bestätegt vum {personne} am {date}.",
     "confirmeOral": "Well dës Bestätegung mëndlech war, muss se bei all Rentrée nei nogepréift ginn.",
     "perime": "Opgepasst: dëse Plang huet seng ugewisen Gëltegkeetsperiod iwwerschratt ({fin}). Kuckt den offizielle Plang no, ier Dir Iech drop verloosst.",

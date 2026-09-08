@@ -453,7 +453,7 @@
     "avertissementHorairesDetail": "Les horaires sont donnés à titre indicatif et peuvent varier légèrement en fonction des conditions de circulation. Nous vous recommandons d'être à l'arrêt 5 minutes avant l'heure prévue. En cas de modification exceptionnelle des horaires (intempéries, travaux, etc.), les parents sont informés par email ou via l'école."
   },
   "validite": {
-    "couverte": "Plan valable pour {annees}",
+    "jusquau": "Plan valable jusqu’au {date}",
     "confirme": "Confirmé par {personne} en {date}.",
     "confirmeOral": "Cette confirmation étant orale, elle reste à revérifier à chaque rentrée.",
     "perime": "Attention : ce plan a dépassé sa période de validité déclarée ({fin}). Vérifiez le plan officiel avant de vous y fier.",

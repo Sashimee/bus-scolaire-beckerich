@@ -105,7 +105,11 @@ export default function App() {
           </nav>
           <p>{t('avertissement.independance')}</p>
           <p>
-            {t('validite.couverte', { annees: plan.anneesCouvertes.join(' · ') })} —{' '}
+            {/* La borne réelle, et non les années couvertes : le plan s'arrête au
+                2026-12-18 pour cause de nouveau campus, alors que 2026/2027 court
+                jusqu'en juillet. Afficher les années annonçait 209 jours de trop, et
+                `valideAu` n'apparaissait qu'une fois dépassée. R67. */}
+            {t('validite.jusquau', { date: plan.valideAu })} —{' '}
             {t('validite.releve', { date: plan.source.dateReleve })} —{' '}
             {t('maj.version', { version: __VERSION__ })}
           </p>

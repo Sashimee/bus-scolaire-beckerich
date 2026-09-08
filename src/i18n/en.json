@@ -453,7 +453,7 @@
     "avertissementHorairesDetail": "Times are indicative and may vary slightly depending on traffic conditions. We recommend being at the stop 5 minutes before the scheduled time. Should times change exceptionally (bad weather, roadworks, etc.), parents are informed by email or through the school."
   },
   "validite": {
-    "couverte": "Plan valid for {annees}",
+    "jusquau": "Plan valid until {date}",
     "confirme": "Confirmed by {personne} in {date}.",
     "confirmeOral": "As this confirmation was verbal, it should be checked again at the start of each school year.",
     "perime": "Warning: this plan has passed its stated validity period ({fin}). Check the official plan before relying on it.",
