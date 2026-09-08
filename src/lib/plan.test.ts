@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arretEcoleDuCycle, cyclesProposes, plan, siteDuCycle } from './donnees'
+import { arretEcoleDuCycle, arrets, cyclesProposes, plan, siteDuCycle } from './donnees'
 import {
   ajusterDillendapp,
   bornesDillendapp,
@@ -428,6 +428,21 @@ describe('cohérence des données', () => {
         }
       }
     }
+  })
+
+  // R68 : les six arrêts « corrigés à la main » avaient basculé en `verifiee` sans
+  // qu'aucune base ne les nomme. Plus un seul arrêt n'était approximatif, les trois
+  // encarts d'avertissement étaient devenus inatteignables, et « Limites » promettait
+  // un signalement que rien ne déclenchait plus.
+  it("n'appelle « vérifié » qu'un arrêt qu'une base publique nomme", () => {
+    const douteux = arrets
+      .filter((a) => a.precision === 'verifiee' && !/^(OSM|Nominatim)\b/.test(a.source))
+      .map((a) => `${a.id} : ${a.source}`)
+    expect(douteux, 'arrêts dits vérifiés sans source publique').toEqual([])
+  })
+
+  it('garde au moins un arrêt approximatif, faute de quoi l’avertissement est mort', () => {
+    expect(arrets.some((a) => a.precision === 'approximative')).toBe(true)
   })
 
   it('couvre chaque cycle desservi par au moins un trajet du matin depuis chaque village', () => {
