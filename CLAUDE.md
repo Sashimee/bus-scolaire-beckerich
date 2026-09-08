@@ -114,7 +114,16 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   rebours dépendait d'un `fetch` pour avancer), ses règles sont passées dans
   `src/lib/aujourdhui.ts`, les trois écrans qu'un parent utilise ont des tests, et le
   paquet principal tombe de 728 à 488 ko — `/edition` et les quatre dictionnaires non
-  français sont chargés à la demande. **À consulter avant d'entamer une évolution.**
+  français sont chargés à la demande. **Le 2026-09-09** : les treize réserves de l'audit
+  (R58 à R70) sont soldées — le précoce ne reçoit plus d'horaire de bus, un C4 au
+  Dillendapp plus de trajet école → école, la carte attend un geste avant d'appeler
+  OpenStreetMap, les arrêts placés à la main redeviennent approximatifs, le pied de page
+  dit la vraie fin de validité, et `validerPlan` contrôle enfin les renvois d'incertitude
+  et de note, le champ `dessert` et les vitesses. Surtout : le dépôt a de nouveau un test
+  de contraste (`src/contraste.test.ts`, survols compris), et les 162 tests du serveur ont
+  tourné contre une vraie base — ce sont eux qui ont révélé qu'un test de sécurité était
+  faux. **Rien de tout cela n'a été vu dans un navigateur : lire R76 avant de déployer.**
+  **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une
