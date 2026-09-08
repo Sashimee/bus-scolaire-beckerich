@@ -125,10 +125,11 @@
      * Les surfaces ne sont plus opaques : ce sont des voiles blancs posés sur un
      * dégradé. Un couple encre/fond ne se vérifie donc plus sur une couleur unie mais
      * sur la COMPOSITION réelle — arrêt du dégradé, halo décoratif, une ou deux
-     * couches de verre. Toutes les encres ci-dessous ont été mesurées ainsi, sur les
-     * 24 compositions possibles, et tiennent ≥ 4,58:1 (voir docs/plan.md, lot 18).
-     * Ne pas éclaircir un voile ni un arrêt du dégradé sans refaire le calcul :
-     * éclaircir le fond abaisse toutes les encres d'un coup.
+     * couches de verre. `src/contraste.test.ts` refait ce calcul à chaque exécution
+     * des tests — états de survol compris, ce que le jeu de 24 compositions du lot 18
+     * n'incluait pas — et exige 4,5:1 ; le pire couple tient aujourd'hui 4,54:1.
+     * Éclaircir un voile ou un arrêt du dégradé abaisse toutes les encres d'un coup :
+     * le test le dira, ce que le commentaire d'avant ne faisait pas.
      */
     --degrade: radial-gradient(120% 80% at 15% 0%, #142b47 0%, #0e1a2e 45%, #080d19 100%);
     --halo: rgb(47 127 184 / 0.1);
@@ -791,6 +792,10 @@
     border-color: var(--danger-bord);
   }
   .bouton--danger:hover {
+    /* Le fond se teinte, donc l'encre doit lâcher le rose : gardée à `--danger`, elle
+       tombait à 3,41:1 sur fond rose en thème sombre — et `:hover` reste collé après
+       un appui sur téléphone, laissant « Supprimer » illisible. R69. */
+    color: var(--encre);
     background: color-mix(in oklab, var(--danger) 22%, var(--surface));
   }
 
