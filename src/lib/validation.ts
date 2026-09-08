@@ -131,6 +131,44 @@ export function validerPlan(brut: unknown): Probleme[] {
     }
   }
 
+  // — Incertitudes ————————————————————————————————————————
+  // Une course peut renvoyer à une incertitude par son identifiant. Un renvoi qui ne
+  // désigne rien ne se voit pas : l'application affiche alors la CLÉ de traduction à
+  // la place de la phrase, sous un titre « Ce que nous ne savons pas ».
+  const idsIncertitudes = new Set<string>()
+  if (brut.incertitudes !== undefined && !Array.isArray(brut.incertitudes)) {
+    erreur('incertitudes', "Ce n'est pas une liste.")
+  } else {
+    for (const [i, brute] of ((brut.incertitudes as unknown[]) ?? []).entries()) {
+      const ou = `incertitude ${i + 1}`
+      if (!estObjet(brute)) {
+        erreur(ou, "Ce n'est pas un objet.")
+        continue
+      }
+      const id = typeof brute.id === 'string' ? brute.id : ''
+      if (!id) erreur(ou, 'Identifiant absent.')
+      else if (idsIncertitudes.has(id)) erreur(id, 'Identifiant en double.')
+      else idsIncertitudes.add(id)
+
+      for (const champ of ['question', 'hypothese']) {
+        if (typeof brute[champ] !== 'string' || !brute[champ]) {
+          erreur(id || ou, `Le champ « ${champ} » est absent ou vide.`)
+        }
+      }
+      // `jours` restreint l'incertitude aux jours qu'elle concerne réellement. Une
+      // liste vide la rendrait invisible partout, ce qui n'est jamais l'intention.
+      if (brute.jours !== undefined) {
+        if (!Array.isArray(brute.jours) || brute.jours.length === 0) {
+          erreur(id || ou, '« jours » doit être une liste non vide, ou être absent.')
+        } else {
+          for (const j of brute.jours) {
+            if (!JOURS.includes(j as Jour)) erreur(id || ou, `Jour inconnu : « ${String(j)} ».`)
+          }
+        }
+      }
+    }
+  }
+
   // — Lignes ——————————————————————————————————————————————
   if (!Array.isArray(brut.lignes) || brut.lignes.length === 0) {
     erreur('lignes', 'Aucune ligne : le plan serait vide.')
@@ -196,6 +234,13 @@ export function validerPlan(brut: unknown): Probleme[] {
       } else {
         for (const j of serviceBrut.jours) {
           if (!JOURS.includes(j as Jour)) erreur(ou, `Jour inconnu : « ${String(j)} ».`)
+        }
+      }
+
+      if (serviceBrut.incertitude !== undefined) {
+        const renvoi = serviceBrut.incertitude
+        if (typeof renvoi !== 'string' || !idsIncertitudes.has(renvoi)) {
+          erreur(ou, `Incertitude inconnue : « ${String(renvoi)} ». Aucune ne porte cet identifiant.`)
         }
       }
 

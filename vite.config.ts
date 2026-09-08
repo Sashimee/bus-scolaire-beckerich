@@ -290,5 +290,11 @@ export default defineConfig({
     // remonter ici rendrait `npm test` dépendant de Docker, et personne ne lancerait
     // plus la boucle courte.
     exclude: ['**/node_modules/**', '**/dist/**', 'serveur/**'],
+    // Toutes les règles de date de cette application sont luxembourgeoises : la fin
+    // de validité du plan, les vacances, l'heure du prochain bus. Laisser le fuseau
+    // à celui de la machine rendait certains tests inertes en intégration continue
+    // (qui tourne en UTC) et vivants en local — un test qui ne peut pas échouer là
+    // où il compte ne protège rien. R66.
+    env: { TZ: 'Europe/Luxembourg' },
   },
 })

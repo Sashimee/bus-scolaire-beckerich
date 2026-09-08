@@ -64,6 +64,7 @@
     {
       "id": "depart-midi-vendredi-hall-sportif",
       "portee": "aller-dillendapp.midi",
+      "jours": ["vendredi"],
       "question": "Le plan 2025/2026 précisait que le départ de 12:10 se faisait depuis le hall sportif le vendredi, et non depuis l'école de Noerdange. La brochure 2026/2027 ne le dit plus — sans dire non plus que cela a changé.",
       "hypothese": "Départ de l'école de Noerdange tous les jours, comme l'écrit le plan en vigueur.",
       "aVerifierAupres": "Commune de Beckerich / Maison relais Dillendapp"

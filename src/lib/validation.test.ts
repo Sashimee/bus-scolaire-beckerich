@@ -179,3 +179,51 @@ describe('cohérence avec les écoles', () => {
     expect(planPubliable(problemes)).toBe(true)
   })
 })
+
+describe('renvois d’incertitude', () => {
+  // R66/R70 : rien ne vérifiait qu'une course renvoyant à une incertitude désignait
+  // une incertitude existante. Un renvoi mort ne casse pas la page — il affiche la
+  // CLÉ de traduction sous le titre « Ce que nous ne savons pas », ce qui est pire.
+  it('refuse une course qui renvoie à une incertitude qui n’existe pas', () => {
+    const q = planValide() as Record<string, any>
+    q.lignes[0].services[0].incertitude = 'fantome'
+    expect(erreurs(q).some((e) => e.message.includes('Incertitude inconnue'))).toBe(true)
+  })
+
+  it('accepte le renvoi quand l’incertitude est déclarée', () => {
+    const q = planValide() as Record<string, any>
+    q.incertitudes = [
+      { id: 'vrai-doute', portee: 'aller-1.matin', question: 'q', hypothese: 'h', aVerifierAupres: 'commune' },
+    ]
+    q.lignes[0].services[0].incertitude = 'vrai-doute'
+    expect(erreurs(q)).toEqual([])
+  })
+
+  it('refuse un jour inconnu, et une liste de jours vide', () => {
+    const base = () => {
+      const q = planValide() as Record<string, any>
+      q.incertitudes = [
+        { id: 'doute', portee: 'aller-1.matin', question: 'q', hypothese: 'h', aVerifierAupres: 'c' },
+      ]
+      return q
+    }
+    const inconnu = base()
+    inconnu.incertitudes[0].jours = ['lundredi']
+    expect(erreurs(inconnu).some((e) => e.message.includes('Jour inconnu'))).toBe(true)
+
+    const vide = base()
+    vide.incertitudes[0].jours = []
+    expect(erreurs(vide).some((e) => e.message.includes('liste non vide'))).toBe(true)
+  })
+
+  it('refuse deux incertitudes de même identifiant', () => {
+    const q = planValide() as Record<string, any>
+    const une = { id: 'doublon', portee: 'x', question: 'q', hypothese: 'h', aVerifierAupres: 'c' }
+    q.incertitudes = [une, { ...une }]
+    expect(erreurs(q).some((e) => e.message.includes('en double'))).toBe(true)
+  })
+
+  it('tient le plan réel pour valide, incertitudes comprises', () => {
+    expect(planPubliable(validerPlan(planReel))).toBe(true)
+  })
+})

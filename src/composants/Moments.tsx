@@ -7,7 +7,7 @@ import { aucunBus, coursApresMidi, trajetsDuJour } from '../lib/plan'
 import { nomArret, sensTrajet } from '../lib/affichage'
 import { horairesDuCycle, maisonRelais } from '../lib/donnees'
 import {
-  JOURS_MIDI,
+  joursMidi,
   adresseProposable,
   borneMatin,
   borneSoir,
@@ -287,7 +287,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
       <ChoixSemaine
         id={`${enfant.id}-midi`}
         legende={t('midi.question', { prenom })}
-        jours={JOURS_MIDI}
+        jours={joursMidi()}
         options={options}
         valeurDuJour={(jour) => midiDuJour(enfant, jour)}
         onRepondre={(jours, choix) => definirMidi(enfant.id, jours, choix)}

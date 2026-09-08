@@ -12,6 +12,7 @@ import {
   arrets,
   cycleSansBus,
   horairesDuCycle,
+  incertitude,
   maisonRelais,
   plan,
 } from './donnees'
@@ -375,6 +376,19 @@ export function aucunBus(ctx: ContexteEnfant): boolean {
   return ctx.marcheDirecte || ctx.sansTransport
 }
 
+/**
+ * L'incertitude `id` pèse-t-elle sur ce jour ?
+ *
+ * Une course circule lundi, mercredi et vendredi, mais l'ambiguïté du hall sportif ne
+ * concerne que le vendredi : sans ce filtre, deux parents sur trois recevraient un
+ * avertissement pour un jour qui n'est pas le leur. Sans `jours` déclarés, l'incertitude
+ * vaut pour tous les jours de la course — c'est le cas le plus sûr.
+ */
+function incertitudePorteSur(id: string, jour: Jour): boolean {
+  const jours = incertitude(id)?.jours
+  return !jours || jours.includes(jour)
+}
+
 /** Y a-t-il cours l'après-midi ce jour-là ? Les jours sont les mêmes pour tous les
  *  cycles, seules les heures diffèrent d'un site à l'autre. */
 export function coursApresMidi(jour: Jour): boolean {
@@ -473,6 +487,13 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       return
     }
     const [principal, ...reste] = trouvees
+    // L'incertitude de la course retenue remonte au jour, et pas seulement au trajet :
+    // c'est le seul canal PAR JOUR dont dispose l'application pour dire ce qu'elle ne
+    // sait pas. Il était déclaré, rendu par `Trajets.tsx`, et jamais alimenté. R66.
+    const doute = principal.service.incertitude
+    if (doute && !incertitudes.includes(doute) && incertitudePorteSur(doute, jour)) {
+      incertitudes.push(doute)
+    }
     trajets.push({
       type,
       ligne: principal.ligne,

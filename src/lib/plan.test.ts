@@ -392,6 +392,49 @@ describe('absence de retour les mardi et jeudi', () => {
   })
 })
 
+describe('incertitudes du jour', () => {
+  // R66 : `JourneeEnfant.incertitudes` était déclaré dans le type, rendu par
+  // `Trajets.tsx`… et jamais alimenté. Le seul canal PAR JOUR dont dispose
+  // l'application pour dire ce qu'elle ne sait pas était mort, et trois tests
+  // l'assertaient vide en croyant prouver quelque chose.
+  const c2AuDillendapp = () => contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)!
+
+  it('remonte l’incertitude de la course réellement empruntée', () => {
+    const vendredi = trajetsDuJour(c2AuDillendapp(), 'vendredi')
+    expect(vendredi.trajets.some((t) => t.type === 'navette-dillendapp-midi')).toBe(true)
+    expect(vendredi.incertitudes).toContain('depart-midi-vendredi-hall-sportif')
+  })
+
+  it('ne la remonte pas les jours qu’elle ne concerne pas', () => {
+    // La course circule lundi, mercredi et vendredi ; l'ambiguïté du hall sportif est
+    // celle du vendredi. Avertir le lundi inquiéterait pour un autre jour.
+    for (const jour of ['lundi', 'mercredi'] as Jour[]) {
+      const journee = trajetsDuJour(c2AuDillendapp(), jour)
+      expect(journee.trajets.some((t) => t.type === 'navette-dillendapp-midi'), jour).toBe(true)
+      expect(journee.incertitudes, jour).toEqual([])
+    }
+  })
+
+  it('n’en remonte aucune à qui ne prend pas la course concernée', () => {
+    const ctx = contexteEnfant(enfant('c2', 'maison'), HOVELANGE)!
+    expect(trajetsDuJour(ctx, 'vendredi').incertitudes).toEqual([])
+  })
+
+  it('ne renvoie que des identifiants déclarés dans le plan', () => {
+    const declarees = new Set(plan.incertitudes.map((i) => i.id))
+    for (const cycle of ['c1', 'c2', 'c3', 'c4'] as Cycle[]) {
+      for (const repas of ['maison', 'dillendapp'] as const) {
+        const ctx = contexteEnfant(enfant(cycle, repas), HOVELANGE)!
+        for (const jour of JOURS) {
+          for (const id of trajetsDuJour(ctx, jour).incertitudes) {
+            expect(declarees, `${cycle}/${repas}/${jour}`).toContain(id)
+          }
+        }
+      }
+    }
+  })
+})
+
 describe('arrivée quelques minutes après l’heure de classe affichée', () => {
   it('ne la signale pas : c’est un transport scolaire, la marge est intégrée', () => {
     // Le plan fait arriver un C2 d'Hovelange à Noerdange à 08:00 alors qu'il annonce
