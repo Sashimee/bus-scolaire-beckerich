@@ -7,7 +7,7 @@ import { JourneeTrajets } from '../composants/Trajets'
 import { CarteTrajet } from '../composants/CarteTrajet'
 import { FicheImprimable } from '../composants/FicheImprimable'
 import { datesDeLaSemaine } from '../lib/calendrier'
-import { coursApresMidi, semaineEnfant } from '../lib/plan'
+import { aucunBus, coursApresMidi, semaineEnfant } from '../lib/plan'
 import { matinDuJour, midiDuJour, soirDuJour } from '../lib/moments'
 import { distanceLisible, nomArret } from '../lib/affichage'
 import { siteDuCycle, transportALaDemande } from '../lib/donnees'
@@ -51,7 +51,10 @@ export function Semaine() {
   // Un enfant dont l'école est déjà l'arrêt le plus proche ne prend aucun bus. Sans ce
   // cas explicite, la fiche affichait cinq journées vides — « aucun trajet ce jour-là »,
   // répété cinq fois, ce qui se lit comme une panne plutôt que comme une bonne nouvelle.
-  const aPied = ctx.marcheDirecte
+  const aPied = aucunBus(ctx)
+  // Deux raisons de n'avoir aucun bus, deux phrases : l'école au coin de la rue, ou un
+  // cycle que le transport scolaire ne dessert pas. R65.
+  const cleSansBus = ctx.sansTransport ? 'sansTransport' : 'aPied'
 
   // Les jours où le parent dépose ou récupère lui-même l'enfant à la maison relais.
   const presences = semaine
@@ -93,14 +96,19 @@ export function Semaine() {
       {aPied ? (
         <section className="carte pile pile--serre">
           <div className="encart encart--info">
-            <div className="encart__titre">{t('enfant.aPied')}</div>
-            {t('enfant.aPiedDetail', {
+            <div className="encart__titre">
+              {t(`enfant.${cleSansBus}`, { cycle: t(`cycles.${enfant.cycle}`) })}
+            </div>
+            {t(`enfant.${cleSansBus}Detail`, {
               minutes: ctx.temps,
               site: siteDuCycle(enfant.cycle).nom,
               prenom: enfant.prenom,
+              cycle: t(`cycles.${enfant.cycle}`),
             })}
           </div>
-          {foyer.adresse && <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretEcole} />}
+          {ctx.marcheDirecte && foyer.adresse && (
+            <CarteTrajet depuis={foyer.adresse.coord} vers={ctx.arretEcole} />
+          )}
         </section>
       ) : (
         <section className="carte pile pile--serre">

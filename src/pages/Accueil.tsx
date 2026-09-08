@@ -5,7 +5,7 @@ import { FicheFoyer } from '../composants/FicheFoyer'
 import { useFoyer } from '../etat'
 import { useUrgences } from '../urgences-contexte'
 import { etatDuJour, jourDeSemaine } from '../lib/calendrier'
-import { trajetsDuJour } from '../lib/plan'
+import { aucunBus, trajetsDuJour } from '../lib/plan'
 import {
   estPassee,
   etapesDuJour,
@@ -155,7 +155,7 @@ function CarteEnfant({
 
   // Un enfant qui va à pied n'a pas d'horaire : sa tuile n'aurait rien à éteindre les
   // jours d'école. Elle reparaît sans école, pour porter la raison comme les autres.
-  const montrerHoraire = !ctx.marcheDirecte || !ecole
+  const montrerHoraire = !aucunBus(ctx) || !ecole
 
   return (
     <article className="carte pile pile--serre">
@@ -168,12 +168,16 @@ function CarteEnfant({
         {t('enfant.scolariseA', { site: siteDuCycle(ctx.enfant.cycle).nom })}
       </p>
 
-      {ctx.marcheDirecte ? (
+      {aucunBus(ctx) ? (
         <p>
-          <strong>{t('enfant.aPied')}</strong>{' '}
-          <span className="champ__aide">
-            · {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
-          </span>
+          <strong>{t(`enfant.${ctx.sansTransport ? 'sansTransport' : 'aPied'}`, {
+            cycle: t(`cycles.${ctx.enfant.cycle}`),
+          })}</strong>{' '}
+          {!ctx.sansTransport && (
+            <span className="champ__aide">
+              · {t('enfant.tempsMarcheEstimation', { minutes: ctx.temps })}
+            </span>
+          )}
         </p>
       ) : (
         <>

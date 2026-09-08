@@ -10,6 +10,7 @@ import {
   arret,
   arretEcoleDuCycle,
   arrets,
+  cycleSansBus,
   horairesDuCycle,
   maisonRelais,
   plan,
@@ -259,6 +260,14 @@ export interface ContexteEnfant {
   /** L'école est l'arrêt le plus proche : l'enfant peut y aller à pied. */
   marcheDirecte: boolean
   /**
+   * Le cycle n'est pas desservi par le transport scolaire — le précoce aujourd'hui.
+   *
+   * Le plan de bus contient bien des courses qui passent par le village et par l'école
+   * de ces enfants : les chercher en rend quatre par jour, plausibles et fausses. La
+   * seule réponse juste est qu'il n'y a pas de bus, et de le dire. R65.
+   */
+  sansTransport: boolean
+  /**
    * L'arrêt réellement utilisé chaque jour, dans chaque sens. Il ne diffère du
    * domicile que les jours où le parent a déclaré une adresse dérogatoire.
    */
@@ -350,8 +359,20 @@ export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant
     distance: domicileMatin.distance,
     temps: domicileMatin.temps,
     marcheDirecte,
+    sansTransport: cycleSansBus(enfant.cycle),
     arretsParJour,
   }
+}
+
+/**
+ * Cet enfant n'a aucun bus, quelle qu'en soit la raison.
+ *
+ * Deux causes, deux messages différents à l'écran — l'école au coin de la rue, ou un
+ * cycle que le transport scolaire ne dessert pas — mais la même conséquence partout
+ * ailleurs : pas d'horaire, pas d'export agenda, rien à régler.
+ */
+export function aucunBus(ctx: ContexteEnfant): boolean {
+  return ctx.marcheDirecte || ctx.sansTransport
 }
 
 /** Y a-t-il cours l'après-midi ce jour-là ? Les jours sont les mêmes pour tous les
@@ -421,7 +442,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const manquants: TypeTrajet[] = []
   const incertitudes: string[] = []
 
-  if (ctx.marcheDirecte) return { jour, trajets, manquants, incertitudes }
+  if (ctx.sansTransport || ctx.marcheDirecte) {
+    return { jour, trajets, manquants, incertitudes }
+  }
 
   const base = {
     jour,
@@ -522,9 +545,12 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
         derogation: derogationRepas,
       })
     }
-  } else {
+  } else if (!dillendappAuPiedDeLEcole) {
     // 2 bis. L'enfant rejoint la maison relais. Selon son cycle, c'est le bus
     // Dillendapp dédié (C2) ou le Retour 2 (C3 et autres), comme le précise le plan.
+    // Les cycles dont l'école est au pied de la maison relais n'ont ici rien à prendre :
+    // proposer un bus reviendrait à faire 86 m en 31 minutes, et l'annoncer manquant
+    // reviendrait à inquiéter pour une navette qui n'a pas lieu d'être. R64.
     ajouter('navette-dillendapp-midi', {
       depuis: ecole,
       vers: dillendapp,
@@ -548,13 +574,17 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       if (finDillendapp) {
         // L'enfant reste au Dillendapp après la classe : le bus du soir l'y dépose.
         // Le parent ne l'attend donc pas à son arrêt, il vient le chercher sur place.
-        ajouter('retour-soir-dillendapp', {
-          depuis: ecole,
-          vers: dillendapp,
-          periodes: ['soir'],
-          directions: ['vers-domicile'],
-          concerneParent: true,
-        })
+        // Sauf si la maison relais est au pied de l'école : il s'y rend à pied, et
+        // `recuperation` dit déjà au parent où le prendre. R64.
+        if (!dillendappAuPiedDeLEcole) {
+          ajouter('retour-soir-dillendapp', {
+            depuis: ecole,
+            vers: dillendapp,
+            periodes: ['soir'],
+            directions: ['vers-domicile'],
+            concerneParent: true,
+          })
+        }
       } else {
         ajouter('retour-soir', {
           depuis: ecole,

@@ -3,7 +3,7 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from './ChampAdresse'
 import { ChoixSemaine, HeureSemaine, type OptionChoix } from './ChoixSemaine'
-import { coursApresMidi, trajetsDuJour } from '../lib/plan'
+import { aucunBus, coursApresMidi, trajetsDuJour } from '../lib/plan'
 import { nomArret, sensTrajet } from '../lib/affichage'
 import { horairesDuCycle, maisonRelais } from '../lib/donnees'
 import {
@@ -65,7 +65,7 @@ function ApercuMoment({ enfant, moment }: { enfant: Enfant; moment: Moment }) {
   const { t } = useT()
   const { contextes } = useFoyer()
   const ctx = contextes.get(enfant.id) ?? null
-  if (!ctx || ctx.marcheDirecte) return null
+  if (!ctx || aucunBus(ctx)) return null
 
   const lignes = JOURS.map((jour) => {
     const journee = trajetsDuJour(ctx, jour)
@@ -173,16 +173,20 @@ function AdressesMoment({ enfant, sens }: { enfant: Enfant; sens: SensAdresse })
   )
 }
 
-/** L'école est l'arrêt le plus proche : il n'y a aucun bus à régler. */
-function APied({ enfant }: { enfant: Enfant }) {
+/** Aucun bus à régler : l'école est l'arrêt le plus proche, ou le cycle n'est pas
+ *  desservi. Les deux cas se disent différemment, c'est tout ce qui les sépare ici. */
+function SansBus({ enfant }: { enfant: Enfant }) {
   const { t } = useT()
   const { contextes } = useFoyer()
   const ctx = contextes.get(enfant.id) ?? null
-  if (!ctx?.marcheDirecte) return null
+  if (!ctx || !aucunBus(ctx)) return null
+  const cycle = t(`cycles.${enfant.cycle}`)
   return (
     <div className="encart encart--info">
-      <div className="encart__titre">{t('enfant.aPied')}</div>
-      {t('moments.aPiedAide')}
+      <div className="encart__titre">
+        {ctx.sansTransport ? t('enfant.sansTransport', { cycle }) : t('enfant.aPied')}
+      </div>
+      {ctx.sansTransport ? t('moments.sansTransportAide', { cycle }) : t('moments.aPiedAide')}
     </div>
   )
 }
@@ -195,7 +199,7 @@ export function SectionMatin({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const arret = ctx ? nomArret(ctx.arretDomicile, t) : null
   const options: OptionChoix<ChoixMatin>[] = [
@@ -256,7 +260,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const options: OptionChoix<ChoixMidi>[] = [
     {
@@ -310,7 +314,7 @@ export function SectionSoir({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const options: OptionChoix<ChoixSoir>[] = [
     { valeur: 'bus', libelle: t('soir.bus'), court: t('soir.busCourt'), aide: t('soir.busAide') },

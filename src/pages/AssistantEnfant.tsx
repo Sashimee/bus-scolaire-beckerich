@@ -8,7 +8,7 @@ import { ChampAdresse } from '../composants/ChampAdresse'
 import { ChoixSimple, type OptionChoix } from '../composants/ChoixSemaine'
 import { SectionMatin, SectionMidi, SectionSoir } from '../composants/Moments'
 import { JourneeTrajets } from '../composants/Trajets'
-import { semaineEnfant } from '../lib/plan'
+import { aucunBus, semaineEnfant } from '../lib/plan'
 import { semaineReglee } from '../lib/moments'
 import { distanceLisible, nomArret } from '../lib/affichage'
 import { cyclesProposes, siteDuCycle } from '../lib/donnees'
@@ -123,7 +123,7 @@ export function AssistantEnfant() {
             <ChampAdresse valeur={foyer.adresse} onChoisir={definirAdresse} />
           )}
 
-          {ctx && !ctx.marcheDirecte && (
+          {ctx && !aucunBus(ctx) && (
             <div className="pile pile--serre" aria-live="polite">
               <span className="etiquette">{t('enfant.arretLePlusProche')}</span>
               <strong className="titre-carte">{nomArret(ctx.arretDomicile, t)}</strong>
@@ -137,13 +137,18 @@ export function AssistantEnfant() {
             </div>
           )}
 
-          {ctx?.marcheDirecte && (
+          {ctx && aucunBus(ctx) && (
             <div className="encart encart--info" aria-live="polite">
-              <div className="encart__titre">{t('enfant.aPied')}</div>
-              {t('enfant.aPiedDetail', {
+              <div className="encart__titre">
+                {t(`enfant.${ctx.sansTransport ? 'sansTransport' : 'aPied'}`, {
+                  cycle: t(`cycles.${enfant.cycle}`),
+                })}
+              </div>
+              {t(`enfant.${ctx.sansTransport ? 'sansTransport' : 'aPied'}Detail`, {
                 minutes: ctx.temps,
                 site: site.nom,
                 prenom,
+                cycle: t(`cycles.${enfant.cycle}`),
               })}
             </div>
           )}

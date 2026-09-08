@@ -70,7 +70,8 @@
     "matin": "Der Morgen",
     "midi": "Der Mittag",
     "soir": "Nach dem Unterricht",
-    "aPiedAide": "Die nächstgelegene Haltestelle ist die der Schule: es ist keine Busfahrt vorgesehen, hier gibt es also nichts einzustellen."
+    "aPiedAide": "Die nächstgelegene Haltestelle ist die der Schule: es ist keine Busfahrt vorgesehen, hier gibt es also nichts einzustellen.",
+    "sansTransportAide": "Für {cycle} gibt es keinen Schultransport: es ist keine Busfahrt vorgesehen, hier gibt es also nichts einzustellen."
   },
   "matin": {
     "question": "Wie kommt {prenom} morgens zur Schule?",
@@ -177,6 +178,8 @@
     "aucunArret": "Von Ihrer Adresse aus fährt keine Haltestelle die Schule dieses Kindes an. Bitte prüfen Sie den offiziellen Plan.",
     "aPied": "Kein Bus: die Schule liegt gleich nebenan",
     "aPiedDetail": "Ihre Adresse liegt etwa {minutes} Min. zu Fuß von {site} entfernt. Für {prenom} ist keine Busfahrt vorgesehen: die nächste Haltestelle ist die der Schule selbst.",
+    "sansTransport": "Kein Bus: für {cycle} gibt es keinen Schultransport",
+    "sansTransportDetail": "Der Schultransport bedient {cycle} nicht. {prenom} geht in {site} zur Schule, aber kein Bus fährt dorthin: Sie müssen Ihr Kind selbst hinbringen und wieder abholen.",
     "sansPrenom": "Kind ohne Vornamen",
     "calquerSur": "Ausgangseinstellung",
     "commeLui": "Wie {prenom}",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Blatt erstellt am {date}",
     "aPied": "Zu Fuß",
+    "sansTransport": "Kein Bus",
     "famille": "Ganze Familie drucken",
     "familleTitre": "Schulbus — die Woche",
     "familleAide": "Eine einzige A4-Seite: die fünf Tage als Zeilen, ein Kind pro Spalte."

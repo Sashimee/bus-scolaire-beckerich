@@ -70,7 +70,8 @@
     "matin": "The morning",
     "midi": "Lunchtime",
     "soir": "After class",
-    "aPiedAide": "The stop nearest your home is the school’s own: no bus journey is planned, so there is nothing to set here."
+    "aPiedAide": "The stop nearest your home is the school’s own: no bus journey is planned, so there is nothing to set here.",
+    "sansTransportAide": "There is no school transport for {cycle}: no bus journey is planned, so there is nothing to set here."
   },
   "matin": {
     "question": "How does {prenom} get to school in the morning?",
@@ -177,6 +178,8 @@
     "aucunArret": "From your address, no stop serves this child's school. Please check the official plan.",
     "aPied": "No bus: the school is right next door",
     "aPiedDetail": "Your address is about {minutes} min on foot from {site}. No bus journey is planned for {prenom}: the nearest stop is the school’s own.",
+    "sansTransport": "No bus: there is no school transport for {cycle}",
+    "sansTransportDetail": "School transport does not serve {cycle}. {prenom} attends school in {site}, but no bus goes there: it is up to you to take your child there and collect them.",
     "sansPrenom": "Child with no first name",
     "calquerSur": "Starting point",
     "commeLui": "Same as {prenom}",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Sheet generated on {date}",
     "aPied": "On foot",
+    "sansTransport": "No bus",
     "famille": "Print the whole family",
     "familleTitre": "School bus — the week",
     "familleAide": "A single A4 page: the five days as rows, one child per column."

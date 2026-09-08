@@ -70,7 +70,8 @@
     "matin": "De manhã",
     "midi": "Ao meio-dia",
     "soir": "Depois das aulas",
-    "aPiedAide": "A paragem mais próxima de sua casa é a da escola: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui."
+    "aPiedAide": "A paragem mais próxima de sua casa é a da escola: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui.",
+    "sansTransportAide": "Não há transporte escolar para {cycle}: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui."
   },
   "matin": {
     "question": "De manhã, como vai {prenom} para a escola?",
@@ -177,6 +178,8 @@
     "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial.",
     "aPied": "Sem autocarro: a escola fica mesmo ao lado",
     "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola.",
+    "sansTransport": "Sem autocarro: não há transporte escolar para {cycle}",
+    "sansTransportDetail": "O transporte escolar não serve {cycle}. {prenom} estuda em {site}, mas nenhum autocarro lá vai: tem de o levar e ir buscá-lo.",
     "sansPrenom": "Criança sem nome",
     "calquerSur": "Configuração inicial",
     "commeLui": "Como {prenom}",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Folha gerada em {date}",
     "aPied": "A pé",
+    "sansTransport": "Sem autocarro",
     "famille": "Imprimir toda a família",
     "familleTitre": "Autocarro escolar — a semana",
     "familleAide": "Uma única página A4: os cinco dias em linhas, uma criança por coluna."

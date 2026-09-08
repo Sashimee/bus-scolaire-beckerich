@@ -167,6 +167,63 @@ describe('règles Dillendapp', () => {
     const journee = trajetsDuJour(ctx!, 'lundi')
     expect(journee.trajets.every((t) => t.ligne.id !== 'aller-dillendapp')).toBe(true)
   })
+
+  // R64 : la maison relais est à 86 m de l'école de Beckerich, donc au même arrêt. La
+  // garde existait, mais sur une seule des quatre branches — un C4 recevait un bus
+  // beckerich-ecole → beckerich-ecole, et l'annonce d'une navette « manquante ».
+  it("ne fait pas prendre le bus à un C4 pour 86 m entre l'école et la maison relais", () => {
+    const ctx = contexteEnfant(enfant('c4', 'dillendapp'), HOVELANGE)
+    const journee = trajetsDuJour(ctx!, 'lundi')
+    const types = journee.trajets.map((t) => t.type)
+    expect(types).not.toContain('navette-dillendapp-midi')
+    expect(types).not.toContain('navette-dillendapp-retour')
+    expect(journee.manquants).toEqual([])
+    expect(journee.trajets.every((t) => t.depart.arret.id !== t.arrivee.arret.id)).toBe(true)
+  })
+
+  it("ramène un C4 chez lui le soir quand il quitte la maison relais après la classe", () => {
+    const e = enfant('c4', 'dillendapp')
+    e.dillendappJusqua = Object.fromEntries(JOURS.map((j) => [j, '17:00'])) as Record<
+      Jour,
+      string | null
+    >
+    const journee = trajetsDuJour(contexteEnfant(e, HOVELANGE)!, 'lundi')
+    // Il reste sur place jusqu'à 17:00 : aucun bus du soir ne le concerne, et surtout
+    // pas un « retour » de l'école vers l'école. C'est le parent qui vient le chercher.
+    expect(journee.trajets.map((t) => t.type)).not.toContain('retour-soir-dillendapp')
+    expect(journee.manquants).toEqual([])
+    expect(journee.recuperation).toEqual({ lieu: 'dillendapp', heure: '17:00' })
+  })
+
+  it('garde les navettes pour les cycles dont l’école est loin de la maison relais', () => {
+    const journee = trajetsDuJour(contexteEnfant(enfant('c2', 'dillendapp'), HOVELANGE)!, 'lundi')
+    const types = journee.trajets.map((t) => t.type)
+    expect(types).toContain('navette-dillendapp-midi')
+    expect(types).toContain('navette-dillendapp-retour')
+  })
+})
+
+describe('cycles sans transport scolaire', () => {
+  // R65 : `CYCLES_SANS_BUS` ne servait qu'à filtrer une liste déroulante. Le moteur
+  // rendait au précoce quatre trajets affirmatifs et `manquants: []` — l'application
+  // n'omettait pas de dire ce qu'elle ignore, elle affirmait ce qui est faux.
+  it('ne rend aucun trajet à un enfant du précoce', () => {
+    const ctx = contexteEnfant(enfant('precoce', 'maison'), HOVELANGE)!
+    expect(ctx.sansTransport).toBe(true)
+    for (const jour of JOURS) {
+      const journee = trajetsDuJour(ctx, jour)
+      expect(journee.trajets, `${jour} devrait être sans bus`).toEqual([])
+      expect(journee.manquants).toEqual([])
+    }
+  })
+
+  it('laisse les cycles desservis intacts', () => {
+    for (const cycle of ['c1', 'c2', 'c3', 'c4'] as Cycle[]) {
+      const ctx = contexteEnfant(enfant(cycle, 'maison'), HOVELANGE)!
+      expect(ctx.sansTransport).toBe(false)
+      expect(trajetsDuJour(ctx, 'lundi').trajets.length).toBeGreaterThan(0)
+    }
+  })
 })
 
 describe('cas particulier de Huttange', () => {
@@ -373,8 +430,11 @@ describe('cohérence des données', () => {
     }
   })
 
-  it('couvre chaque cycle par au moins un trajet du matin depuis chaque village', () => {
-    const cycles: Cycle[] = ['precoce', 'c1', 'c2', 'c3', 'c4']
+  it('couvre chaque cycle desservi par au moins un trajet du matin depuis chaque village', () => {
+    // Le précoce n'en fait pas partie : il n'a pas de transport scolaire, et cette
+    // liste l'incluait — c'est elle qui donnait l'illusion que ses trajets étaient
+    // couverts par un test. R65.
+    const cycles: Cycle[] = ['c1', 'c2', 'c3', 'c4']
     for (const c of cycles) {
       for (const lieu of [HOVELANGE, LEVELANGE, HUTTANGE, SCHWEICH]) {
         const ctx = contexteEnfant(enfant(c, 'maison'), lieu)

@@ -103,6 +103,12 @@ export function siteDuCycle(id: Cycle): SiteScolaire {
  *  alors savoir où l'enfant est scolarisé. */
 const CYCLES_SANS_BUS: Cycle[] = ['precoce']
 
+/** Ce cycle est-il privé de transport scolaire ? À consulter par le moteur AVANT de
+ *  chercher un bus : sans quoi le plan en trouve, et l'application affirme du faux. */
+export function cycleSansBus(id: Cycle): boolean {
+  return CYCLES_SANS_BUS.includes(id)
+}
+
 /** Les cycles offerts au choix d'un parent, `actuel` en tête s'il n'en fait plus partie
  *  — sans quoi une liste déroulante afficherait un cycle que l'enfant n'a pas. */
 export function cyclesProposes(actuel: Cycle): Cycle[] {

@@ -70,7 +70,8 @@
     "matin": "Le matin",
     "midi": "Le midi",
     "soir": "Après la classe",
-    "aPiedAide": "L'arrêt le plus proche de chez vous est celui de l'école : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici."
+    "aPiedAide": "L'arrêt le plus proche de chez vous est celui de l'école : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici.",
+    "sansTransportAide": "Le {cycle} n'est pas desservi par le transport scolaire : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici."
   },
   "matin": {
     "question": "Le matin, comment {prenom} se rend à l'école ?",
@@ -177,6 +178,8 @@
     "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel.",
     "aPied": "Pas de bus : l’école est juste à côté",
     "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même.",
+    "sansTransport": "Pas de bus : le {cycle} n’est pas desservi",
+    "sansTransportDetail": "Le transport scolaire ne dessert pas le {cycle}. {prenom} est scolarisé à {site}, mais aucun bus n’y conduit : c’est à vous de l’y amener et de venir le rechercher.",
     "sansPrenom": "Enfant sans prénom",
     "calquerSur": "Configuration de départ",
     "commeLui": "Comme {prenom}",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Fiche générée le {date}",
     "aPied": "À pied",
+    "sansTransport": "Pas de bus",
     "famille": "Imprimer toute la famille",
     "familleTitre": "Bus scolaire — la semaine",
     "familleAide": "Une seule page A4 : les cinq jours en lignes, un enfant par colonne."
