@@ -10,6 +10,7 @@
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import postgres from 'postgres'
+import { plan as planEmbarque } from '../../src/lib/donnees.ts'
 
 // Simulé avant tout import : `envoyerATous` importe les clés VAPID et sort vers le
 // réseau. On lui substitue un envoi qui « réussit » pour trois abonnés.
@@ -28,6 +29,7 @@ const avecBase = Boolean(process.env.DATABASE_URL_TEST)
 let db: postgres.Sql
 let envoyerRappels: (maintenant?: Date) => Promise<{ rappels: number }>
 let enregistrerPerturbation: (id: string, donnees: unknown) => Promise<unknown>
+let ecrireDocument: (nom: 'horaires', contenu: unknown, version: string) => Promise<unknown>
 let lireEphemere: <T>(cle: string) => Promise<T | null>
 let etatDuJour: (d: Date) => { ecole: boolean }
 
@@ -64,7 +66,9 @@ beforeAll(async () => {
   db = client.base()
 
   envoyerRappels = (await import('./rappels-envoi.ts')).envoyerRappels
-  enregistrerPerturbation = (await import('./stockage/publications.ts')).enregistrerPerturbation
+  const publications = await import('./stockage/publications.ts')
+  enregistrerPerturbation = publications.enregistrerPerturbation
+  ecrireDocument = publications.ecrireDocument
   lireEphemere = (await import('./stockage/ephemeres.ts')).lireEphemere
   etatDuJour = (await import('../../src/lib/calendrier.ts')).etatDuJour
 }, 30_000)
@@ -77,7 +81,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
   if (!avecBase) return
-  await db`truncate perturbation, journal, ephemere`
+  // `document` aussi : un plan publié par un test fausserait les créneaux du suivant.
+  await db`truncate perturbation, journal, ephemere, document`
   envoyerATousSimule.mockClear()
 })
 
@@ -119,6 +124,47 @@ describe.skipIf(!avecBase)('journal de livraison des rappels', () => {
     const { rappels } = await envoyerRappels(AU_CRENEAU)
     expect(rappels).toBe(0)
     expect(await db`select 1 from journal where action = 'rappel'`).toHaveLength(1)
+  })
+
+  it('lit le plan PUBLIÉ et non celui embarqué dans l’image', async () => {
+    // R66 : `envoyerRappels` importait le plan du dépôt. Les créneaux d'un rappel se
+    // déduisent pourtant de la période de la course visée : sur une course qui n'existe
+    // que dans le plan publié, le serveur ne la trouvait pas, retombait sur « tous les
+    // créneaux » et faisait sonner les téléphones à 07:15 pour un bus de l'après-midi.
+    await ecrireDocument(
+      'horaires',
+      {
+        ...planEmbarque,
+        lignes: [
+          ...planEmbarque.lignes,
+          {
+            id: 'ligne-publiee',
+            nom: 'Ligne publiée',
+            direction: 'vers-domicile',
+            services: [
+              {
+                id: 'course-publiee',
+                periode: 'apres-midi',
+                jours: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'],
+                arrets: [
+                  { arret: 'beckerich-ecole', heure: '15:55' },
+                  { arret: 'hovelange-kneppchen', heure: '16:25' },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      'plan-publie',
+    )
+    await enregistrerPerturbation(
+      'u-apres-midi',
+      alerte({ id: 'u-apres-midi', service: 'course-publiee' }),
+    )
+
+    // 07:15 : aucun créneau d'après-midi n'est échu, donc aucun rappel. Avec le plan
+    // embarqué, la course restait introuvable et le créneau de 07:15 s'appliquait.
+    expect((await envoyerRappels(AU_CRENEAU)).rappels).toBe(0)
   })
 
   it("ne journalise rien quand aucune alerte n'est active", async () => {
