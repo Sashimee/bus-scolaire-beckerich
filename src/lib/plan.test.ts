@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { arretEcoleDuCycle, arrets, cyclesProposes, plan, siteDuCycle } from './donnees'
+import {
+  arretEcoleDuCycle,
+  arrets,
+  cyclesProposes,
+  plan,
+  remplacerPlan,
+  siteDuCycle,
+} from './donnees'
 import {
   ajusterDillendapp,
   bornesDillendapp,
@@ -389,6 +396,68 @@ describe('absence de retour les mardi et jeudi', () => {
 
   it("ne déclare plus l’incertitude sur les retours du mardi et du jeudi", () => {
     expect(plan.incertitudes.map((i) => i.id)).not.toContain('retours-apres-midi-mardi-jeudi')
+  })
+})
+
+describe('course qui repasse au même arrêt', () => {
+  /*
+   * R66 : `meilleurePaire` choisit UNE paire (montée, descente) par course — la plus
+   * directe — et le filtre `apres` s'appliquait ENSUITE, sur la liaison déjà formée.
+   * Une course qui repasse à l'arrêt de départ perdait donc son second passage : la
+   * montée de 07:38 était retenue, puis écartée parce que l'enfant arrive à 07:45, et
+   * la course disparaissait alors qu'il pouvait monter à 07:52.
+   *
+   * L'Aller 3 repasse bien au Dillendapp, mais ne redessert pas Oberpallen ensuite :
+   * le cas ne se produit pas sur le plan d'aujourd'hui. Il se produirait au premier
+   * plan publié qui ajouterait ce second passage — d'où la course de test.
+   */
+  const avecSecondPassage = () => {
+    const q = structuredClone(plan)
+    const service = q.lignes
+      .flatMap((l) => l.services)
+      .find((s) => s.id === 'aller-3-matin')!
+    service.arrets.push({ arret: 'oberpallen-ecole', heure: '08:00' })
+    return q
+  }
+
+  const c1DeposeA = (heure: string) => {
+    const e = enfant('c1', 'dillendapp')
+    e.periscolaire = true
+    e.dillendappDepuis = Object.fromEntries(
+      JOURS.map((j) => [j, j === 'lundi' ? heure : null]),
+    ) as Record<Jour, string | null>
+    return contexteEnfant(e, HOVELANGE)!
+  }
+
+  it('retient le second passage quand le premier est déjà parti', () => {
+    const embarque = plan
+    try {
+      remplacerPlan(avecSecondPassage())
+      const navette = trajetsDuJour(c1DeposeA('07:45'), 'lundi').trajets.find(
+        (t) => t.type === 'navette-dillendapp-matin',
+      )
+      expect(navette, 'aucune navette proposée').toBeDefined()
+      // Une autre ligne part à 07:50 et reste la meilleure ; ce qui doit exister, c'est
+      // la course de 07:52 — celle que le filtre faisait disparaître avec sa course.
+      const heures = [navette!.depart.heure, ...navette!.alternatives.map((a) => a.heureDepart)]
+      expect(heures, 'le second passage de 07:52 a été perdu').toContain('07:52')
+      expect(heures.every((h) => h === null || h >= '07:45')).toBe(true)
+    } finally {
+      remplacerPlan(embarque)
+    }
+  })
+
+  it('garde le premier passage quand l’enfant est là à temps', () => {
+    const embarque = plan
+    try {
+      remplacerPlan(avecSecondPassage())
+      const navette = trajetsDuJour(c1DeposeA('07:00'), 'lundi').trajets.find(
+        (t) => t.type === 'navette-dillendapp-matin',
+      )!
+      expect(navette.depart.heure).toBe('07:38')
+    } finally {
+      remplacerPlan(embarque)
+    }
   })
 })
 

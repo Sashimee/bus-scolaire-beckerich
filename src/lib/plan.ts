@@ -131,11 +131,18 @@ function meilleurePaire(
   depuis: string[],
   vers: string[],
   utilisable: (a: ArretDesservi) => boolean,
+  /** Ne monter qu'à cette minute ou après. `null` = aucune contrainte. */
+  auPlusTot: number | null,
 ): { i: number; j: number } | null {
   let meilleur: { i: number; j: number } | null = null
   for (let i = 0; i < service.arrets.length; i++) {
     if (!depuis.includes(service.arrets[i].arret)) continue
     if (!utilisable(service.arrets[i])) continue
+    // La contrainte d'heure porte sur la MONTÉE, donc sur le choix de la paire. Filtrer
+    // la liaison une fois formée écartait la course entière alors qu'un second passage
+    // au même arrêt restait prenable : l'Aller 3 dessert le Dillendapp deux fois. R66.
+    const montee = enMinutes(service.arrets[i].heure)
+    if (auPlusTot !== null && montee !== null && montee < auPlusTot) continue
     for (let j = i + 1; j < service.arrets.length; j++) {
       if (!vers.includes(service.arrets[j].arret)) continue
       if (!utilisable(service.arrets[j])) continue
@@ -169,6 +176,11 @@ interface RechercheOptions {
 function liaisons(o: RechercheOptions): Liaison[] {
   const trouvees: Liaison[] = []
 
+  // Une course déjà partie quand l'enfant arrive ne lui sert à rien. Les heures non
+  // publiées échappent au filtre : on ne peut rien en dire, et les écarter reviendrait
+  // à affirmer que la course ne convient pas.
+  const seuil = enMinutes(o.apres ?? null)
+
   // Un arrêt n'est empruntable que s'il est réellement desservi et que sa restriction
   // propre est satisfaite : le plan liste par exemple Huttange sur l'Aller 2 sans le
   // desservir, et n'ouvre le départ de 07:25 sur l'Aller 1 qu'aux cycles 3.
@@ -185,7 +197,7 @@ function liaisons(o: RechercheOptions): Liaison[] {
       if (!service.jours.includes(o.jour)) continue
       if (!o.periodes.includes(service.periode)) continue
 
-      const paire = meilleurePaire(service, o.depuis, o.vers, utilisable)
+      const paire = meilleurePaire(service, o.depuis, o.vers, utilisable, seuil)
       if (!paire) continue
 
       const d = service.arrets[paire.i]
@@ -200,21 +212,9 @@ function liaisons(o: RechercheOptions): Liaison[] {
     }
   }
 
-  // Une course déjà partie quand l'enfant arrive ne lui sert à rien. Les heures non
-  // publiées échappent au filtre : on ne peut rien en dire, et les écarter reviendrait
-  // à affirmer que la course ne convient pas.
-  const seuil = enMinutes(o.apres ?? null)
-  const retenues =
-    seuil === null
-      ? trouvees
-      : trouvees.filter((l) => {
-          const h = enMinutes(l.depart.heure)
-          return h === null || h >= seuil
-        })
-
   // Tri par heure de départ. Les courses sans heure publiée passent en dernier :
   // elles sont utilisables mais moins informatives pour le parent.
-  return retenues.sort((x, y) => {
+  return trouvees.sort((x, y) => {
     const hx = enMinutes(x.depart.heure)
     const hy = enMinutes(y.depart.heure)
     if (hx === null) return 1
