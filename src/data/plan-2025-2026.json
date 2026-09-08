@@ -212,7 +212,7 @@
       "id": "aller-3",
       "nom": "Aller — Bus 3",
       "direction": "vers-ecole",
-      "dessert": ["beckerich-ecole", "oberpallen-ecole", "noerdange-ecole"],
+      "dessert": ["beckerich-dillendapp", "oberpallen-ecole", "noerdange-ecole"],
       "services": [
         {
           "id": "aller-3-matin",

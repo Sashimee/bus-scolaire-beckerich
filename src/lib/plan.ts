@@ -624,11 +624,12 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     manquants.push('retour-soir')
   }
 
-  // Le plan fait arriver les bus de c1 et c2 quelques minutes après l'heure de classe
-  // affichée (07:58 à Oberpallen, 08:00 à Noerdange, pour une sonnerie à 07:55). Ce
-  // n'est pas un écart à signaler : c'est un transport scolaire, et l'école intègre
-  // ces quelques minutes. Le signaler chaque jour à presque toutes les familles de ces
-  // deux cycles ferait du bruit, pas de l'information.
+  // Le silence sur la marge entre l'arrivée du bus et la sonnerie est délibéré. Il
+  // reposait sur une sonnerie unique à 07:55 : les horaires de cours passant par cycle
+  // (rentrée 2026/2027), c1 et c2 commencent à 08:00, et les mêmes bus arrivent
+  // désormais 07:58 et 08:00 — juste à l'heure plutôt qu'en retard. La conclusion ne
+  // change pas, sa raison si : le signaler chaque jour à presque toutes les familles
+  // de ces deux cycles ferait du bruit, pas de l'information. R70.
 
   trajets.sort((a, b) => {
     const ha = enMinutes(a.depart.heure)

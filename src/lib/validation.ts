@@ -36,6 +36,30 @@ const estObjet = (v: unknown): v is Record<string, unknown> =>
 const minutes = (h: string) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5))
 
 /**
+ * Au-delà, un car scolaire de village a presque sûrement une minute mal recopiée.
+ *
+ * Le plan en vigueur en compte six — Huttange → Noerdange en 1 min pour 1,9 km, soit
+ * 114 km/h — hérités de l'arrondi à la minute de la brochure communale. Ce sont des
+ * AVERTISSEMENTS : refuser de publier pour cela bloquerait une rentrée entière, et ces
+ * six-là sont dans la brochure. Mais personne ne les avait vus. R70.
+ */
+const VITESSE_MAX_KMH = 90
+
+/** Distance à vol d'oiseau entre deux arrêts connus, en km. `null` si l'un est inconnu. */
+function distanceKm(a: string, b: string): number | null {
+  const x = arrets.find((s) => s.id === a)
+  const y = arrets.find((s) => s.id === b)
+  if (!x || !y) return null
+  const rad = (d: number) => (d * Math.PI) / 180
+  const dLat = rad(y.coord[0] - x.coord[0])
+  const dLon = rad(y.coord[1] - x.coord[1])
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(x.coord[0])) * Math.cos(rad(y.coord[0])) * Math.sin(dLon / 2) ** 2
+  return 6371 * 2 * Math.asin(Math.sqrt(h))
+}
+
+/**
  * Vérifie un plan complet. Renvoie la liste des problèmes ; publication autorisée
  * seulement si aucun n'est de gravité « erreur ».
  */
@@ -212,6 +236,12 @@ export function validerPlan(brut: unknown): Probleme[] {
       continue
     }
 
+    // Les arrêts que CETTE ligne dessert réellement, pour confronter son champ
+    // `dessert` : il annonce au parent où la ligne le mène, et `aller-3` y écrivait
+    // « beckerich-ecole » alors qu'il passe à la maison relais. Rien ne l'avait vu,
+    // aucun code ne lisant ce champ. R70.
+    const desservisParLaLigne = new Set<string>()
+
     for (const [iS, serviceBrut] of ligneBrute.services.entries()) {
       const ou2 = `${ou1} › course ${iS + 1}`
       if (!estObjet(serviceBrut)) {
@@ -250,6 +280,7 @@ export function validerPlan(brut: unknown): Probleme[] {
       }
 
       let precedente: number | null = null
+      let arretPrecedent: string | null = null
       for (const [iA, arretBrut] of serviceBrut.arrets.entries()) {
         const ouA = `${ou} › arrêt ${iA + 1}`
         if (!estObjet(arretBrut)) {
@@ -265,6 +296,13 @@ export function validerPlan(brut: unknown): Probleme[] {
           )
         } else {
           arretsUtilises.add(idArret)
+          if (arretBrut.desservi !== false) desservisParLaLigne.add(idArret)
+          // Une boucle qui repasse au même arrêt est normale — l'Aller 3 dessert le
+          // Dillendapp deux fois. Deux fois D'AFFILÉE ne l'est jamais : c'est une
+          // ligne recopiée en trop, et elle ferait un trajet de zéro minute.
+          if (idArret === arretPrecedent) {
+            erreur(ouA, `L'arrêt « ${idArret} » est répété deux fois de suite.`)
+          }
         }
 
         const heure = arretBrut.heure
@@ -278,7 +316,38 @@ export function validerPlan(brut: unknown): Probleme[] {
               `L'heure ${heure} précède celle de l'arrêt précédent : la course remonterait le temps.`,
             )
           }
+          // Une vitesse impossible signale presque toujours une minute mal recopiée.
+          // Avertissement et non erreur : le plan en vigueur en compte six, hérités de
+          // l'arrondi à la minute de la brochure, et refuser de publier pour cela
+          // bloquerait une rentrée entière. R70.
+          if (precedente !== null && typeof idArret === 'string' && arretPrecedent) {
+            const km = distanceKm(arretPrecedent, idArret)
+            const minutesEcoulees = m - precedente
+            if (km !== null && minutesEcoulees > 0 && km / (minutesEcoulees / 60) > VITESSE_MAX_KMH) {
+              avertir(
+                ouA,
+                `${km.toFixed(1)} km en ${minutesEcoulees} min depuis « ${arretPrecedent} » : ` +
+                  `plus de ${VITESSE_MAX_KMH} km/h. Vérifiez l'heure.`,
+              )
+            }
+          }
           precedente = m
+        }
+        if (typeof idArret === 'string') arretPrecedent = idArret
+      }
+    }
+
+    if (ligneBrute.dessert !== undefined) {
+      if (!Array.isArray(ligneBrute.dessert)) {
+        erreur(ou1, '« dessert » doit être une liste d’identifiants d’arrêts.')
+      } else {
+        for (const id of ligneBrute.dessert) {
+          if (!desservisParLaLigne.has(id as string)) {
+            erreur(
+              ou1,
+              `« dessert » annonce « ${String(id)} », qu'aucune course de cette ligne ne dessert.`,
+            )
+          }
         }
       }
     }

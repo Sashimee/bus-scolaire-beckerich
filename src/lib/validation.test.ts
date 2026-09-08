@@ -227,3 +227,44 @@ describe('renvois d’incertitude', () => {
     expect(planPubliable(validerPlan(planReel))).toBe(true)
   })
 })
+
+describe('cohérence des courses (R70)', () => {
+  it('refuse un « dessert » qui annonce un arrêt jamais desservi', () => {
+    // C'est l'erreur trouvée sur `aller-3`, qui annonçait « beckerich-ecole » alors
+    // qu'il passe à la maison relais. Aucun code ne lit ce champ : rien ne l'a vue.
+    const q = planValide() as Record<string, any>
+    q.lignes[0].dessert = ['levelange']
+    expect(erreurs(q).some((e) => e.message.includes('dessert'))).toBe(true)
+  })
+
+  it('accepte un « dessert » conforme aux arrêts de la ligne', () => {
+    const q = planValide() as Record<string, any>
+    const premier = q.lignes[0].services[0].arrets[0].arret
+    q.lignes[0].dessert = [premier]
+    expect(erreurs(q)).toEqual([])
+  })
+
+  it('refuse le même arrêt deux fois de suite, et tolère la boucle', () => {
+    const doublon = planValide() as Record<string, any>
+    const arrets = doublon.lignes[0].services[0].arrets
+    arrets.splice(1, 0, { ...arrets[0], heure: arrets[0].heure })
+    expect(erreurs(doublon).some((e) => e.message.includes('deux fois de suite'))).toBe(true)
+
+    // L'Aller 3 du plan réel repasse au Dillendapp : une boucle n'est pas une erreur.
+    expect(planPubliable(validerPlan(planReel))).toBe(true)
+  })
+
+  it('avertit d’une vitesse impossible entre deux arrêts, sans bloquer', () => {
+    const q = planValide() as Record<string, any>
+    // Levelange → Schweich-Peiffer : 5,1 km. En une minute, 308 km/h.
+    q.lignes[0].services[0].arrets = [
+      { arret: 'levelange', heure: '07:00' },
+      { arret: 'schweich-peiffer', heure: '07:01' },
+    ]
+    const problemes = validerPlan(q)
+    expect(problemes.some((x) => x.gravite === 'avertissement' && x.message.includes('km/h'))).toBe(
+      true,
+    )
+    expect(problemes.some((x) => x.gravite === 'erreur' && x.message.includes('km/h'))).toBe(false)
+  })
+})
