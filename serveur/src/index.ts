@@ -71,7 +71,10 @@ export function creerApplication(): Hono {
 
   api.onError((e, c) => {
     console.log(`exception sur ${c.req.method} ${c.req.path} : ${(e as Error)?.stack ?? e}`)
-    return c.json({ erreur: 'exception', detail: String(e) }, 500)
+    // Le détail reste dans le journal du serveur : rendu au client, il livrait le
+    // texte de la requête SQL, un nom de table, voire « password authentication
+    // failed for user "bus" ». R58 et suivantes.
+    return c.json({ erreur: 'exception' }, 500)
   })
 
   api.notFound((c) => c.json({ erreur: 'route-inconnue' }, 404))

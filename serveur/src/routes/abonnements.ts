@@ -4,7 +4,7 @@
 import type { Hono } from 'hono'
 import { corpsJson } from '../http.ts'
 import * as stock from '../stockage/abonnements.ts'
-import { PREFERENCES, PREFERENCE_DEFAUT } from '../stockage/abonnements.ts'
+import { PREFERENCES, PREFERENCE_DEFAUT, endpointAcceptable } from '../stockage/abonnements.ts'
 import { ecrireEphemere, lireEphemere } from '../stockage/ephemeres.ts'
 import { empreinte } from '../crypto.ts'
 import { envoyer } from '../envois.ts'
@@ -23,6 +23,9 @@ export function monterAbonnements(app: Hono): void {
     }
     if (!abonnement?.endpoint || typeof abonnement.endpoint !== 'string') {
       return c.json({ erreur: 'abonnement-invalide' }, 400)
+    }
+    if (!endpointAcceptable(abonnement.endpoint)) {
+      return c.json({ erreur: 'endpoint-refuse' }, 400)
     }
 
     const preference = (PREFERENCES as readonly string[]).includes(
