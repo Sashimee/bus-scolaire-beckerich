@@ -305,6 +305,7 @@
     "precisionApproximative": "Ongeféier Positioun",
     "precisionApproximativeAide": "De genaue Standuert vun dëser Statioun konnt net nogepréift ginn. D'Zäit zu Fouss ass dofir nach méi ongenau wéi soss.",
     "signaler": "Feeler mellen",
+    "aussiAppele": "och „{noms}“",
     "precision": {
       "verifiee": "Positioun nogepréift",
       "approximative": "Positioun ongeféier"

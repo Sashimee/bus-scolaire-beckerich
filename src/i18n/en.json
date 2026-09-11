@@ -305,6 +305,7 @@
     "precisionApproximative": "Approximate position",
     "precisionApproximativeAide": "The exact location of this stop could not be verified. The walking time is therefore even more indicative than usual.",
     "signaler": "Report an error",
+    "aussiAppele": "also “{noms}”",
     "precision": {
       "verifiee": "position verified",
       "approximative": "position approximate"

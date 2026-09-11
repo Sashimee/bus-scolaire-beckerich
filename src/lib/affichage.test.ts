@@ -3,10 +3,13 @@ import {
   alignerServices,
   destinationTrajet,
   distanceLisible,
+  nomArret,
+  nomArretAvecAlias,
   planPerime,
   sensTrajet,
 } from './affichage'
-import { plan } from './donnees'
+import { arret, plan } from './donnees'
+import fr from '../i18n/fr.json'
 import type { TypeTrajet } from './types'
 
 const ligne = (id: string) => plan.lignes.find((l) => l.id === id)!
@@ -107,5 +110,47 @@ describe('fin de validité du plan', () => {
 
   it('se déclare périmé dès la première minute du lendemain, heure locale', () => {
     expect(planPerime(new Date(annee, mois - 1, jour + 1, 0, 30))).toBe(true)
+  })
+})
+
+describe('nom d’un arrêt dans un choix d’arrêt', () => {
+  /** Le vrai dictionnaire français : une clé absente ferait tomber ces tests. */
+  const t = (chemin: string, params?: Record<string, string | number>): string => {
+    const valeur = chemin
+      .split('.')
+      .reduce<unknown>((n, c) => (n as Record<string, unknown>)?.[c], fr)
+    if (typeof valeur !== 'string') throw new Error(`clé absente du dictionnaire : ${chemin}`)
+    return valeur.replace(/\{(\w+)\}/g, (brut, cle: string) =>
+      params && cle in params ? String(params[cle]) : brut,
+    )
+  }
+
+  it('ajoute le nom que la brochure donne à l’arrêt', () => {
+    // Le parent lit « Liewelerwee » sur la brochure ; l'application écrit
+    // « Leewelerwee ». Sans l'alias, il ne reconnaît pas son arrêt dans la liste.
+    expect(nomArretAvecAlias(arret('beckerich-leewelerwee'), t)).toBe(
+      'Beckerich · Leewelerwee — aussi « Liewelerwee »',
+    )
+  })
+
+  it('énumère les alias quand la brochure en donne plusieurs', () => {
+    expect(nomArretAvecAlias(arret('hovelange-op-der-halte'), t)).toBe(
+      'Hovelange · Op der Halte — aussi « Sportshal/Op der Halte, Op der Halte/Sportshal »',
+    )
+  })
+
+  it('laisse le nom nu quand la brochure n’en donne aucun', () => {
+    // Quatorze des dix-sept arrêts sont dans ce cas : la mention ne doit pas
+    // apparaître, même vide, sans quoi chaque ligne traînerait un tiret orphelin.
+    const sansAlias = arret('huttange')
+    expect(sansAlias.aliases).toBeUndefined()
+    expect(nomArretAvecAlias(sansAlias, t)).toBe(nomArret(sansAlias, t))
+    expect(nomArretAvecAlias(sansAlias, t)).toBe('Huttange')
+  })
+
+  it('garde le nom canonique hors du choix d’arrêt', () => {
+    // `nomArret` sert les horaires, les fiches et l'agenda : y faire entrer les alias
+    // alourdirait chaque ligne. C'est la raison d'être des deux fonctions.
+    expect(nomArret(arret('beckerich-leewelerwee'), t)).toBe('Beckerich · Leewelerwee')
   })
 })
