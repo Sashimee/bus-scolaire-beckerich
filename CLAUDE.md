@@ -122,7 +122,11 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   et de note, le champ `dessert` et les vitesses. Surtout : le dépôt a de nouveau un test
   de contraste (`src/contraste.test.ts`, survols compris), et les 162 tests du serveur ont
   tourné contre une vraie base — ce sont eux qui ont révélé qu'un test de sécurité était
-  faux. **Rien de tout cela n'a été vu dans un navigateur : lire R76 avant de déployer.**
+  faux. **Le 2026-09-11** : le banc navigateur a enfin été ouvert — neuf écrans en clair et
+  en sombre sous Chromium, 458 zones de texte mesurées au pixel par thème, zéro requête
+  OpenStreetMap avant le clic sur la carte. **R76 et R27 sont levées**, et les 162 tests du
+  serveur ont retourné contre une vraie base. Ce que le banc ne couvre pas reste écrit :
+  Safari et WebKit n'ont rien vu (R1, et le `:hover` collé qui motivait R69).
   **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section

@@ -38,7 +38,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **La feuille du foyer débordait, et la cause n'était pas celle qu'on croyait.** Quatre corrections successives le 2026-08-09 sur la hauteur du contenu, puis la feuille d'un foyer de trois enfants est sortie le 2026-08-10 avec le vendredi **tronqué** — et « Page 1 sur 1 » en pied : WebKit avait coupé au lieu de paginer, ce qui ne laisse aucun indice à qui ne compare pas avec l'écran. Cause trouvée le 2026-08-10 : `table-layout: fixed` ne lit les largeurs que sur la PREMIÈRE rangée, et celle de la colonne des jours était posée sur le `tbody`. Les quatre colonnes se partageaient donc la feuille à parts égales — 46 mm pour « Jour » au lieu de 22 — et chaque trajet revenait à la ligne. Corrigé, mesuré à 222 mm pour un foyer réel et 236 mm pour le pire cas imaginable, sur 273 disponibles. **Mais la mesure reste celle de Chrome.** | Réimprimer la feuille du foyer à trois enfants. Elle doit tenir sur une page entière, vendredi compris. |
+| R1 | 2, 7 | **La feuille du foyer débordait, et la cause n'était pas celle qu'on croyait.** Quatre corrections successives le 2026-08-09 sur la hauteur du contenu, puis la feuille d'un foyer de trois enfants est sortie le 2026-08-10 avec le vendredi **tronqué** — et « Page 1 sur 1 » en pied : WebKit avait coupé au lieu de paginer, ce qui ne laisse aucun indice à qui ne compare pas avec l'écran. Cause trouvée le 2026-08-10 : `table-layout: fixed` ne lit les largeurs que sur la PREMIÈRE rangée, et celle de la colonne des jours était posée sur le `tbody`. Les quatre colonnes se partageaient donc la feuille à parts égales — 46 mm pour « Jour » au lieu de 22 — et chaque trajet revenait à la ligne. Corrigé, mesuré à 222 mm pour un foyer réel et 236 mm pour le pire cas imaginable, sur 273 disponibles. **Mais la mesure reste celle de Chrome.** | Réimprimer la feuille du foyer à trois enfants. Elle doit tenir sur une page entière, vendredi compris. **Le 2026-09-11**, le banc a produit cette feuille sous Chromium en média `print` : **une seule page A4**, les cinq jours présents, la colonne du précoce portant « Pas de bus ». Cela ne lève pas la réserve — la troncature silencieuse est un comportement de **WebKit**, et c'est une imprimante WebKit qu'il faut. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | ~~R3~~ | 8 | ~~Le Worker n'avait jamais écrit sur GitHub, et il ne le pouvait pas.~~ **Levée le 2026-08-09** : `cache: 'no-store'`, refusé par le runtime Cloudflare, faisait échouer toute publication depuis le lot 8. Corrigé, puis éprouvé — une correction publiée depuis `/traductions` a bien atteint le dépôt. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
@@ -63,7 +63,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
 | ~~R25~~ | 18 | ~~La couche `impression` n'a toujours pas été vue sur papier.~~ **Levée le 2026-08-10** : la feuille d'un foyer de trois enfants est sortie d'iOS Safari en noir sur blanc franc — aucun voile translucide n'a survécu, aucune ombre, aucun gris moucheté. C'était la crainte de la refonte « verre » ; elle est levée. |
 | R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
-| R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
+| ~~R27~~ | 18 | ~~Le contraste est calculé, pas mesuré à l'écran.~~ **Levée le 2026-09-11** : balayage à la pipette sur les pixels rendus — capture par élément, fond = couleur la plus fréquente, encre = couleur la plus éloignée — sur neuf écrans et les deux thèmes, **458 zones de texte mesurées par thème**. Aucun couple encre/fond sous le seuil. Les seules zones sous 4,5:1 sont la tuile `sous-tuile--eteinte`, **floutée et voilée exprès** (`opacity: .35; filter: blur(2.5px)`) derrière la plaque lisible « Pas d'école aujourd'hui » — le contraste y est l'effet recherché, pas un défaut. Le pire cas redouté (encre douce sur carte dans l'angle clair du dégradé) ne se produit pas. Mesuré sous Chromium, qui compose en sRGB ; un moteur d'un autre espace reste non vérifié. |
 | ~~R28~~ | 19 | ~~Le pied de page collé en bas n'a pas été vu sur iPhone.~~ **Levée le 2026-08-10** : vérifié sous Safari iOS par l'auteur, avec le reste des écrans du lot. |
 | ~~R29~~ | 19 | ~~La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.~~ **Levée le 2026-08-10** : la feuille est sortie sur une seule page — le conteneur souple et la hauteur minimale en hauteur de fenêtre n'ont ajouté aucune feuille. Le débordement constaté le même jour avait une tout autre cause, voir R1. |
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
@@ -110,7 +110,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R73 | 2026-09-09 | **L'école précoce est posée exactement sur la maison relais.** `ecoles.json` donne au site `beckerich-precoce` les coordonnées `[49.731842, 5.882778]`, au chiffre près celles du Dillendapp. C'est peut-être vrai — le précoce est souvent hébergé dans le bâtiment de la maison relais — mais rien ne le dit, et le site ne porte aucune source. Depuis que le précoce n'a plus de bus (R65), la coordonnée ne sert qu'au libellé « scolarisé à » ; elle reste fausse ou vraie sans qu'on sache. | Demander à la commune où se tient le précoce, et poser une `source` sur le site comme les arrêts en portent une. |
 | R74 | 2026-09-09 | **Les deux bus Dillendapp sont réservés à deux cycles différents, sans raison écrite.** `aller-dillendapp` (midi, vers la maison relais) est réservé aux **c2** ; `retour-dillendapp` (après-midi, vers l'école) aux **c3**. La dissymétrie vient de la brochure et le moteur la respecte — un c2 rentre par le Retour 2 les mardi et jeudi, un c3 par le Retour 2 tous les jours, et tous les cycles sont couverts chaque jour (vérifié). Mais aucune note ne dit si c'est voulu ou si c'est une coquille de la brochure. | Poser la question à la commune. Si c'est voulu, l'inscrire en `reglesConfirmees` comme la règle des retours du mardi et du jeudi. |
 | R75 | 2026-09-09 | **Trois champs de données restent orphelins, et c'est peut-être un manque.** `Service.horaireComplet` (posé sur les deux courses Dillendapp), `Arret.aliases` (trois arrêts portent les noms alternatifs de la brochure) et `plan.reglesConfirmees` ne sont lus par aucun code. Le dernier est de la documentation assumée — la règle qu'il décrit vit dans `plan.ts`, et un test vérifie qu'elle n'est plus listée comme incertaine. Les deux premiers ressemblent à des fonctions jamais écrites : `aliases` servirait une recherche d'arrêt par nom de brochure, `horaireComplet` à dire au parent qu'une course n'a pas toutes ses heures publiées. | Trancher champ par champ : brancher, ou retirer du type ET des données. Ne pas laisser un troisième état. |
-| R76 | 2026-09-09 | **Rien de tout cela n'a été vu dans un navigateur.** Les 477 tests d'application, les 162 du serveur, le `typecheck`, le `lint` et le `build` passent, et chaque correctif a sa mutation. Mais la journée a touché six écrans (le message « pas de bus », le pied de page, la carte, le bouton « Supprimer » au survol, les arrêts approximatifs, l'écran des réglages), la palette claire (`--plein`), et la barre système. Playwright est disponible sur cette machine (leçon du 2026-09-08) et n'a pas été rouvert. | Rejouer le banc Playwright du 2026-09-08 sur ces écrans, en clair ET en sombre, et regarder le survol de « Supprimer » sur un vrai appui tactile. Rien n'est déployé avant. |
+| ~~R76~~ | 2026-09-09 | ~~Rien de tout cela n'a été vu dans un navigateur.~~ **Levée le 2026-09-11** : banc Playwright (Chromium 1243, hors dépôt) sur les neuf écrans, **en clair ET en sombre**, avec un foyer semé dans `localStorage` — un c3, un précoce, un c1. Aucune exception de rendu, aucune erreur de console. Vérifié au texte rendu (`textContent`) : le message « pas de bus » du précoce sur Accueil, Semaine, les étapes 3 à 5 de l'assistant (`Moments`) et la fiche du foyer ; la marche directe (domicile à 11 m de l'école d'Elvange) sur Accueil et Semaine, avec son détail ; le pied de page « Plan valable jusqu'au 2026-12-18 » sur tous les écrans ; les encarts « position approximative » sur un foyer de Beckerich-village. Vérifié au pixel : le bouton « Effacer toutes mes données » **au survol** passe à **11,11:1** en clair et **7,41:1** en sombre (c'était 3,41:1 avant R69), le bouton primaire tient 14,27:1 et 16,53:1, `--plein` vaut bien `#1a222c` en clair, et les deux `theme-color` de la barre système (`#0e1a2e` / `#e1e7ee`) sont ceux des jetons — la promesse de R70 tient jusqu'au navigateur. Vérifié au réseau : **zéro requête OpenStreetMap avant le clic**, quatre après (R68). La fiche du foyer de trois enfants tient sur **une seule page A4**, vendredi compris. **Ce qui reste hors de cette levée** : Safari et WebKit (voir R1), et le survol sur un vrai appui tactile — Chromium ne simule pas le `:hover` collé d'iOS. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -2986,3 +2986,74 @@ service de push.
   impossibles, dissymétrie des deux bus Dillendapp, position du précoce : ce sont des
   questions à la commune, pas des valeurs à réécrire. Elles sont désormais signalées par
   `validerPlan` ou inscrites en réserve, jamais devinées.
+
+## Le banc navigateur, enfin ouvert (2026-09-11)
+
+Les dix-neuf commits de la veille n'avaient été jugés que par des tests. Cette séance ne
+change **aucune ligne de l'application** : elle regarde.
+
+### Ce que la machine offre aujourd'hui
+
+Trois choses ont changé depuis la note de reprise, et elles déverrouillent le banc :
+Docker répond sans `sudo` — mais **sans le greffon `compose`** : `docker compose up -d
+bus-postgres` échoue, et c'est `docker run -d --name bus-postgres-test -e POSTGRES_USER=bus
+-e POSTGRES_PASSWORD=bus -e POSTGRES_DB=bus -p 127.0.0.1:5433:5432 postgres:17-alpine` qui
+donne la base (la recette `embedded-postgres` n'est donc plus nécessaire) ; les
+polices DejaVu sont installées (Chromium ne meurt plus sur `/reglages`), et les
+navigateurs Playwright sont dans `~/.cache/ms-playwright`. Le paquet `playwright-core`
+est installé **hors du dépôt**, dans le répertoire de travail temporaire : le projet ne
+gagne aucune dépendance pour un banc qu'on ouvre trois fois par an.
+
+### Ce qui a été regardé
+
+Neuf écrans, **en clair et en sombre**, avec un foyer semé dans `localStorage` : un c3,
+un précoce et un c1 à Huttange, un c3 à onze mètres de l'école d'Elvange pour la marche
+directe, un foyer de Beckerich-village pour les arrêts approximatifs. Le précoce ne peut
+plus être saisi par le formulaire — il est semé directement, exactement comme le fait un
+lien de partage ancien.
+
+Trois natures de preuve, et elles ne se remplacent pas :
+
+| Nature | Ce qu'elle établit |
+| --- | --- |
+| Texte rendu (`textContent`) | Le bon message est là. `innerText` renvoie vide sous `chrome-headless-shell` — piège déjà payé le 2026-09-08. |
+| Pixels (pipette sur capture d'élément) | La couleur **effective**, composition alpha et `color-mix` compris. C'est la seule mesure qui vaut pour le contraste. |
+| Réseau | Ce qui part de l'appareil, et quand. |
+
+### Deux fausses pistes, notées pour ne pas les reprendre
+
+**`getComputedStyle` ne donne pas la couleur effective.** Un fond en
+`color-mix(… / alpha)` revient en `oklab(… / 0.27)` non composité : le rapport calculé
+là-dessus donnait 1,20:1 là où le pixel en vaut 11,11. Le calcul sur les valeurs
+déclarées est exactement ce que R27 reprochait au banc précédent — il ne fallait pas le
+refaire sous un autre nom.
+
+**Une capture `fullPage` ne partage pas les coordonnées du DOM.** Elle redispose la page
+(en-têtes collants, conteneurs défilants) : les rectangles relevés tombent à côté, et le
+balayage a produit onze « défauts » qui n'existaient pas, tous différents d'un thème à
+l'autre. Agrandir la fenêtre à la hauteur du document ne suffit pas non plus. Seule la
+capture **par élément** donne des chiffres qui se reproduisent — et le signe qu'ils sont
+justes est qu'ils désignent alors **les mêmes** zones dans les deux thèmes.
+
+### Ce qui a été prouvé
+
+R76 et R27 sont levées ; le détail chiffré est dans leurs lignes en tête de fichier. En
+résumé : aucune exception de rendu ni erreur de console sur les neuf écrans, les messages
+« pas de bus » et « marche directe » présents partout où ils sont attendus, 458 zones de
+texte mesurées au pixel par thème sans un seul couple sous son seuil, le bouton de
+suppression à 11,11:1 au survol, zéro requête OpenStreetMap avant le clic, et la feuille
+du foyer de trois enfants sur une seule page A4.
+
+La base a été relancée (`docker run postgres:17-alpine`, port 5433) et les **162 tests du
+serveur** ont tourné contre elle — aucun saut. **477 tests d'application**, `typecheck`,
+`lint` et `build` des deux paquets : tout passe.
+
+### Où s'arrête la preuve
+
+Tout ceci est **Chromium**. Safari et WebKit n'ont rien vu, et c'est là que vivent les
+deux réserves les plus tenaces : la troncature silencieuse de la feuille imprimée (R1) et
+le `:hover` qui reste collé après un appui tactile (le motif même de R69). Un banc sans
+doigt ne prouve pas un geste.
+
+Restent ouvertes et **indépendantes du code** : R71 (un vrai service de push), R72 à R74
+(quatre questions à la commune) et R75 (trois champs orphelins à trancher).
