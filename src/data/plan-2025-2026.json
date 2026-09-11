@@ -71,7 +71,8 @@
     }
   ],
 
-  "reglesConfirmees": [
+  "$commentaireReglesConfirmees": "Le préfixe $ dit que ceci est de la prose pour humains, pas une donnée : aucun code ne la lit. La règle décrite vit dans src/lib/plan.ts, et un test garde qu'elle n'est plus listée comme incertaine. On garde la trace de QUI a confirmé et QUAND, parce que c'est ce qu'il faudra redemander à la prochaine rentrée.",
+  "$reglesConfirmees": [
     {
       "id": "retours-apres-midi-mardi-jeudi",
       "portee": "retour-1.soir, retour-2.soir",
@@ -247,7 +248,6 @@
           "id": "aller-dillendapp-midi",
           "periode": "midi",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "horaireComplet": false,
           "incertitude": "depart-midi-vendredi-hall-sportif",
           "arrets": [
             { "arret": "noerdange-ecole", "heure": "12:10" },
@@ -388,7 +388,6 @@
           "id": "retour-dillendapp-apres-midi",
           "periode": "apres-midi",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "horaireComplet": false,
           "arrets": [
             { "arret": "huttange", "heure": "13:45" },
             {

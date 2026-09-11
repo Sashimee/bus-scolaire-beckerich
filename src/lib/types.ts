@@ -78,8 +78,6 @@ export interface Service {
   periode: Periode
   jours: Jour[]
   arrets: ArretDesservi[]
-  /** `false` quand le plan ne détaille pas tous les horaires de la course. */
-  horaireComplet?: boolean
   /** Identifiant d'une incertitude déclarée dans le plan. */
   incertitude?: string
 }
