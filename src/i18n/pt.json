@@ -305,6 +305,7 @@
     "precisionApproximative": "Posição aproximada",
     "precisionApproximativeAide": "Não foi possível verificar a localização exata desta paragem. O tempo a pé é, por isso, ainda mais indicativo do que o habitual.",
     "signaler": "Comunicar um erro",
+    "aussiAppele": "também «{noms}»",
     "precision": {
       "verifiee": "posição verificada",
       "approximative": "posição aproximada"

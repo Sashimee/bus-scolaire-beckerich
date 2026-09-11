@@ -305,6 +305,7 @@
     "precisionApproximative": "Position approximative",
     "precisionApproximativeAide": "L'emplacement exact de cet arrêt n'a pas pu être vérifié. Le temps de marche est donc encore plus indicatif que d'ordinaire.",
     "signaler": "Signaler une erreur",
+    "aussiAppele": "aussi « {noms} »",
     "precision": {
       "verifiee": "position vérifiée",
       "approximative": "position approximative"
