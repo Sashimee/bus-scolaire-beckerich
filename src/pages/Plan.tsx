@@ -1,5 +1,5 @@
 import { useT } from '../i18n'
-import { plan } from '../lib/donnees'
+import { cycles, plan } from '../lib/donnees'
 import { alignerServices, nomArretParId } from '../lib/affichage'
 import type { Ligne } from '../lib/types'
 
@@ -69,7 +69,7 @@ function TableauLigne({ ligne }: { ligne: Ligne }) {
 
 export function PagePlan() {
   const { t } = useT()
-  const { matin, apresMidi } = plan.horairesEcole
+  const { jours, parCycle } = plan.horairesEcole
 
   return (
     <div className="pile pile--large">
@@ -80,13 +80,15 @@ export function PagePlan() {
           {t('plan.anneeScolaire', { annee: plan.anneesCouvertes.join(' · ') })} ·{' '}
           {t('validite.releve', { date: plan.source.dateReleve })}
         </p>
-        {plan.source.confirmationOrale && (
+        {plan.source.confirmePar && (
           <div className="encart encart--info">
-            {t('validite.confirme', {
-              personne: plan.source.confirmePar ?? '—',
-              date: plan.source.confirmeLe ?? '—',
-            })}{' '}
-            {t('validite.confirmeOral')}
+            <p>
+              {t('validite.confirme', {
+                personne: plan.source.confirmePar,
+                date: plan.source.confirmeLe ?? '—',
+              })}
+            </p>
+            {plan.source.confirmationOrale && <p>{t('validite.confirmeOral')}</p>}
           </div>
         )}
         <div className="rangee">
@@ -108,16 +110,39 @@ export function PagePlan() {
         </div>
       </header>
 
-      <section className="carte">
+      {/* Les heures de sortie ne sont pas les mêmes d'une école à l'autre : les donner
+          cycle par cycle, comme la brochure, plutôt qu'une moyenne qui serait fausse
+          partout. */}
+      <section className="carte pile pile--serre">
         <div className="encart__titre">{t('plan.horairesEcole')}</div>
-        <p>
-          {t('plan.horairesEcoleDetail', {
-            matinDebut: matin.debut,
-            matinFin: matin.fin,
-            apresMidiDebut: apresMidi.debut,
-            apresMidiFin: apresMidi.fin,
+        <p className="champ__aide">
+          {t('plan.horairesEcoleJours', {
+            matin: jours.matin.map((j) => t(`jours.${j}`)).join(' · '),
+            apresMidi: jours.apresMidi.map((j) => t(`jours.${j}`)).join(' · '),
           })}
         </p>
+        <div className="tableau-conteneur">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{t('plan.cycle')}</th>
+                <th scope="col">{t('plan.matin')}</th>
+                <th scope="col">{t('plan.apresMidi')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cycles.map(({ id }) => (
+                <tr key={id}>
+                  <th scope="row" className="tableau__arret">
+                    {t(`cycles.${id}`)}
+                  </th>
+                  <td className="heure">{t('plan.creneau', { ...parCycle[id].matin })}</td>
+                  <td className="heure">{t('plan.creneau', { ...parCycle[id].apresMidi })}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       {/* Reprise mot pour mot de l'avertissement du site officiel : c'est la commune

@@ -7,7 +7,7 @@
  * et rien ne doit pouvoir remettre ces deux marches dans l'autre sens.
  */
 import { beforeEach, describe, expect, it } from 'vitest'
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { PileBandeaux } from './Bandeaux'
 import { FournisseurFoyer } from '../etat'
@@ -81,19 +81,29 @@ describe('bandeaux bloquants du premier lancement', () => {
     expect(localStorage.getItem(CLE_LANGUE)).toBeNull()
   })
 
-  it('passe à l’avertissement une fois la langue choisie, et dans cette langue', () => {
+  /*
+   * Le clic est suivi d'un `await` : les dictionnaires autres que le français sont
+   * chargés à la demande, et la bascule attend l'arrivée du sien plutôt que d'afficher
+   * un instant l'avertissement en français.
+   */
+  it('passe à l’avertissement une fois la langue choisie, et dans cette langue', async () => {
     monter()
     act(() => screen.getByRole('button', { name: 'Português' }).click())
+
+    await waitFor(() => expect(avertissement(pt)).not.toBeNull())
     expect(langues()).toBeNull()
-    expect(avertissement(pt)).not.toBeNull()
     expect(localStorage.getItem(CLE_LANGUE)).toBe('"pt"')
   })
 
-  it('ne repose pas la question à la visite suivante', () => {
+  it('ne repose pas la question à la visite suivante', async () => {
     localStorage.setItem(CLE_LANGUE, '"de"')
     monter()
+    // Le dictionnaire allemand arrive après le montage ; l'application, elle, l'attend
+    // avant son premier rendu.
+    await waitFor(() =>
+      expect(screen.queryByRole('group', { name: 'Bevor Sie beginnen' })).not.toBeNull(),
+    )
     expect(langues()).toBeNull()
-    expect(screen.queryByRole('group', { name: 'Bevor Sie beginnen' })).not.toBeNull()
   })
 
   it('n’interroge pas un habitué qui a déjà passé le premier lancement', () => {

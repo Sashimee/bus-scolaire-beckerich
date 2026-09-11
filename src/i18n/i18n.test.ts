@@ -23,11 +23,33 @@ function chemins(objet: unknown, prefixe = ''): Map<string, string> {
   return out
 }
 
+/** Aplatit un dictionnaire en chemins pointés, en gardant le texte de chaque chaîne. */
+function chaines(objet: unknown, prefixe = ''): [string, string][] {
+  if (typeof objet !== 'object' || objet === null) return []
+  return Object.entries(objet).flatMap(([cle, valeur]) => {
+    if (cle.startsWith('$')) return []
+    const chemin = prefixe ? `${prefixe}.${cle}` : cle
+    if (typeof valeur === 'string') return [[chemin, valeur] as [string, string]]
+    return chaines(valeur, chemin)
+  })
+}
+
+/** Les chemins dont le texte est vide ou réduit à des espaces. */
+function vides(dico: unknown): string[] {
+  return chaines(dico)
+    .filter(([, texte]) => texte.trim() === '')
+    .map(([chemin]) => chemin)
+}
+
 const reference = chemins(fr)
 
 describe('dictionnaires de traduction', () => {
   it('le français sert de référence et est complet', () => {
     expect(reference.size).toBeGreaterThan(150)
+  })
+
+  it('le français ne laisse aucune chaîne vide', () => {
+    expect(vides(fr), 'chaînes vides dans fr.json').toEqual([])
   })
 
   for (const [langue, dico] of Object.entries(AUTRES)) {
@@ -54,8 +76,10 @@ describe('dictionnaires de traduction', () => {
       })
 
       it('ne laisse aucune chaîne vide', () => {
-        const vides = [...Object.entries(chemins(dico))]
-        expect(vides.filter(([, v]) => v === '')).toEqual([])
+        // `chemins()` rend une Map de TYPES : ce test la parcourait avec
+        // `Object.entries()`, qui rend [] sur une Map, et comparait donc [] à []
+        // dans les quatre langues depuis toujours. R63.
+        expect(vides(dico), `chaînes vides dans ${langue}.json`).toEqual([])
       })
     })
   }
@@ -63,19 +87,10 @@ describe('dictionnaires de traduction', () => {
   it('conserve les mêmes marqueurs de substitution dans toutes les langues', () => {
     // Un {prenom} oublié en traduction afficherait une phrase amputée.
     const marqueurs = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort().join(',')
-    const plat = (o: unknown, p = ''): [string, string][] => {
-      if (typeof o !== 'object' || o === null) return []
-      return Object.entries(o).flatMap(([k, v]) => {
-        if (k.startsWith('$')) return []
-        const c = p ? `${p}.${k}` : k
-        if (typeof v === 'string') return [[c, v] as [string, string]]
-        return plat(v, c)
-      })
-    }
-    const refs = new Map(plat(fr).map(([c, v]) => [c, marqueurs(v)]))
+    const refs = new Map(chaines(fr).map(([c, v]) => [c, marqueurs(v)]))
 
     for (const [langue, dico] of Object.entries(AUTRES)) {
-      for (const [chemin, texte] of plat(dico)) {
+      for (const [chemin, texte] of chaines(dico)) {
         const attendu = refs.get(chemin)
         if (attendu === undefined) continue
         expect(marqueurs(texte), `${langue}.json → ${chemin}`).toBe(attendu)

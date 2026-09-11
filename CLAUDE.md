@@ -35,7 +35,7 @@ la commune ni avec l'école**.
 
 | Chemin | Rôle |
 | --- | --- |
-| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `moments.ts` (la journée telle qu'un parent la décrit ↔ les champs du stockage), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
+| `src/lib/` | Moteur pur, testé. `plan.ts` (calcul des trajets), `aujourdhui.ts` (ce que l'écran du jour retient d'une journée), `moments.ts` (la journée telle qu'un parent la décrit ↔ les champs du stockage), `calendrier.ts`, `urgences.ts`, `validation.ts`, `partage.ts`, `adresses.ts`. |
 | `src/composants/`, `src/pages/` | Affichage uniquement. Aucune règle métier. |
 | `src/data/` | Toutes les données : plan de bus, arrêts, écoles, vacances, adresses. |
 | `src/i18n/` | Dictionnaires de traduction. |
@@ -71,6 +71,11 @@ npm run typecheck && npm run build
 Sans `DATABASE_URL_TEST`, les tests de stockage **se sautent** au lieu d'échouer : la
 boucle courte doit rester lançable sans Docker. C'est aussi pourquoi la CI, elle, la
 pose toujours — un test qui se saute en silence ne protège rien s'il se saute partout.
+**88 tests sur 162 en dépendent**, et ce sont ceux de l'authentification, des capacités,
+de la limitation de débit, du SQL et du journal. Les lancer n'est pas optionnel avant de
+toucher au serveur : c'est en les lançant qu'on a découvert, le 2026-09-09, qu'un test
+de limitation de débit était faux. Sans Docker, voir la recette `embedded-postgres` à la
+fin de [docs/plan.md](docs/plan.md) — elle n'ajoute aucune dépendance au dépôt.
 
 ```bash
 docker compose up                            # la pile entière en local
@@ -97,9 +102,32 @@ implémentation des règles de validation aurait divergé au premier ajustement.
   auto-hébergée (GoatCounter retiré, onglet « Fréquentation » de `/edition`). **Tous les
   lots planifiés (0 à 28) sont faits.** **Le 2026-09-07** : la clé VAPID se lit à
   l'exécution sur `/sante` au lieu d'être figée au build, un jeton de session refusé
-  s'efface, `pull_policy: always` sur les deux images — et la section « Ouverture à la
-  commune » ouvre la mise en service du premier compte d'agent (les identités restent
-  hors dépôt, il est public). **À consulter avant d'entamer une évolution.**
+  s'efface, `pull_policy: always` sur les deux images — et **l'ouverture à la commune est
+  faite** : le premier compte d'agent est créé et le courriel d'accès envoyé (les
+  identités restent hors dépôt, il est public). **Le 2026-09-08** : la brochure 2026/2027
+  est relue — **aucun horaire de bus n'a changé**, mais les horaires de COURS passent par
+  cycle (ils ne l'étaient pas : l'application affichait à tout le monde ceux du précoce,
+  le seul cycle sans bus), la validité s'arrête au 2026-12-18 à cause du nouveau campus
+  annoncé pour janvier 2027, et la note « hall sportif le vendredi » devient une
+  incertitude. **Le 2026-09-08 (suite)** : une barrière d'erreur remplace l'écran blanc
+  qu'une exception au rendu laissait, l'écran « Aujourd'hui » a son horloge (son compte à
+  rebours dépendait d'un `fetch` pour avancer), ses règles sont passées dans
+  `src/lib/aujourdhui.ts`, les trois écrans qu'un parent utilise ont des tests, et le
+  paquet principal tombe de 728 à 488 ko — `/edition` et les quatre dictionnaires non
+  français sont chargés à la demande. **Le 2026-09-09** : les treize réserves de l'audit
+  (R58 à R70) sont soldées — le précoce ne reçoit plus d'horaire de bus, un C4 au
+  Dillendapp plus de trajet école → école, la carte attend un geste avant d'appeler
+  OpenStreetMap, les arrêts placés à la main redeviennent approximatifs, le pied de page
+  dit la vraie fin de validité, et `validerPlan` contrôle enfin les renvois d'incertitude
+  et de note, le champ `dessert` et les vitesses. Surtout : le dépôt a de nouveau un test
+  de contraste (`src/contraste.test.ts`, survols compris), et les 162 tests du serveur ont
+  tourné contre une vraie base — ce sont eux qui ont révélé qu'un test de sécurité était
+  faux. **Le 2026-09-11** : le banc navigateur a enfin été ouvert — neuf écrans en clair et
+  en sombre sous Chromium, 458 zones de texte mesurées au pixel par thème, zéro requête
+  OpenStreetMap avant le clic sur la carte. **R76 et R27 sont levées**, et les 162 tests du
+  serveur ont retourné contre une vraie base. Ce que le banc ne couvre pas reste écrit :
+  Safari et WebKit n'ont rien vu (R1, et le `:hover` collé qui motivait R69).
+  **À consulter avant d'entamer une évolution.**
 
   À la fin d'un lot, y consigner **tout ce qui n'a pas pu être vérifié** : la section
   « Réserves ouvertes » en tête de fichier, plus une ligne dans le bloc du lot. Une

@@ -5,6 +5,7 @@
  * traduit en texte lisible.
  */
 import type { Traduction } from '../i18n'
+import { isoDate } from './calendrier'
 import { arret as trouverArret, plan } from './donnees'
 import type { Arret, ArretDesservi, Ligne, Service, Trajet, TypeTrajet } from './types'
 
@@ -112,7 +113,10 @@ export function distanceLisible(metres: number): string {
 
 /** Le plan chargé est-il encore dans sa période de validité ? */
 export function planPerime(aujourdhui = new Date()): boolean {
-  return aujourdhui.toISOString().slice(0, 10) > plan.valideAu
+  // `toISOString()` rend une date UTC : à Luxembourg, le lendemain de l'échéance, le
+  // plan se serait dit valable jusqu'à 01:00 ou 02:00 du matin. `isoDate` existe
+  // précisément pour ce piège, et `valideAu` est une date locale. R66.
+  return isoDate(aujourdhui) > plan.valideAu
 }
 
 /** Liste lisible : « 2025/2026 et 2026/2027 ». */

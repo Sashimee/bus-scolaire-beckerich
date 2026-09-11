@@ -31,3 +31,6 @@ worker/.dev.vars
 
 # État local de `wrangler dev` : cache et KV de développement, propres à la machine.
 worker/.wrangler
+
+# État de reprise local, jamais commité.
+RESUME.md

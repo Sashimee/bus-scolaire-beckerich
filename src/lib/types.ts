@@ -78,8 +78,6 @@ export interface Service {
   periode: Periode
   jours: Jour[]
   arrets: ArretDesservi[]
-  /** `false` quand le plan ne détaille pas tous les horaires de la course. */
-  horaireComplet?: boolean
   /** Identifiant d'une incertitude déclarée dans le plan. */
   incertitude?: string
 }
@@ -107,12 +105,33 @@ export interface Incertitude {
   question: string
   hypothese: string
   aVerifierAupres: string
+  /**
+   * Les jours où l'incertitude pèse réellement. Absent = tous les jours de la course.
+   *
+   * Une course circule lundi, mercredi et vendredi ; l'ambiguïté du hall sportif ne
+   * concerne que le vendredi. Sans ce champ, elle s'affichait aussi le lundi et le
+   * mercredi — inquiéter pour un autre jour n'est pas informer.
+   */
+  jours?: Jour[]
 }
 
-export interface DemiJournee {
+/** Une plage de cours, telle que la brochure communale la publie. */
+export interface Creneau {
   debut: string
   fin: string
-  jours: Jour[]
+}
+
+/**
+ * Le rythme scolaire de la commune.
+ *
+ * Les JOURS sont communs : la brochure énonce une seule fois qu'il n'y a pas cours les
+ * mardis et jeudis après-midi. Les HEURES, elles, diffèrent d'un site à l'autre — un
+ * enfant de Noerdange sort à 12:05, un enfant de Beckerich à 12:00 — et c'est le cycle
+ * qui décide lequel s'applique.
+ */
+export interface HorairesEcole {
+  jours: { matin: Jour[]; apresMidi: Jour[] }
+  parCycle: Record<Cycle, { matin: Creneau; apresMidi: Creneau }>
 }
 
 export interface Plan {
@@ -130,7 +149,7 @@ export interface Plan {
     confirmationOrale?: boolean
     noteConfirmation?: string
   }
-  horairesEcole: { matin: DemiJournee; apresMidi: DemiJournee }
+  horairesEcole: HorairesEcole
   incertitudes: Incertitude[]
   lignes: Ligne[]
 }

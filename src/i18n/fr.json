@@ -70,7 +70,8 @@
     "matin": "Le matin",
     "midi": "Le midi",
     "soir": "Après la classe",
-    "aPiedAide": "L'arrêt le plus proche de chez vous est celui de l'école : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici."
+    "aPiedAide": "L'arrêt le plus proche de chez vous est celui de l'école : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici.",
+    "sansTransportAide": "Le {cycle} n'est pas desservi par le transport scolaire : aucun trajet en bus n'est prévu, il n'y a donc rien à régler ici."
   },
   "matin": {
     "question": "Le matin, comment {prenom} se rend à l'école ?",
@@ -177,6 +178,8 @@
     "aucunArret": "Aucun arrêt ne dessert l'école de cet enfant depuis votre adresse. Vérifiez le plan officiel.",
     "aPied": "Pas de bus : l’école est juste à côté",
     "aPiedDetail": "Votre adresse se trouve à environ {minutes} min à pied de {site}. Aucun trajet en bus n’est prévu pour {prenom} : l’arrêt le plus proche est celui de l’école elle-même.",
+    "sansTransport": "Pas de bus : le {cycle} n’est pas desservi",
+    "sansTransportDetail": "Le transport scolaire ne dessert pas le {cycle}. {prenom} est scolarisé à {site}, mais aucun bus n’y conduit : c’est à vous de l’y amener et de venir le rechercher.",
     "sansPrenom": "Enfant sans prénom",
     "calquerSur": "Configuration de départ",
     "commeLui": "Comme {prenom}",
@@ -312,11 +315,11 @@
     "voir-aller-3": "Huttange n'est pas desservi par cette ligne : voir l'horaire « Aller Bus 3 ».",
     "huttange-retour-dillendapp-1345": "Les enfants de Huttange peuvent prendre le bus « Retour Bus Dillendapp » à 13:45 à Huttange.",
     "depart-non-precise": "Le plan officiel ne précise pas l'arrêt exact de ce départ à Beckerich.",
-    "vendredi-hall-sportif": "Le vendredi, le départ se fait depuis le hall sportif et non depuis l'école.",
     "horaire-intermediaire-non-publie": "Le plan officiel ne publie pas l'heure de passage à cet arrêt."
   },
   "incertitudes": {
-    "titre": "Point non tranché par le plan officiel"
+    "titre": "Point non tranché par le plan officiel",
+    "depart-midi-vendredi-hall-sportif": "Le plan précédent indiquait un départ depuis le hall sportif le vendredi ; celui de 2026/2027 ne le dit plus. L'application suit le plan en vigueur : départ de l'école de Noerdange. À vérifier auprès de la commune."
   },
   "calendrier": {
     "titre": "Ajouter à un agenda",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Fiche générée le {date}",
     "aPied": "À pied",
+    "sansTransport": "Pas de bus",
     "famille": "Imprimer toute la famille",
     "familleTitre": "Bus scolaire — la semaine",
     "familleAide": "Une seule page A4 : les cinq jours en lignes, un enfant par colonne."
@@ -413,8 +417,9 @@
   "carte": {
     "titre": "Trajet à pied",
     "domicile": "Domicile",
-    "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne.",
-    "ouvrirItineraire": "Ouvrir l'itinéraire"
+    "afficher": "Afficher la carte du trajet",
+    "avertissement": "La carte n’est chargée que si vous la demandez : ses tuiles viennent alors d’OpenStreetMap, qui voit la zone affichée — donc les environs de votre domicile. Ni votre adresse ni les prénoms ne lui sont envoyés.",
+    "horsLigne": "La carte nécessite une connexion. Le reste de l'application fonctionne hors ligne."
   },
   "reglages": {
     "titre": "Réglages",
@@ -442,12 +447,14 @@
     "circule": "Circule",
     "reserve": "Ligne réservée",
     "horairesEcole": "Horaires de l'école",
-    "horairesEcoleDetail": "Cours de {matinDebut} à {matinFin} du lundi au vendredi, et de {apresMidiDebut} à {apresMidiFin} les lundi, mercredi et vendredi.",
+    "horairesEcoleJours": "Cours le matin : {matin}. Cours l'après-midi : {apresMidi}. Les heures de sortie diffèrent d'une école à l'autre.",
+    "cycle": "Cycle",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Horaires indicatifs",
     "avertissementHorairesDetail": "Les horaires sont donnés à titre indicatif et peuvent varier légèrement en fonction des conditions de circulation. Nous vous recommandons d'être à l'arrêt 5 minutes avant l'heure prévue. En cas de modification exceptionnelle des horaires (intempéries, travaux, etc.), les parents sont informés par email ou via l'école."
   },
   "validite": {
-    "couverte": "Plan valable pour {annees}",
+    "jusquau": "Plan valable jusqu’au {date}",
     "confirme": "Confirmé par {personne} en {date}.",
     "confirmeOral": "Cette confirmation étant orale, elle reste à revérifier à chaque rentrée.",
     "perime": "Attention : ce plan a dépassé sa période de validité déclarée ({fin}). Vérifiez le plan officiel avant de vous y fier.",
@@ -471,7 +478,7 @@
     "adressesTitre": "Les adresses par jour ne fonctionnent que dans la commune",
     "adressesCorps": "Vous pouvez indiquer, pour un jour donné, une adresse de départ ou d'arrivée différente de votre domicile. La recherche d'adresse ne connaît toutefois que la commune de Beckerich : pour un lieu situé en dehors, indiquez directement l'arrêt utilisé, plutôt que de laisser le site deviner.",
     "donneesTitre": "Vos données restent chez vous",
-    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement : ni compte, ni serveur qui les reçoive. Un compteur de visites, hébergé sur notre propre serveur (aucun service tiers), reçoit la page consultée et rien d'autre — ni cookie, ni aucune des données que vous avez saisies. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez.",
+    "donneesCorps": "L'adresse et les prénoms sont enregistrés sur votre appareil uniquement : ni compte, ni serveur qui les reçoive. Un compteur de visites, hébergé sur notre propre serveur (aucun service tiers), reçoit la page consultée et rien d'autre — ni cookie, ni aucune des données que vous avez saisies. Un lien de partage transporte les données dans son fragment, que le serveur ne reçoit jamais. Si vous activez les notifications, un identifiant d'appareil anonyme est enregistré sur un serveur le temps de l'abonnement, et supprimé dès que vous le désactivez. La carte du trajet, elle, n'est chargée que si vous la demandez : ses tuiles viennent alors d'OpenStreetMap, qui voit la zone affichée — donc les environs de votre domicile — mais ni votre adresse, ni les prénoms.",
     "notificationsTitre": "Notifications",
     "notificationsCorps": "Elles préviennent d'une annulation ou d'un retard, mais rien ne garantit qu'elles arrivent : téléphone éteint, mode Ne pas déranger, service de notification en panne. Une application web ne peut pas non plus se déclarer prioritaire d'elle-même. L'école et la commune restent la voie d'information officielle ; cette application ne les remplace pas."
   },
@@ -544,6 +551,16 @@
     "version": "Version {version}",
     "horsLigne": "Hors ligne — les horaires restent consultables."
   },
+  "panne": {
+    "titre": "L'application s'est arrêtée",
+    "explication": "Un défaut d'affichage a interrompu la page. Vos données n'ont pas bougé : elles sont sur cet appareil, et rien n'a été envoyé.",
+    "recharger": "Recharger la page",
+    "horaires": "Voir les horaires officiels",
+    "detail": "Détail technique",
+    "effacer": "Si la panne revient à chaque ouverture",
+    "effacerConfirmation": "Effacer l'adresse, les enfants et les préférences enregistrés sur cet appareil ? La saisie sera à refaire.",
+    "effacerConfirmer": "Effacer et repartir de zéro"
+  },
   "commun": {
     "fermer": "Fermer",
     "modifier": "Modifier",
@@ -580,7 +597,7 @@
     "nonSupportees": "Ce navigateur ne prend pas en charge les notifications.",
     "nonConfigurees": "Les notifications ne sont pas encore activées sur ce site.",
     "iosNote": "Sur iPhone et iPad, les notifications ne fonctionnent que si l'application a été ajoutée à l'écran d'accueil.",
-    "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. C'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
+    "confidentialite": "Activer les notifications enregistre un identifiant d'appareil anonyme sur un serveur, le temps de l'abonnement. En dehors de la carte du trajet, que vous n'affichez que si vous la demandez, c'est la seule donnée qui quitte votre téléphone, et elle est supprimée dès que vous vous désabonnez.",
     "erreur": "L'abonnement a échoué. Réessayez plus tard.",
     "recevoir": "Ce que je veux recevoir",
     "preference": {

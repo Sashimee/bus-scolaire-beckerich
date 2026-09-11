@@ -11,6 +11,7 @@ import vacancesJson from '../data/vacances-lu.json'
 import transportJson from '../data/transport-a-la-demande.json'
 import type {
   Arret,
+  Creneau,
   Cycle,
   CycleScolaire,
   MaisonRelais,
@@ -102,6 +103,12 @@ export function siteDuCycle(id: Cycle): SiteScolaire {
  *  alors savoir où l'enfant est scolarisé. */
 const CYCLES_SANS_BUS: Cycle[] = ['precoce']
 
+/** Ce cycle est-il privé de transport scolaire ? À consulter par le moteur AVANT de
+ *  chercher un bus : sans quoi le plan en trouve, et l'application affirme du faux. */
+export function cycleSansBus(id: Cycle): boolean {
+  return CYCLES_SANS_BUS.includes(id)
+}
+
 /** Les cycles offerts au choix d'un parent, `actuel` en tête s'il n'en fait plus partie
  *  — sans quoi une liste déroulante afficherait un cycle que l'enfant n'a pas. */
 export function cyclesProposes(actuel: Cycle): Cycle[] {
@@ -112,6 +119,14 @@ export function cyclesProposes(actuel: Cycle): Cycle[] {
 /** L'arrêt « école » desservi pour un cycle donné. */
 export function arretEcoleDuCycle(id: Cycle): Arret {
   return arret(cycleScolaire(id).arretEcole)
+}
+
+/** Les heures de cours d'un cycle. Elles varient d'un site à l'autre : un enfant de
+ *  Noerdange sort à 12:05, un enfant de Beckerich à 12:00. */
+export function horairesDuCycle(id: Cycle): { matin: Creneau; apresMidi: Creneau } {
+  const h = plan.horairesEcole.parCycle[id]
+  if (!h) throw new Error(`Horaires de cours inconnus pour le cycle : ${id}`)
+  return h
 }
 
 /** L'incertitude déclarée dans le plan, si elle existe. */

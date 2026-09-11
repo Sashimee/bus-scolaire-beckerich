@@ -3,11 +3,11 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { ChampAdresse } from './ChampAdresse'
 import { ChoixSemaine, HeureSemaine, type OptionChoix } from './ChoixSemaine'
-import { coursApresMidi, trajetsDuJour } from '../lib/plan'
+import { aucunBus, coursApresMidi, trajetsDuJour } from '../lib/plan'
 import { nomArret, sensTrajet } from '../lib/affichage'
-import { maisonRelais, plan } from '../lib/donnees'
+import { horairesDuCycle, maisonRelais } from '../lib/donnees'
 import {
-  JOURS_MIDI,
+  joursMidi,
   adresseProposable,
   borneMatin,
   borneSoir,
@@ -65,7 +65,7 @@ function ApercuMoment({ enfant, moment }: { enfant: Enfant; moment: Moment }) {
   const { t } = useT()
   const { contextes } = useFoyer()
   const ctx = contextes.get(enfant.id) ?? null
-  if (!ctx || ctx.marcheDirecte) return null
+  if (!ctx || aucunBus(ctx)) return null
 
   const lignes = JOURS.map((jour) => {
     const journee = trajetsDuJour(ctx, jour)
@@ -173,16 +173,20 @@ function AdressesMoment({ enfant, sens }: { enfant: Enfant; sens: SensAdresse })
   )
 }
 
-/** L'école est l'arrêt le plus proche : il n'y a aucun bus à régler. */
-function APied({ enfant }: { enfant: Enfant }) {
+/** Aucun bus à régler : l'école est l'arrêt le plus proche, ou le cycle n'est pas
+ *  desservi. Les deux cas se disent différemment, c'est tout ce qui les sépare ici. */
+function SansBus({ enfant }: { enfant: Enfant }) {
   const { t } = useT()
   const { contextes } = useFoyer()
   const ctx = contextes.get(enfant.id) ?? null
-  if (!ctx?.marcheDirecte) return null
+  if (!ctx || !aucunBus(ctx)) return null
+  const cycle = t(`cycles.${enfant.cycle}`)
   return (
     <div className="encart encart--info">
-      <div className="encart__titre">{t('enfant.aPied')}</div>
-      {t('moments.aPiedAide')}
+      <div className="encart__titre">
+        {ctx.sansTransport ? t('enfant.sansTransport', { cycle }) : t('enfant.aPied')}
+      </div>
+      {ctx.sansTransport ? t('moments.sansTransportAide', { cycle }) : t('moments.aPiedAide')}
     </div>
   )
 }
@@ -195,7 +199,7 @@ export function SectionMatin({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const arret = ctx ? nomArret(ctx.arretDomicile, t) : null
   const options: OptionChoix<ChoixMatin>[] = [
@@ -256,14 +260,14 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const options: OptionChoix<ChoixMidi>[] = [
     {
       valeur: 'maison',
       libelle: t('midi.maison'),
       court: t('midi.maisonCourt'),
-      aide: t('midi.maisonAide', { heure: plan.horairesEcole.apresMidi.debut }),
+      aide: t('midi.maisonAide', { heure: horairesDuCycle(enfant.cycle).apresMidi.debut }),
     },
     {
       valeur: 'relais',
@@ -274,7 +278,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
   ]
 
   // Les jours sans cours l'après-midi ne sont pas dans la grille : la classe s'y
-  // arrête à 11:45 et c'est la question suivante qui décide du repas. Le dire, plutôt
+  // arrête à midi et c'est la question suivante qui décide du repas. Le dire, plutôt
   // que de laisser croire à un oubli.
   const sansApresMidi = JOURS.filter((j) => !coursApresMidi(j))
 
@@ -283,7 +287,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
       <ChoixSemaine
         id={`${enfant.id}-midi`}
         legende={t('midi.question', { prenom })}
-        jours={JOURS_MIDI}
+        jours={joursMidi()}
         options={options}
         valeurDuJour={(jour) => midiDuJour(enfant, jour)}
         onRepondre={(jours, choix) => definirMidi(enfant.id, jours, choix)}
@@ -292,7 +296,7 @@ export function SectionMidi({ enfant }: { enfant: Enfant }) {
       <p className="champ__aide">
         {t('midi.sansApresMidi', {
           jours: sansApresMidi.map((j) => t(`jours.${j}`)).join(' · '),
-          heure: plan.horairesEcole.matin.fin,
+          heure: horairesDuCycle(enfant.cycle).matin.fin,
         })}
       </p>
 
@@ -310,7 +314,7 @@ export function SectionSoir({ enfant }: { enfant: Enfant }) {
   const ctx = contextes.get(enfant.id) ?? null
   const prenom = enfant.prenom.trim() || t('enfant.sansPrenom')
 
-  if (ctx?.marcheDirecte) return <APied enfant={enfant} />
+  if (ctx && aucunBus(ctx)) return <SansBus enfant={enfant} />
 
   const options: OptionChoix<ChoixSoir>[] = [
     { valeur: 'bus', libelle: t('soir.bus'), court: t('soir.busCourt'), aide: t('soir.busAide') },

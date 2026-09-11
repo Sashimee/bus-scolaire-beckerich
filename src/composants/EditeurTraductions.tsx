@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { LANGUES, NOMS_LANGUES, useT, type Langue } from '../i18n'
 import fr from '../i18n/fr.json'
-import { valeurCompilee } from '../i18n/dictionnaires'
+import { valeurCompilee } from '../i18n/tous-dictionnaires'
 import {
   motifRefus,
   valeurDeReference,

@@ -47,15 +47,36 @@ C'est le cas le plus fréquent, à chaque rentrée.
      "confirmationOrale": false
    }
    ```
-5. **Corriger les horaires** ligne par ligne en comparant au PDF. Chaque arrêt s'écrit :
+5. **Relever les horaires de cours**, qui ne sont pas les mêmes d'une école à l'autre.
+   Ils sont publiés dans les pages « cycles » de la brochure, pas dans les tableaux de
+   bus, et vivent dans `horairesEcole` :
+   ```json
+   "horairesEcole": {
+     "jours": {
+       "matin": ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+       "apresMidi": ["lundi", "mercredi", "vendredi"]
+     },
+     "parCycle": {
+       "c2": {
+         "matin": { "debut": "08:00", "fin": "12:05" },
+         "apresMidi": { "debut": "14:00", "fin": "15:55" }
+       }
+     }
+   }
+   ```
+   Les **cinq** cycles sont obligatoires, `precoce` compris : sans eux, la validation
+   refuse le plan. Les **jours** sont communs à tous les cycles — la brochure ne dit
+   qu'une fois qu'il n'y a pas cours les mardis et jeudis après-midi.
+6. **Corriger les horaires de bus** ligne par ligne en comparant au PDF. Chaque arrêt
+   s'écrit :
    ```json
    { "arret": "noerdange-gare", "heure": "07:28" }
    ```
    Mettez `"heure": null` si le plan n'indique pas d'heure à cet arrêt.
-6. **Faire pointer l'application** sur le nouveau fichier : dans `src/lib/donnees.ts`,
+7. **Faire pointer l'application** sur le nouveau fichier : dans `src/lib/donnees.ts`,
    remplacer `plan-2025-2026.json` par `plan-2026-2027.json`. C'est la seule ligne de
    code à toucher.
-7. Mettre à jour le lien du PDF dans `src/pages/Plan.tsx` et `src/pages/Infos.tsx`
+8. Mettre à jour le lien du PDF dans `src/pages/Plan.tsx` et `src/pages/Infos.tsx`
    (`plan-bus-2025-2026.pdf` → `plan-bus-2026-2027.pdf`).
 
 ### Si le plan n'a pas changé
@@ -181,3 +202,9 @@ plus tard sur quoi elles reposent :
 
 - **L'arrêt du départ de 13:25 à Beckerich (Aller 1)** n'est pas nommé dans le plan :
   s'agit-il de l'école, du Dillendapp ou d'un autre point ?
+- **Le bus Dillendapp de midi part-il du hall sportif le vendredi ?** Le plan 2025/2026
+  le disait, celui de 2026/2027 ne le dit plus sans annoncer de changement. Consigné
+  comme incertitude `depart-midi-vendredi-hall-sportif`.
+- **Quand le nouveau campus ouvre-t-il, et quel plan de bus l'accompagne ?** Annoncé pour
+  janvier 2027, sous réserve ; la validité du plan s'arrête au 18 décembre 2026 en
+  attendant.

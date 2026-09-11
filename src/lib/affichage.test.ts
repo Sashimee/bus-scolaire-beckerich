@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { alignerServices, destinationTrajet, distanceLisible, sensTrajet } from './affichage'
+import {
+  alignerServices,
+  destinationTrajet,
+  distanceLisible,
+  planPerime,
+  sensTrajet,
+} from './affichage'
 import { plan } from './donnees'
 import type { TypeTrajet } from './types'
 
@@ -86,5 +92,20 @@ describe('distances lisibles', () => {
 
   it('passe en kilomètres au-delà du kilomètre', () => {
     expect(distanceLisible(1240)).toBe('1,2 km')
+  })
+})
+
+describe('fin de validité du plan', () => {
+  // R66 : `planPerime` comparait `toISOString()` — une date UTC — à `valideAu`, qui
+  // est une date locale. À Luxembourg, le plan se disait encore valable pendant les
+  // deux premières heures du lendemain de son échéance.
+  const [annee, mois, jour] = plan.valideAu.split('-').map(Number)
+
+  it('tient jusqu’au dernier instant du jour d’échéance', () => {
+    expect(planPerime(new Date(annee, mois - 1, jour, 23, 59))).toBe(false)
+  })
+
+  it('se déclare périmé dès la première minute du lendemain, heure locale', () => {
+    expect(planPerime(new Date(annee, mois - 1, jour + 1, 0, 30))).toBe(true)
   })
 })

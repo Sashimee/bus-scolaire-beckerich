@@ -2,7 +2,7 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { arretCoteFamille, destinationTrajet, nomArret } from '../lib/affichage'
 import { plan, siteDuCycle } from '../lib/donnees'
-import { semaineEnfant, type ContexteEnfant } from '../lib/plan'
+import { aucunBus, semaineEnfant, type ContexteEnfant } from '../lib/plan'
 import { JOURS } from '../lib/types'
 import type { Jour, TypeTrajet } from '../lib/types'
 
@@ -164,8 +164,8 @@ export function FicheFoyer({ contextes }: { contextes: ContexteEnfant[] }) {
                       {t(`cycles.${ctx.enfant.cycle}`)} · {siteDuCycle(ctx.enfant.cycle).nom}
                     </span>
                     <span className="fiche__ligne">
-                      {ctx.marcheDirecte
-                        ? t('impression.aPied')
+                      {aucunBus(ctx)
+                        ? t(`impression.${ctx.sansTransport ? 'sansTransport' : 'aPied'}`)
                         : `${nomArret(ctx.arretDomicile, t)} · ${t('enfant.tempsMarche', {
                             minutes: ctx.temps,
                           })}`}
@@ -180,8 +180,10 @@ export function FicheFoyer({ contextes }: { contextes: ContexteEnfant[] }) {
                   <th scope="row">{t(`jours.${jour}`)}</th>
                   {page.map((ctx) => (
                     <td key={ctx.enfant.id}>
-                      {ctx.marcheDirecte ? (
-                        <span className="fiche__vide">{t('impression.aPied')}</span>
+                      {aucunBus(ctx) ? (
+                        <span className="fiche__vide">
+                          {t(`impression.${ctx.sansTransport ? 'sansTransport' : 'aPied'}`)}
+                        </span>
                       ) : (
                         <CelluleJour ctx={ctx} jour={jour} />
                       )}

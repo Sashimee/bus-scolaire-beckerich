@@ -19,6 +19,40 @@ import { empreinte } from '../crypto.ts'
 export const PREFERENCES = ['urgences', 'urgences-rappels', 'tout'] as const
 export const PREFERENCE_DEFAUT = 'urgences-rappels'
 
+/**
+ * Les services de push que nous acceptons d'appeler.
+ *
+ * Un endpoint arrive d'un inconnu — `POST /abonner` n'exige aucun compte — et
+ * `envois.ts` en fait un `fetch` à chaque notification. Sans cette liste, n'importe
+ * qui faisait émettre au serveur une requête vers l'adresse de son choix, y compris
+ * une adresse interne à la VPS, et en relisait le début de la réponse dans le rapport
+ * d'envoi. Le sous-domaine varie (`updates.push.services.mozilla.com`,
+ * `wns2-*.notify.windows.com`) : on compare donc sur le suffixe, jamais sur l'égalité
+ * seule. Voir la réserve R58.
+ */
+const HOTES_PUSH = [
+  'android.googleapis.com',
+  'fcm.googleapis.com',
+  'web.push.apple.com',
+  'push.services.mozilla.com',
+  'notify.windows.com',
+] as const
+
+/** Vrai si `endpoint` est une URL d'un service de push connu, appelable sans risque. */
+export function endpointAcceptable(endpoint: string): boolean {
+  let url: URL
+  try {
+    url = new URL(endpoint)
+  } catch {
+    return false
+  }
+  // Un port ou des identifiants dans l'URL ne servent à aucun service de push : les
+  // refuser ferme le détournement vers un autre service du même hôte.
+  if (url.protocol !== 'https:' || url.port || url.username || url.password) return false
+  const hote = url.hostname.toLowerCase()
+  return HOTES_PUSH.some((h) => hote === h || hote.endsWith(`.${h}`))
+}
+
 export interface Abonnement {
   endpointHash: string
   endpoint: string

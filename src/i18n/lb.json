@@ -70,7 +70,8 @@
     "matin": "De Moien",
     "midi": "De Mëtteg",
     "soir": "Nom Cours",
-    "aPiedAide": "Déi nooste Statioun ass déi vun der Schoul: et ass keng Busfaart virgesinn, hei ass also näischt anzestellen."
+    "aPiedAide": "Déi nooste Statioun ass déi vun der Schoul: et ass keng Busfaart virgesinn, hei ass also näischt anzestellen.",
+    "sansTransportAide": "Fir {cycle} gëtt et kee Schoultransport: et ass keng Busfaart virgesinn, hei ass also näischt anzestellen."
   },
   "matin": {
     "question": "Wéi kënnt {prenom} moies an d'Schoul?",
@@ -177,6 +178,8 @@
     "aucunArret": "Vun Ärer Adress aus bedéngt keng Statioun d'Schoul vun dësem Kand. Kuckt w.e.g. den offizielle Plang no.",
     "aPied": "Kee Bus: d’Schoul ass direkt niewendrun",
     "aPiedDetail": "Är Adress ass ongeféier {minutes} Min. zu Fouss vu(n) {site} ewech. Fir {prenom} ass keng Busfaart virgesinn: déi nooste Statioun ass déi vun der Schoul selwer.",
+    "sansTransport": "Kee Bus: fir {cycle} gëtt et kee Schoultransport",
+    "sansTransportDetail": "De Schoultransport bedéngt {cycle} net. {prenom} ass zu {site} an der Schoul, mee kee Bus féiert dohin: Dir musst Äert Kand selwer hibréngen a rëm ofhuelen.",
     "sansPrenom": "Kand ouni Virnumm",
     "calquerSur": "Ufanksastellung",
     "commeLui": "Wéi {prenom}",
@@ -312,11 +315,11 @@
     "voir-aller-3": "Hüttingen gëtt vun dëser Linn net bedéngt: kuckt den Horaire „Aller Bus 3“.",
     "huttange-retour-dillendapp-1345": "Kanner aus Hüttingen kënnen de Bus „Retour Bus Dillendapp“ um 13:45 zu Hüttingen huelen.",
     "depart-non-precise": "Den offizielle Plang nennt déi genee Statioun vun dëser Offahrt zu Biekerech net.",
-    "vendredi-hall-sportif": "Freides ass d'Offahrt bei der Sportshal an net bei der Schoul.",
     "horaire-intermediaire-non-publie": "Den offizielle Plang publizéiert fir dës Statioun keng Auerzäit."
   },
   "incertitudes": {
-    "titre": "Vum offizielle Plang net gekläert"
+    "titre": "Vum offizielle Plang net gekläert",
+    "depart-midi-vendredi-hall-sportif": "De virege Plang huet freides eng Offahrt bei der Sportshal genannt; de Plang 2026/2027 seet dat net méi. D'Applikatioun follegt dem gëltege Plang: Offahrt bei der Schoul zu Noerdange. Bei der Gemeng nozefroen."
   },
   "calendrier": {
     "titre": "An e Kalenner derbäisetzen",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Blat erstallt den {date}",
     "aPied": "Zu Fouss",
+    "sansTransport": "Kee Bus",
     "famille": "Ganz Famill drécken",
     "familleTitre": "Schoulbus — d'Woch",
     "familleAide": "Eng eenzeg A4-Säit: déi fënnef Deeg als Zeilen, ee Kand pro Kolonn."
@@ -413,8 +417,9 @@
   "carte": {
     "titre": "Wee zu Fouss",
     "domicile": "Doheem",
-    "horsLigne": "D'Kaart brauch eng Verbindung. De Rescht vun der App funktionéiert offline.",
-    "ouvrirItineraire": "Streck opmaachen"
+    "afficher": "D’Kaart vum Wee weisen",
+    "avertissement": "D’Kaart gëtt nëmme gelueden, wann Dir se ufrot: hir Kachele kommen dann vun OpenStreetMap, dat de gewisene Beräich gesäit — also d’Ëmgéigend vun Ärer Wunneng. Weder Är Adress nach d’Virnimm gi geschéckt.",
+    "horsLigne": "D'Kaart brauch eng Verbindung. De Rescht vun der App funktionéiert offline."
   },
   "reglages": {
     "titre": "Astellungen",
@@ -442,12 +447,14 @@
     "circule": "Fiert",
     "reserve": "Linn reservéiert",
     "horairesEcole": "Schoulziichten",
-    "horairesEcoleDetail": "Cours vun {matinDebut} bis {matinFin} vu méindes bis freides, a vun {apresMidiDebut} bis {apresMidiFin} méindes, mëttwochs a freides.",
+    "horairesEcoleJours": "Cours moies: {matin}. Cours nomëttes: {apresMidi}. D'Schlusszäite sinn net an all Schoul déiselwecht.",
+    "cycle": "Zyklus",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Indikativ Zäiten",
     "avertissementHorairesDetail": "D'Auerzäite si just indikativ a kënne liicht variéieren no de Verkéiersbedéngungen. Mir recommandéieren, 5 Minutte virun der virgesinner Zäit op der Arrêt ze sinn. Bei aussergewéinlechen Ännerungen (schlecht Wieder, Aarbechten asw.) ginn d'Eltere per E-Mail oder iwwer d'Schoul informéiert."
   },
   "validite": {
-    "couverte": "Plang gëlteg fir {annees}",
+    "jusquau": "Plang gëlteg bis den {date}",
     "confirme": "Bestätegt vum {personne} am {date}.",
     "confirmeOral": "Well dës Bestätegung mëndlech war, muss se bei all Rentrée nei nogepréift ginn.",
     "perime": "Opgepasst: dëse Plang huet seng ugewisen Gëltegkeetsperiod iwwerschratt ({fin}). Kuckt den offizielle Plang no, ier Dir Iech drop verloosst.",
@@ -471,7 +478,7 @@
     "adressesTitre": "Adresse pro Dag funktionéieren nëmmen an der Gemeng",
     "adressesCorps": "Dir kënnt fir e bestëmmten Dag eng aner Ufanks- oder Ukunftsadress wéi Äre Wunnsëtz uginn. D'Adressiche kennt awer nëmmen d'Gemeng Biekerech: fir e Plaz baussent der Gemeng gitt direkt den Arrêt un, deen Dir benotzt, amplaz d'Säit roden ze loossen.",
     "donneesTitre": "Är Donnéeë bleiwen bei Iech",
-    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert: kee Konto, kee Server, deen se kritt. E Besucherzieler op eisem eegene Server (kee Drëttdéngscht) kritt déi opgeruff Säit an soss näischt — kee Cookie a keng vun de Donnéeën, déi Dir aginn hutt. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparat-Kennung fir d'Dauer vum Abonnement op engem Server gespäichert a beim Ausschalte geläscht.",
+    "donneesCorps": "Adress a Virnimm ginn nëmmen op Ärem Apparat gespäichert: kee Konto, kee Server, deen se kritt. E Besucherzieler op eisem eegene Server (kee Drëttdéngscht) kritt déi opgeruff Säit an soss näischt — kee Cookie a keng vun de Donnéeën, déi Dir aginn hutt. E Deele-Link dréit d'Donnéeën a sengem Fragment, dat de Server ni kritt. Wann Dir d'Notifikatiounen aschalt, gëtt eng anonym Apparat-Kennung fir d'Dauer vum Abonnement op engem Server gespäichert a beim Ausschalte geläscht. D'Weekaart gëtt nëmme gelueden, wann Dir se ufrot: hir Kachele kommen dann vun OpenStreetMap, dat de gewisene Beräich gesäit — also d'Ëmgéigend vun Ärer Wunneng — mee weder Är Adress nach d'Virnimm.",
     "notificationsTitre": "Notifikatiounen",
     "notificationsCorps": "Si mellen eng Annulatioun oder e Retard, mä näischt garantéiert, datt se ukommen: Telefon aus, Net stéieren, Panne beim Push-Déngscht. Eng Web-Applikatioun kann sech och net selwer als prioritär deklaréieren. D'Schoul an d'Gemeng bleiwen den offiziellen Informatiounswee; dës Applikatioun ersetzt se net."
   },
@@ -544,6 +551,16 @@
     "version": "Versioun {version}",
     "horsLigne": "Offline — d'Ziichte bleiwen ofrufbar."
   },
+  "panne": {
+    "titre": "D'Applikatioun ass ofgebrach",
+    "explication": "E Feeler beim Uweisen huet d'Säit ofgebrach. Är Donnéeë sinn onverännert: si leien op dësem Apparat, a näischt gouf geschéckt.",
+    "recharger": "Säit nei lueden",
+    "horaires": "Offiziell Ziichte kucken",
+    "detail": "Technesch Detailer",
+    "effacer": "Wann de Feeler bei all Opmaachen erëmkënnt",
+    "effacerConfirmation": "Adress, Kanner an Astellungen op dësem Apparat läschen? Alles muss dann nei agitipt ginn.",
+    "effacerConfirmer": "Läschen an nei ufänken"
+  },
   "commun": {
     "fermer": "Zoumaachen",
     "modifier": "Änneren",
@@ -580,7 +597,7 @@
     "nonSupportees": "Dëse Browser ënnerstëtzt keng Notifikatiounen.",
     "nonConfigurees": "D'Notifikatioune sinn op dëser Säit nach net ariicht.",
     "iosNote": "Um iPhone an iPad funktionéieren d'Notifikatioune nëmmen, wann d'App op den Home-Bildschierm gesat gouf.",
-    "confidentialite": "D'Aschalte späichert eng anonym Apparatkennung op engem Server, sou laang wéi den Abonnement dauert. Dat ass déi eenzeg Donnée, déi Äert Telefon verléisst, a si gëtt beim Ofmelle geläscht.",
+    "confidentialite": "D'Aschalte späichert eng anonym Apparatkennung op engem Server, sou laang wéi den Abonnement dauert. Ausser der Weekaart, déi Dir nëmmen op Ufro weist, ass dat déi eenzeg Donnée, déi Äert Telefon verléisst, a si gëtt beim Ofmelle geläscht.",
     "erreur": "Den Abonnement huet net geklappt. Probéiert w.e.g. méi spéit nach eng Kéier.",
     "recevoir": "Wat ech kréie wëll",
     "preference": {

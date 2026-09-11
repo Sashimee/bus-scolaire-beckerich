@@ -6,7 +6,16 @@
  * Une erreur ici ferait rater un bus à un enfant : c'est le fichier le plus testé.
  */
 import { distanceMarche, distanceVolOiseau, tempsMarche } from './distance'
-import { arret, arretEcoleDuCycle, arrets, maisonRelais, plan } from './donnees'
+import {
+  arret,
+  arretEcoleDuCycle,
+  arrets,
+  cycleSansBus,
+  horairesDuCycle,
+  incertitude,
+  maisonRelais,
+  plan,
+} from './donnees'
 import type {
   Adresse,
   Arret,
@@ -122,11 +131,18 @@ function meilleurePaire(
   depuis: string[],
   vers: string[],
   utilisable: (a: ArretDesservi) => boolean,
+  /** Ne monter qu'à cette minute ou après. `null` = aucune contrainte. */
+  auPlusTot: number | null,
 ): { i: number; j: number } | null {
   let meilleur: { i: number; j: number } | null = null
   for (let i = 0; i < service.arrets.length; i++) {
     if (!depuis.includes(service.arrets[i].arret)) continue
     if (!utilisable(service.arrets[i])) continue
+    // La contrainte d'heure porte sur la MONTÉE, donc sur le choix de la paire. Filtrer
+    // la liaison une fois formée écartait la course entière alors qu'un second passage
+    // au même arrêt restait prenable : l'Aller 3 dessert le Dillendapp deux fois. R66.
+    const montee = enMinutes(service.arrets[i].heure)
+    if (auPlusTot !== null && montee !== null && montee < auPlusTot) continue
     for (let j = i + 1; j < service.arrets.length; j++) {
       if (!vers.includes(service.arrets[j].arret)) continue
       if (!utilisable(service.arrets[j])) continue
@@ -160,6 +176,11 @@ interface RechercheOptions {
 function liaisons(o: RechercheOptions): Liaison[] {
   const trouvees: Liaison[] = []
 
+  // Une course déjà partie quand l'enfant arrive ne lui sert à rien. Les heures non
+  // publiées échappent au filtre : on ne peut rien en dire, et les écarter reviendrait
+  // à affirmer que la course ne convient pas.
+  const seuil = enMinutes(o.apres ?? null)
+
   // Un arrêt n'est empruntable que s'il est réellement desservi et que sa restriction
   // propre est satisfaite : le plan liste par exemple Huttange sur l'Aller 2 sans le
   // desservir, et n'ouvre le départ de 07:25 sur l'Aller 1 qu'aux cycles 3.
@@ -176,7 +197,7 @@ function liaisons(o: RechercheOptions): Liaison[] {
       if (!service.jours.includes(o.jour)) continue
       if (!o.periodes.includes(service.periode)) continue
 
-      const paire = meilleurePaire(service, o.depuis, o.vers, utilisable)
+      const paire = meilleurePaire(service, o.depuis, o.vers, utilisable, seuil)
       if (!paire) continue
 
       const d = service.arrets[paire.i]
@@ -191,21 +212,9 @@ function liaisons(o: RechercheOptions): Liaison[] {
     }
   }
 
-  // Une course déjà partie quand l'enfant arrive ne lui sert à rien. Les heures non
-  // publiées échappent au filtre : on ne peut rien en dire, et les écarter reviendrait
-  // à affirmer que la course ne convient pas.
-  const seuil = enMinutes(o.apres ?? null)
-  const retenues =
-    seuil === null
-      ? trouvees
-      : trouvees.filter((l) => {
-          const h = enMinutes(l.depart.heure)
-          return h === null || h >= seuil
-        })
-
   // Tri par heure de départ. Les courses sans heure publiée passent en dernier :
   // elles sont utilisables mais moins informatives pour le parent.
-  return retenues.sort((x, y) => {
+  return trouvees.sort((x, y) => {
     const hx = enMinutes(x.depart.heure)
     const hy = enMinutes(y.depart.heure)
     if (hx === null) return 1
@@ -251,6 +260,14 @@ export interface ContexteEnfant {
   temps: number
   /** L'école est l'arrêt le plus proche : l'enfant peut y aller à pied. */
   marcheDirecte: boolean
+  /**
+   * Le cycle n'est pas desservi par le transport scolaire — le précoce aujourd'hui.
+   *
+   * Le plan de bus contient bien des courses qui passent par le village et par l'école
+   * de ces enfants : les chercher en rend quatre par jour, plausibles et fausses. La
+   * seule réponse juste est qu'il n'y a pas de bus, et de le dire. R65.
+   */
+  sansTransport: boolean
   /**
    * L'arrêt réellement utilisé chaque jour, dans chaque sens. Il ne diffère du
    * domicile que les jours où le parent a déclaré une adresse dérogatoire.
@@ -343,13 +360,39 @@ export function contexteEnfant(enfant: Enfant, adresse: Adresse): ContexteEnfant
     distance: domicileMatin.distance,
     temps: domicileMatin.temps,
     marcheDirecte,
+    sansTransport: cycleSansBus(enfant.cycle),
     arretsParJour,
   }
 }
 
-/** Y a-t-il cours l'après-midi ce jour-là ? */
+/**
+ * Cet enfant n'a aucun bus, quelle qu'en soit la raison.
+ *
+ * Deux causes, deux messages différents à l'écran — l'école au coin de la rue, ou un
+ * cycle que le transport scolaire ne dessert pas — mais la même conséquence partout
+ * ailleurs : pas d'horaire, pas d'export agenda, rien à régler.
+ */
+export function aucunBus(ctx: ContexteEnfant): boolean {
+  return ctx.marcheDirecte || ctx.sansTransport
+}
+
+/**
+ * L'incertitude `id` pèse-t-elle sur ce jour ?
+ *
+ * Une course circule lundi, mercredi et vendredi, mais l'ambiguïté du hall sportif ne
+ * concerne que le vendredi : sans ce filtre, deux parents sur trois recevraient un
+ * avertissement pour un jour qui n'est pas le leur. Sans `jours` déclarés, l'incertitude
+ * vaut pour tous les jours de la course — c'est le cas le plus sûr.
+ */
+function incertitudePorteSur(id: string, jour: Jour): boolean {
+  const jours = incertitude(id)?.jours
+  return !jours || jours.includes(jour)
+}
+
+/** Y a-t-il cours l'après-midi ce jour-là ? Les jours sont les mêmes pour tous les
+ *  cycles, seules les heures diffèrent d'un site à l'autre. */
 export function coursApresMidi(jour: Jour): boolean {
-  return plan.horairesEcole.apresMidi.jours.includes(jour)
+  return plan.horairesEcole.jours.apresMidi.includes(jour)
 }
 
 /**
@@ -413,7 +456,9 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
   const manquants: TypeTrajet[] = []
   const incertitudes: string[] = []
 
-  if (ctx.marcheDirecte) return { jour, trajets, manquants, incertitudes }
+  if (ctx.sansTransport || ctx.marcheDirecte) {
+    return { jour, trajets, manquants, incertitudes }
+  }
 
   const base = {
     jour,
@@ -442,6 +487,13 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       return
     }
     const [principal, ...reste] = trouvees
+    // L'incertitude de la course retenue remonte au jour, et pas seulement au trajet :
+    // c'est le seul canal PAR JOUR dont dispose l'application pour dire ce qu'elle ne
+    // sait pas. Il était déclaré, rendu par `Trajets.tsx`, et jamais alimenté. R66.
+    const doute = principal.service.incertitude
+    if (doute && !incertitudes.includes(doute) && incertitudePorteSur(doute, jour)) {
+      incertitudes.push(doute)
+    }
     trajets.push({
       type,
       ligne: principal.ligne,
@@ -514,9 +566,12 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
         derogation: derogationRepas,
       })
     }
-  } else {
+  } else if (!dillendappAuPiedDeLEcole) {
     // 2 bis. L'enfant rejoint la maison relais. Selon son cycle, c'est le bus
     // Dillendapp dédié (C2) ou le Retour 2 (C3 et autres), comme le précise le plan.
+    // Les cycles dont l'école est au pied de la maison relais n'ont ici rien à prendre :
+    // proposer un bus reviendrait à faire 86 m en 31 minutes, et l'annoncer manquant
+    // reviendrait à inquiéter pour une navette qui n'a pas lieu d'être. R64.
     ajouter('navette-dillendapp-midi', {
       depuis: ecole,
       vers: dillendapp,
@@ -540,13 +595,17 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
       if (finDillendapp) {
         // L'enfant reste au Dillendapp après la classe : le bus du soir l'y dépose.
         // Le parent ne l'attend donc pas à son arrêt, il vient le chercher sur place.
-        ajouter('retour-soir-dillendapp', {
-          depuis: ecole,
-          vers: dillendapp,
-          periodes: ['soir'],
-          directions: ['vers-domicile'],
-          concerneParent: true,
-        })
+        // Sauf si la maison relais est au pied de l'école : il s'y rend à pied, et
+        // `recuperation` dit déjà au parent où le prendre. R64.
+        if (!dillendappAuPiedDeLEcole) {
+          ajouter('retour-soir-dillendapp', {
+            depuis: ecole,
+            vers: dillendapp,
+            periodes: ['soir'],
+            directions: ['vers-domicile'],
+            concerneParent: true,
+          })
+        }
       } else {
         ajouter('retour-soir', {
           depuis: ecole,
@@ -565,11 +624,12 @@ export function trajetsDuJour(ctx: ContexteEnfant, jour: Jour): JourneeEnfant {
     manquants.push('retour-soir')
   }
 
-  // Le plan fait arriver les bus de c1 et c2 quelques minutes après l'heure de classe
-  // affichée (07:58 à Oberpallen, 08:00 à Noerdange, pour une sonnerie à 07:55). Ce
-  // n'est pas un écart à signaler : c'est un transport scolaire, et l'école intègre
-  // ces quelques minutes. Le signaler chaque jour à presque toutes les familles de ces
-  // deux cycles ferait du bruit, pas de l'information.
+  // Le silence sur la marge entre l'arrivée du bus et la sonnerie est délibéré. Il
+  // reposait sur une sonnerie unique à 07:55 : les horaires de cours passant par cycle
+  // (rentrée 2026/2027), c1 et c2 commencent à 08:00, et les mêmes bus arrivent
+  // désormais 07:58 et 08:00 — juste à l'heure plutôt qu'en retard. La conclusion ne
+  // change pas, sa raison si : le signaler chaque jour à presque toutes les familles
+  // de ces deux cycles ferait du bruit, pas de l'information. R70.
 
   trajets.sort((a, b) => {
     const ha = enMinutes(a.depart.heure)
@@ -651,8 +711,9 @@ export function bornesDillendapp(ctx: ContexteEnfant, jour: Jour): BornesDillend
     return h !== null && (tard === null || h > tard) ? h : tard
   }, null)
 
+  const horaires = horairesDuCycle(ctx.enfant.cycle)
   const ouvre = enMinutes(ouverture) ?? 0
-  const limiteMatin = (dernierDepart ?? enMinutes(plan.horairesEcole.matin.debut) ?? 0) -
+  const limiteMatin = (dernierDepart ?? enMinutes(horaires.matin.debut) ?? 0) -
     margeAvantBusMinutes
   // Une heure d'arrivée reste une heure d'arrivée : au-delà d'une heure après
   // l'ouverture, ce n'est plus un accueil du matin.
@@ -669,7 +730,7 @@ export function bornesDillendapp(ctx: ContexteEnfant, jour: Jour): BornesDillend
         periodes: [apresMidi ? 'soir' : 'midi'],
         directions: ['vers-domicile', 'vers-dillendapp'],
       })
-  const finDesCours = apresMidi ? plan.horairesEcole.apresMidi.fin : plan.horairesEcole.matin.fin
+  const finDesCours = apresMidi ? horaires.apresMidi.fin : horaires.matin.fin
   const arriveeSurPlace =
     enMinutes(versLaMaisonRelais[0]?.arrivee.heure ?? null) ?? enMinutes(finDesCours) ?? 0
   const ferme = enMinutes(fermeture) ?? 24 * 60 - 1

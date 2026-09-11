@@ -70,7 +70,8 @@
     "matin": "De manhã",
     "midi": "Ao meio-dia",
     "soir": "Depois das aulas",
-    "aPiedAide": "A paragem mais próxima de sua casa é a da escola: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui."
+    "aPiedAide": "A paragem mais próxima de sua casa é a da escola: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui.",
+    "sansTransportAide": "Não há transporte escolar para {cycle}: não está prevista nenhuma viagem de autocarro, não há portanto nada a definir aqui."
   },
   "matin": {
     "question": "De manhã, como vai {prenom} para a escola?",
@@ -177,6 +178,8 @@
     "aucunArret": "A partir da sua morada, nenhuma paragem serve a escola desta criança. Consulte o plano oficial.",
     "aPied": "Sem autocarro: a escola fica mesmo ao lado",
     "aPiedDetail": "A sua morada fica a cerca de {minutes} min a pé de {site}. Não está prevista nenhuma viagem de autocarro para {prenom}: a paragem mais próxima é a da própria escola.",
+    "sansTransport": "Sem autocarro: não há transporte escolar para {cycle}",
+    "sansTransportDetail": "O transporte escolar não serve {cycle}. {prenom} estuda em {site}, mas nenhum autocarro lá vai: tem de o levar e ir buscá-lo.",
     "sansPrenom": "Criança sem nome",
     "calquerSur": "Configuração inicial",
     "commeLui": "Como {prenom}",
@@ -312,11 +315,11 @@
     "voir-aller-3": "Huttange não é servida por esta linha: consulte o horário «Aller Bus 3».",
     "huttange-retour-dillendapp-1345": "As crianças de Huttange podem apanhar o autocarro «Retour Bus Dillendapp» às 13:45 em Huttange.",
     "depart-non-precise": "O plano oficial não indica a paragem exata desta partida em Beckerich.",
-    "vendredi-hall-sportif": "À sexta-feira, a partida faz-se a partir do pavilhão desportivo e não da escola.",
     "horaire-intermediaire-non-publie": "O plano oficial não publica a hora de passagem nesta paragem."
   },
   "incertitudes": {
-    "titre": "Ponto não esclarecido pelo plano oficial"
+    "titre": "Ponto não esclarecido pelo plano oficial",
+    "depart-midi-vendredi-hall-sportif": "O plano anterior indicava uma partida do pavilhão desportivo à sexta-feira; o de 2026/2027 já não o diz. A aplicação segue o plano em vigor: partida da escola de Noerdange. A confirmar junto do município."
   },
   "calendrier": {
     "titre": "Adicionar a um calendário",
@@ -406,6 +409,7 @@
     "versDillendapp": "→ Dillendapp",
     "genereLe": "Folha gerada em {date}",
     "aPied": "A pé",
+    "sansTransport": "Sem autocarro",
     "famille": "Imprimir toda a família",
     "familleTitre": "Autocarro escolar — a semana",
     "familleAide": "Uma única página A4: os cinco dias em linhas, uma criança por coluna."
@@ -413,8 +417,9 @@
   "carte": {
     "titre": "Percurso a pé",
     "domicile": "Casa",
-    "horsLigne": "O mapa necessita de ligação. O resto da aplicação funciona sem rede.",
-    "ouvrirItineraire": "Abrir o itinerário"
+    "afficher": "Mostrar o mapa do percurso",
+    "avertissement": "O mapa só é carregado se o pedir: os seus mosaicos vêm então do OpenStreetMap, que vê a zona apresentada — ou seja, os arredores da sua casa. Nem a sua morada nem os nomes lhe são enviados.",
+    "horsLigne": "O mapa necessita de ligação. O resto da aplicação funciona sem rede."
   },
   "reglages": {
     "titre": "Definições",
@@ -442,12 +447,14 @@
     "circule": "Circula",
     "reserve": "Linha reservada",
     "horairesEcole": "Horário da escola",
-    "horairesEcoleDetail": "Aulas das {matinDebut} às {matinFin} de segunda a sexta-feira, e das {apresMidiDebut} às {apresMidiFin} às segundas, quartas e sextas-feiras.",
+    "horairesEcoleJours": "Aulas de manhã: {matin}. Aulas à tarde: {apresMidi}. As horas de saída diferem de escola para escola.",
+    "cycle": "Ciclo",
+    "creneau": "{debut} – {fin}",
     "avertissementHoraires": "Horários indicativos",
     "avertissementHorairesDetail": "Os horários são indicativos e podem variar ligeiramente consoante as condições de trânsito. Recomendamos estar na paragem 5 minutos antes da hora prevista. Em caso de alteração excecional dos horários (mau tempo, obras, etc.), os pais são informados por email ou através da escola."
   },
   "validite": {
-    "couverte": "Plano válido para {annees}",
+    "jusquau": "Plano válido até {date}",
     "confirme": "Confirmado por {personne} em {date}.",
     "confirmeOral": "Sendo esta confirmação verbal, deve ser reverificada no início de cada ano letivo.",
     "perime": "Atenção: este plano ultrapassou o seu período de validade declarado ({fin}). Verifique o plano oficial antes de confiar nele.",
@@ -471,7 +478,7 @@
     "adressesTitre": "Os endereços por dia só funcionam dentro da comuna",
     "adressesCorps": "Pode indicar, para um determinado dia, um endereço de partida ou de chegada diferente da sua morada. A pesquisa de endereços conhece, no entanto, apenas a comuna de Beckerich: para um local fora dela, indique diretamente a paragem utilizada, em vez de deixar o site adivinhar.",
     "donneesTitre": "Os seus dados ficam consigo",
-    "donneesCorps": "A morada e os nomes são guardados apenas no seu aparelho: sem conta, sem servidor que os receba. Um contador de visitas, alojado no nosso próprio servidor (sem serviço externo), recebe a página consultada e mais nada — nem cookie, nem qualquer dos dados que introduziu. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar.",
+    "donneesCorps": "A morada e os nomes são guardados apenas no seu aparelho: sem conta, sem servidor que os receba. Um contador de visitas, alojado no nosso próprio servidor (sem serviço externo), recebe a página consultada e mais nada — nem cookie, nem qualquer dos dados que introduziu. Um link de partilha transporta os dados no seu fragmento, que o servidor nunca recebe. Se ativar as notificações, um identificador anónimo do aparelho é guardado num servidor enquanto durar a subscrição, e apagado assim que a desativar. Já o mapa do percurso só é carregado se o pedir: os seus mosaicos vêm então do OpenStreetMap, que vê a zona apresentada — ou seja, os arredores da sua casa — mas nem a sua morada, nem os nomes.",
     "notificationsTitre": "Notificações",
     "notificationsCorps": "Avisam de um cancelamento ou de um atraso, mas nada garante que cheguem: telemóvel desligado, Não incomodar, avaria do serviço de notificações. Uma aplicação web também não pode declarar-se prioritária por si própria. A escola e o município continuam a ser a via oficial de informação; esta aplicação não os substitui."
   },
@@ -544,6 +551,16 @@
     "version": "Versão {version}",
     "horsLigne": "Sem rede — os horários continuam consultáveis."
   },
+  "panne": {
+    "titre": "A aplicação foi interrompida",
+    "explication": "Uma falha de apresentação interrompeu a página. Os seus dados não se perderam: estão neste aparelho e nada foi enviado.",
+    "recharger": "Recarregar a página",
+    "horaires": "Ver os horários oficiais",
+    "detail": "Detalhe técnico",
+    "effacer": "Se a falha voltar sempre que abre a aplicação",
+    "effacerConfirmation": "Apagar a morada, as crianças e as preferências guardadas neste aparelho? Será preciso preencher tudo de novo.",
+    "effacerConfirmer": "Apagar e recomeçar"
+  },
   "commun": {
     "fermer": "Fechar",
     "modifier": "Alterar",
@@ -580,7 +597,7 @@
     "nonSupportees": "Este navegador não suporta notificações.",
     "nonConfigurees": "As notificações ainda não estão configuradas neste site.",
     "iosNote": "No iPhone e no iPad, as notificações só funcionam se a aplicação tiver sido adicionada ao ecrã principal.",
-    "confidentialite": "Ativar as notificações guarda um identificador anónimo do aparelho num servidor, enquanto durar a subscrição. É o único dado que sai do seu telemóvel e é apagado assim que cancelar.",
+    "confidentialite": "Ativar as notificações guarda um identificador anónimo do aparelho num servidor, enquanto durar a subscrição. Fora o mapa do percurso, que só apresenta se o pedir, é o único dado que sai do seu telemóvel e é apagado assim que cancelar.",
     "erreur": "A subscrição falhou. Tente novamente mais tarde.",
     "recevoir": "O que quero receber",
     "preference": {
