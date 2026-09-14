@@ -170,3 +170,49 @@ Le mot de passe s'affiche une seule fois. Se connecter ensuite sur
   À éprouver : deux connexions échouées depuis deux réseaux différents ; la seconde ne
   doit pas hériter du compteur de la première.
 - **R43 (reste)** — installer la PWA depuis `app.schoulbus.lu` sur un vrai appareil.
+
+## Déploiement — 2026-09-14
+
+Mise en production de l'audit du 2026-09-08, du banc navigateur et des alias d'arrêts.
+Commit déployé : **`f7290cd`** (fusion de la PR #6). Le précédent datait du 2026-09-08
+(`0795834`) — six jours de travail entre les deux.
+
+### Ce qui s'est passé, dans l'ordre
+
+1. PR #3 (alias d'arrêts) fusionnée dans `dev`, puis PR #4 `dev` → `main`.
+2. **La CI a refusé le déploiement en 32 secondes**, sur `npm audit --audit-level=high`.
+   Deux failles `high` publiées depuis la dernière mise en ligne, dont `nodemailer` — qui
+   envoie les liens de réinitialisation de mot de passe. **Rien n'a atteint les parents** :
+   les travaux qui construisent les images dépendent des tests, et les tests n'avaient pas
+   commencé. La barrière a fait exactement ce pour quoi elle est là.
+3. PR #5 : verrous de version relevés, sans aucune montée de majeure. PR #6 : `dev` → `main`.
+4. Les six travaux de la CI au vert, les deux images poussées sur GHCR.
+5. Redéploiement Dokploy déclenché par l'API (`compose.redeploy`, compose `bus-app`
+   `NlpH0DNxs0fJ28bJt6LAo`). Aucune image n'étant épinglée par `IMAGE_SERVEUR` ni
+   `IMAGE_SITE`, `pull_policy: always` a tiré les `latest` fraîchement publiées.
+
+### Ce qui a été vérifié APRÈS la mise en ligne
+
+| Contrôle | Résultat |
+| --- | --- |
+| `/api/sante` | `base`, `push`, `comptes`, `courriel`, `rappels` au vert (`google: false`, aucun identifiant OAuth posé — inchangé) |
+| `/version.json` | `f7290cd`, construit le 2026-09-14T08:55:06Z |
+| Paquet réellement servi | contient `aussiAppele` et `sansTransport` — les deux nouveautés sont bien en ligne, et non seulement dans le dépôt |
+| Navigateur, sur `app.schoulbus.lu` | 5 écrans × 2 thèmes : **aucune erreur de page, aucune erreur de console** |
+| Message du précoce | présent sur Accueil, Semaine et Configurer, dans les deux thèmes |
+| Pied de page | « Plan valable jusqu'au 2026-12-18 » partout |
+| Carte | **0 requête OpenStreetMap** avant un geste, sur les dix chargements |
+
+### Ce que ce déploiement ne prouve toujours pas
+
+Il ne lève **aucune** des réserves qui attendaient la production. Elles attendent un
+usage réel, pas une mise en ligne :
+
+- **R44** — aucun courriel réel n'est parti. `courriel: true` dit que le SMTP est
+  configuré, rien de plus. `nodemailer` vient de passer en 9.1.1 : le premier courriel
+  d'activation envoyé depuis la production est le seul contrôle de ce changement.
+- **R71** — le filtre des points de terminaison push n'a toujours vu aucun vrai service.
+- **R39, R40, R41** — la reprise des abonnés, l'adresse client derrière Traefik, la
+  concurrence d'envoi sous charge.
+- **R50** — la pile orpheline `bus-beckerich` n'a pas été touchée : regarder ce qu'elle
+  contient avant d'y toucher reste à faire, et ce n'était pas l'objet de ce déploiement.
