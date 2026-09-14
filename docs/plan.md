@@ -3095,3 +3095,34 @@ Vérifié : 481 tests (477 + 4), les options relues dans le navigateur en franç
 allemand et en portugais, et deux mutations — retirer la concaténation fait tomber deux
 tests, retirer la clé d'un seul dictionnaire fait tomber le test de parité des cinq
 langues.
+
+### La CI a refusé la mise en production, et elle avait raison (2026-09-14)
+
+La fusion de `dev` dans `main` a déclenché le déploiement, qui s'est arrêté **en 32
+secondes** sur `npm audit --audit-level=high`. Rien n'est parti sur GHCR, rien n'a atteint
+les parents : les travaux qui construisent les images dépendent des tests, et les tests
+n'ont pas commencé.
+
+Les alertes étaient nouvelles — publiées depuis le déploiement du 2026-09-08 — et deux
+étaient **`high`** :
+
+| Paquet | Gravité | Ce qui était en jeu |
+| --- | --- | --- |
+| `nodemailer` ≤ 9.1.0 | **high** | Quatre alertes, dont **deux contournements de la validation du domaine destinataire** (IDN/Punycode, et commentaires RFC 5322 mal analysés). Ce paquet envoie les courriels de création de compte et de **réinitialisation de mot de passe** : un lien de réinitialisation livré à un domaine choisi par un attaquant est exactement ce qu'il ne faut pas. |
+| `sharp` < 0.35.4 | **high** | Failles de `libheif`. Outil de construction des icônes, hors production — mais la barrière ne fait pas ce tri, et c'est bien ainsi. |
+| `hono` ≤ 4.13.4 | moderate | Épuisement mémoire par imbrication en notation pointée dans `parseBody()`, et lecture des paramètres **après le fragment** d'URL par l'analyseur de requête. Les deux sont sur le chemin des requêtes du serveur. |
+| `@vitest/mocker` | moderate | Lecture de fichier arbitraire. Outil de test seulement. |
+
+**Aucune montée de version majeure n'a été nécessaire** : les quatre correctifs existaient
+dans les bornes déjà déclarées. Seuls les deux `package-lock.json` changent — `nodemailer`
+9.0.5 → **9.1.1**, `hono` → **4.13.7**, `sharp` → **0.35.4**, `vitest` → **4.1.11**. Les
+deux `package.json` ne bougent pas d'une ligne.
+
+Les moderate ont été corrigées avec les high, alors que la barrière ne les exigeait pas :
+celles de `hono` sont sur le chemin des requêtes, et le correctif ne coûtait qu'un verrou
+de version.
+
+Ce que cela ne prouve pas : `nodemailer` 9.1.1 n'a envoyé **aucun courriel réel** ici. Les
+162 tests du serveur exercent le module en mode capture, pas contre un vrai SMTP — c'est
+**R44**, déjà ouverte, et le premier courriel d'activation envoyé depuis la production
+reste son seul contrôle.
