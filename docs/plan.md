@@ -112,6 +112,8 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R75~~ | 2026-09-09 | ~~Trois champs de données restent orphelins.~~ **Soldée le 2026-09-11, champ par champ.** `Service.horaireComplet` : **retiré** du type et des données — il redisait au niveau de la course ce que chaque arrêt porte déjà en `heure: null`, et ce que le parent lit déjà arrêt par arrêt sous `trajets.heureNonPubliee` ; deux sources pour un même fait finissent par diverger. `reglesConfirmees` : devenu **`$reglesConfirmees`**, le préfixe que ce répertoire emploie déjà pour `$commentaire` et `$note` — de la prose pour humains, et non un champ qui attend d'être branché. `Arret.aliases` : **branché** dans le choix d'arrêt (`nomArretAvecAlias`, clé `arrets.aussiAppele` dans les cinq dictionnaires). Un parent qui lit « Liewelerwee » sur la brochure retrouve « Beckerich · Leewelerwee » dans la liste. La mention est réservée à l'endroit où l'on CHOISIT un arrêt : l'ajouter aux horaires, aux fiches et à l'agenda aurait alourdi chaque ligne. Vérifié au navigateur en fr, de et pt, et par mutation (retirer la concaténation fait tomber deux tests ; retirer la clé d'un seul dictionnaire fait tomber le test de parité). | Soldée. |
 | ~~R76~~ | 2026-09-09 | ~~Rien de tout cela n'a été vu dans un navigateur.~~ **Levée le 2026-09-11** : banc Playwright (Chromium 1243, hors dépôt) sur les neuf écrans, **en clair ET en sombre**, avec un foyer semé dans `localStorage` — un c3, un précoce, un c1. Aucune exception de rendu, aucune erreur de console. Vérifié au texte rendu (`textContent`) : le message « pas de bus » du précoce sur Accueil, Semaine, les étapes 3 à 5 de l'assistant (`Moments`) et la fiche du foyer ; la marche directe (domicile à 11 m de l'école d'Elvange) sur Accueil et Semaine, avec son détail ; le pied de page « Plan valable jusqu'au 2026-12-18 » sur tous les écrans ; les encarts « position approximative » sur un foyer de Beckerich-village. Vérifié au pixel : le bouton « Effacer toutes mes données » **au survol** passe à **11,11:1** en clair et **7,41:1** en sombre (c'était 3,41:1 avant R69), le bouton primaire tient 14,27:1 et 16,53:1, `--plein` vaut bien `#1a222c` en clair, et les deux `theme-color` de la barre système (`#0e1a2e` / `#e1e7ee`) sont ceux des jetons — la promesse de R70 tient jusqu'au navigateur. Vérifié au réseau : **zéro requête OpenStreetMap avant le clic**, quatre après (R68). La fiche du foyer de trois enfants tient sur **une seule page A4**, vendredi compris. **Ce qui reste hors de cette levée** : Safari et WebKit (voir R1), et le survol sur un vrai appui tactile — Chromium ne simule pas le `:hover` collé d'iOS. |
 | R77 | 2026-09-11 | **Le plus long nom d'arrêt n'a été lu que sur un écran d'ordinateur.** Depuis que les alias de la brochure s'affichent, l'entrée la plus longue du choix d'arrêt fait 83 caractères : « Hovelange · Op der Halte — aussi « Sportshal/Op der Halte, Op der Halte/Sportshal » ». C'est une `<option>` d'un `<select>` natif : sur iPhone, la roue de sélection la **tronque avec des points de suspension** au lieu de la replier, et rien ne prévient. Les deux alias de cet arrêt sont d'ailleurs les mêmes mots dans les deux ordres — la brochure les écrit ainsi, mais pour l'affichage le second n'apprend rien. Les deux autres arrêts aliasés tiennent sous 46 caractères et ne courent pas ce risque. | Ouvrir le choix d'arrêt sur l'iPhone (saisir une adresse hors commune, puis « Indiquer l'arrêt utilisé ») et lire l'entrée de Hovelange. Si elle est tronquée, la correction est **dans les données** : retirer de `arrets.json` la permutation redondante `Op der Halte/Sportshal`, et non raccourcir dans le composant. |
+| R78 | 2026-09-14 | **L'étiquette d'une ligne de bus n'a plus de couleur à elle.** `--accent-2` servait à distinguer « Aller — Bus 1 » d'une étiquette d'heure ; c'était un violet, franchement autre chose que l'accent. La charte de la vitrine n'a pas de troisième couleur à offrir — le corail y est réservé à ce qui presse —, et `--accent-2` prend donc la sarcelle forte : `#a5dedf` en sombre, `#0b3f45` en clair. En thème clair, elle voisine l'encre `#1c2725`. Aucun test ne la garde : `src/contraste.test.ts` ne mesure pas `--accent-2`. | Regarder une semaine réelle en thème clair et dire si la ligne se distingue encore d'une heure. Sinon, lui donner une teinte propre — et l'inscrire dans le test, qui ne la voit pas. |
+| R79 | 2026-09-14 | **Quatre `backdrop-filter` flouttent désormais sous des surfaces opaques.** En reprenant la charte de la vitrine, les cartes cessent d'être des voiles translucides : `--surface` vaut une couleur pleine. Les règles qui posent `backdrop-filter: var(--flou)` sur ces surfaces (quatre endroits dans `src/index.css`) coûtent toujours une couche de composition, pour un effet que plus rien ne laisse voir. Le rail et le voile de dialogue, eux, restent translucides et gardent le leur. | Retirer `backdrop-filter` des règles dont le fond est opaque, puis remesurer au banc que rien ne change à l'écran. Non fait ici : c'est du rendu, pas de la couleur, et le lot ne devait toucher qu'à la palette. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -3126,3 +3128,62 @@ Ce que cela ne prouve pas : `nodemailer` 9.1.1 n'a envoyé **aucun courriel rée
 162 tests du serveur exercent le module en mode capture, pas contre un vrai SMTP — c'est
 **R44**, déjà ouverte, et le premier courriel d'activation envoyé depuis la production
 reste son seul contrôle.
+
+### L'application prend la charte de la vitrine (2026-09-14)
+
+Deux chartes pour un seul service. La vitrine `schoulbus.lu` s'était donné la sienne —
+crème, sarcelle, corail — parce qu'une page qu'on lit une fois n'a pas le travail d'un
+outil qu'on ouvre à 07:25 ; l'application était restée au verre bleu sur dégradé sombre.
+Le parent qui suit le lien de la vitrine vers `app.schoulbus.lu` changeait donc de monde
+au clic. C'est la vitrine qui garde la charte désormais, et c'est ce fichier-ci qui la
+porte : `src/index.css` est la source, la copie `src/styles/jetons.css` de la vitrine s'y
+confronte par `npm run jetons:verifier`.
+
+Ce que la palette emporte, au-delà des couleurs : **les surfaces deviennent opaques**. Ce
+n'étaient plus des voiles blancs posés sur un dégradé mais des plans pleins — des cartes
+sur du papier, comme sur la vitrine. Seuls le rail de navigation et le voile d'une boîte
+de dialogue restent translucides, et gardent leur flou. L'arête de verre de `--lustre`
+disparaît avec eux : un filet de lumière en haut n'éclaire rien sur un plan opaque.
+
+| Rôle | Sombre | Clair |
+| --- | --- | --- |
+| `--fond` | `#121a19` | `#fbf6ef` |
+| `--surface` | `#1a2422` | `#fffdf9` |
+| `--encre` | `#f2ece3` | `#1c2725` |
+| `--accent` (sarcelle) | `#6fc3c6` | `#0f5a61` |
+| `--plein` (le galet) | `#f2ece3` | `#1c2725` |
+| `--danger` (corail) | `#ffae91` | `#a9381f` |
+| `--attention` (ambre) | `#e0a44e` | `#8f5a0b` |
+
+Deux écarts assumés par rapport à la vitrine, tous deux écrits dans la feuille :
+
+- **`--plein` n'est pas l'accent.** La vitrine donne la sarcelle à son bouton d'action ;
+  l'application ne le peut pas — la sarcelle y sert à lire les heures, et un bouton de la
+  même couleur qu'une heure de départ crée une hésitation (R70, gardée par un test). Le
+  galet prend donc l'encre de la page, renversée : crème en sombre, encre en clair. La
+  valeur que R76 avait vérifiée au navigateur, `#1a222c`, devient `#1c2725`.
+- **`--succes` n'existe pas dans la charte de la vitrine** — elle n'a rien à confirmer.
+  Un vert tiré vers la sarcelle a été ajouté pour ce seul rôle : `#8fd0ad` / `#145c3c`.
+
+Vérifié : les **52 contrôles de contraste** de `src/contraste.test.ts` — qui recomposent
+chaque couple encre/fond, survols compris — passent sur les deux palettes, et les 484
+tests de l'application avec eux. Au banc (Chromium, hors dépôt), six écrans en clair et en
+sombre, **1 422 zones de texte mesurées** en tout, aucune exception de
+rendu, aucune erreur de console ; le même banc lancé contre l'ancienne palette signale
+exactement les mêmes zones — celles que la plaque « Pas d'école aujourd'hui » floute
+volontairement —, ce qui dit que rien n'a régressé. La balise `theme-color` et le
+manifeste ont suivi tout seuls : `#121a19` et `#fbf6ef`, lus dans les jetons par le
+greffon Vite posé en R70.
+
+Les trois couleurs écrites en dur hors de la feuille ont suivi : le repli du tracé
+Leaflet (`CarteTrajet`), les marqueurs d'`EditeurArrets`, et `scripts/build-icones.mjs`.
+Les icônes et la vignette de partage sont **régénérées** : pastille sarcelle et
+carrosserie crème pour l'icône — le dessin de la vitrine, et pour sa raison, une icône
+étant vue à 16 px sur l'onglet d'un navigateur au fond presque toujours clair — et une
+vignette de partage qui est maintenant une page de crème, comme la vitrine.
+
+**Ce que ce lot ne fait pas :** les captures d'écran de l'application qui illustrent la
+vitrine montrent toujours le verre bleu. Elles vivent dans l'autre dépôt, engendrées par
+son propre script ; c'est à lui de les refaire. Et le banc reste **Chromium** : la palette
+n'a pas été vue sous Safari ni WebKit (R1). Deux réserves sont ouvertes : **R78** (la
+ligne de bus n'a plus de couleur à elle) et **R79** (des flous qui ne floutent plus rien).

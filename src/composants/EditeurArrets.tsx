@@ -54,7 +54,7 @@ export function EditeurArrets({ session }: { session: SessionCompte }) {
         L.circleMarker([a.coord[0], a.coord[1]], {
           radius: 7,
           weight: 2,
-          color: a.precision === 'verifiee' ? '#9ece6a' : '#e0af68',
+          color: a.precision === 'verifiee' ? '#8fd0ad' : '#e0a44e',
           fillOpacity: 0.7,
         })
           .addTo(carte)
