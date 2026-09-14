@@ -19,7 +19,8 @@
     "menu": "Menu",
     "retour": "Back",
     "principale": "Main navigation",
-    "credits": "Credits"
+    "credits": "Credits",
+    "contact": "Contact"
   },
   "choixLangue": {
     "titre": "Choose your language",
@@ -492,7 +493,8 @@
     "corps5": "In case of doubt or discrepancy, the municipality's official document prevails.",
     "lienOfficiel": "Open the school's official page",
     "lienPdf": "Download the official plan",
-    "contact": "Report an error"
+    "contact": "Report an error",
+    "contactAdresse": "The form is online. With no network, write directly to"
   },
   "installer": {
     "titre": "Install the app",

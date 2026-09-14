@@ -1,6 +1,7 @@
 import { useT } from '../i18n'
 import { plan, vacances } from '../lib/donnees'
 import { sourceAdresses } from '../lib/adresses'
+import { ADRESSE_CONTACT, lienContact } from '../lib/contact'
 
 /** Ce que le site sait faire, et surtout ce qu'il ne sait pas faire. */
 export function Limites() {
@@ -61,7 +62,7 @@ export function Limites() {
 
 /** Mentions d'indépendance. Rendues à partir des données, jamais écrites en dur. */
 export function Independance() {
-  const { t } = useT()
+  const { t, langue } = useT()
 
   return (
     <div className="pile pile--large">
@@ -99,13 +100,20 @@ export function Independance() {
         </a>
         <a
           className="bouton bouton--discret"
-          href="https://github.com/Sashimee/bus-scolaire-beckerich/issues/new"
+          href={lienContact(langue)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {t('independance.contact')}
         </a>
       </section>
+
+      {/* L'application marche hors ligne, le formulaire non : l'adresse en clair est ce
+          qui reste lisible et copiable dans un couloir d'école sans réseau. */}
+      <p className="champ__aide">
+        {t('independance.contactAdresse')}{' '}
+        <a href={`mailto:${ADRESSE_CONTACT}`}>{ADRESSE_CONTACT}</a>
+      </p>
     </div>
   )
 }

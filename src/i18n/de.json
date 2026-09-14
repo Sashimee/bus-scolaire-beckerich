@@ -19,7 +19,8 @@
     "menu": "Menü",
     "retour": "Zurück",
     "principale": "Hauptnavigation",
-    "credits": "Danksagung"
+    "credits": "Danksagung",
+    "contact": "Kontakt"
   },
   "choixLangue": {
     "titre": "Wählen Sie Ihre Sprache",
@@ -492,7 +493,8 @@
     "corps5": "Im Zweifels- oder Abweichungsfall gilt das offizielle Dokument der Gemeinde.",
     "lienOfficiel": "Offizielle Seite der Schule aufrufen",
     "lienPdf": "Offiziellen Plan herunterladen",
-    "contact": "Fehler melden"
+    "contact": "Fehler melden",
+    "contactAdresse": "Das Formular ist online. Ohne Netz schreiben Sie direkt an"
   },
   "installer": {
     "titre": "App installieren",

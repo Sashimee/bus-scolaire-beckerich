@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useT } from './i18n'
 import { plan } from './lib/donnees'
+import { lienContact } from './lib/contact'
 import { PileBandeaux } from './composants/Bandeaux'
 import { BarriereErreur } from './composants/BarriereErreur'
 import { InvitationInstallation } from './composants/InvitationInstallation'
@@ -35,7 +36,7 @@ const Reinitialiser = lazy(() =>
 )
 
 export default function App() {
-  const { t } = useT()
+  const { t, langue } = useT()
   const { pathname } = useLocation()
 
   return (
@@ -97,6 +98,12 @@ export default function App() {
             <Link to="/limites">{t('nav.limites')}</Link>
             <Link to="/independance">{t('nav.independance')}</Link>
             <Link to="/credits">{t('nav.credits')}</Link>
+            {/* Un seul formulaire pour la vitrine et l'application : deux, ce seraient
+                deux destinations et deux endroits où écrire sans que l'autre le sache.
+                L'adresse en clair est sur « Site indépendant », lisible sans réseau. */}
+            <a href={lienContact(langue)} target="_blank" rel="noopener noreferrer">
+              {t('nav.contact')}
+            </a>
             <Link to="/installer">{t('nav.installer')}</Link>
             {/* L'entrée de l'espace agents/commune. Discrète, en pied, et seulement quand
                 un serveur est configuré — sinon elle ne mènerait qu'à un « non configuré ».
