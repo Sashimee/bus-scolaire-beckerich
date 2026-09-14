@@ -305,6 +305,7 @@
     "precisionApproximative": "Ungefähre Position",
     "precisionApproximativeAide": "Der genaue Standort dieser Haltestelle konnte nicht überprüft werden. Die Gehzeit ist daher noch ungenauer als sonst.",
     "signaler": "Fehler melden",
+    "aussiAppele": "auch „{noms}“",
     "precision": {
       "verifiee": "Position geprüft",
       "approximative": "Position ungefähr"

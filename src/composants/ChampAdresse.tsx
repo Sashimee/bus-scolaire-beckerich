@@ -1,7 +1,7 @@
 import { useId, useMemo, useState } from 'react'
 import { chercherAdresses, type AdresseTrouvee } from '../lib/adresses'
 import { arrets } from '../lib/donnees'
-import { nomArret } from '../lib/affichage'
+import { nomArret, nomArretAvecAlias } from '../lib/affichage'
 import { useT } from '../i18n'
 import type { Adresse } from '../lib/types'
 
@@ -166,7 +166,7 @@ export function ChampAdresse({ valeur, onChoisir, onEffacer, libelle, compact }:
                 </option>
                 {arrets.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {nomArret(a, t)}
+                    {nomArretAvecAlias(a, t)}
                   </option>
                 ))}
               </select>
