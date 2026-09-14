@@ -99,9 +99,10 @@
     /* Une pilule : le rayon dépasse toujours la moitié de la hauteur. */
     --rayon-pilule: 999px;
     /* `--lustre` porte l'ombre des surfaces posées ; il ne reste que deux ombres
-       portées, pour ce qui flotte au-dessus d'elles et pour ce qui bloque la page. */
-    --ombre-2: 0 2px 6px -1px rgb(0 0 0 / 0.22), 0 8px 24px -14px rgb(0 0 0 / 0.4);
-    --ombre-3: 0 4px 12px -2px rgb(0 0 0 / 0.28), 0 20px 48px -20px rgb(0 0 0 / 0.5);
+       portées, pour ce qui flotte au-dessus d'elles et pour ce qui bloque la page.
+       Étalées et basses, comme sur la vitrine ; le thème clair les reteinte. */
+    --ombre-2: 0 26px 60px -40px rgb(0 0 0 / 0.5);
+    --ombre-3: 0 30px 70px -40px rgb(0 0 0 / 0.6);
     --trait: 1px;
     --trait-fort: 2px;
 
@@ -129,47 +130,63 @@
     /*
      * Palette sombre (défaut).
      *
-     * Les surfaces ne sont plus opaques : ce sont des voiles blancs posés sur un
-     * dégradé. Un couple encre/fond ne se vérifie donc plus sur une couleur unie mais
-     * sur la COMPOSITION réelle — arrêt du dégradé, halo décoratif, une ou deux
-     * couches de verre. `src/contraste.test.ts` refait ce calcul à chaque exécution
-     * des tests — états de survol compris, ce que le jeu de 24 compositions du lot 18
-     * n'incluait pas — et exige 4,5:1 ; le pire couple tient aujourd'hui 4,54:1.
-     * Éclaircir un voile ou un arrêt du dégradé abaisse toutes les encres d'un coup :
-     * le test le dira, ce que le commentaire d'avant ne faisait pas.
+     * Les couleurs sont celles de la vitrine `schoulbus.lu` — crème, sarcelle, corail.
+     * Un parent qui arrive de la page de présentation doit reconnaître le même objet ;
+     * deux chartes pour un seul service donnaient à croire à deux services. La vitrine
+     * tient ces valeurs de sa maquette ; ce fichier-ci en est désormais la source, et
+     * c'est lui que son `npm run jetons:verifier` confronte à sa copie.
+     *
+     * Ce que le changement emporte : les surfaces ne sont plus des voiles translucides
+     * posés sur un dégradé, mais des plans opaques — des cartes posées sur du papier,
+     * comme sur la vitrine. Seuls le rail et le voile d'une boîte de dialogue restent
+     * translucides.
+     *
+     * Le contraste reste calculé sur la COMPOSITION réelle — arrêt du dégradé, halo,
+     * plans empilés — par `src/contraste.test.ts`, à chaque exécution des tests, états
+     * de survol compris, et exige 4,5:1.
+     *
+     * Sémantique des deux accents, reprise de la vitrine et à ne pas diluer :
+     *   sarcelle = ce qui est vrai et vérifiable — heures, arrêts, action principale ;
+     *   corail   = ce qui presse ou ce qui nuance — décompte, danger, « bientôt ».
+     * Rien de décoratif ne prend le corail.
      */
-    --degrade: radial-gradient(120% 80% at 15% 0%, #142b47 0%, #0e1a2e 45%, #080d19 100%);
-    --halo: rgb(47 127 184 / 0.1);
-    --fond: #0e1a2e; /* repli uni : barre système, impression, `color-scheme` */
-    --fond-creux: rgb(255 255 255 / 0.05); /* creux d'un champ, d'une puce */
-    --surface: rgb(255 255 255 / 0.07); /* le verre ordinaire */
-    --surface-haute: rgb(255 255 255 / 0.12); /* verre appuyé : survol, en-tête de tableau */
-    --surface-accent: rgb(169 220 245 / 0.1); /* verre teinté : ce qui appelle une décision */
-    --rail: rgb(255 255 255 / 0.12); /* la barre de navigation flottante */
+    --degrade: radial-gradient(120% 80% at 15% 0%, #1d2725 0%, #171f1e 45%, #121a19 100%);
+    --halo: rgb(111 195 198 / 0.08);
+    --fond: #121a19; /* repli uni : barre système, impression, `color-scheme` */
+    --fond-creux: #1d2725; /* creux d'un champ, d'une puce */
+    --surface: #1a2422; /* la carte posée */
+    --surface-haute: #171f1e; /* surface appuyée : survol, en-tête de tableau */
+    --surface-accent: #16302f; /* teinté sarcelle : ce qui appelle une décision */
+    --rail: rgb(18 26 25 / 0.86); /* la barre de navigation flottante */
 
-    --bord: rgb(255 255 255 / 0.18);
-    --bord-accent: rgb(169 220 245 / 0.34);
-    /* L'arête de la vitre : un filet de lumière en haut, une ombre portée en dessous. */
-    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+    --bord: rgb(242 236 227 / 0.14);
+    --bord-accent: rgb(111 195 198 / 0.32);
+    /* Une ombre étalée et basse, et plus d'arête de verre : un filet de lumière en haut
+       n'a rien à éclairer sur une surface opaque. */
+    --lustre: 0 18px 40px -30px rgb(0 0 0 / 0.55);
 
-    --encre: #e9eff6;
-    --encre-douce: #c2cdda;
+    --encre: #f2ece3;
+    --encre-douce: #c4ccc9;
 
-    --accent: #a9dcf5;
-    --accent-2: #d5bdf7; /* seul usage : distinguer une ligne de bus */
-    /* Le bouton d'action : un galet clair, pas une pastille colorée. */
-    --plein: rgb(255 255 255 / 0.92);
-    --encre-sur-plein: #10233d;
+    --accent: #6fc3c6;
+    --accent-2: #a5dedf; /* seul usage : distinguer une ligne de bus */
+    /* Le galet d'action : l'encre de la page, renversée. Il ne prend PAS l'accent —
+       celui-ci sert à lire les heures, et un bouton de la même couleur qu'une heure de
+       départ crée une hésitation. R70. */
+    --plein: #f2ece3;
+    --encre-sur-plein: #0b2a2e;
 
-    --danger: #f4aab6;
-    --danger-fond: rgb(232 121 140 / 0.14);
-    --danger-bord: rgb(232 121 140 / 0.38);
-    --attention: #ecc386;
-    --attention-fond: rgb(224 169 90 / 0.14);
-    --attention-bord: rgb(224 169 90 / 0.38);
-    --succes: #b3d3ad;
-    --succes-fond: rgb(147 197 140 / 0.14);
-    --succes-bord: rgb(147 197 140 / 0.38);
+    --danger: #ffae91;
+    --danger-fond: rgb(255 140 102 / 0.14);
+    --danger-bord: rgb(255 140 102 / 0.38);
+    --attention: #e0a44e;
+    --attention-fond: rgb(224 164 78 / 0.12);
+    --attention-bord: rgb(224 164 78 / 0.34);
+    /* Le seul rôle que la vitrine ne nomme pas — elle n'a rien à confirmer. Un vert
+       tiré vers la sarcelle, pour qu'il appartienne à la même charte. */
+    --succes: #8fd0ad;
+    --succes-fond: rgb(143 208 173 / 0.14);
+    --succes-bord: rgb(143 208 173 / 0.38);
     --info-fond: var(--surface-accent);
     --info-bord: var(--bord-accent);
 
@@ -177,90 +194,94 @@
   }
 
   /*
-   * Palette claire. Elle est écrite deux fois — sur le choix explicite et sur la
+   * Palette claire — celle de la maquette de la vitrine, et celle que voit la majorité
+   * des lecteurs. Elle est écrite deux fois — sur le choix explicite et sur la
    * préférence système — parce qu'une media query ne peut pas figurer dans un
    * sélecteur : c'est la seule duplication acceptée de la couche `tokens`.
    *
-   * Le principe s'inverse : les voiles sont blancs sur un fond gris-bleu, et le bouton
-   * d'action redevient sombre. La bordure, elle, ne peut pas rester blanche comme dans
-   * la maquette — un filet blanc sur un fond clair ne sépare rien. Elle passe à l'encre
-   * translucide, et c'est `--lustre` seul qui garde l'arête de verre.
+   * Le principe s'inverse : crème et papier, sarcelle assombrie pour tenir dessus, et le
+   * galet d'action redevient sombre. Les ombres se teintent de sarcelle — une ombre
+   * noire sur du crème grise la page au lieu de la creuser.
    */
   :root[data-theme='clair'] {
-    --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
-    --halo: rgb(47 127 184 / 0.05);
-    --fond: #e1e7ee;
-    --fond-creux: rgb(255 255 255 / 0.5);
-    --surface: rgb(255 255 255 / 0.55);
-    --surface-haute: rgb(255 255 255 / 0.75);
-    --surface-accent: rgb(157 196 232 / 0.38);
-    --rail: rgb(255 255 255 / 0.6);
+    --degrade: radial-gradient(120% 80% at 20% 0%, #fffdf9 0%, #fbf6ef 50%, #f3ebdf 100%);
+    --halo: rgb(15 90 97 / 0.05);
+    --fond: #fbf6ef;
+    --fond-creux: #f3ebdf;
+    --surface: #fffdf9;
+    --surface-haute: #f6efe4;
+    --surface-accent: #e3edeb;
+    --rail: rgb(251 246 239 / 0.86);
 
-    --bord: rgb(21 26 32 / 0.14);
-    --bord-accent: rgb(18 57 95 / 0.3);
-    --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
+    --bord: rgb(28 39 37 / 0.12);
+    --bord-accent: rgb(15 90 97 / 0.28);
+    --lustre: 0 18px 40px -30px rgb(11 63 69 / 0.55);
+    --ombre-2: 0 26px 60px -40px rgb(11 63 69 / 0.5);
+    --ombre-3: 0 30px 70px -40px rgb(11 63 69 / 0.6);
 
-    --encre: #151a20;
-    --encre-douce: #4a5262;
+    --encre: #1c2725;
+    --encre-douce: #4a5654;
 
-    --accent: #12395f;
-    --accent-2: #553094;
-    /* Le galet plein n'est PAS l'accent — un bouton de la même couleur qu'une heure
-       de départ crée une hésitation, et c'est exactement ce que faisait la palette
-       claire : les deux jetons y étaient strictement identiques, contre l'intention
-       écrite plus haut. Un gris d'encre, symétrique du galet clair du thème sombre. R70. */
-    --plein: #1a222c;
-    --encre-sur-plein: #eef2f7;
+    --accent: #0f5a61;
+    --accent-2: #0b3f45;
+    /* Le galet plein n'est pas l'accent : même raison qu'en thème sombre. R70. */
+    --plein: #1c2725;
+    --encre-sur-plein: #fbf6ef;
 
-    --danger: #8f1f2b;
-    --danger-fond: rgb(156 39 51 / 0.1);
-    --danger-bord: rgb(156 39 51 / 0.28);
-    --attention: #6b4300;
-    --attention-fond: rgb(125 80 0 / 0.1);
-    --attention-bord: rgb(125 80 0 / 0.28);
-    --succes: #215424;
-    --succes-fond: rgb(44 107 34 / 0.1);
-    --succes-bord: rgb(44 107 34 / 0.28);
+    --danger: #a9381f;
+    --danger-fond: rgb(217 80 47 / 0.1);
+    --danger-bord: rgb(217 80 47 / 0.28);
+    /* L'ambre de la maquette (#b77410) ne tenait que 3,75:1 sur le crème : assombri à
+       #8f5a0b, même teinte, même rôle. La vitrine a fait le même écart, pour la même
+       raison. */
+    --attention: #8f5a0b;
+    --attention-fond: rgb(143 90 11 / 0.1);
+    --attention-bord: rgb(143 90 11 / 0.3);
+    --succes: #145c3c;
+    --succes-fond: rgb(20 92 60 / 0.1);
+    --succes-bord: rgb(20 92 60 / 0.28);
 
     color-scheme: light;
   }
 
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='sombre']) {
-      --degrade: radial-gradient(120% 80% at 20% 0%, #eef2f7 0%, #e1e7ee 50%, #cfd8e2 100%);
-      --halo: rgb(47 127 184 / 0.05);
-      --fond: #e1e7ee;
-      --fond-creux: rgb(255 255 255 / 0.5);
-      --surface: rgb(255 255 255 / 0.55);
-      --surface-haute: rgb(255 255 255 / 0.75);
-      --surface-accent: rgb(157 196 232 / 0.38);
-      --rail: rgb(255 255 255 / 0.6);
+      --degrade: radial-gradient(120% 80% at 20% 0%, #fffdf9 0%, #fbf6ef 50%, #f3ebdf 100%);
+      --halo: rgb(15 90 97 / 0.05);
+      --fond: #fbf6ef;
+      --fond-creux: #f3ebdf;
+      --surface: #fffdf9;
+      --surface-haute: #f6efe4;
+      --surface-accent: #e3edeb;
+      --rail: rgb(251 246 239 / 0.86);
 
-      --bord: rgb(21 26 32 / 0.14);
-      --bord-accent: rgb(18 57 95 / 0.3);
-      --lustre: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(21 26 32 / 0.6);
+      --bord: rgb(28 39 37 / 0.12);
+      --bord-accent: rgb(15 90 97 / 0.28);
+      --lustre: 0 18px 40px -30px rgb(11 63 69 / 0.55);
+      --ombre-2: 0 26px 60px -40px rgb(11 63 69 / 0.5);
+      --ombre-3: 0 30px 70px -40px rgb(11 63 69 / 0.6);
 
-      --encre: #151a20;
-      --encre-douce: #4a5262;
+      --encre: #1c2725;
+      --encre-douce: #4a5654;
 
-      --accent: #12395f;
-      --accent-2: #553094;
-      /* Le galet plein n'est PAS l'accent — un bouton de la même couleur qu'une heure
-         de départ crée une hésitation, et c'est exactement ce que faisait la palette
-         claire : les deux jetons y étaient strictement identiques, contre l'intention
-         écrite plus haut. Un gris d'encre, symétrique du galet clair du thème sombre. R70. */
-      --plein: #1a222c;
-      --encre-sur-plein: #eef2f7;
+      --accent: #0f5a61;
+      --accent-2: #0b3f45;
+      /* Le galet plein n'est pas l'accent : même raison qu'en thème sombre. R70. */
+      --plein: #1c2725;
+      --encre-sur-plein: #fbf6ef;
 
-      --danger: #8f1f2b;
-      --danger-fond: rgb(156 39 51 / 0.1);
-      --danger-bord: rgb(156 39 51 / 0.28);
-      --attention: #6b4300;
-      --attention-fond: rgb(125 80 0 / 0.1);
-      --attention-bord: rgb(125 80 0 / 0.28);
-      --succes: #215424;
-      --succes-fond: rgb(44 107 34 / 0.1);
-      --succes-bord: rgb(44 107 34 / 0.28);
+      --danger: #a9381f;
+      --danger-fond: rgb(217 80 47 / 0.1);
+      --danger-bord: rgb(217 80 47 / 0.28);
+      /* L'ambre de la maquette (#b77410) ne tenait que 3,75:1 sur le crème : assombri à
+         #8f5a0b, même teinte, même rôle. La vitrine a fait le même écart, pour la même
+         raison. */
+      --attention: #8f5a0b;
+      --attention-fond: rgb(143 90 11 / 0.1);
+      --attention-bord: rgb(143 90 11 / 0.3);
+      --succes: #145c3c;
+      --succes-fond: rgb(20 92 60 / 0.1);
+      --succes-bord: rgb(20 92 60 / 0.28);
 
       color-scheme: light;
     }
