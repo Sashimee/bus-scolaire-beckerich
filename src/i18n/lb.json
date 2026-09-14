@@ -19,7 +19,8 @@
     "menu": "Menü",
     "retour": "Zréck",
     "principale": "Haaptnavigatioun",
-    "credits": "Merci"
+    "credits": "Merci",
+    "contact": "Kontakt"
   },
   "choixLangue": {
     "titre": "Wielt Är Sprooch",
@@ -492,7 +493,8 @@
     "corps5": "Am Zweiwels- oder Ofwäichungsfall gëllt dat offiziellt Dokument vun der Gemeng.",
     "lienOfficiel": "Offiziell Säit vun der Schoul opmaachen",
     "lienPdf": "Offizielle Plang eroflueden",
-    "contact": "Feeler mellen"
+    "contact": "Feeler mellen",
+    "contactAdresse": "De Formulaire ass online. Ouni Netz schreift direkt un"
   },
   "installer": {
     "titre": "App installéieren",

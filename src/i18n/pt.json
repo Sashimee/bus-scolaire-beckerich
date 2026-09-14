@@ -19,7 +19,8 @@
     "menu": "Menu",
     "retour": "Voltar",
     "principale": "Navegação principal",
-    "credits": "Créditos"
+    "credits": "Créditos",
+    "contact": "Contacto"
   },
   "choixLangue": {
     "titre": "Escolha o seu idioma",
@@ -492,7 +493,8 @@
     "corps5": "Em caso de dúvida ou divergência, prevalece o documento oficial do município.",
     "lienOfficiel": "Consultar a página oficial da escola",
     "lienPdf": "Transferir o plano oficial",
-    "contact": "Comunicar um erro"
+    "contact": "Comunicar um erro",
+    "contactAdresse": "O formulário está online. Sem rede, escreva diretamente para"
   },
   "installer": {
     "titre": "Instalar a aplicação",
