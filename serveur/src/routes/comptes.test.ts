@@ -199,6 +199,38 @@ describe.skipIf(!avecBase)('espace comptes', () => {
       })
       expect(rep.status).toBe(429)
     })
+
+    it('« mot de passe oublié » ne remet pas le compteur de tentatives à zéro', async () => {
+      // R59 : cette route appelait `reussite(ip)`, qui efface le compteur partagé avec
+      // la connexion. Il suffisait de l'intercaler AVANT d'atteindre la limite pour
+      // remettre le verrou à zéro, indéfiniment, et forcer un mot de passe sans frein.
+      //
+      // Le compte s'incrémente à CHAQUE appel gardé, connexion ou oubli confondus, et
+      // ne refuse qu'au-delà de cinq. On en consomme donc quatre, l'oubli prend le
+      // cinquième — il doit encore passer — et la tentative suivante doit être refusée.
+      // Sans le correctif, l'oubli effaçait tout et cette tentative ne valait qu'un 401.
+      await creerCompte()
+      const memeIp = { 'X-Forwarded-For': '203.0.113.251' }
+      const essayer = (motDePasse: string) =>
+        app.request('/api/comptes/connexion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...memeIp },
+          body: JSON.stringify({ courriel: 'agent@ville.lu', motDePasse }),
+        })
+
+      for (let i = 0; i < 4; i++) {
+        expect((await essayer('faux')).status).toBe(401)
+      }
+
+      const oubli = await app.request('/api/comptes/mot-de-passe-oublie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...memeIp },
+        body: JSON.stringify({ courriel: 'agent@ville.lu' }),
+      })
+      expect(oubli.status, 'l’oubli consomme le cinquième jeton, il doit encore passer').toBe(200)
+
+      expect((await essayer('faux')).status, 'le verrou a été remis à zéro').toBe(429)
+    })
   })
 
   describe('session', () => {

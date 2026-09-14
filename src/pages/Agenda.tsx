@@ -16,7 +16,7 @@ import {
   terminerConnexion,
 } from '../lib/agenda/google'
 import { nomArretParId } from '../lib/affichage'
-import type { ContexteEnfant } from '../lib/plan'
+import { aucunBus, type ContexteEnfant } from '../lib/plan'
 
 type Plateforme = 'ios' | 'android' | 'google' | 'outlook'
 
@@ -131,7 +131,7 @@ function BlocGoogle() {
 
   const enfants = foyer.enfants
     .map((e) => contextes.get(e.id))
-    .filter((c): c is ContexteEnfant => c !== null && c !== undefined && !c.marcheDirecte)
+    .filter((c): c is ContexteEnfant => c !== null && c !== undefined && !aucunBus(c))
 
   const synchroniser = async () => {
     if (!jeton) return

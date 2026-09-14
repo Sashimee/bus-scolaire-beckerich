@@ -36,6 +36,30 @@ const estObjet = (v: unknown): v is Record<string, unknown> =>
 const minutes = (h: string) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5))
 
 /**
+ * Au-delà, un car scolaire de village a presque sûrement une minute mal recopiée.
+ *
+ * Le plan en vigueur en compte six — Huttange → Noerdange en 1 min pour 1,9 km, soit
+ * 114 km/h — hérités de l'arrondi à la minute de la brochure communale. Ce sont des
+ * AVERTISSEMENTS : refuser de publier pour cela bloquerait une rentrée entière, et ces
+ * six-là sont dans la brochure. Mais personne ne les avait vus. R70.
+ */
+const VITESSE_MAX_KMH = 90
+
+/** Distance à vol d'oiseau entre deux arrêts connus, en km. `null` si l'un est inconnu. */
+function distanceKm(a: string, b: string): number | null {
+  const x = arrets.find((s) => s.id === a)
+  const y = arrets.find((s) => s.id === b)
+  if (!x || !y) return null
+  const rad = (d: number) => (d * Math.PI) / 180
+  const dLat = rad(y.coord[0] - x.coord[0])
+  const dLon = rad(y.coord[1] - x.coord[1])
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(x.coord[0])) * Math.cos(rad(y.coord[0])) * Math.sin(dLon / 2) ** 2
+  return 6371 * 2 * Math.asin(Math.sqrt(h))
+}
+
+/**
  * Vérifie un plan complet. Renvoie la liste des problèmes ; publication autorisée
  * seulement si aucun n'est de gravité « erreur ».
  */
@@ -131,6 +155,57 @@ export function validerPlan(brut: unknown): Probleme[] {
     }
   }
 
+  // — Incertitudes ————————————————————————————————————————
+  // Une course peut renvoyer à une incertitude par son identifiant. Un renvoi qui ne
+  // désigne rien ne se voit pas : l'application affiche alors la CLÉ de traduction à
+  // la place de la phrase, sous un titre « Ce que nous ne savons pas ».
+  const idsIncertitudes = new Set<string>()
+  if (brut.incertitudes !== undefined && !Array.isArray(brut.incertitudes)) {
+    erreur('incertitudes', "Ce n'est pas une liste.")
+  } else {
+    for (const [i, brute] of ((brut.incertitudes as unknown[]) ?? []).entries()) {
+      const ou = `incertitude ${i + 1}`
+      if (!estObjet(brute)) {
+        erreur(ou, "Ce n'est pas un objet.")
+        continue
+      }
+      const id = typeof brute.id === 'string' ? brute.id : ''
+      if (!id) erreur(ou, 'Identifiant absent.')
+      else if (idsIncertitudes.has(id)) erreur(id, 'Identifiant en double.')
+      else idsIncertitudes.add(id)
+
+      for (const champ of ['question', 'hypothese']) {
+        if (typeof brute[champ] !== 'string' || !brute[champ]) {
+          erreur(id || ou, `Le champ « ${champ} » est absent ou vide.`)
+        }
+      }
+      // `jours` restreint l'incertitude aux jours qu'elle concerne réellement. Une
+      // liste vide la rendrait invisible partout, ce qui n'est jamais l'intention.
+      if (brute.jours !== undefined) {
+        if (!Array.isArray(brute.jours) || brute.jours.length === 0) {
+          erreur(id || ou, '« jours » doit être une liste non vide, ou être absent.')
+        } else {
+          for (const j of brute.jours) {
+            if (!JOURS.includes(j as Jour)) erreur(id || ou, `Jour inconnu : « ${String(j)} ».`)
+          }
+        }
+      }
+    }
+  }
+
+  // — Notes ————————————————————————————————————————————————
+  // Même piège que les incertitudes : un arrêt porte des identifiants de note, dont le
+  // texte vit dans les dictionnaires. Une note qui n'est pas déclarée ici affiche sa
+  // CLÉ au parent, à côté d'une heure de bus. R70.
+  const idsNotes = new Set<string>()
+  if (brut.notes !== undefined && !estObjet(brut.notes)) {
+    erreur('notes', "Ce n'est pas un objet.")
+  } else {
+    for (const cle of Object.keys((brut.notes as Record<string, unknown>) ?? {})) {
+      if (!cle.startsWith('$')) idsNotes.add(cle)
+    }
+  }
+
   // — Lignes ——————————————————————————————————————————————
   if (!Array.isArray(brut.lignes) || brut.lignes.length === 0) {
     erreur('lignes', 'Aucune ligne : le plan serait vide.')
@@ -174,6 +249,12 @@ export function validerPlan(brut: unknown): Probleme[] {
       continue
     }
 
+    // Les arrêts que CETTE ligne dessert réellement, pour confronter son champ
+    // `dessert` : il annonce au parent où la ligne le mène, et `aller-3` y écrivait
+    // « beckerich-ecole » alors qu'il passe à la maison relais. Rien ne l'avait vu,
+    // aucun code ne lisant ce champ. R70.
+    const desservisParLaLigne = new Set<string>()
+
     for (const [iS, serviceBrut] of ligneBrute.services.entries()) {
       const ou2 = `${ou1} › course ${iS + 1}`
       if (!estObjet(serviceBrut)) {
@@ -199,12 +280,20 @@ export function validerPlan(brut: unknown): Probleme[] {
         }
       }
 
+      if (serviceBrut.incertitude !== undefined) {
+        const renvoi = serviceBrut.incertitude
+        if (typeof renvoi !== 'string' || !idsIncertitudes.has(renvoi)) {
+          erreur(ou, `Incertitude inconnue : « ${String(renvoi)} ». Aucune ne porte cet identifiant.`)
+        }
+      }
+
       if (!Array.isArray(serviceBrut.arrets) || serviceBrut.arrets.length < 2) {
         erreur(ou, 'Une course doit desservir au moins deux arrêts.')
         continue
       }
 
       let precedente: number | null = null
+      let arretPrecedent: string | null = null
       for (const [iA, arretBrut] of serviceBrut.arrets.entries()) {
         const ouA = `${ou} › arrêt ${iA + 1}`
         if (!estObjet(arretBrut)) {
@@ -220,6 +309,25 @@ export function validerPlan(brut: unknown): Probleme[] {
           )
         } else {
           arretsUtilises.add(idArret)
+          if (arretBrut.desservi !== false) desservisParLaLigne.add(idArret)
+          // Une boucle qui repasse au même arrêt est normale — l'Aller 3 dessert le
+          // Dillendapp deux fois. Deux fois D'AFFILÉE ne l'est jamais : c'est une
+          // ligne recopiée en trop, et elle ferait un trajet de zéro minute.
+          if (idArret === arretPrecedent) {
+            erreur(ouA, `L'arrêt « ${idArret} » est répété deux fois de suite.`)
+          }
+        }
+
+        if (arretBrut.notes !== undefined) {
+          if (!Array.isArray(arretBrut.notes)) {
+            erreur(ouA, '« notes » doit être une liste d’identifiants.')
+          } else {
+            for (const n of arretBrut.notes) {
+              if (!idsNotes.has(n as string)) {
+                erreur(ouA, `Note inconnue : « ${String(n)} ». Déclarez-la dans « notes ».`)
+              }
+            }
+          }
         }
 
         const heure = arretBrut.heure
@@ -233,7 +341,38 @@ export function validerPlan(brut: unknown): Probleme[] {
               `L'heure ${heure} précède celle de l'arrêt précédent : la course remonterait le temps.`,
             )
           }
+          // Une vitesse impossible signale presque toujours une minute mal recopiée.
+          // Avertissement et non erreur : le plan en vigueur en compte six, hérités de
+          // l'arrondi à la minute de la brochure, et refuser de publier pour cela
+          // bloquerait une rentrée entière. R70.
+          if (precedente !== null && typeof idArret === 'string' && arretPrecedent) {
+            const km = distanceKm(arretPrecedent, idArret)
+            const minutesEcoulees = m - precedente
+            if (km !== null && minutesEcoulees > 0 && km / (minutesEcoulees / 60) > VITESSE_MAX_KMH) {
+              avertir(
+                ouA,
+                `${km.toFixed(1)} km en ${minutesEcoulees} min depuis « ${arretPrecedent} » : ` +
+                  `plus de ${VITESSE_MAX_KMH} km/h. Vérifiez l'heure.`,
+              )
+            }
+          }
           precedente = m
+        }
+        if (typeof idArret === 'string') arretPrecedent = idArret
+      }
+    }
+
+    if (ligneBrute.dessert !== undefined) {
+      if (!Array.isArray(ligneBrute.dessert)) {
+        erreur(ou1, '« dessert » doit être une liste d’identifiants d’arrêts.')
+      } else {
+        for (const id of ligneBrute.dessert) {
+          if (!desservisParLaLigne.has(id as string)) {
+            erreur(
+              ou1,
+              `« dessert » annonce « ${String(id)} », qu'aucune course de cette ligne ne dessert.`,
+            )
+          }
         }
       }
     }

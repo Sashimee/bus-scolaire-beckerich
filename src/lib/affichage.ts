@@ -5,6 +5,7 @@
  * traduit en texte lisible.
  */
 import type { Traduction } from '../i18n'
+import { isoDate } from './calendrier'
 import { arret as trouverArret, plan } from './donnees'
 import type { Arret, ArretDesservi, Ligne, Service, Trajet, TypeTrajet } from './types'
 
@@ -99,6 +100,23 @@ export function nomArretParId(id: string, t: Traduction['t']): string {
   return nomArret(trouverArret(id), t)
 }
 
+/**
+ * Le nom de l'arrêt, suivi des noms que la brochure communale lui donne.
+ *
+ * Un parent choisit son arrêt la brochure à la main : il y lit « Sportshal/Op der
+ * Halte » et cherche cette étiquette dans la liste. Sans les alias, il ne la trouve pas.
+ * Réservé aux endroits où l'on CHOISIT un arrêt — ailleurs, le nom canonique suffit et
+ * la mention alourdirait chaque ligne d'horaire.
+ */
+export function nomArretAvecAlias(a: Arret, t: Traduction['t']): string {
+  const nom = nomArret(a, t)
+  if (!a.aliases?.length) return nom
+  // Virgule et non « · » : ce dernier sépare déjà le village du lieu dans le nom
+  // lui-même, et le réemployer ferait lire « Op der Halte · Op der Halte » comme un
+  // seul arrêt à rallonge.
+  return `${nom} — ${t('arrets.aussiAppele', { noms: a.aliases.join(', ') })}`
+}
+
 /** Heure affichable, ou mention explicite quand le plan ne la publie pas. */
 export function heureOuMention(heure: string | null, t: Traduction['t']): string {
   return heure ?? t('trajets.heureNonPubliee')
@@ -112,7 +130,10 @@ export function distanceLisible(metres: number): string {
 
 /** Le plan chargé est-il encore dans sa période de validité ? */
 export function planPerime(aujourdhui = new Date()): boolean {
-  return aujourdhui.toISOString().slice(0, 10) > plan.valideAu
+  // `toISOString()` rend une date UTC : à Luxembourg, le lendemain de l'échéance, le
+  // plan se serait dit valable jusqu'à 01:00 ou 02:00 du matin. `isoDate` existe
+  // précisément pour ce piège, et `valideAu` est une date locale. R66.
+  return isoDate(aujourdhui) > plan.valideAu
 }
 
 /** Liste lisible : « 2025/2026 et 2026/2027 ». */

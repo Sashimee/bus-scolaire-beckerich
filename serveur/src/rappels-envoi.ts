@@ -13,10 +13,10 @@
  */
 import { rappelsDus } from './rappels.js'
 import { etatDuJour } from '../../src/lib/calendrier.ts'
-import { plan } from '../../src/lib/donnees.ts'
+import { plan as planEmbarque } from '../../src/lib/donnees.ts'
 import { envoyerATous } from './envois.ts'
 import { ecrireEphemere, lireEphemere } from './stockage/ephemeres.ts'
-import { listerPerturbations } from './stockage/publications.ts'
+import { lireDocument, listerPerturbations } from './stockage/publications.ts'
 import { journaliser } from './stockage/journal.ts'
 import { baseConfiguree } from './stockage/client.ts'
 
@@ -51,6 +51,21 @@ async function lireUrgencesPubliees(): Promise<any[]> {
   return listerPerturbations()
 }
 
+/**
+ * Le plan en vigueur : celui publié en base, à défaut celui embarqué dans l'image.
+ *
+ * Les créneaux d'un rappel se déduisent des heures de la course concernée. Lire le plan
+ * embarqué revenait à les calculer sur des horaires que plus personne ne voit : après
+ * une publication, un rappel serait parti au mauvais moment — ou pas du tout, si la
+ * course visée n'existait que dans le plan publié. `/horaires` sert déjà le document
+ * publié aux parents ; c'est la même source. R66.
+ */
+async function planEnVigueur(): Promise<typeof planEmbarque> {
+  if (!baseConfiguree()) return planEmbarque
+  const doc = await lireDocument('horaires')
+  return (doc?.contenu as typeof planEmbarque | undefined) ?? planEmbarque
+}
+
 interface EtatRappel {
   compte: number
   creneaux: string[]
@@ -77,7 +92,7 @@ export async function envoyerRappels(maintenant = new Date()): Promise<{ rappels
     perturbations,
     maintenant,
     etats,
-    plan,
+    plan: await planEnVigueur(),
     // `etatDuJour` connaît vacances et fériés : un rappel un jour de congé n'aurait
     // aucun sens, et c'est la même table que celle affichée aux parents.
     jourEcole: etatDuJour(maintenant).ecole,

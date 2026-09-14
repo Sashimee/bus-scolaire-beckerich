@@ -22,7 +22,7 @@ import { FournisseurRechargement } from '../rechargement-contexte'
 import fr from '../i18n/fr.json'
 import type { Adresse, Enfant, Foyer, Jour, RepasMidi } from '../lib/types'
 import { JOURS } from '../lib/types'
-import { JOURS_MIDI } from '../lib/moments'
+import { joursMidi } from '../lib/moments'
 
 // Le fournisseur déduit la langue du navigateur, qui répond « en » sous jsdom. Les
 // assertions portent sur le dictionnaire de référence : autant le lui imposer.
@@ -239,7 +239,7 @@ describe('forme du parcours', () => {
 
     expect(screen.getByText(fr.recapitulatif.reponses)).toBeDefined()
     // Le déjeuner n'est récapitulé que les jours où il y a cours l'après-midi.
-    expect(screen.getAllByText(fr.midi.maisonCourt).length).toBe(JOURS_MIDI.length)
+    expect(screen.getAllByText(fr.midi.maisonCourt).length).toBe(joursMidi().length)
     expect(
       screen.queryByRole('button', { name: fr.calendrier.icsEnfant.replace('{prenom}', 'Léa') }),
     ).toBeNull()

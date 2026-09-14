@@ -221,7 +221,9 @@ async function motDePasseOublie(c: Context) {
   if (compte && !compte.desactive && courrielConfigure()) {
     await envoyerLienReprise(compte, DUREE_REINIT_S, false)
   }
-  await reussite(ip)
+  // Surtout pas de `reussite(ip)` ici : le compteur est partagé avec la connexion, et
+  // l'effacer rendait le verrou des cinq tentatives inopérant — il suffisait
+  // d'intercaler un appel à cette route entre deux essais de mot de passe. R59.
   return c.json({ ok: true })
 }
 

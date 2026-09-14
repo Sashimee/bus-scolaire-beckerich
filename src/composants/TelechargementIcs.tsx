@@ -2,7 +2,7 @@ import { useT } from '../i18n'
 import { useFoyer } from '../etat'
 import { icsEnfant, icsFoyer } from '../lib/agenda'
 import { nomArretParId } from '../lib/affichage'
-import type { ContexteEnfant } from '../lib/plan'
+import { aucunBus, type ContexteEnfant } from '../lib/plan'
 import type { OptionsAgenda } from '../lib/agenda'
 
 /**
@@ -20,7 +20,7 @@ export function TelechargementIcs() {
   // Sans trajet, l'export produirait un calendrier vide : mieux vaut pas de bouton.
   const enfants = foyer.enfants
     .map((e) => contextes.get(e.id))
-    .filter((c): c is ContexteEnfant => c !== null && c !== undefined && !c.marcheDirecte)
+    .filter((c): c is ContexteEnfant => c !== null && c !== undefined && !aucunBus(c))
 
   if (enfants.length === 0) return null
 

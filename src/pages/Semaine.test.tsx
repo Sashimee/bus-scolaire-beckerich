@@ -104,6 +104,7 @@ const carteDuJour = (jour: string) =>
 
 const MIA = enfant('mia', 'Mia', 'c2')
 const TOM = enfant('tom', 'Tom', 'c4')
+const NOE = enfant('noe', 'Noé', 'precoce')
 
 describe('la semaine d’un enfant qui prend le bus', () => {
   it('donne les cinq jours, chacun avec ses trajets', () => {
@@ -152,6 +153,28 @@ describe('l’enfant qui va à l’école à pied', () => {
 
   it('ne propose pas l’agenda : il n’y aurait aucun horaire à y mettre', () => {
     monter({ adresse: DEVANT_LECOLE, enfants: [TOM] }, 'tom')
+
+    expect(screen.queryAllByRole('link', { name: fr.agenda.lienDepuisFiche })).toHaveLength(0)
+  })
+})
+
+/*
+ * Le précoce n'a pas de transport scolaire, mais les courses du plan passent par son
+ * village et par son école : le moteur en trouvait quatre par jour, et l'écran les
+ * affichait. Une réponse fausse est pire qu'une réponse absente. R65.
+ */
+describe('l’enfant d’un cycle sans transport scolaire', () => {
+  it('dit qu’il n’y a pas de bus, et n’affiche aucun horaire', () => {
+    monter({ adresse: HOVELANGE, enfants: [NOE] }, 'noe')
+
+    expect(screen.getByText(fr.enfant.sansTransport.replace('{cycle}', fr.cycles.precoce)))
+      .toBeDefined()
+    expect(screen.queryByRole('heading', { level: 3, name: fr.jours.lundi })).toBeNull()
+    expect(screen.queryByText('07:44')).toBeNull()
+  })
+
+  it('ne propose pas l’agenda : il n’y aurait aucun horaire à y mettre', () => {
+    monter({ adresse: HOVELANGE, enfants: [NOE] }, 'noe')
 
     expect(screen.queryAllByRole('link', { name: fr.agenda.lienDepuisFiche })).toHaveLength(0)
   })

@@ -64,13 +64,15 @@
     {
       "id": "depart-midi-vendredi-hall-sportif",
       "portee": "aller-dillendapp.midi",
+      "jours": ["vendredi"],
       "question": "Le plan 2025/2026 précisait que le départ de 12:10 se faisait depuis le hall sportif le vendredi, et non depuis l'école de Noerdange. La brochure 2026/2027 ne le dit plus — sans dire non plus que cela a changé.",
       "hypothese": "Départ de l'école de Noerdange tous les jours, comme l'écrit le plan en vigueur.",
       "aVerifierAupres": "Commune de Beckerich / Maison relais Dillendapp"
     }
   ],
 
-  "reglesConfirmees": [
+  "$commentaireReglesConfirmees": "Le préfixe $ dit que ceci est de la prose pour humains, pas une donnée : aucun code ne la lit. La règle décrite vit dans src/lib/plan.ts, et un test garde qu'elle n'est plus listée comme incertaine. On garde la trace de QUI a confirmé et QUAND, parce que c'est ce qu'il faudra redemander à la prochaine rentrée.",
+  "$reglesConfirmees": [
     {
       "id": "retours-apres-midi-mardi-jeudi",
       "portee": "retour-1.soir, retour-2.soir",
@@ -211,7 +213,7 @@
       "id": "aller-3",
       "nom": "Aller — Bus 3",
       "direction": "vers-ecole",
-      "dessert": ["beckerich-ecole", "oberpallen-ecole", "noerdange-ecole"],
+      "dessert": ["beckerich-dillendapp", "oberpallen-ecole", "noerdange-ecole"],
       "services": [
         {
           "id": "aller-3-matin",
@@ -246,7 +248,6 @@
           "id": "aller-dillendapp-midi",
           "periode": "midi",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "horaireComplet": false,
           "incertitude": "depart-midi-vendredi-hall-sportif",
           "arrets": [
             { "arret": "noerdange-ecole", "heure": "12:10" },
@@ -387,7 +388,6 @@
           "id": "retour-dillendapp-apres-midi",
           "periode": "apres-midi",
           "jours": ["lundi", "mercredi", "vendredi"],
-          "horaireComplet": false,
           "arrets": [
             { "arret": "huttange", "heure": "13:45" },
             {

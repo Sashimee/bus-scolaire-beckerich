@@ -14,14 +14,22 @@ interface Props {
  * C'est le SEUL élément de l'application qui a besoin du réseau. Il se charge donc
  * paresseusement et, hors ligne, cède la place à un texte : l'application doit rester
  * pleinement utilisable à l'arrêt de bus, sans couverture.
+ *
+ * Et il ne se charge QUE sur demande. Les tuiles sont réclamées à OpenStreetMap par
+ * leurs coordonnées `{z}/{x}/{y}`, calculées depuis le domicile jusqu'au zoom 18 : la
+ * tuile centrale désigne le pâté de maisons. Montée au montage, cette carte faisait
+ * donc sortir de l'appareil une dérivée de l'adresse à chaque ouverture d'une fiche
+ * enfant, alors que l'application affirme par ailleurs que rien n'en sort. Le premier
+ * principe du projet veut que ce soit le parent qui le décide, en sachant quoi. R61.
  */
 export function CarteTrajet({ depuis, vers }: Props) {
   const { t } = useT()
   const conteneur = useRef<HTMLDivElement>(null)
   const [echec, setEchec] = useState(!navigator.onLine)
+  const [demandee, setDemandee] = useState(false)
 
   useEffect(() => {
-    if (!navigator.onLine || !conteneur.current) return
+    if (!demandee || !navigator.onLine || !conteneur.current) return
     let carte: import('leaflet').Map | undefined
     let annule = false
 
@@ -61,10 +69,21 @@ export function CarteTrajet({ depuis, vers }: Props) {
       annule = true
       carte?.remove()
     }
-  }, [depuis, vers, t])
+  }, [demandee, depuis, vers, t])
 
   if (echec) {
     return <p className="champ__aide sans-impression">{t('carte.horsLigne')}</p>
+  }
+
+  if (!demandee) {
+    return (
+      <div className="pile pile--serre sans-impression">
+        <button type="button" className="bouton" onClick={() => setDemandee(true)}>
+          {t('carte.afficher')}
+        </button>
+        <p className="champ__aide">{t('carte.avertissement')}</p>
+      </div>
+    )
   }
 
   return (

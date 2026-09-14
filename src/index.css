@@ -70,7 +70,6 @@
     --texte-xl: 1.125rem; /* titre de carte, heure mise en avant */
     --texte-2xl: 1.375rem; /* titre de section */
     --texte-3xl: 1.75rem; /* titre de page */
-    --texte-4xl: 2.25rem; /* titre d'écran, sur les pages qui n'en portent qu'un */
 
     /*
      * L'heure du prochain départ. Elle ne fait pas partie de l'échelle : c'est le seul
@@ -97,6 +96,8 @@
     --rayon-s: 12px;
     --rayon-m: 16px;
     --rayon-l: 24px;
+    /* Une pilule : le rayon dépasse toujours la moitié de la hauteur. */
+    --rayon-pilule: 999px;
     /* `--lustre` porte l'ombre des surfaces posées ; il ne reste que deux ombres
        portées, pour ce qui flotte au-dessus d'elles et pour ce qui bloque la page. */
     --ombre-2: 0 2px 6px -1px rgb(0 0 0 / 0.22), 0 8px 24px -14px rgb(0 0 0 / 0.4);
@@ -116,6 +117,12 @@
 
     /* Le flou d'arrière-plan des surfaces de verre, en un seul endroit. */
     --flou: blur(28px) saturate(140%);
+    /* Le rail flotte AU-DESSUS du contenu qui défile : il lui faut un flou plus franc
+       que les surfaces posées, sans quoi le texte transparaît au travers. */
+    --flou-rail: blur(30px) saturate(180%);
+    /* Le voile d'une boîte de dialogue : il éteint la page, il ne la floute qu'à peine. */
+    --voile-modale: rgb(0 0 0 / 0.5);
+    --flou-modale: blur(4px);
     --sortie: cubic-bezier(0.22, 0.61, 0.36, 1);
     --ressort: cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -125,10 +132,11 @@
      * Les surfaces ne sont plus opaques : ce sont des voiles blancs posés sur un
      * dégradé. Un couple encre/fond ne se vérifie donc plus sur une couleur unie mais
      * sur la COMPOSITION réelle — arrêt du dégradé, halo décoratif, une ou deux
-     * couches de verre. Toutes les encres ci-dessous ont été mesurées ainsi, sur les
-     * 24 compositions possibles, et tiennent ≥ 4,58:1 (voir docs/plan.md, lot 18).
-     * Ne pas éclaircir un voile ni un arrêt du dégradé sans refaire le calcul :
-     * éclaircir le fond abaisse toutes les encres d'un coup.
+     * couches de verre. `src/contraste.test.ts` refait ce calcul à chaque exécution
+     * des tests — états de survol compris, ce que le jeu de 24 compositions du lot 18
+     * n'incluait pas — et exige 4,5:1 ; le pire couple tient aujourd'hui 4,54:1.
+     * Éclaircir un voile ou un arrêt du dégradé abaisse toutes les encres d'un coup :
+     * le test le dira, ce que le commentaire d'avant ne faisait pas.
      */
     --degrade: radial-gradient(120% 80% at 15% 0%, #142b47 0%, #0e1a2e 45%, #080d19 100%);
     --halo: rgb(47 127 184 / 0.1);
@@ -197,7 +205,11 @@
 
     --accent: #12395f;
     --accent-2: #553094;
-    --plein: #12395f;
+    /* Le galet plein n'est PAS l'accent — un bouton de la même couleur qu'une heure
+       de départ crée une hésitation, et c'est exactement ce que faisait la palette
+       claire : les deux jetons y étaient strictement identiques, contre l'intention
+       écrite plus haut. Un gris d'encre, symétrique du galet clair du thème sombre. R70. */
+    --plein: #1a222c;
     --encre-sur-plein: #eef2f7;
 
     --danger: #8f1f2b;
@@ -233,7 +245,11 @@
 
       --accent: #12395f;
       --accent-2: #553094;
-      --plein: #12395f;
+      /* Le galet plein n'est PAS l'accent — un bouton de la même couleur qu'une heure
+         de départ crée une hésitation, et c'est exactement ce que faisait la palette
+         claire : les deux jetons y étaient strictement identiques, contre l'intention
+         écrite plus haut. Un gris d'encre, symétrique du galet clair du thème sombre. R70. */
+      --plein: #1a222c;
       --encre-sur-plein: #eef2f7;
 
       --danger: #8f1f2b;
@@ -501,8 +517,8 @@
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
     background: var(--rail);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: var(--flou-rail);
+    -webkit-backdrop-filter: var(--flou-rail);
     border: var(--trait) solid var(--bord);
     border-radius: var(--rayon-l);
     box-shadow: var(--lustre);
@@ -671,11 +687,6 @@
     box-shadow: var(--lustre), var(--ombre-3);
   }
 
-  .carte__titre {
-    font-size: var(--texte-xl);
-    font-weight: 650;
-  }
-
   /*
    * L'entrée des cartes se décale de proche en proche. Trois crans suffisent : au
    * quatrième, le dernier bloc arriverait après que l'œil a fini de lire le premier.
@@ -791,11 +802,11 @@
     border-color: var(--danger-bord);
   }
   .bouton--danger:hover {
+    /* Le fond se teinte, donc l'encre doit lâcher le rose : gardée à `--danger`, elle
+       tombait à 3,41:1 sur fond rose en thème sombre — et `:hover` reste collé après
+       un appui sur téléphone, laissant « Supprimer » illisible. R69. */
+    color: var(--encre);
     background: color-mix(in oklab, var(--danger) 22%, var(--surface));
-  }
-
-  .bouton--pleine-largeur {
-    inline-size: 100%;
   }
 
   /* --- Champs de formulaire --------------------------------------------------- */
@@ -956,7 +967,6 @@
     gap: var(--espace-2);
   }
 
-  .grille-semaine__entete,
   .grille-semaine__jour {
     display: grid;
     grid-template-columns: 5.5rem minmax(9rem, 1fr) minmax(9rem, 1.2fr);
@@ -964,18 +974,8 @@
     gap: var(--espace-2);
   }
 
-  .grille-semaine__entete {
-    color: var(--encre-douce);
-    font-size: var(--texte-xs);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-
   /* Sur petit écran, les deux réglages passent l'un sous l'autre sous le nom du jour. */
   @media (max-width: 34rem) {
-    .grille-semaine__entete {
-      display: none;
-    }
     .grille-semaine__jour {
       grid-template-columns: 1fr;
       gap: var(--espace-1);
@@ -1004,16 +1004,6 @@
     grid-template-columns: 5.5rem minmax(0, 1fr);
   }
 
-  /*
-   * Une présence par ligne : le jour, la case, et l'heure seulement si la case est
-   * cochée. Les deux moments de la journée étaient auparavant côte à côte sur la même
-   * ligne — deux champs d'heure de 44 px dans 390 px de large, sans libellé lisible.
-   */
-  .grille-semaine__jour--presence {
-    grid-template-columns: 5.5rem auto minmax(0, 1fr);
-    align-items: center;
-  }
-
   /* Sans cela, une colonne ne descend jamais sous la largeur intrinsèque de son
      contenu — c'est ce qui faisait déborder les champs d'heure sur iPhone. */
   .grille-semaine__jour > * {
@@ -1023,14 +1013,6 @@
   @media (max-width: 34rem) {
     .grille-semaine__jour--simple {
       grid-template-columns: 1fr;
-    }
-
-    /* Le nom du jour prend sa ligne, la case et l'heure se partagent la suivante. */
-    .grille-semaine__jour--presence {
-      grid-template-columns: auto minmax(0, 1fr);
-    }
-    .grille-semaine__jour--presence > .grille-semaine__nom {
-      grid-column: 1 / -1;
     }
   }
 
@@ -1081,7 +1063,7 @@
     content: '';
     align-self: stretch;
     block-size: 4px;
-    border-radius: 999px;
+    border-radius: var(--rayon-pilule);
     background: var(--bord);
   }
 
@@ -1224,15 +1206,6 @@
 
   /* Case posée dans une ligne de grille, à côté de son heure : le libellé s'aligne
      sur la case au lieu de la surplomber, et l'écart se resserre. */
-  .case--compacte {
-    align-items: center;
-    gap: var(--espace-2);
-  }
-
-  .case--compacte input[type='checkbox'] {
-    margin-block-start: 0;
-  }
-
   /* Adresse dérogatoire retenue : une ligne, pas une carte — il y en a dix. */
   .adresse-retenue {
     padding: var(--espace-2) var(--espace-3);
@@ -1381,7 +1354,7 @@
   .prochain__signal::before,
   .prochain__signal::after {
     content: '';
-    border-radius: 999px;
+    border-radius: var(--rayon-pilule);
   }
 
   .prochain__signal::before {
@@ -1615,7 +1588,7 @@
   .etiquette {
     display: inline-block;
     padding: var(--espace-1) var(--espace-3);
-    border-radius: 999px;
+    border-radius: var(--rayon-pilule);
     font-size: var(--texte-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1763,8 +1736,8 @@
   }
 
   .dialogue::backdrop {
-    background: rgb(0 0 0 / 0.5);
-    backdrop-filter: blur(4px);
+    background: var(--voile-modale);
+    backdrop-filter: var(--flou-modale);
     animation: fondu 0.24s var(--sortie) both;
   }
 
@@ -1831,13 +1804,6 @@
   }
 
   /* Le code d'accès se lit et se retape : chasse fixe, gros, espacé. */
-  .champ-code {
-    font-family: var(--police-chiffres);
-    font-size: var(--texte-2xl);
-    letter-spacing: 0.12em;
-    text-align: center;
-  }
-
   /* --- Bandeaux de tête de page ------------------------------------------------ */
   .bandeau {
     background: var(--fond-creux);
@@ -1905,11 +1871,6 @@
   td.heure {
     font-family: var(--police-chiffres);
     font-variant-numeric: tabular-nums;
-  }
-
-  td.heure--incoherente {
-    color: var(--danger);
-    font-weight: 700;
   }
 
   .carte-osm {
@@ -2189,7 +2150,7 @@
     flex: 0 0 auto;
     inline-size: 1.5rem;
     block-size: 1.5rem;
-    border-radius: 999px;
+    border-radius: var(--rayon-pilule);
     background: var(--fond-creux);
     border: var(--trait) solid var(--bord);
     /* Le chevron proprement dit, tracé au centre de la pastille. */
@@ -2273,9 +2234,6 @@
   .texte-doux {
     color: var(--encre-douce);
   }
-  .texte-danger {
-    color: var(--danger);
-  }
   .texte-attention {
     color: var(--attention);
   }
@@ -2285,12 +2243,6 @@
 
   .liste-puces {
     padding-inline-start: var(--espace-5);
-    margin: 0;
-  }
-
-  .separateur {
-    border: 0;
-    border-block-start: var(--trait) solid var(--bord);
     margin: 0;
   }
 
@@ -2464,6 +2416,10 @@
     }
 
     .fiche__tableau thead th {
+      /* Les navigateurs n'impriment pas les fonds par défaut : sans cette ligne, on
+         ignorait si l'en-tête sortait gris ou blanc. Il sort gris, comme dessiné. */
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
       background: #eee;
       font-size: 8.5pt;
       text-transform: uppercase;

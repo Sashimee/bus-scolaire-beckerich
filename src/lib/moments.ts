@@ -45,8 +45,16 @@ export const MOMENTS: readonly Moment[] = ['matin', 'midi', 'soir']
  * Les autres, la classe s'arrête à 11:45 : le repas de midi n'est plus une étape de la
  * journée d'école mais sa fin, et c'est la question du soir qui le règle. Poser les
  * deux ferait répondre deux fois à la même chose, avec le risque de se contredire.
+ *
+ * Une FONCTION et non une constante : figée au chargement du module, elle lisait le
+ * plan embarqué et ignorait celui publié en base — un plan qui déplacerait un
+ * après-midi de classe ne changeait rien à l'écran des réglages. `donnees.ts` interdit
+ * explicitement de lire `plan` au chargement, et c'était le seul endroit du dépôt qui
+ * le faisait. R66.
  */
-export const JOURS_MIDI: readonly Jour[] = JOURS.filter(coursApresMidi)
+export function joursMidi(): readonly Jour[] {
+  return JOURS.filter(coursApresMidi)
+}
 
 /* ------------------------------------------------------------------ lecture */
 

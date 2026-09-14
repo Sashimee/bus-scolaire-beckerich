@@ -53,8 +53,8 @@
         49.72373,
         5.92908
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-08"
+      "precision": "approximative",
+      "source": "Rue « An der Hoh » (centre de rue) ; position cohérente avec le marqueur 6 des cartes du plan, mais l'arrêt lui-même n'est nommé dans aucune base publique"
     },
     {
       "id": "elvange-ecole",
@@ -86,8 +86,8 @@
         49.72349,
         5.90348
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-08"
+      "precision": "approximative",
+      "source": "Voie « Kneppchen » ; position estimée à la main le 2026-08-08, l'arrêt n'est nommé dans aucune base publique"
     },
     {
       "id": "hovelange-op-der-halte",
@@ -126,8 +126,8 @@
         49.73107,
         5.88267
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-08"
+      "precision": "approximative",
+      "source": "Dikrecherstrooss ; l'école est au n° 8, mais l'arrêt lui-même n'est nommé dans aucune base publique"
     },
     {
       "id": "beckerich-dillendapp",
@@ -151,8 +151,8 @@
         49.73256,
         5.86943
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-08"
+      "precision": "approximative",
+      "source": "Voie « Leewelerwee » (centre de rue) ; l'arrêt n'est nommé dans aucune base publique"
     },
     {
       "id": "beckerich-village",
@@ -162,8 +162,8 @@
         49.72958,
         5.88536
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-08"
+      "precision": "approximative",
+      "source": "Centre du village ; le plan officiel ne précise pas l'arrêt de ce départ de 13:25"
     },
     {
       "id": "levelange",
@@ -173,8 +173,8 @@
         49.73917,
         5.85574
       ],
-      "precision": "verifiee",
-      "source": "Position corrigée à la main le 2026-08-07"
+      "precision": "approximative",
+      "source": "Position estimée à la main le 2026-08-07 ; deux arrêts existent à Levelange dans OpenStreetMap (Ellerstroos, Kalek) et le plan ne nomme pas celui utilisé"
     },
     {
       "id": "oberpallen-ecole",

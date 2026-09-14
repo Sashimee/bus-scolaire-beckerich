@@ -29,7 +29,7 @@ afterEach(() => localStorage.clear())
 describe('initialiserHoraires', () => {
   it('adopte un plan publié valide', async () => {
     const { donnees, initialiserHoraires } = await fraisImports()
-    const planPublie = { ...(planBundle as any), incertitudes: [] }
+    const planPublie = { ...(planBundle as any), anneeScolaire: '2027/2028' }
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       reponse({ version: '2026-09-01', plan: planPublie }),
     )
@@ -70,7 +70,7 @@ describe('initialiserHoraires', () => {
   })
 
   it('repart du cache local avant même le réseau', async () => {
-    const planCache = { ...(planBundle as any), incertitudes: [] }
+    const planCache = { ...(planBundle as any), anneeScolaire: '2027/2028' }
     localStorage.setItem('bus-beckerich.horaires', JSON.stringify({ version: 'v-cache', plan: planCache }))
     const { donnees, initialiserHoraires } = await fraisImports()
     // Réseau muet : seul le cache agit.

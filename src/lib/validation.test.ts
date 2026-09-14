@@ -179,3 +179,103 @@ describe('cohérence avec les écoles', () => {
     expect(planPubliable(problemes)).toBe(true)
   })
 })
+
+describe('renvois d’incertitude', () => {
+  // R66/R70 : rien ne vérifiait qu'une course renvoyant à une incertitude désignait
+  // une incertitude existante. Un renvoi mort ne casse pas la page — il affiche la
+  // CLÉ de traduction sous le titre « Ce que nous ne savons pas », ce qui est pire.
+  it('refuse une course qui renvoie à une incertitude qui n’existe pas', () => {
+    const q = planValide() as Record<string, any>
+    q.lignes[0].services[0].incertitude = 'fantome'
+    expect(erreurs(q).some((e) => e.message.includes('Incertitude inconnue'))).toBe(true)
+  })
+
+  it('accepte le renvoi quand l’incertitude est déclarée', () => {
+    const q = planValide() as Record<string, any>
+    q.incertitudes = [
+      { id: 'vrai-doute', portee: 'aller-1.matin', question: 'q', hypothese: 'h', aVerifierAupres: 'commune' },
+    ]
+    q.lignes[0].services[0].incertitude = 'vrai-doute'
+    expect(erreurs(q)).toEqual([])
+  })
+
+  it('refuse un jour inconnu, et une liste de jours vide', () => {
+    const base = () => {
+      const q = planValide() as Record<string, any>
+      q.incertitudes = [
+        { id: 'doute', portee: 'aller-1.matin', question: 'q', hypothese: 'h', aVerifierAupres: 'c' },
+      ]
+      return q
+    }
+    const inconnu = base()
+    inconnu.incertitudes[0].jours = ['lundredi']
+    expect(erreurs(inconnu).some((e) => e.message.includes('Jour inconnu'))).toBe(true)
+
+    const vide = base()
+    vide.incertitudes[0].jours = []
+    expect(erreurs(vide).some((e) => e.message.includes('liste non vide'))).toBe(true)
+  })
+
+  it('refuse deux incertitudes de même identifiant', () => {
+    const q = planValide() as Record<string, any>
+    const une = { id: 'doublon', portee: 'x', question: 'q', hypothese: 'h', aVerifierAupres: 'c' }
+    q.incertitudes = [une, { ...une }]
+    expect(erreurs(q).some((e) => e.message.includes('en double'))).toBe(true)
+  })
+
+  it('tient le plan réel pour valide, incertitudes comprises', () => {
+    expect(planPubliable(validerPlan(planReel))).toBe(true)
+  })
+})
+
+describe('cohérence des courses (R70)', () => {
+  it('refuse un « dessert » qui annonce un arrêt jamais desservi', () => {
+    // C'est l'erreur trouvée sur `aller-3`, qui annonçait « beckerich-ecole » alors
+    // qu'il passe à la maison relais. Aucun code ne lit ce champ : rien ne l'a vue.
+    const q = planValide() as Record<string, any>
+    q.lignes[0].dessert = ['levelange']
+    expect(erreurs(q).some((e) => e.message.includes('dessert'))).toBe(true)
+  })
+
+  it('accepte un « dessert » conforme aux arrêts de la ligne', () => {
+    const q = planValide() as Record<string, any>
+    const premier = q.lignes[0].services[0].arrets[0].arret
+    q.lignes[0].dessert = [premier]
+    expect(erreurs(q)).toEqual([])
+  })
+
+  it('refuse le même arrêt deux fois de suite, et tolère la boucle', () => {
+    const doublon = planValide() as Record<string, any>
+    const arrets = doublon.lignes[0].services[0].arrets
+    arrets.splice(1, 0, { ...arrets[0], heure: arrets[0].heure })
+    expect(erreurs(doublon).some((e) => e.message.includes('deux fois de suite'))).toBe(true)
+
+    // L'Aller 3 du plan réel repasse au Dillendapp : une boucle n'est pas une erreur.
+    expect(planPubliable(validerPlan(planReel))).toBe(true)
+  })
+
+  it('refuse une note d’arrêt qui n’est pas déclarée', () => {
+    // Même piège que les incertitudes : le texte de la note vit dans les dictionnaires,
+    // et un identifiant inconnu affiche sa clé au parent, à côté d'une heure de bus.
+    const q = planValide() as Record<string, any>
+    q.lignes[0].services[0].arrets[0].notes = ['note-fantome']
+    expect(erreurs(q).some((e) => e.message.includes('Note inconnue'))).toBe(true)
+
+    q.notes = { 'note-fantome': {} }
+    expect(erreurs(q)).toEqual([])
+  })
+
+  it('avertit d’une vitesse impossible entre deux arrêts, sans bloquer', () => {
+    const q = planValide() as Record<string, any>
+    // Levelange → Schweich-Peiffer : 5,1 km. En une minute, 308 km/h.
+    q.lignes[0].services[0].arrets = [
+      { arret: 'levelange', heure: '07:00' },
+      { arret: 'schweich-peiffer', heure: '07:01' },
+    ]
+    const problemes = validerPlan(q)
+    expect(problemes.some((x) => x.gravite === 'avertissement' && x.message.includes('km/h'))).toBe(
+      true,
+    )
+    expect(problemes.some((x) => x.gravite === 'erreur' && x.message.includes('km/h'))).toBe(false)
+  })
+})

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { decoderFoyer, encoderFoyer, foyerDepuisUrl, lienPartage } from './partage'
+import { contexteEnfant, trajetsDuJour } from './plan'
 import { JOURS } from './types'
 import type { Enfant, Foyer, Jour, RepasMidi, UsageBus } from './types'
 
@@ -281,5 +282,36 @@ describe('liens trafiqués', () => {
     )!
     expect(relu.enfants[0].dillendappJusqua!.lundi).toBeNull()
     expect(relu.enfants[0].dillendappJusqua!.mardi).toBeNull()
+  })
+})
+
+describe('un lien qui porte un cycle sans transport scolaire', () => {
+  // R65 : le précoce n'est plus proposé à la saisie, mais le format du lien le garde —
+  // le retirer décalerait tous les indices. Un lien ancien peut donc le réintroduire,
+  // et c'est le moteur, pas la liste déroulante, qui doit refuser d'inventer des bus.
+  const foyerPrecoce: Foyer = {
+    adresse: { libelle: 'Hovelange 1', localite: 'Hovelange', coord: [49.7228, 5.9049] },
+    enfants: [
+      {
+        id: 'p1',
+        prenom: 'Noé',
+        cycle: 'precoce',
+        repas: grille<RepasMidi>('maison'),
+      },
+    ],
+  }
+
+  it('rend bien le cycle tel quel : on doit savoir où l’enfant est scolarisé', () => {
+    const relu = decoderFoyer(encoderFoyer(foyerPrecoce))
+    expect(relu?.enfants[0].cycle).toBe('precoce')
+  })
+
+  it('n’en tire aucun trajet, quel que soit le jour', () => {
+    const relu = decoderFoyer(encoderFoyer(foyerPrecoce))!
+    const ctx = contexteEnfant(relu.enfants[0], relu.adresse!)!
+    expect(ctx.sansTransport).toBe(true)
+    for (const jour of JOURS) {
+      expect(trajetsDuJour(ctx, jour).trajets, jour).toEqual([])
+    }
   })
 })

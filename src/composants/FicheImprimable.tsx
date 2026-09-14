@@ -1,7 +1,7 @@
 import { useT } from '../i18n'
 import { arretCoteFamille, destinationTrajet, nomArret } from '../lib/affichage'
 import { siteDuCycle, plan } from '../lib/donnees'
-import { semaineEnfant, type ContexteEnfant } from '../lib/plan'
+import { aucunBus, semaineEnfant, type ContexteEnfant } from '../lib/plan'
 import { JOURS } from '../lib/types'
 import type { TypeTrajet } from '../lib/types'
 
@@ -40,13 +40,16 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
         </p>
       </header>
 
-      {ctx.marcheDirecte ? (
+      {aucunBus(ctx) ? (
         <p className="fiche__arret">
-          <strong>{t('impression.aPied')} :</strong>{' '}
-          {t('enfant.aPiedDetail', {
+          <strong>
+            {t(`impression.${ctx.sansTransport ? 'sansTransport' : 'aPied'}`)} :
+          </strong>{' '}
+          {t(`enfant.${ctx.sansTransport ? 'sansTransport' : 'aPied'}Detail`, {
             minutes: ctx.temps,
             site: siteDuCycle(enfant.cycle).nom,
             prenom: enfant.prenom,
+            cycle: t(`cycles.${enfant.cycle}`),
           })}
         </p>
       ) : (
@@ -58,7 +61,7 @@ export function FicheImprimable({ ctx }: { ctx: ContexteEnfant }) {
         </p>
       )}
 
-      {!ctx.marcheDirecte && (
+      {!aucunBus(ctx) && (
       <table className="fiche__tableau">
         <thead>
           <tr>

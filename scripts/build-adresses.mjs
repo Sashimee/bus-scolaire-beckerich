@@ -75,7 +75,19 @@ for (let n = 1; n < lignes.length; n++) {
   ])
 }
 
-adresses.sort((a, b) => a[0] - b[0] || String(a[1]).localeCompare(String(b[1]), 'fr', { numeric: true }))
+// Le registre national livre parfois deux fois la même adresse, à quelques mètres
+// près — trois cas sur les 1162 de Beckerich. Le parent voyait alors son adresse
+// proposée en double dans la liste, sans rien pour les distinguer. On garde la
+// première : les deux coordonnées diffèrent de moins de dix mètres, ce qui ne change
+// aucun temps de marche.
+const vues = new Set()
+const uniques = adresses.filter((a) => {
+  const cle = `${a[0]}|${a[1]}|${a[2]}`
+  if (vues.has(cle)) return false
+  vues.add(cle)
+  return true
+})
+uniques.sort((a, b) => a[0] - b[0] || String(a[1]).localeCompare(String(b[1]), 'fr', { numeric: true }))
 
 const resultat = {
   $commentaire:
@@ -90,12 +102,12 @@ const resultat = {
   commune: COMMUNE,
   rues,
   localites,
-  adresses,
+  adresses: uniques,
 }
 
 writeFileSync(SORTIE, JSON.stringify(resultat) + '\n')
 
 const ko = (JSON.stringify(resultat).length / 1024).toFixed(0)
-console.log(`${adresses.length} adresses, ${rues.length} rues, ${localites.length} localités`)
+console.log(`${uniques.length} adresses, ${rues.length} rues, ${localites.length} localités`)
 console.log(`Localités : ${localites.sort().join(', ')}`)
 console.log(`Écrit dans ${SORTIE} (${ko} Ko)`)

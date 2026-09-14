@@ -22,9 +22,10 @@ import {
   CHOIX_MATIN,
   CHOIX_MIDI,
   CHOIX_SOIR,
-  JOURS_MIDI,
+  joursMidi,
 } from './moments'
 import { contexteEnfant, coursApresMidi, trajetsDuJour } from './plan'
+import { plan, remplacerPlan } from './donnees'
 import { enfantVierge } from './stockage'
 import type { Adresse, Enfant, Jour } from './types'
 import { JOURS } from './types'
@@ -50,8 +51,24 @@ describe('lecture des trois moments', () => {
   })
 
   it('ne pose la question du midi que les jours avec cours l’après-midi', () => {
-    expect([...JOURS_MIDI]).toEqual(JOURS.filter(coursApresMidi))
+    expect([...joursMidi()]).toEqual(JOURS.filter(coursApresMidi))
     expect(semaineReglee(neuf()).find((j) => j.jour === SANS_APRES_MIDI)!.midi).toBeNull()
+  })
+
+  it('suit un plan publié qui déplacerait les après-midi de classe', () => {
+    // R66 : c'était une constante calculée au chargement du module. Elle lisait donc
+    // le plan EMBARQUÉ et ignorait celui publié en base — l'écran des réglages aurait
+    // continué de poser la question du midi les jours où la classe s'arrête à 11:45.
+    const embarque = plan
+    try {
+      const publie = structuredClone(plan)
+      publie.horairesEcole.jours.apresMidi = ['lundi']
+      remplacerPlan(publie)
+      expect([...joursMidi()]).toEqual(['lundi'])
+    } finally {
+      remplacerPlan(embarque)
+    }
+    expect([...joursMidi()]).toEqual(['lundi', 'mercredi', 'vendredi'])
   })
 })
 
@@ -64,7 +81,7 @@ describe('écriture : tout ce qu’une réponse implique', () => {
       for (const midi of CHOIX_MIDI) {
         for (const soir of CHOIX_SOIR) {
           let e = avecMatin(neuf(), JOURS, matin, ctx)
-          e = avecMidi(e, JOURS_MIDI, midi)
+          e = avecMidi(e, joursMidi(), midi)
           e = avecSoir(e, JOURS, soir, ctx)
           for (const jour of JOURS) {
             expect(soirDuJour(e, jour), `${matin}/${midi}/${soir} — ${jour}`).toBe(soir)
@@ -139,10 +156,10 @@ describe('écriture : tout ce qu’une réponse implique', () => {
   })
 
   it('déduit les deux inscriptions au lieu de les faire cocher', () => {
-    const e = avecMidi(neuf(), JOURS_MIDI, 'relais')
+    const e = avecMidi(neuf(), joursMidi(), 'relais')
     expect(e.periscolaireMidi).toBe(true)
     expect(e.periscolaireHorsMidi).toBe(false)
-    expect(JOURS_MIDI.every((j) => e.repas[j] === 'dillendapp')).toBe(true)
+    expect(joursMidi().every((j) => e.repas[j] === 'dillendapp')).toBe(true)
   })
 
   it('déplace une heure sans changer la réponse', () => {

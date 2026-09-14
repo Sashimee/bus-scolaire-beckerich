@@ -8,9 +8,12 @@
       name="description"
       content="Les horaires du bus scolaire de la commune de Beckerich, personnalisés pour chaque enfant. Site indépendant, sans lien avec la commune."
     />
-    <!-- La couleur de barre suit le thème : sombre par défaut, clair si le système l'est. -->
-    <meta name="theme-color" content="#0e1a2e" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#e1e7ee" media="(prefers-color-scheme: light)" />
+    <!-- La couleur de barre suit le thème : sombre par défaut, clair si le système l'est.
+         Les deux valeurs sont REMPLACÉES à la construction par le jeton `--fond` de
+         `src/index.css` : recopiées à la main, elles rendaient fausse la promesse de la
+         couche `tokens`. Voir `pluginCharte` dans vite.config.ts. -->
+    <meta name="theme-color" content="CHARTE_FOND_SOMBRE" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="CHARTE_FOND_CLAIR" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Bus scolaire" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />

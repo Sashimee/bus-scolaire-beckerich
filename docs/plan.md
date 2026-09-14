@@ -38,7 +38,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 
 | # | Lot | Réserve | Comment la lever |
 | --- | --- | --- | --- |
-| R1 | 2, 7 | **La feuille du foyer débordait, et la cause n'était pas celle qu'on croyait.** Quatre corrections successives le 2026-08-09 sur la hauteur du contenu, puis la feuille d'un foyer de trois enfants est sortie le 2026-08-10 avec le vendredi **tronqué** — et « Page 1 sur 1 » en pied : WebKit avait coupé au lieu de paginer, ce qui ne laisse aucun indice à qui ne compare pas avec l'écran. Cause trouvée le 2026-08-10 : `table-layout: fixed` ne lit les largeurs que sur la PREMIÈRE rangée, et celle de la colonne des jours était posée sur le `tbody`. Les quatre colonnes se partageaient donc la feuille à parts égales — 46 mm pour « Jour » au lieu de 22 — et chaque trajet revenait à la ligne. Corrigé, mesuré à 222 mm pour un foyer réel et 236 mm pour le pire cas imaginable, sur 273 disponibles. **Mais la mesure reste celle de Chrome.** | Réimprimer la feuille du foyer à trois enfants. Elle doit tenir sur une page entière, vendredi compris. |
+| R1 | 2, 7 | **La feuille du foyer débordait, et la cause n'était pas celle qu'on croyait.** Quatre corrections successives le 2026-08-09 sur la hauteur du contenu, puis la feuille d'un foyer de trois enfants est sortie le 2026-08-10 avec le vendredi **tronqué** — et « Page 1 sur 1 » en pied : WebKit avait coupé au lieu de paginer, ce qui ne laisse aucun indice à qui ne compare pas avec l'écran. Cause trouvée le 2026-08-10 : `table-layout: fixed` ne lit les largeurs que sur la PREMIÈRE rangée, et celle de la colonne des jours était posée sur le `tbody`. Les quatre colonnes se partageaient donc la feuille à parts égales — 46 mm pour « Jour » au lieu de 22 — et chaque trajet revenait à la ligne. Corrigé, mesuré à 222 mm pour un foyer réel et 236 mm pour le pire cas imaginable, sur 273 disponibles. **Mais la mesure reste celle de Chrome.** | Réimprimer la feuille du foyer à trois enfants. Elle doit tenir sur une page entière, vendredi compris. **Le 2026-09-11**, le banc a produit cette feuille sous Chromium en média `print` : **une seule page A4**, les cinq jours présents, la colonne du précoce portant « Pas de bus ». Cela ne lève pas la réserve — la troncature silencieuse est un comportement de **WebKit**, et c'est une imprimante WebKit qu'il faut. |
 | ~~R2~~ | 6 | ~~L'installation réelle n'a pas été essayée.~~ **Levée le 2026-08-09** : installée depuis Safari sur l'iPhone de l'auteur, ouverte depuis l'icône. |
 | ~~R3~~ | 8 | ~~Le Worker n'avait jamais écrit sur GitHub, et il ne le pouvait pas.~~ **Levée le 2026-08-09** : `cache: 'no-store'`, refusé par le runtime Cloudflare, faisait échouer toute publication depuis le lot 8. Corrigé, puis éprouvé — une correction publiée depuis `/traductions` a bien atteint le dépôt. |
 | R4 | 8 | **La limitation de débit n'est pas stricte.** Elle repose sur la cohérence différée de KV : des requêtes concurrentes laisseront passer quelques tentatives de plus que les cinq annoncées. Sans commune mesure avec une force brute, mais à savoir. | Rien à faire tant que l'ordre de grandeur suffit. Un Durable Object le rendrait strict, au prix d'une brique de plus. |
@@ -63,7 +63,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R20~~ | 17 | ~~Aucune notification d'essai.~~ **Levée le 2026-08-09** : route `POST /essai`, authentifiée par le endpoint lui-même — le connaître ne permet que de se faire vibrer soi-même, une fois par minute au plus. 7 tests, dont le refus d'un endpoint non abonné et la limite par abonnement. Reste à essayer sur un vrai téléphone (R19). |
 | ~~R25~~ | 18 | ~~La couche `impression` n'a toujours pas été vue sur papier.~~ **Levée le 2026-08-10** : la feuille d'un foyer de trois enfants est sortie d'iOS Safari en noir sur blanc franc — aucun voile translucide n'a survécu, aucune ombre, aucun gris moucheté. C'était la crainte de la refonte « verre » ; elle est levée. |
 | R26 | 18 | **Les nouvelles polices n'ont pas été vues sur iPhone.** IBM Plex Sans est chargée en fabrique VARIABLE (`woff2-variations`). Safari la gère depuis longtemps, mais si le format échouait, le repli `system-ui` s'appliquerait sans prévenir — et l'échelle typographique a été réglée sur les métriques de Plex. Les chiffres, eux, sont en graisses fixes et ne courent pas ce risque. | Ouvrir le site sur l'iPhone et vérifier que le texte est bien en Plex (le `l` sans empattement et le `a` à double étage se reconnaissent d'un coup d'œil). |
-| R27 | 18 | **Le contraste est calculé, pas mesuré à l'écran.** Les 4,58:1 du pire cas viennent d'un calcul sur les compositions alpha, pas d'une pipette sur un rendu réel. Le calcul suppose que le navigateur compose en sRGB ; un moteur travaillant dans un autre espace, ou un `backdrop-filter` avec `saturate(140%)` sur l'en-tête, peut décaler la couleur effective de quelques points. | Pipette sur un rendu réel, sur les deux thèmes, pour l'encre douce sur une carte posée dans l'angle clair du dégradé — le pire cas identifié. |
+| ~~R27~~ | 18 | ~~Le contraste est calculé, pas mesuré à l'écran.~~ **Levée le 2026-09-11** : balayage à la pipette sur les pixels rendus — capture par élément, fond = couleur la plus fréquente, encre = couleur la plus éloignée — sur neuf écrans et les deux thèmes, **458 zones de texte mesurées par thème**. Aucun couple encre/fond sous le seuil. Les seules zones sous 4,5:1 sont la tuile `sous-tuile--eteinte`, **floutée et voilée exprès** (`opacity: .35; filter: blur(2.5px)`) derrière la plaque lisible « Pas d'école aujourd'hui » — le contraste y est l'effet recherché, pas un défaut. Le pire cas redouté (encre douce sur carte dans l'angle clair du dégradé) ne se produit pas. Mesuré sous Chromium, qui compose en sRGB ; un moteur d'un autre espace reste non vérifié. |
 | ~~R28~~ | 19 | ~~Le pied de page collé en bas n'a pas été vu sur iPhone.~~ **Levée le 2026-08-10** : vérifié sous Safari iOS par l'auteur, avec le reste des écrans du lot. |
 | ~~R29~~ | 19 | ~~La feuille imprimée n'a pas été refaite depuis que `.page` est un conteneur flex.~~ **Levée le 2026-08-10** : la feuille est sortie sur une seule page — le conteneur souple et la hauteur minimale en hauteur de fenêtre n'ont ajouté aucune feuille. Le débordement constaté le même jour avait une tout autre cause, voir R1. |
 | ~~R30~~ | 19 | ~~Le bandeau « mise à jour… » n'a pas été vu à l'œuvre.~~ **Levée le 2026-08-10** : la mise à jour automatique s'est faite seule sous Safari iOS, sans qu'aucun bouton n'apparaisse. |
@@ -92,6 +92,26 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | ~~R55~~ | 2026-09-08 (bis) | ~~Le gain de poids est un gain de chemin critique, pas d'octets, et personne ne l'a mesuré.~~ **Mesurée le 2026-09-08**, navigateur contre navigateur, l'avant reconstruit depuis `fc8d5b5` : un parent francophone télécharge **227 → 152 Kio** compressés avant le premier affichage (−33 %), un parent germanophone **227 → 170 Kio** (−25 %, son dictionnaire coûtant 18 Kio). **Reste vrai, et assumé** : le service worker précharge ensuite tout le reste — 31 entrées et 1123 Kio contre 22 et 1116 Kio. Le total téléchargé ne baisse pas ; c'est le temps avant premier affichage qui gagne. Mesure faite en local, pas sur le réseau du village. |
 | ~~R56~~ | 2026-09-08 (bis) | ~~La barrière d'erreur n'a jamais rattrapé une vraie panne.~~ **Levée le 2026-09-08** : un foyer portant un cycle disparu (`c9`) a été posé dans `localStorage` — JSON valide, donc accepté par le stockage, et qui fait tomber le rendu. La barrière prend la main, affiche le message technique, et « Effacer et repartir de zéro » rend une application utilisable. Deux enseignements de méthode, tous deux dans le harnais et non dans le code : un script d'initialisation Playwright rejoue à CHAQUE navigation, donc reposait le foyer corrompu après l'effacement et faisait croire à un échec ; et `innerText` renvoie vide sous `chrome-headless-shell`, ce qui faisait croire à une page blanche alors que le DOM était complet. |
 | R57 | 2026-09-08 (bis) | **Les deux raccourcis du manifeste ne sont vérifiés qu'à moitié.** Le manifeste est servi et valide, et les deux adresses visées — `/plan`, `/configurer` — se rendent bien (vérifié au navigateur le 2026-09-08). Ce qui n'est pas vérifié est le geste lui-même : `shortcuts` est lu par Android, iOS l'ignore, et l'application est installée sur iPhone chez l'auteur. Aucune capture d'écran n'a été ajoutée — `screenshots` enrichit l'invite d'installation sur Chrome et demande de vraies images. | Installer depuis Chrome sur Android, appui long sur l'icône. Les captures peuvent maintenant être prises par Playwright. |
+| ~~R58~~ | 2026-09-08 (ter) | ~~**`POST /abonner` faisait partir une requête vers l'adresse de son choix.** `endpoint` n'était contrôlé que par `typeof === 'string'`, puis `envois.ts` faisait `fetch(endpoint, …)` à chaque notification. Les clés de chiffrement étant fournies par l'appelant, le chiffrement RFC 8291 réussissait et la requête partait pour de bon — vers `127.0.0.1` ou n'importe quel hôte du réseau de la VPS, sans aucun compte. Les 200 premiers octets de la réponse repartaient dans `resultat.details[].motif`, donc dans la réponse rendue à l'éditeur : c'était un canal de lecture, pas seulement d'écriture. Et `/abonner` n'ayant pas de limitation de débit, *n* abonnements forgés valaient *n* requêtes par notification. **Corrigé le 2026-09-08** : `endpointAcceptable()` dans `stockage/abonnements.ts`, appelée par la route, n'accepte qu'une URL `https`, sans port ni identifiants, dont l'hôte est l'un des cinq services de push connus ou l'un de leurs sous-domaines. 6 tests l'accompagnent (`abonnement-endpoint.test.ts`), et ils tournent **sans base** — vérifiés par mutation : remplacer la comparaison de suffixe par un `includes` en fait tomber deux.~~ **Levée le 2026-09-09** : le correctif est désormais gardé au niveau de la ROUTE et non plus seulement du filtre — `routes/abonnements.test.ts` exerce `POST /abonner` contre l'application Hono et une vraie base, et retirer l'appel à `endpointAcceptable` le fait tomber (vérifié). La réserve d'alors — « le correctif n'a jamais vu un vrai service de push » — reste entière et devient **R71**. |
+| ~~R59~~ | 2026-09-08 (ter) | ~~**Le verrou des cinq tentatives s'annulait lui-même depuis le lot 8.** `motDePasseOublie` appelait `await reussite(ip)` **inconditionnellement**, et `reussite()` fait `delete from debit where ip_hash = …`. Les deux routes partageant la clé (l'empreinte de l'IP), alterner une connexion ratée et un appel à `/mot-de-passe-oublie` remettait le compteur à zéro sans fin : la force brute sur le mot de passe n'était plus freinée du tout, depuis une seule adresse. Effet second, chaque tentative déclenchait un argon2id de 19 Mio — épuisement mémoire non borné par la même porte. Aucun test de route ne couvrait le verrouillage, le trou serait passé même avec la base levée. **Corrigé le 2026-09-08** : la ligne est retirée, et le test qui manquait est écrit (`routes/comptes.test.ts`, « « mot de passe oublié » ne remet pas le compteur de tentatives à zéro ») — cinq connexions ratées, un `/mot-de-passe-oublie`, puis une sixième tentative qui doit répondre 429.~~ **Levée le 2026-09-09** : le test a tourné sur une vraie base, et il était FAUX — il consommait les cinq jetons de débit avant d'appeler `/mot-de-passe-oublie`, qui se faisait alors refuser lui-même et n'exerçait donc pas l'exploit. Réécrit : quatre échecs, l'oubli prend le cinquième, la tentative suivante doit valoir 429. Vérifié par mutation — en remettant `await reussite(ip)`, elle retombe à 401. |
+| ~~R60~~ | 2026-09-08 (ter) | ~~**Quatre-vingt-trois tests du serveur se sautent en silence, et ce sont les bons.** Sans `DATABASE_URL_TEST`, `npm test` côté serveur passe 68 tests et en saute 83 — soit 5 fichiers sur 11, et précisément ceux qui couvrent l'authentification, les capacités, la limitation de débit, le SQL et le journal de livraison (`routes/comptes.test.ts`, `routes/essai.test.ts`, `routes/publiques.test.ts`, `stockage/stockage.test.ts`, `rappels-envoi.test.ts`). Le mécanisme est délibéré — la boucle courte doit rester lançable sans Docker — mais il vient de masquer la surface la plus sensible du dépôt pendant tout un audit. **L'audit du 2026-09-08 est une lecture, pas une exécution** : R58 et R59 ont été trouvées à l'œil, aucun test ne les a vues ni ne les a vues disparaître.~~ **Levée le 2026-09-09** : les 84 tests ont tourné, contre un PostgreSQL 18.4 réel. Faute de Docker, de `sudo` et de tout paquet système, la base a été montée depuis le binaire d'`embedded-postgres` installé HORS du dépôt (voir « Lancer les tests du serveur sans Docker », plus bas). **Les 162 tests du serveur passent**, et c'est cette exécution qui a montré que le test de R59 était faux (R59) et que R58 n'était gardée nulle part au niveau de la route. |
+| ~~R61~~ | 2026-09-08 (ter) | ~~**Les tuiles de la carte disent le domicile à OpenStreetMap, et l'application affirme le contraire.** `CarteTrajet.tsx` charge `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png` et cadre la vue sur `fitBounds([domicile, arrêt])` : les triplets `{z}/{x}/{y}` demandés sont calculés à partir du domicile, jusqu'au zoom 18 — la tuile centrale désigne le pâté de maisons. Ce n'est pas déclenché par un geste : `useEffect` au montage, donc à chaque ouverture d'une fiche enfant, en ligne. Ce n'est pas l'adresse en clair, mais c'en est une dérivée. Or `notifications.confidentialite` écrit « C'est la **seule** donnée qui quitte votre téléphone » et `limites.donneesCorps` « ni compte, ni serveur qui les reçoive […] ni aucune des données que vous avez saisies ». Le second principe veut au minimum que ce soit dit.~~ **Tranchée et levée le 2026-09-09** : la carte attend un geste. `CarteTrajet` ne monte plus rien au `useEffect` ; un bouton dit ce que le geste déclenche, et « Limites » comme l'écran des notifications décrivent désormais ce qui part vers OpenStreetMap quand le parent le demande — dans les cinq langues. Trois tests le gardent, dont un vérifié par mutation. |
+| ~~R62~~ | 2026-09-08 (ter) | ~~**Trois surfaces sur six n'ont pas été auditées du tout.** L'audit du 2026-09-08 a lancé six agents ; trois se sont arrêtés sur une limite de session avant d'avoir rien produit — les jetons de design (`style={{}}`, valeurs brutes hors couche `tokens`, cibles 44 px, contraste 4.5:1), le moteur (`src/lib/plan.ts` et `aujourdhui.ts` : cas limites sans test, règles devinées, tests faibles) et les données (`src/data/` : références croisées, coordonnées, bornes de validité, incertitudes). **`plan.ts` n'a donc reçu aucun audit** — le fichier dont ce dépôt écrit qu'« une erreur y fait rater un bus à un enfant ». Ne pas lire le rapport du 2026-09-08 comme une revue complète.~~ **Caduque au 2026-09-09** : les trois agents ont bien produit, plus tard dans la même session — leurs constats sont R64 à R70. `plan.ts` a donc reçu son audit, et les six constats du moteur ont tous été reproduits puis corrigés. Les deux autres règles de `gardien-jetons` ont été revérifiées à la main : **zéro** `style={{` dans les composants, `--cible` posée à 15 endroits. |
+| ~~R63~~ | 2026-09-08 (ter) | ~~**Un test des dictionnaires passait quoi qu'il arrive.** `i18n.test.ts` faisait `[...Object.entries(chemins(dico))]` ; `chemins()` renvoie une `Map`, et `Object.entries()` sur une `Map` renvoie `[]`. Le test comparait donc `[]` à `[]` dans les quatre langues, depuis toujours. Aucune chaîne vide n'existe aujourd'hui — un contrôle indépendant l'a confirmé sur les cinq dictionnaires — donc c'est une garantie qui manquait, pas une régression en cours. **Leçon inscrite** : un test qui n'échoue jamais ne se distingue d'un test qui réussit que si on le fait échouer exprès une fois.~~ **Levée le 2026-09-09** : `chemins()` rend une Map, un aplatissement qui garde le TEXTE la remplace, et le français y passe aussi. Vérifié par mutation — une chaîne vidée dans `fr.json` et dans `de.json` fait tomber les deux tests. |
+| ~~R64~~ | 2026-09-08 (ter) | ~~**Un enfant de C4 inscrit au Dillendapp reçoit des bus École → École, et une fausse alerte.** `plan.ts` calcule `dillendappAuPiedDeLEcole` — la maison relais est à 86 m de l'école de Beckerich, donc le même point d'embarquement — et n'applique cette garde qu'à **une** de ses quatre branches, celle de la navette du matin. Reproduit sur le moteur réel, C4 domicilié à Hovelange, lundi : avec `repas: dillendapp`, la journée contient `navette-dillendapp-midi~~ **Levée le 2026-09-09** : `dillendappAuPiedDeLEcole` garde les quatre branches. Un C4 au Dillendapp n'a plus ni navette de midi, ni navette de retour, ni retour du soir école → école, ni `manquants`. Trois tests écrits d'abord, et vus échouer. |
+| ~~R65~~ | 2026-09-08 (ter) | ~~**Le précoce, seul cycle sans transport scolaire, reçoit un horaire de bus complet et affirmatif.** `donnees.ts` déclare `CYCLES_SANS_BUS = ['precoce']`, mais la constante ne sert qu'à filtrer une liste déroulante (`cyclesProposes`) : aucune fonction du moteur ne la consulte, et `partage.ts` accepte explicitement `'precoce'` dans un lien de partage. Reproduit sur le moteur réel, précoce domicilié à Hovelange, lundi : **4 trajets** (`aller-matin 07:44→07:50`, `retour-midi 12:00→12:25`, `aller-apres-midi 13:44→13:50`, `retour-soir 15:55→16:25`) et `manquants: []`. C'est la violation la plus nette du second principe dans tout le dépôt : l'application n'omet pas de dire ce qu'elle ne sait pas, elle affirme ce qui est faux — et ce sont les parents des plus jeunes enfants qui le reçoivent.~~ **Levée le 2026-09-09** : le contexte porte `sansTransport`, `trajetsDuJour` sort avant toute recherche, et les six écrans qui disaient « à pied » distinguent les deux raisons — quatre clés nouvelles dans les cinq dictionnaires. Le chemin `partage.ts` est couvert : un lien qui porte encore le précoce rend le cycle, et le moteur n'en tire aucun trajet. |
+| ~~R66~~ | 2026-09-08 (ter) | ~~**L'audit du moteur a produit d'autres constats, non revérifiés à la main.** Outre R64 et R65 (reproduits), l'agent `auditeur-moteur` rapporte : `JourneeEnfant.incertitudes` déclaré, rendu et **jamais alimenté** — le seul canal *par jour* dont dispose l'application pour dire ce qu'elle ne sait pas est mort, et trois tests l'assertent vide en croyant prouver quelque chose ; l'incertitude « hall sportif le vendredi » affichée aussi les lundi et mercredi, faute de granularité par jour ; `JOURS_MIDI` figé au chargement du module, ce que `donnees.ts` interdit explicitement, donc insensible à un plan publié ; le serveur qui calcule les rappels sur le plan **embarqué** et non sur le plan publié en base ; `planPerime` qui compare une date UTC à une date locale alors que `isoDate` existe pour ce piège ; et le filtre `apres` appliqué après `meilleurePaire`, qui peut supprimer une course prenable.~~ **Levée le 2026-09-09** : les six constats ont été reproduits un par un, puis corrigés. `incertitudes` est alimenté et filtré par jour (`jours` sur l'incertitude) ; `JOURS_MIDI` est devenu `joursMidi()` ; `planPerime` lit `isoDate` et le fuseau des tests est épinglé sur Europe/Luxembourg ; les rappels lisent le document `horaires` publié ; le filtre `apres` est passé dans le choix de la paire. Chaque correctif a sa mutation. |
+| ~~R67~~ | 2026-09-08 (ter) | ~~**Le pied de page annonce une validité deux fois plus longue que la vraie.** `App.tsx` affiche `validite.couverte` avec `plan.anneesCouvertes.join(' · ')`, soit « Plan valable pour 2025/2026 · 2026/2027 » — alors que `valideAu` vaut **2026-12-18**. L'année 2026/2027 court jusqu'au 2027-07-15 : le pied de page couvre 209 jours de plus que le plan. Et `valideAu` n'est écrit qu'à un seul endroit (`Bandeaux.tsx`), sous condition `planPerime()`, c'est-à-dire **seulement après** le 18 décembre. Avant cette date — donc aujourd'hui, à 101 jours de l'échéance — la vraie borne n'est visible nulle part, et la seule date affichée est trompeuse.~~ **Levée le 2026-09-09** : le pied de page affiche `valideAu` en clair (« Plan valable jusqu'au 2026-12-18 ») et la clé des années couvertes, devenue morte, a quitté les cinq dictionnaires. |
+| ~~R68~~ | 2026-09-08 (ter) | ~~**Plus aucun arrêt n'est signalé approximatif, et l'application promet le contraire.** Les **17 arrêts** d'`arrets.json` portent `precision: "verifiee"`, mais **6** portent aussi `source: "Position corrigée à la main le 2026-08-0x"` — ce qui n'est ni « arrêt nommé dans OpenStreetMap » ni « adresse exacte », les deux seules définitions que `$commentaire` donne de `verifiee`. Conséquence vérifiée : les encarts `arrets.precisionApproximative` de `Semaine.tsx`, `Accueil.tsx` et `FicheImprimable.tsx` sont **inatteignables**, et `limites.arretsCorps` — « Ceux dont la position n'a pas pu être vérifiée sont signalés comme tels » — promet un signalement qui ne se déclenche jamais. Second principe.~~ **Levée le 2026-09-09** : les six arrêts placés à la main repassent en `approximative`, avec une source qui dit ce qu'on sait vraiment de leur position. Un test refuse qu'un arrêt soit dit vérifié sans source publique — vérifié par mutation — et un autre garde l'avertissement atteignable. |
+| ~~R69~~ | 2026-09-08 (ter) | ~~**Le bouton « Supprimer » devient illisible au survol.** `.bouton--danger:hover` ne remplace que le fond (`color-mix(in oklab, var(--danger) 22%, var(--surface))`) et garde `color: var(--danger)` : le texte et le fond sont le même rose. Contraste **recalculé à la main**, thème sombre, sur une carte : **3,41:1** en haut du dégradé, 4,00:1 au milieu, 4,55:1 en bas — sous le seuil de 4.5:1 que ce dépôt s'impose, à toutes les positions sauf la dernière. Ce n'est pas théorique : `:hover` reste collé après un appui sur iOS et Android, donc un parent qui tape « Supprimer » (`Reglages.tsx`, `Configurer.tsx`, `BarriereErreur.tsx`) voit ensuite une action destructrice à 3,4:1. **Pourquoi le lot 18 ne l'a pas vu** : son jeu de 24 compositions n'appariait « que ce qui se rencontre vraiment » et n'incluait aucun **état de survol** — ni `--surface-haute`, ni les `color-mix`.~~ **Levée le 2026-09-09** : `color: var(--encre)` au survol, et surtout `src/contraste.test.ts` recalcule 52 couples à chaque exécution — voiles, halo et dégradé composés, dans les deux thèmes, **états de survol compris**. Il LIT les règles des boutons dans la feuille plutôt que de les recopier : remettre `color: var(--danger)` le fait tomber (3,16:1). Le pire couple tient 4,54:1, et le commentaire de la couche `tokens` ne promet plus 4,58 sans preuve. |
+| ~~R70~~ | 2026-09-08 (ter) | ~~**Les agents « données » et « jetons » ont produit d'autres constats, non revérifiés à la main.** Côté données : `aller-3.dessert` annonce `beckerich-ecole` alors que la course dessert `beckerich-dillendapp` (et le champ `dessert` n'est lu par aucun code, comme `reglesConfirmees`, `plan.notes`, `horaireComplet` et `arrets[].aliases` — cinq champs orphelins) ; un segment Huttange → Noerdange parcouru en 1 min pour 1,9 km (114 km/h) sur `aller-1-apres-midi` ; des marges **nulles** entre sonnerie et bus pour c1, c2 et c4 depuis le passage des horaires de cours par cycle, alors que le commentaire de `plan.ts` qui assume ce silence parle encore d'une sonnerie à 07:55 ; le bus de midi vers la cantine absent les mardi et jeudi ; des réserves asymétriques entre les deux bus Dillendapp (c2 à l'aller, c3 au retour) ; l'école précoce positionnée exactement sur la maison relais ; 3 adresses en double ; et `validerPlan()` qui ne contrôle ni les renvois d'incertitude, ni `dessert`, ni les arrêts répétés dans une course. Côté jetons : `backdrop-filter` en dur alors que `--flou` existe, `rgb(0 0 0 / 0.5)` sans jeton, `999px` en quatre exemplaires, `--texte-4xl` mort, neuf sélecteurs CSS morts, `--accent` et `--plein` strictement identiques en thème clair contre l'intention écrite, `--fond` recopié en dur dans `index.html` et le manifeste PWA — ce qui rend fausse la promesse « réaligner la charte en changeant `tokens` et rien d'autre » —, et un aplat `#eee` en couche impression sans `print-color-adjust`, dont on ignore donc s'il s'imprime.~~ **Levée le 2026-09-09** pour tout ce qui relevait du dépôt. Données : `aller-3.dessert` corrigé, et `validerPlan` contrôle désormais `dessert`, les renvois d'incertitude, les renvois de note, l'arrêt répété deux fois de suite, et AVERTIT au-delà de 90 km/h entre deux arrêts (le plan en vigueur en compte deux à 114 km/h). Les trois adresses en double sont parties, du générateur comme du fichier, avec un test. Jetons : `--flou-rail`, `--voile-modale`, `--flou-modale`, `--rayon-pilule` rapatriés ; `--texte-4xl`, neuf sélecteurs morts et deux clés i18n mortes supprimés ; `--plein` distinct de `--accent` en thème clair, avec test ; `--fond` lu dans la feuille par un greffon Vite pour `index.html` et le manifeste ; `print-color-adjust: exact` sur l'aplat imprimé. **Ce qui restait de source, et non de code, devient R72 à R75.** |
+| R71 | 2026-09-09 | **Le filtre des points de terminaison push n'a jamais vu un vrai service.** Héritée de R58, et entière : les cinq hôtes de `HOTES_PUSH` et les endpoints des tests sont recopiés de mémoire, pas capturés sur un abonnement réel. La route est maintenant gardée de bout en bout, mais contre une liste dont personne n'a vérifié qu'elle laisse passer les vrais. Une liste trop étroite couperait les notifications au lieu de les protéger, et l'échec serait silencieux : un 400 à l'abonnement, puis plus rien. | S'abonner depuis Safari iOS — le seul appareil du projet —, vérifier que l'abonnement est accepté et que la notification arrive. |
+| R72 | 2026-09-09 | **Deux segments du plan roulent à 114 km/h, et c'est la brochure qui le dit.** Huttange → Noerdange-gare, 1,9 km en 1 min, sur `aller-1-apres-midi` et `retour-2-soir`. `validerPlan` les signale désormais en avertissement, mais ne les corrige pas : les heures publiées sont arrondies à la minute, et inventer une minute intermédiaire serait deviner. Quatre autres segments tiennent 74 km/h, sous le seuil de 90. | Demander à la commune les heures réelles de ces deux passages, ou constater sur place. En attendant, les avertissements restent visibles à la publication depuis `/edition`. |
+| R73 | 2026-09-09 | **L'école précoce est posée exactement sur la maison relais.** `ecoles.json` donne au site `beckerich-precoce` les coordonnées `[49.731842, 5.882778]`, au chiffre près celles du Dillendapp. C'est peut-être vrai — le précoce est souvent hébergé dans le bâtiment de la maison relais — mais rien ne le dit, et le site ne porte aucune source. Depuis que le précoce n'a plus de bus (R65), la coordonnée ne sert qu'au libellé « scolarisé à » ; elle reste fausse ou vraie sans qu'on sache. | Demander à la commune où se tient le précoce, et poser une `source` sur le site comme les arrêts en portent une. |
+| R74 | 2026-09-09 | **Les deux bus Dillendapp sont réservés à deux cycles différents, sans raison écrite.** `aller-dillendapp` (midi, vers la maison relais) est réservé aux **c2** ; `retour-dillendapp` (après-midi, vers l'école) aux **c3**. La dissymétrie vient de la brochure et le moteur la respecte — un c2 rentre par le Retour 2 les mardi et jeudi, un c3 par le Retour 2 tous les jours, et tous les cycles sont couverts chaque jour (vérifié). Mais aucune note ne dit si c'est voulu ou si c'est une coquille de la brochure. | Poser la question à la commune. Si c'est voulu, l'inscrire en `reglesConfirmees` comme la règle des retours du mardi et du jeudi. |
+| ~~R75~~ | 2026-09-09 | ~~Trois champs de données restent orphelins.~~ **Soldée le 2026-09-11, champ par champ.** `Service.horaireComplet` : **retiré** du type et des données — il redisait au niveau de la course ce que chaque arrêt porte déjà en `heure: null`, et ce que le parent lit déjà arrêt par arrêt sous `trajets.heureNonPubliee` ; deux sources pour un même fait finissent par diverger. `reglesConfirmees` : devenu **`$reglesConfirmees`**, le préfixe que ce répertoire emploie déjà pour `$commentaire` et `$note` — de la prose pour humains, et non un champ qui attend d'être branché. `Arret.aliases` : **branché** dans le choix d'arrêt (`nomArretAvecAlias`, clé `arrets.aussiAppele` dans les cinq dictionnaires). Un parent qui lit « Liewelerwee » sur la brochure retrouve « Beckerich · Leewelerwee » dans la liste. La mention est réservée à l'endroit où l'on CHOISIT un arrêt : l'ajouter aux horaires, aux fiches et à l'agenda aurait alourdi chaque ligne. Vérifié au navigateur en fr, de et pt, et par mutation (retirer la concaténation fait tomber deux tests ; retirer la clé d'un seul dictionnaire fait tomber le test de parité). | Soldée. |
+| ~~R76~~ | 2026-09-09 | ~~Rien de tout cela n'a été vu dans un navigateur.~~ **Levée le 2026-09-11** : banc Playwright (Chromium 1243, hors dépôt) sur les neuf écrans, **en clair ET en sombre**, avec un foyer semé dans `localStorage` — un c3, un précoce, un c1. Aucune exception de rendu, aucune erreur de console. Vérifié au texte rendu (`textContent`) : le message « pas de bus » du précoce sur Accueil, Semaine, les étapes 3 à 5 de l'assistant (`Moments`) et la fiche du foyer ; la marche directe (domicile à 11 m de l'école d'Elvange) sur Accueil et Semaine, avec son détail ; le pied de page « Plan valable jusqu'au 2026-12-18 » sur tous les écrans ; les encarts « position approximative » sur un foyer de Beckerich-village. Vérifié au pixel : le bouton « Effacer toutes mes données » **au survol** passe à **11,11:1** en clair et **7,41:1** en sombre (c'était 3,41:1 avant R69), le bouton primaire tient 14,27:1 et 16,53:1, `--plein` vaut bien `#1a222c` en clair, et les deux `theme-color` de la barre système (`#0e1a2e` / `#e1e7ee`) sont ceux des jetons — la promesse de R70 tient jusqu'au navigateur. Vérifié au réseau : **zéro requête OpenStreetMap avant le clic**, quatre après (R68). La fiche du foyer de trois enfants tient sur **une seule page A4**, vendredi compris. **Ce qui reste hors de cette levée** : Safari et WebKit (voir R1), et le survol sur un vrai appui tactile — Chromium ne simule pas le `:hover` collé d'iOS. |
+| R77 | 2026-09-11 | **Le plus long nom d'arrêt n'a été lu que sur un écran d'ordinateur.** Depuis que les alias de la brochure s'affichent, l'entrée la plus longue du choix d'arrêt fait 83 caractères : « Hovelange · Op der Halte — aussi « Sportshal/Op der Halte, Op der Halte/Sportshal » ». C'est une `<option>` d'un `<select>` natif : sur iPhone, la roue de sélection la **tronque avec des points de suspension** au lieu de la replier, et rien ne prévient. Les deux alias de cet arrêt sont d'ailleurs les mêmes mots dans les deux ordres — la brochure les écrit ainsi, mais pour l'affichage le second n'apprend rien. Les deux autres arrêts aliasés tiennent sous 46 caractères et ne courent pas ce risque. | Ouvrir le choix d'arrêt sur l'iPhone (saisir une adresse hors commune, puis « Indiquer l'arrêt utilisé ») et lire l'entrée de Hovelange. Si elle est tronquée, la correction est **dans les données** : retirer de `arrets.json` la permutation redondante `Op der Halte/Sportshal`, et non raccourcir dans le composant. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -2856,3 +2876,222 @@ GitHub est passée sur ses six travaux, et le redéploiement Dokploy du compose 
 paquet, `GET /api/sante` répond `ok` avec sa clé VAPID. La correction des horaires par
 cycle est donc en ligne pour les parents. **R53 est levée dans la foulée** — rien n'était
 publié en base. R51 et R52 restent ouvertes, elles attendent la commune.
+
+---
+
+## Les treize constats de l'audit, repris un par un (2026-09-09)
+
+L'audit du 2026-09-08 avait laissé treize réserves ouvertes (R58 à R70) et une liste de
+constats non revérifiés. Cette journée-ci ne livre aucune fonction nouvelle : elle solde
+cette liste. **Les treize sont levées**, six réserves neuves les remplacent (R71 à R76),
+et rien n'est déployé — voir R76.
+
+### Ce qu'un parent recevait de faux
+
+Trois défauts atteignaient l'écran, et tous les trois contredisaient le second principe
+du projet — *l'application dit ce qu'elle ne sait pas* — dans le sens le plus grave :
+elle affirmait ce qui est faux.
+
+- **Le précoce recevait un horaire de bus complet** (R65). `CYCLES_SANS_BUS` ne servait
+  qu'à filtrer une liste déroulante ; le moteur, lui, trouvait quatre trajets par jour et
+  `manquants: []` pour le seul cycle qui n'a pas de transport scolaire. Le contexte porte
+  désormais `sansTransport`, `trajetsDuJour` sort avant toute recherche, et les six écrans
+  qui affichaient « à pied » disent laquelle des deux raisons s'applique.
+- **Un C4 inscrit au Dillendapp recevait 31 minutes de bus pour 86 m** (R64), un retour du
+  soir de l'école vers l'école, et l'alerte d'une navette manquante — que `bornesDillendapp`,
+  dans le même fichier, savait déjà inexistante. La garde n'était posée que sur une des
+  quatre branches.
+- **Le pied de page annonçait 209 jours de validité de trop** (R67) : les années couvertes
+  au lieu de `valideAu`, dont la vraie borne n'apparaissait qu'une fois dépassée.
+
+### Ce que l'application promettait sans le tenir
+
+- **Plus aucun arrêt n'était approximatif** (R68). Six arrêts placés à la main en août
+  avaient basculé en `verifiee` — pour trois d'entre eux, seules les décimales avaient
+  changé, pas la position. Les trois encarts d'avertissement étaient devenus
+  inatteignables et « Limites » promettait un signalement que rien ne déclenchait.
+- **La carte disait le domicile à OpenStreetMap** (R61), au montage, à chaque ouverture
+  d'une fiche enfant, cadrée sur le domicile jusqu'au zoom 18. Tranché dans le sens du
+  premier principe : elle attend un geste, et le bouton dit ce que le geste déclenche.
+- **`JourneeEnfant.incertitudes` était déclaré, rendu, et jamais alimenté** (R66) : le seul
+  canal *par jour* dont dispose l'application pour dire ce qu'elle ignore. Trois tests
+  l'assertaient vide en croyant prouver quelque chose. L'incertitude gagne un champ
+  `jours` — celle du hall sportif ne concerne que le vendredi et s'affichait aussi le
+  lundi et le mercredi.
+
+### Ce que les tests ne gardaient pas
+
+C'est la part la plus instructive de la journée : **quatre gardes s'étaient éteintes sans
+bruit**, et deux ne se sont révélées qu'en donnant enfin une base au serveur.
+
+- Un test des dictionnaires comparait `[]` à `[]` dans les quatre langues depuis toujours
+  (R63) : `Object.entries()` sur une `Map` rend `[]`.
+- Il n'existait **aucun test de contraste** depuis R49, et le jeu de 24 compositions du
+  lot 18 — consigné dans un commentaire — n'incluait aucun état de survol. « Supprimer »
+  était illisible au survol à 3,16:1 (R69), et `:hover` reste collé après un appui tactile.
+- **Le test de R59 était faux** : il consommait les cinq jetons de débit avant d'appeler
+  `/mot-de-passe-oublie`, qui se faisait alors refuser lui-même — il n'exerçait donc pas
+  l'exploit qu'il prétendait couvrir.
+- **R58 n'était gardée nulle part au niveau de la route** : retirer l'appel à
+  `endpointAcceptable` dans `/abonner` ne faisait rien tomber.
+
+Les deux derniers points n'ont été trouvés qu'après avoir levé R60. C'est la leçon de la
+journée : *un test qui se saute ne protège rien, et un test qu'on n'a jamais vu échouer
+n'est pas encore un test.* Chaque correctif de cette journée a donc sa **mutation** —
+on a remis le défaut, vu le test tomber, et remis le correctif.
+
+### Lancer les tests du serveur sans Docker
+
+Cette machine n'a ni Docker, ni PostgreSQL, ni `sudo` : les 84 tests qui comptent se
+sautaient (R60). Un binaire PostgreSQL installé **hors du dépôt** suffit, et aucune
+dépendance n'a été ajoutée :
+
+```bash
+# hors du dépôt, une fois
+cd /tmp/pg && npm init -y && npm install embedded-postgres
+BIN=$PWD/node_modules/@embedded-postgres/linux-x64/native/bin
+export LD_LIBRARY_PATH=$PWD/node_modules/@embedded-postgres/linux-x64/native/lib
+$BIN/initdb -D data -U bus --auth=trust -E UTF8
+# `-k` court : le chemin d'un socket Unix ne peut pas dépasser 107 octets, et celui
+# d'un répertoire de travail temporaire le dépasse largement.
+mkdir -p /tmp/pgsock && $BIN/pg_ctl -D data -l pg.log -o "-p 5433 -k /tmp/pgsock" start
+# puis, dans le dépôt
+cd serveur && DATABASE_URL_TEST=postgres://bus@127.0.0.1:5433/bus npm test
+```
+
+### Ce qui a été prouvé, et où s'arrête la preuve
+
+Vérifié : **477 tests d'application** (386 avant la journée), **162 tests de serveur**
+(74 avant, les 88 autres se sautaient), `typecheck`, `lint` et `build` des deux paquets.
+Chaque correctif a été reproduit avant d'être écrit, et vérifié par mutation après.
+
+**Où s'arrête la preuve** : aucun navigateur. Six écrans, la palette claire et la barre
+système ont changé sans qu'on les regarde — c'est **R76**, et rien ne part en production
+avant. Quatre questions restent pour la commune (R72 à R75), et R71 attend un vrai
+service de push.
+
+### Écarts assumés par rapport aux constats de l'audit
+
+- **R70 demandait de refuser un arrêt répété dans une course.** Refusé : l'Aller 3
+  dessert légitimement le Dillendapp deux fois, et la règle aurait rejeté le plan en
+  vigueur. Seule la répétition **immédiate** — le même arrêt deux fois de suite — est
+  une erreur.
+- **R70 relevait six segments à plus de 70 km/h.** Le seuil d'avertissement est posé à
+  90 : quatre des six tiennent 74 km/h, ce qui reste plausible sur une route de village.
+  Deux dépassent, et deviennent R72.
+- **R62 demandait de relancer trois agents.** Ils avaient déjà produit, plus tard dans la
+  même session : leurs constats SONT R64 à R70. La réserve est marquée caduque plutôt que
+  levée, et les deux règles de `gardien-jetons` qu'aucune réserve ne reprenait ont été
+  revérifiées à la main.
+- **Les données n'ont pas été corrigées là où la brochure est la source.** Vitesses
+  impossibles, dissymétrie des deux bus Dillendapp, position du précoce : ce sont des
+  questions à la commune, pas des valeurs à réécrire. Elles sont désormais signalées par
+  `validerPlan` ou inscrites en réserve, jamais devinées.
+
+## Le banc navigateur, enfin ouvert (2026-09-11)
+
+Les dix-neuf commits de la veille n'avaient été jugés que par des tests. Cette séance ne
+change **aucune ligne de l'application** : elle regarde.
+
+### Ce que la machine offre aujourd'hui
+
+Trois choses ont changé depuis la note de reprise, et elles déverrouillent le banc :
+Docker répond sans `sudo` — mais **sans le greffon `compose`** : `docker compose up -d
+bus-postgres` échoue, et c'est `docker run -d --name bus-postgres-test -e POSTGRES_USER=bus
+-e POSTGRES_PASSWORD=bus -e POSTGRES_DB=bus -p 127.0.0.1:5433:5432 postgres:17-alpine` qui
+donne la base (la recette `embedded-postgres` n'est donc plus nécessaire) ; les
+polices DejaVu sont installées (Chromium ne meurt plus sur `/reglages`), et les
+navigateurs Playwright sont dans `~/.cache/ms-playwright`. Le paquet `playwright-core`
+est installé **hors du dépôt**, dans le répertoire de travail temporaire : le projet ne
+gagne aucune dépendance pour un banc qu'on ouvre trois fois par an.
+
+### Ce qui a été regardé
+
+Neuf écrans, **en clair et en sombre**, avec un foyer semé dans `localStorage` : un c3,
+un précoce et un c1 à Huttange, un c3 à onze mètres de l'école d'Elvange pour la marche
+directe, un foyer de Beckerich-village pour les arrêts approximatifs. Le précoce ne peut
+plus être saisi par le formulaire — il est semé directement, exactement comme le fait un
+lien de partage ancien.
+
+Trois natures de preuve, et elles ne se remplacent pas :
+
+| Nature | Ce qu'elle établit |
+| --- | --- |
+| Texte rendu (`textContent`) | Le bon message est là. `innerText` renvoie vide sous `chrome-headless-shell` — piège déjà payé le 2026-09-08. |
+| Pixels (pipette sur capture d'élément) | La couleur **effective**, composition alpha et `color-mix` compris. C'est la seule mesure qui vaut pour le contraste. |
+| Réseau | Ce qui part de l'appareil, et quand. |
+
+### Deux fausses pistes, notées pour ne pas les reprendre
+
+**`getComputedStyle` ne donne pas la couleur effective.** Un fond en
+`color-mix(… / alpha)` revient en `oklab(… / 0.27)` non composité : le rapport calculé
+là-dessus donnait 1,20:1 là où le pixel en vaut 11,11. Le calcul sur les valeurs
+déclarées est exactement ce que R27 reprochait au banc précédent — il ne fallait pas le
+refaire sous un autre nom.
+
+**Une capture `fullPage` ne partage pas les coordonnées du DOM.** Elle redispose la page
+(en-têtes collants, conteneurs défilants) : les rectangles relevés tombent à côté, et le
+balayage a produit onze « défauts » qui n'existaient pas, tous différents d'un thème à
+l'autre. Agrandir la fenêtre à la hauteur du document ne suffit pas non plus. Seule la
+capture **par élément** donne des chiffres qui se reproduisent — et le signe qu'ils sont
+justes est qu'ils désignent alors **les mêmes** zones dans les deux thèmes.
+
+### Ce qui a été prouvé
+
+R76 et R27 sont levées ; le détail chiffré est dans leurs lignes en tête de fichier. En
+résumé : aucune exception de rendu ni erreur de console sur les neuf écrans, les messages
+« pas de bus » et « marche directe » présents partout où ils sont attendus, 458 zones de
+texte mesurées au pixel par thème sans un seul couple sous son seuil, le bouton de
+suppression à 11,11:1 au survol, zéro requête OpenStreetMap avant le clic, et la feuille
+du foyer de trois enfants sur une seule page A4.
+
+La base a été relancée (`docker run postgres:17-alpine`, port 5433) et les **162 tests du
+serveur** ont tourné contre elle — aucun saut. **477 tests d'application**, `typecheck`,
+`lint` et `build` des deux paquets : tout passe.
+
+### Où s'arrête la preuve
+
+Tout ceci est **Chromium**. Safari et WebKit n'ont rien vu, et c'est là que vivent les
+deux réserves les plus tenaces : la troncature silencieuse de la feuille imprimée (R1) et
+le `:hover` qui reste collé après un appui tactile (le motif même de R69). Un banc sans
+doigt ne prouve pas un geste.
+
+Restent ouvertes et **indépendantes du code** : R71 (un vrai service de push), R72 à R74
+(quatre questions à la commune) et R75 (trois champs orphelins à trancher).
+
+### Les trois champs orphelins, tranchés (2026-09-11, suite)
+
+R75 demandait de trancher champ par champ, sans laisser de troisième état. Deux réponses
+étaient du nettoyage, la troisième une décision d'affichage — c'est Alex qui l'a prise.
+
+`horaireComplet` **part**. Il marquait les deux courses Dillendapp dont la brochure ne
+publie qu'une heure sur cinq. Mais chaque arrêt porte déjà `heure: null`, et
+`heureOuMention` affiche « heure non publiée » arrêt par arrêt : le parent le sait déjà,
+à l'endroit où ça lui sert. Un booléen de course qui redit la même chose est une seconde
+source de vérité, et une seconde source finit toujours par diverger de la première.
+
+`reglesConfirmees` devient **`$reglesConfirmees`**. Le préfixe `$` est déjà la convention
+de ce répertoire pour `$commentaire` et `$note` : il dit « prose pour humains, aucun code
+ne lit ceci ». La règle décrite (pas de retour de fin d'après-midi les mardi et jeudi) vit
+dans `plan.ts` et un test la garde ; ce qui reste ici, et qui vaut d'être gardé, c'est
+**qui** l'a confirmée et **quand** — ce qu'il faudra redemander à la prochaine rentrée.
+
+`aliases` est **branché**. Les trois noms de brochure n'apparaissaient nulle part, alors
+que le choix d'arrêt n'est qu'une liste déroulante de dix-sept entrées sans recherche.
+Un parent qui lit « Liewelerwee » sur le document communal cherchait « Leewelerwee » sans
+le savoir. `nomArretAvecAlias` ajoute la mention, et **seulement là** : `nomArret` reste
+nu pour les horaires, les fiches et l'agenda, où la mention alourdirait chaque ligne.
+
+Deux détails qui ne se voyaient qu'à l'écran :
+
+- **Le séparateur entre alias ne peut pas être `·`.** C'est déjà celui qui sépare le
+  village du lieu dans le nom lui-même : « Hovelange · Op der Halte — aussi
+  « Sportshal/Op der Halte · Op der Halte/Sportshal » » se lit comme un seul arrêt à
+  rallonge. Une virgule à l'intérieur des guillemets lève l'ambiguïté.
+- **La ligne la plus longue fait 83 caractères**, dans une `<option>` native. C'est
+  **R77** : la roue de sélection d'iOS tronque au lieu de replier.
+
+Vérifié : 481 tests (477 + 4), les options relues dans le navigateur en français, en
+allemand et en portugais, et deux mutations — retirer la concaténation fait tomber deux
+tests, retirer la clé d'un seul dictionnaire fait tomber le test de parité des cinq
+langues.

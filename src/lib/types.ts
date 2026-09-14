@@ -78,8 +78,6 @@ export interface Service {
   periode: Periode
   jours: Jour[]
   arrets: ArretDesservi[]
-  /** `false` quand le plan ne détaille pas tous les horaires de la course. */
-  horaireComplet?: boolean
   /** Identifiant d'une incertitude déclarée dans le plan. */
   incertitude?: string
 }
@@ -107,6 +105,14 @@ export interface Incertitude {
   question: string
   hypothese: string
   aVerifierAupres: string
+  /**
+   * Les jours où l'incertitude pèse réellement. Absent = tous les jours de la course.
+   *
+   * Une course circule lundi, mercredi et vendredi ; l'ambiguïté du hall sportif ne
+   * concerne que le vendredi. Sans ce champ, elle s'affichait aussi le lundi et le
+   * mercredi — inquiéter pour un autre jour n'est pas informer.
+   */
+  jours?: Jour[]
 }
 
 /** Une plage de cours, telle que la brochure communale la publie. */
