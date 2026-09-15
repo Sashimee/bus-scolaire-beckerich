@@ -36,6 +36,7 @@ import { base, type Sql } from '../stockage/client.ts'
 import { envoyerATous } from '../envois.ts'
 import { journaliser, lireJournal } from '../stockage/journal.ts'
 import { lireMesures } from '../stockage/mesure.ts'
+import { resume as resumeAbonnements } from '../stockage/abonnements.ts'
 import { LANGUES, perturbationPropre, validerPerturbation } from '../validation-perturbation.ts'
 
 const TAILLE_CORPS_MAX = 64 * 1024
@@ -272,6 +273,17 @@ async function mesures(c: Context) {
   return c.json(await lireMesures(Number.isFinite(jours) ? jours : 30))
 }
 
+/**
+ * Le compte des abonnements aux notifications. Lisible par toute session connectée,
+ * comme le journal et la fréquentation : savoir combien de téléphones sont abonnés n'est
+ * pas un droit d'édition, et aucun point de terminaison ne sort d'ici — que des agrégats.
+ */
+async function abonnes(c: Context) {
+  const r = await exigerSession(c)
+  if ('refus' in r) return r.refus
+  return c.json(await resumeAbonnements())
+}
+
 export function monterEdition(app: Hono): void {
   app.post('/edition/credits', publierCredits)
   app.post('/edition/corrections', publierCorrection)
@@ -282,4 +294,5 @@ export function monterEdition(app: Hono): void {
   app.post('/edition/traductions', publierTraductions)
   app.get('/edition/journal', journal)
   app.get('/edition/mesure', mesures)
+  app.get('/edition/abonnes', abonnes)
 }

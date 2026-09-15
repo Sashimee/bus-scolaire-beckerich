@@ -130,3 +130,49 @@ export async function compter(db: Sql = base()): Promise<number> {
   const [ligne] = await db`select count(*)::int as n from abonnement`
   return ligne.n as number
 }
+
+/**
+ * Le compte des abonnements, pour l'onglet « Abonnés » de `/edition`.
+ *
+ * Ce que ce nombre N'EST PAS, et que l'écran doit dire : un nombre de personnes. La clé
+ * est un hachage du point de terminaison, c'est-à-dire un NAVIGATEUR — le même parent
+ * avec son téléphone et son portable compte deux fois. Et un abonnement reste en base
+ * jusqu'à ce que le service de push le déclare parti : une application désinstallée
+ * compte encore, tant qu'aucun envoi n'a échoué dessus.
+ *
+ * `ayantRecu` sépare les deux : un abonnement dont `dernier_succes` est nul n'a jamais
+ * reçu quoi que ce soit. Tant qu'aucun rappel réel n'est parti (R7), ils le sont tous.
+ *
+ * Aucun endpoint ne sort d'ici : ce sont des agrégats, comme la fréquentation.
+ */
+export interface ResumeAbonnements {
+  total: number
+  ayantRecu: number
+  parPreference: { preference: string; n: number }[]
+  premier: string | null
+  dernier: string | null
+}
+
+export async function resume(db: Sql = base()): Promise<ResumeAbonnements> {
+  const lignes = await db`
+    select preference,
+           count(*)::int          as n,
+           count(dernier_succes)::int as recu,
+           min(cree_le)           as premier,
+           max(cree_le)           as dernier
+    from abonnement
+    group by preference
+    order by preference
+  `
+  const dates = (champ: 'premier' | 'dernier') =>
+    lignes.map((l) => l[champ] as Date).filter(Boolean)
+  const premiers = dates('premier')
+  const derniers = dates('dernier')
+  return {
+    total: lignes.reduce((n, l) => n + (l.n as number), 0),
+    ayantRecu: lignes.reduce((n, l) => n + (l.recu as number), 0),
+    parPreference: lignes.map((l) => ({ preference: l.preference as string, n: l.n as number })),
+    premier: premiers.length ? new Date(Math.min(...premiers.map(Number))).toISOString() : null,
+    dernier: derniers.length ? new Date(Math.max(...derniers.map(Number))).toISOString() : null,
+  }
+}

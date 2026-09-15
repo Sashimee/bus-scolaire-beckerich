@@ -9,6 +9,7 @@ import { EditeurHoraires } from '../composants/EditeurHoraires'
 import { EditeurTraductions } from '../composants/EditeurTraductions'
 import { JournalEdition } from '../composants/JournalEdition'
 import { MesureEdition } from '../composants/MesureEdition'
+import { AbonnesEdition } from '../composants/AbonnesEdition'
 import {
   chargerSession,
   comptesConfigures,
@@ -109,6 +110,14 @@ export function Edition() {
     cle: 'mesure',
     libelle: t('mesure.titre'),
     contenu: <MesureEdition session={session} />,
+  })
+  // Les abonnés aux notifications, ouverts à toute session pour la même raison : le
+  // chiffre vivait en base sans être lisible ailleurs qu'en ouvrant `psql` sur la
+  // production.
+  onglets.push({
+    cle: 'abonnes',
+    libelle: t('abonnes.titre'),
+    contenu: <AbonnesEdition session={session} />,
   })
 
   return (

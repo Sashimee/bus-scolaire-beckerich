@@ -1019,5 +1019,18 @@
     "accueil": "Haaptsäit",
     "autre": "Aner",
     "parJour": "Pro Dag"
+  },
+  "abonnes": {
+    "titre": "Abonnenten",
+    "aide": "Wéivill Browser fir Notifikatioune ugemellt sinn. Kee Endpunkt gëtt hei gewisen, nëmme Summen.",
+    "recharger": "Nei lueden",
+    "echec": "D'Zuel vun den Abonnente konnt net gelies ginn.",
+    "total": "{total} Umeldungen",
+    "vide": "Keng Umeldung erfaasst.",
+    "preference": "Wat si kréien",
+    "nombre": "Umeldungen",
+    "periode": "Éischt Umeldung den {premier}, lescht den {dernier}.",
+    "pasDesPersonnes": "Eng Umeldung ass e Browser, keng Persoun: deeselwechten Elterendeel mat sengem Telefon an sengem Computer zielt zweemol.",
+    "ayantRecu": "{ayantRecu} hu scho eng Notifikatioun kritt. Déi aner hunn nach ni eppes kritt — eng Umeldung bleift gespäichert, bis de Push-Déngscht se fir fort erkläert."
   }
 }

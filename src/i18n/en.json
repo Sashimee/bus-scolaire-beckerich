@@ -1019,5 +1019,18 @@
     "accueil": "Home",
     "autre": "Other",
     "parJour": "Per day"
+  },
+  "abonnes": {
+    "titre": "Subscribers",
+    "aide": "How many browsers are subscribed to notifications. No endpoint is shown here, only totals.",
+    "recharger": "Reload",
+    "echec": "The subscriber count could not be read.",
+    "total": "{total} subscriptions",
+    "vide": "No subscription recorded.",
+    "preference": "What they receive",
+    "nombre": "Subscriptions",
+    "periode": "First subscription on {premier}, latest on {dernier}.",
+    "pasDesPersonnes": "A subscription is a browser, not a person: the same parent with a phone and a computer counts twice.",
+    "ayantRecu": "{ayantRecu} have already received a notification. The others never received anything — a subscription stays on file until the push service declares it gone."
   }
 }
