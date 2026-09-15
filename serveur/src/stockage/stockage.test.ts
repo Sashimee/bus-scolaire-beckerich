@@ -59,6 +59,41 @@ describe.skipIf(!avecBase)('abonnements', () => {
     await abonnements.supprimerParHash(await empreinte('https://push.example/c'), db)
     expect(await abonnements.lireParEndpoint('https://push.example/c', db)).toBeNull()
   })
+
+  it('le résumé compte par préférence, et sépare ceux qui ont déjà reçu', async () => {
+    // Les tests précédents ont laissé des abonnements : ce test compte, il part donc
+    // d'une table vide plutôt que de deviner ce qu'ils ont laissé.
+    await db`delete from abonnement`
+    await abonnements.enregistrer('https://push.example/r1', {}, 'tout', db)
+    await abonnements.enregistrer('https://push.example/r2', {}, 'tout', db)
+    await abonnements.enregistrer('https://push.example/r3', {}, 'urgences', db)
+    await abonnements.noterSucces(await empreinte('https://push.example/r1'), db)
+
+    const r = await abonnements.resume(db)
+    expect(r.total).toBe(3)
+    // Ce que le nombre total ne dit pas : deux abonnements sur trois n'ont jamais rien
+    // reçu. C'est la nuance que l'écran affiche, et elle se perd si personne ne la teste.
+    expect(r.ayantRecu).toBe(1)
+    expect(r.parPreference).toEqual([
+      { preference: 'tout', n: 2 },
+      { preference: 'urgences', n: 1 },
+    ])
+    expect(r.premier).not.toBeNull()
+    expect(new Date(r.dernier as string).getTime()).toBeGreaterThanOrEqual(
+      new Date(r.premier as string).getTime(),
+    )
+  })
+
+  it('le résumé d’une base vide ne casse pas', async () => {
+    await db`delete from abonnement`
+    expect(await abonnements.resume(db)).toEqual({
+      total: 0,
+      ayantRecu: 0,
+      parPreference: [],
+      premier: null,
+      dernier: null,
+    })
+  })
 })
 
 /**

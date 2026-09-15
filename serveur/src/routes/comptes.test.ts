@@ -749,3 +749,56 @@ describe.skipIf(!avecBase)('mesure de fréquentation auto-hébergée', () => {
     expect(m.parJour).toHaveLength(1)
   })
 })
+
+describe.skipIf(!avecBase)('abonnés aux notifications', () => {
+  it('le compte exige une session, mais aucune capacité', async () => {
+    // `beforeEach` ne vide pas `abonnement` : ce test compte, il part donc d'une table
+    // vide plutôt que de deviner ce que les tests voisins ont laissé.
+    await db`delete from abonnement`
+    expect((await app.request('/api/edition/abonnes')).status).toBe(401)
+
+    await poster('/abonner', {
+      endpoint: 'https://web.push.apple.com/a',
+      keys: { p256dh: 'x', auth: 'y' },
+      preference: 'tout',
+    })
+    await poster('/abonner', {
+      endpoint: 'https://web.push.apple.com/b',
+      keys: { p256dh: 'x', auth: 'y' },
+      preference: 'urgences',
+    })
+
+    await creerCompte({ courriel: 'compteur@ville.lu', capacites: [] })
+    const jeton = await connecter('compteur@ville.lu', 'motdepasse-solide')
+    const rep = await app.request('/api/edition/abonnes', { headers: avecJeton(jeton) })
+    expect(rep.status).toBe(200)
+
+    const a = (await rep.json()) as any
+    expect(a.total).toBe(2)
+    // Aucun rappel n'est parti : personne n'a encore rien reçu.
+    expect(a.ayantRecu).toBe(0)
+    expect(a.parPreference).toEqual([
+      { preference: 'tout', n: 1 },
+      { preference: 'urgences', n: 1 },
+    ])
+  })
+
+  it('ne laisse fuir aucun point de terminaison', async () => {
+    await db`delete from abonnement`
+    await poster('/abonner', {
+      endpoint: 'https://web.push.apple.com/secret-de-lappareil',
+      keys: { p256dh: 'x', auth: 'y' },
+      preference: 'tout',
+    })
+
+    await creerCompte({ courriel: 'curieux@ville.lu', capacites: [] })
+    const jeton = await connecter('curieux@ville.lu', 'motdepasse-solide')
+    const rep = await app.request('/api/edition/abonnes', { headers: avecJeton(jeton) })
+
+    // Le premier principe du projet vaut aussi pour qui est connecté : cet écran rend
+    // des totaux, jamais l'identifiant d'un appareil.
+    const brut = await rep.text()
+    expect(brut).not.toContain('secret-de-lappareil')
+    expect(brut).not.toContain('web.push.apple.com')
+  })
+})

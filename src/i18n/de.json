@@ -1019,5 +1019,18 @@
     "accueil": "Startseite",
     "autre": "Andere",
     "parJour": "Pro Tag"
+  },
+  "abonnes": {
+    "titre": "Abonnenten",
+    "aide": "Wie viele Browser für Benachrichtigungen angemeldet sind. Kein Endpunkt wird hier angezeigt, nur Summen.",
+    "recharger": "Neu laden",
+    "echec": "Die Zahl der Abonnenten konnte nicht gelesen werden.",
+    "total": "{total} Anmeldungen",
+    "vide": "Keine Anmeldung erfasst.",
+    "preference": "Was sie erhalten",
+    "nombre": "Anmeldungen",
+    "periode": "Erste Anmeldung am {premier}, letzte am {dernier}.",
+    "pasDesPersonnes": "Eine Anmeldung ist ein Browser, keine Person: derselbe Elternteil mit Telefon und Computer zählt zweimal.",
+    "ayantRecu": "{ayantRecu} haben bereits eine Benachrichtigung erhalten. Die übrigen haben nie etwas erhalten — eine Anmeldung bleibt gespeichert, bis der Push-Dienst sie für beendet erklärt."
   }
 }
