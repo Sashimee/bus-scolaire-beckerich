@@ -1019,5 +1019,18 @@
     "accueil": "Accueil",
     "autre": "Autre",
     "parJour": "Par jour"
+  },
+  "abonnes": {
+    "titre": "Abonnés",
+    "aide": "Combien de navigateurs sont abonnés aux notifications. Aucun point de terminaison n'est affiché ici, seulement des totaux.",
+    "recharger": "Recharger",
+    "echec": "Le compte des abonnés n'a pas pu être lu.",
+    "total": "{total} abonnements",
+    "vide": "Aucun abonnement enregistré.",
+    "preference": "Ce qu'ils reçoivent",
+    "nombre": "Abonnements",
+    "periode": "Premier abonnement le {premier}, dernier le {dernier}.",
+    "pasDesPersonnes": "Un abonnement est un navigateur, pas une personne : le même parent avec son téléphone et son ordinateur compte deux fois.",
+    "ayantRecu": "{ayantRecu} ont déjà reçu une notification. Les autres n'ont jamais rien reçu — un abonnement reste enregistré tant que le service de push ne l'a pas déclaré parti."
   }
 }

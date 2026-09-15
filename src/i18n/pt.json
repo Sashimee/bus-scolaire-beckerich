@@ -1019,5 +1019,18 @@
     "accueil": "Início",
     "autre": "Outro",
     "parJour": "Por dia"
+  },
+  "abonnes": {
+    "titre": "Subscritores",
+    "aide": "Quantos navegadores estão subscritos às notificações. Nenhum ponto de entrega é mostrado aqui, apenas totais.",
+    "recharger": "Recarregar",
+    "echec": "Não foi possível ler o número de subscritores.",
+    "total": "{total} subscrições",
+    "vide": "Nenhuma subscrição registada.",
+    "preference": "O que recebem",
+    "nombre": "Subscrições",
+    "periode": "Primeira subscrição a {premier}, última a {dernier}.",
+    "pasDesPersonnes": "Uma subscrição é um navegador, não uma pessoa: o mesmo pai com o telemóvel e o computador conta duas vezes.",
+    "ayantRecu": "{ayantRecu} já receberam uma notificação. As restantes nunca receberam nada — uma subscrição fica registada enquanto o serviço de push não a declarar terminada."
   }
 }

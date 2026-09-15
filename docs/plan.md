@@ -3187,3 +3187,33 @@ vitrine montrent toujours le verre bleu. Elles vivent dans l'autre dépôt, enge
 son propre script ; c'est à lui de les refaire. Et le banc reste **Chromium** : la palette
 n'a pas été vue sous Safari ni WebKit (R1). Deux réserves sont ouvertes : **R78** (la
 ligne de bus n'a plus de couleur à elle) et **R79** (des flous qui ne floutent plus rien).
+
+### Le nombre d'abonnés devient lisible (2026-09-15)
+
+Question d'Alex : « combien de personnes souscrites aux notifications ? ». Réponse d'alors :
+impossible à dire sans ouvrir `psql` sur la production. Le chiffre existait en base depuis
+le lot 10 — une ligne par abonnement dans `abonnement` — et **aucune route ne l'exposait**,
+`/edition` ne l'affichait pas, et `/api/sante` ne dit que « la clé VAPID est posée ».
+
+`GET /edition/abonnes` le rend, et un onglet « Abonnés » l'affiche à côté du journal et de
+la fréquentation. Ouvert à **toute session, sans capacité**, pour la raison déjà écrite
+pour les deux autres : voir n'est pas éditer.
+
+Ce que l'écran dit **en plus du nombre**, et qui est le vrai travail de ce lot :
+
+- **un abonnement est un navigateur, pas une personne.** La clé primaire est un hachage du
+  point de terminaison : le même parent avec son téléphone et son portable compte deux
+  fois. Un total seul se lirait comme un nombre de familles joignables ;
+- **combien ont déjà reçu quelque chose.** `dernier_succes` reste nul tant qu'aucun envoi
+  n'a abouti, et un abonnement reste en base jusqu'à ce que le service de push le déclare
+  parti — une application désinstallée compte encore. Tant qu'aucun rappel réel n'est parti
+  (R7), ce compte vaut zéro, et c'est une information.
+
+Le premier principe tient : aucun point de terminaison ne sort de cette route, et un test
+le vérifie sur la réponse brute — pas sur le chemin heureux, sur la chaîne servie.
+
+Vérifié : 166 tests du serveur contre une vraie base (162 + 4) et 489 de l'application
+(484 + 5). Deux des tests du serveur ont été écrits pour ce que le lot promet et non pour
+ce qu'il code : la route refuse sans session, et sa réponse ne contient ni `web.push.apple.com`
+ni l'identifiant d'appareil. Côté écran, cinq tests, dont un sur chacune des deux nuances —
+les retirer de l'affichage fait tomber le test.

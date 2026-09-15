@@ -175,3 +175,21 @@ export interface Mesures {
 export async function lireMesures(session: SessionCompte, jours = 30): Promise<Mesures> {
   return appeler<Mesures>(`/edition/mesure?jours=${jours}`, session)
 }
+
+/**
+ * Le compte des abonnements aux notifications.
+ *
+ * `total` compte des NAVIGATEURS, pas des personnes — l'écran doit le dire, sans quoi
+ * le chiffre se lit comme un nombre de familles.
+ */
+export interface Abonnes {
+  total: number
+  ayantRecu: number
+  parPreference: { preference: string; n: number }[]
+  premier: string | null
+  dernier: string | null
+}
+
+export async function lireAbonnes(session: SessionCompte): Promise<Abonnes> {
+  return appeler<Abonnes>('/edition/abonnes', session)
+}

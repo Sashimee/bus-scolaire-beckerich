@@ -216,3 +216,50 @@ usage réel, pas une mise en ligne :
   concurrence d'envoi sous charge.
 - **R50** — la pile orpheline `bus-beckerich` n'a pas été touchée : regarder ce qu'elle
   contient avant d'y toucher reste à faire, et ce n'était pas l'objet de ce déploiement.
+
+## Déploiement — 2026-09-15
+
+Mise en production de la charte de la vitrine. Commit déployé : **`0f7c5df`** (fusion de
+la PR #12), construit le 2026-09-14T22:12:07Z — soit 00:12 heure locale. Le précédent
+datait du même jour à 16:15 (`fdc720d`).
+
+C'est le premier déploiement dont l'objet est **uniquement visuel** : aucun calcul de
+trajet, aucune donnée, aucune route de serveur ne change. Ce que voit un parent change
+entièrement — crème et sarcelle au lieu du verre bleu, en clair comme en sombre.
+
+### Ce qui s'est passé, dans l'ordre
+
+1. PR #11 (`feat/charte-vitrine`) fusionnée dans `dev`, puis PR #12 `dev` → `main`.
+2. CI `34902779022` : **au vert en 1 min 58**, `npm audit` compris — les verrous relevés
+   la veille tiennent toujours.
+3. Les deux images poussées sur GHCR, puis redéploiement Dokploy du compose `bus-app`.
+4. Les deux gestes ont été faits **par Alex depuis son téléphone** : le classificateur de
+   l'auto mode refuse la fusion de PR et le redéploiement, et `bypassPermissions` dans les
+   réglages ne couvre pas ce refus — ce sont deux portes distinctes. À savoir pour la
+   prochaine fois : ni `gh pr merge` ni `compose.redeploy` ne passeront depuis une session
+   en mode auto.
+
+### Ce qui a été vérifié APRÈS la mise en ligne
+
+| Contrôle | Résultat |
+| --- | --- |
+| `/version.json` | `0f7c5df`, construit le 2026-09-14T22:12:07Z |
+| `/api/sante` | `base`, `push`, `comptes`, `courriel`, `rappels` au vert (`google: false`, inchangé) |
+| Barre système | `theme-color` `#121a19` / `#fbf6ef` — les jetons de la nouvelle charte, lus à la construction |
+| Icône servie | `favicon.svg` ne contient plus que `#0f5a61` et `#fbf6ef` : pastille sarcelle, carrosserie crème |
+| Navigateur, sur `app.schoulbus.lu` | 6 écrans × 2 thèmes, **1 442 zones de texte mesurées**, aucune erreur de page, aucune erreur de console |
+| Contraste en sombre | pire couple réellement rendu : **5,83:1** (écran Réglages), très au-dessus des 4,5:1 exigés |
+| Contraste en clair | les seules zones sous le seuil sont celles que la plaque « Pas d'école aujourd'hui » floute **volontairement** — le même banc les signalait déjà avant la charte |
+
+### Ce que ce déploiement ne prouve toujours pas
+
+- **La charte n'a été vue que sous Chromium.** Ni Safari ni WebKit (R1). Sur un dépôt dont
+  les parents sont en majorité sur iPhone, c'est la réserve qui pèse le plus ici.
+- **R78** — l'étiquette de ligne de bus a perdu son violet pour une sarcelle forte, qui
+  voisine l'encre en thème clair. Aucun test ne la garde.
+- **R79** — quatre `backdrop-filter` flouttent désormais sous des surfaces opaques.
+- Les réserves qui attendaient un usage réel n'ont pas bougé : **R44** (aucun courriel
+  réel), **R71** (le filtre push n'a vu aucun vrai service), **R39 à R41**, **R50**.
+- **Hors de ce dépôt** : les captures d'écran de l'application qui illustrent la vitrine
+  montrent encore le verre bleu, et la copie `jetons.css` de la vitrine a dérivé. Les deux
+  se règlent dans `schoulbus`, pas ici.
