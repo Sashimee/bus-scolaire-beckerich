@@ -263,3 +263,37 @@ entièrement — crème et sarcelle au lieu du verre bleu, en clair comme en som
 - **Hors de ce dépôt** : les captures d'écran de l'application qui illustrent la vitrine
   montrent encore le verre bleu, et la copie `jetons.css` de la vitrine a dérivé. Les deux
   se règlent dans `schoulbus`, pas ici.
+
+## Déploiement — 2026-09-15 (second)
+
+L'onglet « Abonnés » de `/edition`. Commit déployé : **`0c0e4ab`** (fusion de la PR #15),
+construit le 2026-09-15T03:27:33Z. Le précédent datait de la même nuit, 03:12 plus tôt
+(`0f7c5df`, la charte de la vitrine).
+
+Premier déploiement depuis longtemps qui change **l'image du serveur** et pas seulement le
+site : une route nouvelle, `GET /edition/abonnes`. Le redéploiement Dokploy n'était donc
+pas optionnel — sans lui, le site aurait affiché un onglet que l'API ne connaît pas.
+
+Le journal du déploiement précédent (PR #13) est parti avec : de la documentation seule,
+qu'on avait décidé de ne pas publier pour elle-même, et qui a voyagé gratuitement avec un
+changement de code. C'est le bon moment pour ce genre de commit — il ne fait pas signer
+une « nouvelle version » à lui tout seul.
+
+### Ce qui a été vérifié APRÈS la mise en ligne
+
+| Contrôle | Résultat |
+| --- | --- |
+| CI `34924967642` | verte en 2 min 02, `npm audit` compris |
+| `/version.json` | `0c0e4ab`, construit le 2026-09-15T03:27:33Z |
+| `/api/edition/abonnes` sans session | **401** `session-expiree` — la route existe et elle est gardée |
+| `/api/edition/nimporte-quoi` | **404** — c'est ce témoin qui donne sa valeur au 401 ci-dessus : sans lui, un 401 global aurait pu le simuler |
+| `/api/sante` | `ok`, `push`, `base`, `comptes`, `courriel`, `rappels` au vert |
+
+### Ce que ce déploiement ne prouve pas
+
+- **Le chiffre lui-même n'a pas été lu.** Il faut une session pour ouvrir l'onglet, et
+  aucune n'a été ouverte ici. Combien de navigateurs sont abonnés reste inconnu de ce
+  journal — c'est Alex qui le verra le premier.
+- **R7 tient toujours** : aucun rappel réel n'est jamais parti. Tant que c'est vrai,
+  l'onglet affichera « 0 ont déjà reçu une notification », quel que soit le total.
+- La charte du déploiement précédent n'a toujours été vue que sous **Chromium** (R1).
