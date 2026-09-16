@@ -33,6 +33,12 @@ function fondsDeLaCharte(): { sombre: string; clair: string } {
 // préfixe ou sur un domaine propre. Une variable d'environnement suffit alors.
 const base = process.env.BASE_PATH ?? '/bus-scolaire-beckerich/'
 
+// Origine publique du site, sans barre finale. Le défaut couvre GitHub Pages ; une
+// commune qui hébergerait le site ailleurs pose la variable, comme pour `BASE_PATH`.
+const urlPublique = (
+  process.env.URL_PUBLIQUE ?? `https://sashimee.github.io${base.replace(/\/$/, '')}`
+).replace(/\/$/, '')
+
 // Empreinte du déploiement. Le hook useVersionCheck relit version.json à intervalles
 // réguliers et propose le rechargement quand l'empreinte a changé.
 const version = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
@@ -93,11 +99,8 @@ function politiqueSecurite(urlApi: string): string {
  * parents s'affiche avec ce texte et rien d'autre : laisser croire à une communication
  * officielle contredirait le premier principe du projet avant même l'ouverture du site.
  *
- * `robots: noindex` reste par ailleurs en place ; il vise les moteurs de recherche, pas
- * les aperçus de lien, et les deux ne se contredisent pas.
  */
-function metasPartage(urlPublique: string): string {
-  const url = urlPublique.replace(/\/$/, '')
+function metasPartage(url: string): string {
   const titre = 'Bus scolaire Beckerich'
   const description =
     "Les horaires du bus scolaire de la commune de Beckerich, personnalisés pour chaque enfant. " +
@@ -146,10 +149,6 @@ function pluginCsp() {
       // produirait une CSP qui n'ouvre pas l'origine que l'application appelle —
       // exactement la panne du lot 11, muette et longue à diagnostiquer.
       const csp = politiqueSecurite(process.env.VITE_URL_API || process.env.VITE_URL_WORKER || '')
-      // Origine publique du site. Le défaut couvre GitHub Pages ; une commune qui
-      // hébergerait le site ailleurs pose la variable, comme pour `BASE_PATH`.
-      const urlPublique =
-        process.env.URL_PUBLIQUE ?? `https://sashimee.github.io${base.replace(/\/$/, '')}`
       return html.replace(
         '<head>',
         `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />\n` +
@@ -192,6 +191,58 @@ function pluginVersion() {
   }
 }
 
+/**
+ * Indexation par les moteurs de recherche : `robots.txt`, `sitemap.xml` et, pour les
+ * miroirs, la balise `noindex`.
+ *
+ * Le site a porté `noindex` jusqu'au 2026-09-16, pour ne pas concurrencer la page
+ * officielle de la commune. Il s'ouvre depuis aux moteurs — mais UNE seule adresse doit
+ * l'être. Le miroir GitHub Pages, servi en repli, pose `HORS_INDEX=1` au build : sans
+ * cela, deux copies du même site se disputeraient les résultats, et une balise
+ * `canonical` ne saurait pas les départager, le gabarit étant unique pour toutes les
+ * routes.
+ *
+ * Les deux fichiers sont engendrés plutôt que posés dans `public/`, parce que le sitemap
+ * et la ligne `Sitemap:` exigent des URL absolues, connues seulement à la construction.
+ * Seules les pages d'information entrent au sitemap : les écrans d'un foyer
+ * (`/enfant/…`, `/configurer`, `/agenda`, `/reglages`) n'ont rien à montrer sans les
+ * données locales du navigateur, et l'espace des agents comme l'API restent hors index.
+ */
+function pluginIndexation() {
+  const horsIndex = process.env.HORS_INDEX === '1'
+  const pagesPubliques = ['', 'plan', 'limites', 'independance', 'credits', 'installer']
+  const cheminsExclus = ['api/', 'edition', 'connexion', 'comptes', 'reinitialiser', 'commune', 'traductions']
+  return {
+    name: 'bus-indexation',
+    apply: 'build' as const,
+    transformIndexHtml(html: string) {
+      if (!horsIndex) return html
+      return html.replace('<head>', `<head>\n    <meta name="robots" content="noindex" />`)
+    },
+    closeBundle() {
+      const robots = horsIndex
+        ? ['User-agent: *', 'Disallow: /', '']
+        : [
+            'User-agent: *',
+            ...cheminsExclus.map((chemin) => `Disallow: ${base}${chemin}`),
+            `Sitemap: ${urlPublique}/sitemap.xml`,
+            '',
+          ]
+      const sitemap = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ...pagesPubliques.map((chemin) => `  <url><loc>${urlPublique}/${chemin}</loc></url>`),
+        '</urlset>',
+        '',
+      ]
+      writeFileSync(resolve(import.meta.dirname, 'dist/robots.txt'), robots.join('\n'))
+      if (!horsIndex) {
+        writeFileSync(resolve(import.meta.dirname, 'dist/sitemap.xml'), sitemap.join('\n'))
+      }
+    },
+  }
+}
+
 export default defineConfig({
   base,
   define: {
@@ -202,6 +253,7 @@ export default defineConfig({
     react(),
     pluginCharte(),
     pluginCsp(),
+    pluginIndexation(),
     pluginVersion(),
     VitePWA({
       registerType: 'autoUpdate',

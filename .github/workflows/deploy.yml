@@ -103,6 +103,10 @@ jobs:
           # le site déménage sous un autre préfixe ou un domaine propre.
           BASE_PATH: /${{ github.event.repository.name }}/
           GITHUB_SHA: ${{ github.sha }}
+          # Ce déploiement est un miroir de repli : seul app.schoulbus.lu s'offre aux
+          # moteurs de recherche, sinon deux copies du site se disputeraient l'index.
+          # Voir `pluginIndexation` dans vite.config.ts.
+          HORS_INDEX: '1'
           # L'URL du serveur. Variable de dépôt, pas un secret : elle se retrouve de
           # toute façon dans le code servi. Vide, l'application fonctionne à
           # l'identique, sans notifications ni espace agents.
