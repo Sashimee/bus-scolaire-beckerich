@@ -114,6 +114,7 @@ perdue. Elle se raye quand la vérification a été faite, pas avant.
 | R77 | 2026-09-11 | **Le plus long nom d'arrêt n'a été lu que sur un écran d'ordinateur.** Depuis que les alias de la brochure s'affichent, l'entrée la plus longue du choix d'arrêt fait 83 caractères : « Hovelange · Op der Halte — aussi « Sportshal/Op der Halte, Op der Halte/Sportshal » ». C'est une `<option>` d'un `<select>` natif : sur iPhone, la roue de sélection la **tronque avec des points de suspension** au lieu de la replier, et rien ne prévient. Les deux alias de cet arrêt sont d'ailleurs les mêmes mots dans les deux ordres — la brochure les écrit ainsi, mais pour l'affichage le second n'apprend rien. Les deux autres arrêts aliasés tiennent sous 46 caractères et ne courent pas ce risque. | Ouvrir le choix d'arrêt sur l'iPhone (saisir une adresse hors commune, puis « Indiquer l'arrêt utilisé ») et lire l'entrée de Hovelange. Si elle est tronquée, la correction est **dans les données** : retirer de `arrets.json` la permutation redondante `Op der Halte/Sportshal`, et non raccourcir dans le composant. |
 | R78 | 2026-09-14 | **L'étiquette d'une ligne de bus n'a plus de couleur à elle.** `--accent-2` servait à distinguer « Aller — Bus 1 » d'une étiquette d'heure ; c'était un violet, franchement autre chose que l'accent. La charte de la vitrine n'a pas de troisième couleur à offrir — le corail y est réservé à ce qui presse —, et `--accent-2` prend donc la sarcelle forte : `#a5dedf` en sombre, `#0b3f45` en clair. En thème clair, elle voisine l'encre `#1c2725`. Aucun test ne la garde : `src/contraste.test.ts` ne mesure pas `--accent-2`. | Regarder une semaine réelle en thème clair et dire si la ligne se distingue encore d'une heure. Sinon, lui donner une teinte propre — et l'inscrire dans le test, qui ne la voit pas. |
 | R79 | 2026-09-14 | **Quatre `backdrop-filter` flouttent désormais sous des surfaces opaques.** En reprenant la charte de la vitrine, les cartes cessent d'être des voiles translucides : `--surface` vaut une couleur pleine. Les règles qui posent `backdrop-filter: var(--flou)` sur ces surfaces (quatre endroits dans `src/index.css`) coûtent toujours une couche de composition, pour un effet que plus rien ne laisse voir. Le rail et le voile de dialogue, eux, restent translucides et gardent le leur. | Retirer `backdrop-filter` des règles dont le fond est opaque, puis remesurer au banc que rien ne change à l'écran. Non fait ici : c'est du rendu, pas de la couleur, et le lot ne devait toucher qu'à la palette. |
+| R80 | 2026-09-16 | **Google n'a pas encore vu le site sans `noindex`.** La balise est retirée, `robots.txt` et `sitemap.xml` sont servis, mais l'indexation est un fait que seul Google constate, à son rythme — et Search Console affichait encore le refus au moment du déploiement. Le miroir GitHub Pages, lui, garde `noindex` par `HORS_INDEX=1` : rien ne vérifie que la variable est bien lue par le job `construction`, sinon la CI elle-même. | Dans Search Console, demander l'inspection de `https://app.schoulbus.lu/` après le déploiement, puis soumettre `https://app.schoulbus.lu/sitemap.xml`. Vérifier une fois que `https://sashimee.github.io/bus-scolaire-beckerich/` sert toujours `<meta name="robots" content="noindex">`. |
 | ~~R49~~ | 2026-09-07 | ~~La charte graphique n'est pas déployée, et `dev` ne la porte plus.~~ **Tranchée le 2026-09-07** : la charte est abandonnée. `dev` a été remise sur `main` par avance rapide (`db3173e` → `18549fa`, aucun commit perdu) et les quatre commits de `charte-et-pile-dev-2026-08-25` — refonte de `src/index.css`, `LogoBus`, icônes régénérées, `src/contraste.test.ts`, `src/style.test.ts`, pile dev du compose — ne seront pas repris. La branche reste sur GitHub comme trace. L'agent communal verra donc l'apparence actuelle, et c'est assumé. |
 
 ### Mise en service — faite
@@ -3217,3 +3218,31 @@ Vérifié : 166 tests du serveur contre une vraie base (162 + 4) et 489 de l'app
 ce qu'il code : la route refuse sans session, et sa réponse ne contient ni `web.push.apple.com`
 ni l'identifiant d'appareil. Côté écran, cinq tests, dont un sur chacune des deux nuances —
 les retirer de l'affichage fait tomber le test.
+
+### Le site s'ouvre aux moteurs de recherche (2026-09-16)
+
+Search Console disait : « noindex détecté dans la balise Meta robots ». C'était voulu
+depuis le premier déploiement — le commentaire d'`index.html` disait « ne pas concurrencer
+la page officielle de la commune » — et Alex a tranché le 2026-09-16 : **le site devient
+indexable**.
+
+- **`index.html`** ne porte plus `noindex`.
+- **`pluginIndexation`** (`vite.config.ts`) engendre `robots.txt` et `sitemap.xml` dans le
+  build. Engendrés et non posés dans `public/` : le sitemap et la ligne `Sitemap:` exigent
+  des URL absolues, connues seulement à la construction — même raison que les métadonnées
+  de partage. Le sitemap ne liste que les six pages d'information (`/`, `/plan`, `/limites`,
+  `/independance`, `/credits`, `/installer`) ; les écrans d'un foyer n'ont rien à montrer
+  sans les données locales du navigateur. `robots.txt` tient hors index `/api/`,
+  `/edition`, `/connexion`, `/comptes`, `/reinitialiser` et les deux anciens chemins
+  redirigés.
+- **Une seule adresse s'offre aux moteurs.** Le site est servi deux fois — `app.schoulbus.lu`
+  et le miroir GitHub Pages de repli. Le job `construction` de `deploy.yml` pose
+  `HORS_INDEX=1`, et le miroir garde alors sa balise `noindex` avec un `robots.txt` qui
+  interdit tout. Une balise `canonical` a été essayée puis retirée : le gabarit est unique
+  pour toutes les routes, elle aurait donc replié `/plan` sur `/`.
+- Le dossier de commercialisation ne présente plus le `noindex` comme un argument.
+
+Vérifié : typecheck, 489 tests de l'application, et les deux constructions inspectées à
+la main — celle de production sans `noindex`, avec robots et sitemap corrects ; celle du
+miroir avec `noindex`, `Disallow: /` et sans sitemap. Rien ne teste `pluginIndexation`
+autrement : il écrit des fichiers dans `dist/`, hors de portée de Vitest. Réserve R80.

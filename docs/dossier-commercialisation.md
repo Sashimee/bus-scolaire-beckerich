@@ -60,7 +60,7 @@ is not a multi-tenant product**: one commune, one deployment.
 **The three open questions this document deliberately does not answer.** (1) Is there a
 market — how many of Luxembourg's communes run their own school transport, and who pays?
 (2) Can the project be commercialised at all given that it currently declares itself
-independent of the commune everywhere, is `noindex`, and is MIT-licensed? (3) Should the
+independent of the commune everywhere and is MIT-licensed? (3) Should the
 next money go into serial twin deployments, or into a multi-tenant rewrite first?
 
 ---
@@ -301,8 +301,10 @@ sont majoritairement sur iPhone.
   d'administration — passe par un point de nettoyage unique dont la politique est explicite :
   **refuser proprement, jamais deviner**. Une perturbation malformée est ignorée sans
   emporter les autres.
-- Le site est en `noindex` : il ne cherche pas à concurrencer la page officielle de la
-  commune dans les moteurs de recherche.
+- Le site est indexable par les moteurs de recherche depuis le 2026-09-16 (il portait
+  `noindex` jusque-là) ; l'espace des agents, la connexion et l'API restent hors index
+  par `robots.txt`, et seule l'adresse `app.schoulbus.lu` s'offre aux moteurs — le
+  miroir GitHub Pages garde son `noindex`.
 - Le jeton d'authentification du mainteneur est relayé dans le **fragment** de l'URL, jamais
   dans les journaux du serveur ni dans l'en-tête de provenance.
 
@@ -519,8 +521,7 @@ consignées, plus les risques non techniques.
   titre de la page, dans la description de l'application installable, dans la vignette de
   partage, sur une page dédiée, dans un écran d'avertissement à la première ouverture, en
   pied de page, sur la page du plan, sur la fiche de la semaine, **et jusque sur les feuilles
-  imprimées**. Le site est en `noindex` pour ne pas concurrencer la page officielle.
-  Passer de « site indépendant fait par un parent » à « prestataire de la commune » est un
+  imprimées**. Passer de « site indépendant fait par un parent » à « prestataire de la commune » est un
   **point de bascule à traiter en premier**, pas une note de bas de page : il touche à la
   raison d'être du projet, à la confiance des parents actuels, et à des dizaines de chaînes
   de traduction dans cinq langues.
